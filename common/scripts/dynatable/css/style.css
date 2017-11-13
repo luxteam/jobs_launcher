@@ -1,0 +1,16 @@
+table {
+  border: solid 1px #ccc;
+  border-collapse: collapse;
+  border-spacing: 0;
+  position: relative; /* Add positioning */
+}
+td, th {
+  border-bottom: solid 1px #eee;
+  border-top: solid 1px #ccc;
+  border-left: solid 1px #eee;
+  border-right: solid 1px #ccc;
+  padding: 10px 15px;
+}
+th {
+  background: #eee;
+}

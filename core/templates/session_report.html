@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style media="screen" type="text/css">
+        a:link    {
+        color: "black"}
+        a:visited {color: "black"}
+        a:active  {color: "black"}
+
+        tr.passed    { background-color: "greenyellow"; }
+        tr.failed    { background-color: "red"; }
+        tr.unknown   { background-color: "darkgray"; }
+
+        table, th, td {
+            border: 1px solid black;
+            padding: 2px;
+        }
+            table {
+            border-collapse: collapse;
+        }
+
+        .heap {
+            font-family: Arial;
+        }
+        .heap td {
+            text-align: center;
+            font-family: Arial;
+            font-size: 16px;
+            padding: 4px 7px 2px;
+            vertical-align: top;
+        }
+        .heap th {
+            text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
+            font-family: Arial,"Bitstream Vera Sans",Helvetica,Verdana,sans-serif;
+            font-weight: 700;
+            line-height: 1.3em;
+            font-size: 16px;
+            background-color: "#d0e0e0"
+        }
+
+        td.left   { text-align: left; }
+
+        .logtable {
+            display: none;
+        }
+
+    </style>
+    <script type="text/javascript">
+        function switchLogtable(tableId){
+            var table = document.getElementById(tableId);
+            if (table.style.display == "block"){
+                table.style.display = "none";
+            } else {
+                table.style.display = "block";
+            }
+        }
+    </script>
+    <title>Title</title>
+</head>
+<body>
+    <h2>Summary</h2>
+    <table class="heap">
+        <tr>
+            <th>Total</th>
+            <th>Passed</th>
+            <th>Failed</th>
+            <th>Skipped</th>
+            <th>Time taken</th>
+        </tr>
+        <tr>
+            <td>{{ total.total }}</td>
+            <td>{{ total.passed }}</td>
+            <td>{{ total.failed }}</td>
+            <td>{{ total.skipped }}</td>
+            <td>{{ total.duration }}</td>
+        </tr>
+    </table>
+    <hr>
+
+    <h2>Details</h2>
+    <table class="heap">
+        <tr>
+            <th>Name</th>
+            <th>Config</th>
+            <th>Report</th>
+            <th>Total</th>
+            <th>Passed</th>
+            <th>Failed</th>
+            <th>Skipped</th>
+            <th>Time taken</th>
+            <th>LOG</th>
+        </tr>
+        {% for result in results %}
+            {% set resultsloop = loop %}
+        <tr>
+            <td rowspan="{{ results[result]|length }}">{{ result }}</td>
+            {% for item in results[result] %}
+                <td>{{ item }}</td>
+                <td><a href="{{ results[result][item].reportlink }}">Report</a></td>
+                <td>{{ results[result][item].total }}</td>
+                <td>{{ results[result][item].passed }}</td>
+                <td>{{ results[result][item].failed }}</td>
+                <td>{{ results[result][item].skipped }}</td>
+                <td>{{ results[result][item].duration }}</td>
+                <td>
+                    <div class="Button" onclick="switchLogtable('logtable{{ resultsloop.index }}{{ loop.index }}')">Show log</div>
+                    <table class="logtable" id="logtable{{ resultsloop.index }}{{ loop.index }}">
+                        <tr>
+                            <th>Stage status</th>
+                            <th>Stage log</th>
+                        </tr>
+                        {% for stage in results[result][item].log %}
+                        <tr>
+                            <td>{{ stage[0]['status'] }}</td>
+                            <td>
+                                {% for message in stage[1]['log'] %}
+                                {{ message }}
+                                <br/>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+        </tr>
+        <tr>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
