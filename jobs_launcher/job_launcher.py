@@ -9,7 +9,13 @@ def launch_job(cmd_line):
     started = time.time()
 
     p = psutil.Popen(cmd_line, stdout=subprocess.PIPE)
-    rc = p.wait(timeout=2000)
+    try:
+        rc = p.wait(timeout=3000)
+    except psutil.TimeoutExpired as err:
+        rc = 1
+        for child in reversed(p.children(recursive=True)):
+            child.terminate()
+        p.terminate()
 
     proc_time = int(time.time() - started)
 
