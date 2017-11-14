@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import os
-import time
 import shutil
 import webbrowser
 import json
@@ -16,7 +15,6 @@ from core.auto_dict import AutoDict
 
 SCRIPTS = os.path.dirname( os.path.realpath(__file__) )
 # TODO: mb make common simpleRender for Maya and Max
-# TODO: delete html report building
 
 def validate_cmd_execution(stage_name, stage_path):
     stage_report = stage_name + '.json'
@@ -88,6 +86,7 @@ def main():
 
     for found_job in found_jobs:
         # TODO: rewrite
+        print("Processing ", found_job[0])
         report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 1, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
@@ -121,12 +120,15 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
+    # TODO: delete html report building
     core.reportExporter.build_session_report(report, session_dir)
     core.reportExporter.build_summary_report(work_path)
+    destination_path = 'd:/reports_storage/app/packages/RPR_Maya_Plugin/2.2.0.3'
+    core.reportExporter.build_export_reports(session_dir, destination_path)
 
     # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").\
     #     open(os.path.join(work_path, 'summary_report.html'))
-
+    # TODO: add create_base_line stage (or .bat)
 
 if __name__ == "__main__":
     if not main():

@@ -69,3 +69,8 @@ def build_summary_report(work_dir):
     # print(json.dumps(summary_report, indent=4))
     html_result = template.render(summary_report=summary_report, details_report=details_report)
     save_html_report(html_result, work_dir, 'summary_report.html')
+
+
+def build_export_reports(session_dir, destination_path):
+    # TODO: in future export json and img on different servers
+    pass

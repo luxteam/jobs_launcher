@@ -3,6 +3,11 @@
 
     <outpath value="{OutputDir}"/>
 
+    <option name="Some option">
+        <configuration name="First configuration">1</configuration>
+        <configuration name="Second configuration">2</configuration>
+    </option>
+
     <execute command='python "{Script}/test_stage.py"' stage="stage1">
         <argument>--stage_report stage1.json</argument>
         <argument>--terminate_status OK</argument>
