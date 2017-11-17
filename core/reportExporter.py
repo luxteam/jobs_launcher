@@ -1,7 +1,7 @@
 import os
 import jinja2
 import json
-
+import shutil
 
 def save_json_report(report, session_dir, file_name):
     with open(os.path.join(session_dir, file_name), "w") as file:
@@ -71,6 +71,9 @@ def build_summary_report(work_dir):
     save_html_report(html_result, work_dir, 'summary_report.html')
 
 
-def build_export_reports(session_dir, destination_path):
+def build_export_reports(server_root, package_name, plugin_version, session_dir):
     # TODO: in future export json and img on different servers
-    pass
+    # TODO: add cheack to unique folder name
+    server_path = os.path.abspath(os.path.join(server_root, package_name, plugin_version, os.path.basename(session_dir)))
+
+    shutil.copytree(session_dir, server_path)

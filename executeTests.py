@@ -93,7 +93,7 @@ def main():
         # report['results'][found_job[0]][' '.join(found_job[1])] = jobs_launcher.job_launcher.launch_job(found_job[3][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
-            # print(found_job[3][i].format(SessionDir=session_dir))
+            print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
 
             if not validate_cmd_execution(found_job[5][i], temp_path):
@@ -121,10 +121,13 @@ def main():
     # print(json_report)
 
     # TODO: delete html report building
+    print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
+    print("Saving summary report")
     core.reportExporter.build_summary_report(work_path)
-    destination_path = 'd:/reports_storage/app/packages/RPR_Maya_Plugin/2.2.0.3'
-    core.reportExporter.build_export_reports(session_dir, destination_path)
+    # print("Sending report to server (now just copy to c:/reports_storage")
+    # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Maya_Plugin', '2.2.3.3', session_dir)
+    # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Max_Plugin', '2.1.3.3', session_dir)
 
     # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").\
     #     open(os.path.join(work_path, 'summary_report.html'))

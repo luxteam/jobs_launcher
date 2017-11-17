@@ -14,4 +14,4 @@ python -m pip install MarkupSafe
 python -m pip install Jinja2
 
 python -m pip install pytest
-python -m pip install pyopencl
+rem python -m pip install pyopencl
