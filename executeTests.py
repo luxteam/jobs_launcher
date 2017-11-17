@@ -131,7 +131,7 @@ def main():
 
     # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").\
     #     open(os.path.join(work_path, 'summary_report.html'))
-    # TODO: add create_base_line stage (or .bat)
+
 
 if __name__ == "__main__":
     if not main():
