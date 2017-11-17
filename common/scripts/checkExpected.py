@@ -14,15 +14,27 @@ def createArgParser():
 
 
 def check(folder, report_name, stage_report):
-    filesColor = {x for x in os.listdir(os.path.join(folder, "Color")) if
+    filesColor = set()
+    filesOpacity = set()
+
+    # TODO: fix try catch
+    try:
+        filesColor = {x for x in os.listdir(os.path.join(folder, "Color")) if
                   os.path.isfile(os.path.join(folder, "Color", x))}
-    filesOpacity = {x for x in os.listdir(os.path.join(folder, "Opacity")) if
-                    os.path.isfile(os.path.join(folder, "Opacity", x))}
+        filesOpacity = {x for x in os.listdir(os.path.join(folder, "Opacity")) if
+                        os.path.isfile(os.path.join(folder, "Opacity", x))}
+    except:
+        pass
+
+    try:
+        filesColor = {x for x in os.listdir(os.path.join(folder, "images")) if
+                  os.path.isfile(os.path.join(folder, "images", x))}
+    except:
+        pass
 
     with open(os.path.join(folder, report_name)) as file:
         expected = file.read()
         expected = json.loads(expected)
-        file.close()
 
     expected = {x['file_name'] for x in expected}
 
@@ -35,6 +47,7 @@ def main():
     args = createArgParser().parse_args()
     stage_report = [{'status': 'INIT'}, {'log': ['checkExpected.py start']}]
 
+    print(args)
     folder = os.path.abspath(args.work_dir)
 
     result = check(folder, args.report_name, stage_report)
@@ -47,7 +60,6 @@ def main():
 
         with open(os.path.abspath(os.path.join(folder, args.result_name)), 'w') as file:
             json.dump(resultJson, file, indent=" ")
-            file.close()
 
     stage_report[0]['status'] = 'OK'
     with open(os.path.join(folder, args.stage_report), 'w') as file:
