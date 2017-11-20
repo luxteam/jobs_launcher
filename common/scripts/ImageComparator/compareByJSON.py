@@ -34,15 +34,18 @@ def repairJson(jsonReport):
         return jsonReport
 
 
-def compareFoldersWalk(jsonReport, workFolder, baseFolder, resultPath, suffix, result_name):
+def compareFoldersWalk(jsonReport, workFolder, baseFolder, suffix, result_report):
     for img in jsonReport:
         file1 = os.path.abspath(os.path.join(workFolder, img['file_name']))
         file2 = os.path.abspath(os.path.join(baseFolder, img['file_name']))
 
         try:
             metrics = CompareMetrics.CompareMetrics(file1, file2)
-            key_diff = ('difference_' + suffix + '_' + os.path.basename(workFolder)).lower()
-            key_src = ('path_' + suffix + '_' + os.path.basename(workFolder)).lower()
+            key_diff = ('difference_' + os.path.basename(workFolder)).lower()
+            key_src = ('path_' + os.path.basename(workFolder)).lower()
+            # key_diff = ('difference_' + suffix + '_' + os.path.basename(workFolder)).lower()
+            # key_src = ('path_' + suffix + '_' + os.path.basename(workFolder)).lower()
+
             diff = {key_diff: metrics.getDiffPixeles()}
             src = {key_src: file2}
         except:
@@ -52,18 +55,16 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, resultPath, suffix, r
             img.update(diff)
             img.update(src)
 
-    with open(os.path.join(resultPath, result_name), 'w') as file:
+    with open(result_report, 'w') as file:
         json.dump(jsonReport, file, indent=" ", sort_keys=True)
-        file.close()
 
-    return jsonReport
+    return
 
 
 def main():
     stage_report = [{'status': 'INIT'}, {'log': []}]
     args = createArgParser().parse_args()
     workFolder = args.work_dir
-    baseFolder = args.base_dir
     report = os.path.join(workFolder, args.report_name)
 
     jsonReport = ""
@@ -76,17 +77,23 @@ def main():
 
     jsonReport = repairJson(jsonReport)
 
-    for path, dirs, files in os.walk(baseFolder):
-        for dir in dirs:
-            s = os.path.split(path)
-            key = (os.path.split(s[0])[1])
-            stage_report[1]['log'].append('Comparison_ ' + key)
-            if dir == 'Opacity':
-                jsonReport = compareFoldersWalk(jsonReport, os.path.join(workFolder, 'Opacity'), os.path.join(path, dir), os.path.dirname(report), key, args.result_name)
-            elif dir == 'Color':
-                jsonReport = compareFoldersWalk(jsonReport, os.path.join(workFolder, 'Color'), os.path.join(path, dir), os.path.dirname(report), key, args.result_name)
+    if os.path.exists(os.path.abspath(args.base_dir)):
+        for path, dirs, files in os.walk(args.base_dir):
+            for dir in dirs:
+                # TODO: change key
+                s = os.path.split(path)
+                key = (os.path.split(s[0])[1])
+                if dir == 'Opacity' or dir == 'Color' or dir == 'images':
+                    stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
+                    compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir), key,
+                                       os.path.join(args.work_dir, args.result_name))
+    else:
+        stage_report[1]['log'].append('Baseline dose not exist')
 
     stage_report[0]['status'] = 'OK'
+
+    with open(os.path.join(args.work_dir, args.result_name), 'w') as file:
+        json.dump(jsonReport, file, indent=" ", sort_keys=True)
 
     with open(os.path.join(workFolder, args.stage_report), 'w') as file:
         json.dump(stage_report, file, indent=' ')

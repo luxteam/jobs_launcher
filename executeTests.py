@@ -23,7 +23,7 @@ def validate_cmd_execution(stage_name, stage_path):
             report = file.read()
             report = json.loads(report)
         # print(report)
-        if report[0]['status'] == 'OK':
+        if report[0]['status'] == 'OK' or report[0]['status'] == 'TERMINATED':
             return True
         else:
             return False
@@ -104,7 +104,7 @@ def main():
                 break
 
             # report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.join(temp_path, 'result.html')
-            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.json'), session_dir)
+            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
             report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
             report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1
             report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
@@ -126,6 +126,7 @@ def main():
     print("Saving summary report")
     core.reportExporter.build_summary_report(work_path)
     # print("Sending report to server (now just copy to c:/reports_storage")
+
     # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Maya_Plugin', '2.2.3.3', session_dir)
     # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Max_Plugin', '2.1.3.3', session_dir)
 
