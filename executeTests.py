@@ -23,12 +23,13 @@ def validate_cmd_execution(stage_name, stage_path):
             report = file.read()
             report = json.loads(report)
         # print(report)
-        if report[0]['status'] == 'OK' or report[0]['status'] == 'TERMINATED':
-            return True
-        else:
-            return False
-    else:
-        return False
+        return report[0]['status']
+    #     if report[0]['status'] == 'OK' or report[0]['status'] == 'TERMINATED':
+    #         return 'OK'
+    #     else:
+    #         return False
+    # else:
+    #     return False
 
 
 def main():
@@ -39,9 +40,13 @@ def main():
     parser.add_argument('--tests_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_dir', required=False, metavar="<dir>", help="tests root dir")
+    parser.add_argument('--cmd_variables', required=True, metavar="<dir>", type=str)
 
     args = parser.parse_args()
     print(args)
+    args.cmd_variables = json.loads(args.cmd_variables)
+    print(args)
+
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
@@ -77,7 +82,7 @@ def main():
     report['failed_tests'] = []
     report['machine_info'] = machine_info
 
-    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs)
+    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables)
 
     # with open('d:\works.json', 'w') as file:
     #     json_jobs = json.dumps(found_jobs, indent = 4)
@@ -96,18 +101,26 @@ def main():
             print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
 
-            if not validate_cmd_execution(found_job[5][i], temp_path):
+            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.join(temp_path, 'result.html')
+            # report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
+
+            # if not validate_cmd_execution(found_job[5][i], temp_path):
+            if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
                 report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 0
                 report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
                 break
-
-            # report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.join(temp_path, 'result.html')
-            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
-            report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
-            report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1
-            report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
+            elif validate_cmd_execution(found_job[5][i], temp_path) == 'TERMINATED':
+                report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
+                report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
+                report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 0
+                report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
+            else:
+                report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
+                report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
+                if not report['results'][found_job[0]][' '.join(found_job[1])]['failed']:
+                    report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1
 
         log = []
         for stage_report in found_job[5]:

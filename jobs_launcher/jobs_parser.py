@@ -13,7 +13,7 @@ class ParsingError(Exception): pass
 default_package_options = {'variables': {}, 'options': collections.OrderedDict()}
 
 
-def parse_package_manifest(level, filename, package_options=copy.deepcopy(default_package_options)):
+def parse_package_manifest(level, filename, cmd_variables, package_options=copy.deepcopy(default_package_options)):
     delim = ' '*level
     file_dir = os.path.dirname(filename)
     root = None
@@ -44,6 +44,9 @@ def parse_package_manifest(level, filename, package_options=copy.deepcopy(defaul
             value = value.format(CWD=file_dir)
             #print(name + '=' + value)
             package_options['variables'][name] = value
+
+        for key, value in cmd_variables.items():
+            package_options['variables'][key] = value
 
         if elem.tag == 'option':
             option_name = elem.attrib.get('name')
@@ -163,7 +166,10 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         for command in summary_command_parts:
             execute_command.append(' '.join(command))
 
-        config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir), os.path.sep.join(config_dirs))
+        # TODO: fix it
+        # config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir), os.path.sep.join(config_dirs))
+        print("____ELSE", os.path.sep.join(config_dirs))
+        config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir))
 
         #try:
         #    os.makedirs(config_output_dir)
@@ -196,7 +202,7 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         #execute_job(level, execute_command, report['results'][job_name][job_config_name])
 
 
-def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, package_options=copy.deepcopy(default_package_options)):
+def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd_variables, package_options=copy.deepcopy(default_package_options)):
     delim = ' '*level
     current_job_dir = os.path.join(job_root_dir, job_sub_path)
     dir_items = os.listdir(path=current_job_dir)
@@ -204,7 +210,7 @@ def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, pac
     for dir_item in dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
         if dir_item_path.endswith('.package-manifest.xml') and os.path.isfile(dir_item_path):
-            parse_package_manifest(level, dir_item_path, package_options)
+            parse_package_manifest(level, dir_item_path, cmd_variables, package_options)
 
     for dir_item in dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
@@ -216,4 +222,4 @@ def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, pac
         dir_item_path = os.path.join(current_job_dir, dir_item)
         if os.path.isdir(dir_item_path):
             parse_folder(level + 1, job_root_dir, os.path.join(job_sub_path, dir_item), session_dir, found_jobs,
-                         copy.deepcopy(package_options))
+                         cmd_variables, copy.deepcopy(package_options))

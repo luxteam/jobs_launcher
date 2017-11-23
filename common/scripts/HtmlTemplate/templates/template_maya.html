@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<style media="screen" type="text/css">
+		body{
+			background-color: #F2ECD0;
+		}
+		.resultsTable{
+			width: 100%;
+			border: 2px solid #000;
+			text-align: center;
+			border-collapse: collapse;
+		}
+		.resultsTable caption{
+			font-size: 15pt;
+			font-weight: 700;
+			padding: 10px;
+		}
+		.resultsTable tr:nth-child(odd) td{
+			background-color: #A6A28E;
+		}
+		.resultsTable tr:nth-child(even) td{
+			background-color: #B5A765;
+		}
+		.resultsTable tr:nth-child(1) td{
+			font-size: 14pt;
+			background-color: #737062;
+		}
+		.resultsTable tr, td{
+			border: 1px solid #000;
+			padding: 2px;
+			font-size: 13pt;
+		}
+		.resultsTable tr:hover td{
+			background-color: #F2E9BC;
+		}
+
+		.notRenderedTable {
+			border: 2px solid #000;
+			text-align: center;
+			border-collapse: collapse;
+		}
+		.notRenderedTable tr, td{
+			border: 1px solid #000;
+		}
+
+		img {
+			width: 40%;
+		}
+
+		.resultsTable tr:hover td img{
+			width: 100%;
+		}
+	</style>
+    <title>{{ title }}</title>
+</head>
+<body>
+
+	<table class="resultsTable">
+		<caption>Rendering results</caption>
+		<tr>
+			<td>Tool</td>
+			<td>Render version</td>
+			<td>Test name</td>
+			<td>Render device</td>
+			<td>Scene name</td>
+			<td>File name</td>
+			<td>Difference for color</td>
+			<td>Difference for opacity</td>
+			<td>Render time</td>
+		</tr>
+		{% for item in rendered %}
+		<tr>
+			<td>{{ item.tool }}</td>
+			<td>{{ item.render_version }}</td>
+			<td>{{ item.test_name }}</td>
+			<td>{{ item.render_device }}</td>
+			<td>{{ item.scene_name }}</td>
+			<td>{{ item.file_name }}</td>
+			<td>{{ item.difference_color }}</td>
+			<td>{{ item.difference_opacity }}</td>
+			<td>{{ item.render_time }}</td>
+		</tr>
+		<tr>
+			<td>Rendered</td>
+			<td>Baseline</td>
+		</tr>
+		
+		<tr>
+			<td colspan="3"><img src="Color/{{ item.file_name }}"/></td>
+			<td colspan="2"><img src="{{ item.path_color }}"/></td>
+			<td colspan="2"><img src="Opacity/{{ item.file_name }}"/></td>
+			<td colspan="2"><img src="{{ item.path_opacity }}"/></td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<br/>
+	<br/>
+
+	<table class="resultsTable">
+		<caption>Not rendered images</caption>
+		<tr>
+			<td>File name</td>
+		</tr>
+		{% for item in notRendered %}
+		<tr>
+			<td>{{ item.not_rendered }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<img src="error_screenshot.jpg"/>
+
+</body>
+</html>

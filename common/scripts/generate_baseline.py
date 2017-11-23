@@ -24,12 +24,12 @@ def main():
         for dir in dirs:
             if dir == 'Tests':
                 for test in os.listdir(os.path.join(path, dir)):
-                    print(test)
+
                     try:
-                        # TODO: copy only images
-                        shutil.copytree(os.path.join(path, dir, test), os.path.join(baseline_path, test))
-                    except:
-                        pass
+                        shutil.copytree(os.path.join(path, dir, test), os.path.join(baseline_path, test),
+                                        ignore=shutil.ignore_patterns('*.json', '*.html', '*.txt', '*.bat', '*.mel', '*.ms', '*.log', '*.py', '*.pyc', 'error_screenshot.jpg'))
+                    except Exception as err:
+                        print("Copy error", str(err))
 
                 return
 
