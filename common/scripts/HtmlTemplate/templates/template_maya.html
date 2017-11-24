@@ -17,12 +17,15 @@
 			font-weight: 700;
 			padding: 10px;
 		}
-		.resultsTable tr:nth-child(odd) td{
+		.resultsTable tr{
 			background-color: #A6A28E;
 		}
-		.resultsTable tr:nth-child(even) td{
-			background-color: #B5A765;
-		}
+		<!--.resultsTable tr:nth-child(odd) td{-->
+			<!--background-color: #A6A28E;-->
+		<!--}-->
+		<!--.resultsTable tr:nth-child(even) td{-->
+			<!--background-color: #B5A765;-->
+		<!--}-->
 		.resultsTable tr:nth-child(1) td{
 			font-size: 14pt;
 			background-color: #737062;
@@ -63,35 +66,40 @@
 			<td>Tool</td>
 			<td>Render version</td>
 			<td>Test name</td>
-			<td>Render device</td>
 			<td>Scene name</td>
 			<td>File name</td>
-			<td>Difference for color</td>
-			<td>Difference for opacity</td>
 			<td>Render time</td>
+			<td>Render device</td>
 		</tr>
 		{% for item in rendered %}
 		<tr>
 			<td>{{ item.tool }}</td>
 			<td>{{ item.render_version }}</td>
 			<td>{{ item.test_name }}</td>
-			<td>{{ item.render_device }}</td>
 			<td>{{ item.scene_name }}</td>
 			<td>{{ item.file_name }}</td>
-			<td>{{ item.difference_color }}</td>
-			<td>{{ item.difference_opacity }}</td>
 			<td>{{ item.render_time }}</td>
+			<td>{{ item.render_device }}</td>
 		</tr>
 		<tr>
-			<td>Rendered</td>
+			<td colspan="4">Difference for color</td>
+			<td colspan="3">Difference for opacity</td>
+		</tr>
+		<tr>
+			<td colspan="4">{{ item.difference_color }}</td>
+			<td colspan="3">{{ item.difference_opacity }}</td>
+		</tr>
+		<tr>
+			<td colspan="2">Rendered</td>
+			<td colspan="2">Baseline</td>
+			<td colspan="2">Rendered</td>
 			<td>Baseline</td>
 		</tr>
-		
 		<tr>
-			<td colspan="3"><img src="Color/{{ item.file_name }}"/></td>
+			<td colspan="2"><img src="Color/{{ item.file_name }}"/></td>
 			<td colspan="2"><img src="{{ item.path_color }}"/></td>
 			<td colspan="2"><img src="Opacity/{{ item.file_name }}"/></td>
-			<td colspan="2"><img src="{{ item.path_opacity }}"/></td>
+			<td><img src="{{ item.path_opacity }}"/></td>
 		</tr>
 		{% endfor %}
 	</table>

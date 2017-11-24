@@ -61,23 +61,27 @@
 		<caption>Rendering results</caption>
 		<tr>
 			<td>Tool</td>
-			<td>Render version</td>
 			<td>Test name</td>
+			<td>Pass Limit</td>
+			<td>Render Size</td>
+			<td>Frame</td>
 			<td>Scene name</td>
 			<td>File name</td>
+			<td>Time stamp</td>
 			<td>Difference for color</td>
-			<td>Difference for opacity</td>
 			<td>Render time</td>
 		</tr>
 		{% for item in rendered %}
 		<tr>
 			<td>{{ item.tool }}</td>
-			<td>{{ item.render_version }}</td>
 			<td>{{ item.test_name }}</td>
+			<td>{{ item.PassLimit }}</td>
+			<td>{{ item.RenderSize }}</td>
+			<td>{{ item.frame }}</td>
 			<td>{{ item.scene_name }}</td>
 			<td>{{ item.file_name }}</td>
-			<td>{{ item.difference_color }}</td>
-			<td>{{ item.difference_opacity }}</td>
+			<td>{{ item.date_time }}</td>
+			<td>{{ item.difference_images }}</td>
 			<td>{{ item.render_time }}</td>
 		</tr>
 		<tr>
@@ -86,10 +90,8 @@
 		</tr>
 		
 		<tr>
-			<td><img src="Color/{{ item.file_name }}"/></td>
-			<td><img src="{{ item.path_color }}"/></td>
-			<td><img src="Opacity/{{ item.file_name }}"/></td>
-			<td><img src="{{ item.path_opacity }}"/></td>
+			<td colspan="5"><img src="images/{{ item.file_name }}"/></td>
+			<td colspan="5"><img src="{{ item.path_color }}"/></td>
 		</tr>
 		{% endfor %}
 	</table>
@@ -108,6 +110,8 @@
 		</tr>
 		{% endfor %}
 	</table>
+
+	<img src="error_screenshot.jpg"/>
 
 </body>
 </html>

@@ -22,14 +22,7 @@ def validate_cmd_execution(stage_name, stage_path):
         with open(os.path.join(stage_path, stage_report)) as file:
             report = file.read()
             report = json.loads(report)
-        # print(report)
         return report[0]['status']
-    #     if report[0]['status'] == 'OK' or report[0]['status'] == 'TERMINATED':
-    #         return 'OK'
-    #     else:
-    #         return False
-    # else:
-    #     return False
 
 
 def main():
@@ -40,13 +33,11 @@ def main():
     parser.add_argument('--tests_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_dir', required=False, metavar="<dir>", help="tests root dir")
-    parser.add_argument('--cmd_variables', required=True, metavar="<dir>", type=str)
+    parser.add_argument('--cmd_variables', required=True, nargs="*")
 
     args = parser.parse_args()
+    args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
     print(args)
-    args.cmd_variables = json.loads(args.cmd_variables)
-    print(args)
-
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
@@ -101,8 +92,8 @@ def main():
             print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
 
-            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.join(temp_path, 'result.html')
-            # report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
+            # report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.join(temp_path, 'result.html')
+            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
 
             # if not validate_cmd_execution(found_job[5][i], temp_path):
             if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
@@ -133,11 +124,10 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
-    # TODO: delete html report building
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
-    print("Saving summary report")
-    core.reportExporter.build_summary_report(work_path)
+    # print("Saving summary report")
+    # core.reportExporter.build_summary_report(work_path)
     # print("Sending report to server (now just copy to c:/reports_storage")
 
     # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Maya_Plugin', '2.2.3.3', session_dir)

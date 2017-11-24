@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# TODO: fix count of diff results in report
 from jinja2 import Environment
 from jinja2 import PackageLoader
 from jinja2 import select_autoescape
@@ -7,7 +6,6 @@ from jinja2 import select_autoescape
 import argparse
 import os
 import json
-# TODO: add fatal error screensho in report
 
 def main():
     args = argparse.ArgumentParser()
