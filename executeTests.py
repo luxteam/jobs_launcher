@@ -37,6 +37,25 @@ def main():
 
     args = parser.parse_args()
     args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
+    args.tests_root = os.path.abspath(args.tests_root)
+    print(args)
+
+    config_devices = {}
+    new_config = []
+    with open(os.path.join(os.path.split(args.tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
+        config_devices = file.read()
+        config_devices = json.loads(config_devices)
+
+    for item in args.cmd_variables['RenderDevice'].split(','):
+        print(item)
+        if item in config_devices.values():
+            pass
+        else:
+            new_config.append(config_devices[item])
+
+    if new_config:
+        args.cmd_variables['RenderDevice'] = ','.join(new_config)
+
     print(args)
 
     tests_path = os.path.abspath(args.tests_root)
