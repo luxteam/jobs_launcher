@@ -2,7 +2,6 @@ import os
 import json
 import argparse
 import time
-# TODO: customise test.manifests
 
 
 def createArgParser():

@@ -7,6 +7,7 @@ import argparse
 import os
 import json
 
+
 def main():
     args = argparse.ArgumentParser()
     args.add_argument('--stage_report')
