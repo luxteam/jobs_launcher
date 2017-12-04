@@ -57,6 +57,16 @@
 		}
 	</style>
     <title>{{ title }}</title>
+	<script type="text/javascript">
+        function resizeImage(imageID){
+            var img = document.getElementById(imageID);
+            if (img.style.width == "40%"){
+                img.style.width = "100%";
+            } else {
+                img.style.width = "40%";
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -93,8 +103,8 @@
 		</tr>
 		
 		<tr>
-			<td colspan="5"><img src="images/{{ item.file_name }}"/></td>
-			<td colspan="5"><img src="{{ item.path_color }}"/></td>
+			<td colspan="5"><div ><img id="img{{ loop.index }}rendered" onclick="resizeImage('img{{ loop.index }}rendered')" src="images/{{ item.file_name }}"/></div></td>
+			<td colspan="5"><div ><img id="img{{ loop.index }]baseline" onclick="resizeImage('img{{ loop.index }}baseline')" src="{{ item.path_color }}"/></div></td>
 		</tr>
 		{% endfor %}
 	</table>

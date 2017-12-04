@@ -16,6 +16,27 @@ def save_html_report(report, session_dir, file_name):
 def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
 
+    current_test_report = {}
+    current_test_expected = {}
+    for path, dirs, files in os.walk(session_dir):
+        for dir in dirs:
+            if dir in report['results']:
+                with open(os.path.join(path, dir, 'report_compare.json'), 'r') as file:
+                    current_test_report[dir] = file.read()
+                    current_test_report[dir] = json.loads(current_test_report[dir])
+                report['results'][dir]['']['passed'] = len(current_test_report[dir])
+                with open(os.path.join(path, dir, 'expected.json'), 'r') as file:
+                    current_test_expected[dir] = file.read()
+                    current_test_expected[dir] = json.loads(current_test_expected[dir])
+                report['results'][dir]['']['total'] = len(current_test_expected[dir])
+                report['results'][dir]['']['skipped'] = len(current_test_expected[dir]) - len(current_test_report[dir])
+
+                for item in current_test_report[dir]:
+                    item.update({'render_color_path': os.path.relpath(os.path.join(path, dir, 'Color', item['file_name']), session_dir)})
+                    baseline_img_path = os.path.join(path, dir, 'Opacity', item['file_name'])
+                    if os.path.exists(baseline_img_path):
+                        item.update({'render_opacity_path': os.path.relpath(baseline_img_path, session_dir)})
+
     for result in report['results']:
         for item in report['results'][result]:
             for key in total:
@@ -23,6 +44,7 @@ def build_session_report(report, session_dir):
 
     report.update({'summary': total})
     save_json_report(report, session_dir, 'session_report.json')
+    save_json_report(current_test_report, session_dir, 'all_tests_summary.json')
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -30,7 +52,7 @@ def build_session_report(report, session_dir):
     )
     template = env.get_template('session_report.html')
 
-    html_result = template.render(results=report['results'], total=total)
+    html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
     save_html_report(html_result, session_dir, 'session_report.html')
 
 

@@ -15,13 +15,16 @@
         table, th, td {
             border: 1px solid black;
             padding: 2px;
-        }
-            table {
             border-collapse: collapse;
+        }
+
+        table {
+            width: 100%;
         }
 
         .heap {
             font-family: Arial;
+            width: auto;
         }
         .heap td {
             text-align: center;
@@ -44,6 +47,16 @@
         .logtable {
             display: none;
         }
+
+        .detailsTable img{
+            width: 64px;
+            height: 64px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        #topButton a{
+
 
     </style>
     <script type="text/javascript">
@@ -78,7 +91,8 @@
     </table>
     <hr>
 
-    <h2>Details</h2>
+    <h2>Tests</h2>
+    <a name="tests"/>
     <table class="heap">
         <tr>
             <th>Name</th>
@@ -94,7 +108,7 @@
         {% for result in results %}
             {% set resultsloop = loop %}
         <tr>
-            <td rowspan="{{ results[result]|length }}">{{ result }}</td>
+            <td rowspan="{{ results[result]|length }}"><a href="#{{ result }}">{{ result }}</a></td>
             {% for item in results[result] %}
                 <td>{{ item }}</td>
                 <td><a href="{{ results[result][item].reportlink }}">Report</a></td>
@@ -128,6 +142,48 @@
             {% endfor %}
         </tr>
         {% endfor %}
+    </table>
+
+    <hr>
+    <h2>Details</h2>
+    <table class="detailsTable">
+    {% for test in detail_report %}
+        <tr>
+            <td colspan="10ru"><h3><a name="{{ test }}">{{ test }}</a></h3></td>
+        </tr>
+        <tr>
+            <th>Scene name</th>
+            <th>File name</th>
+            <th>Render time</th>
+            <th>Plugin version</th>
+            <th>Render Device</th>
+            <th>Rendered color</th>
+            {% if detail_report[test]['baseline_color_path'] %}
+            <th>Baseline Color</th>
+            {% endif %}
+            <th>Baseline Opacity</th>
+            {% if detail_report[test]['baseline_opacity_path'] %}
+            <th>Baseline Opacity</th>
+            {% endif %}
+        </tr>
+        {% for item in detail_report[test] %}
+        <tr>
+            <th>{{ item.scene_name }}</th>
+            <th>{{ item.file_name }}</th>
+            <th>{{ item.render_time }}</th>
+            <th>{{ item.render_version }}</th>
+            <th>{{ item.render_device }}</th>
+            <th><img src="{{ item.render_color_path }}"/></th>
+            {% if item.baseline_color_path %}
+            <th><img src="{{ item.baseline_color_path }}"/></th>
+            {% endif %}
+            <th><img src="{{ item.render_opacity_path }}"/></th>
+            {% if item.baseline_opacity_path %}
+            <th><img src="{{ item.baseline_opacity_path }}"/></th>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endfor %}
     </table>
 </body>
 </html>
