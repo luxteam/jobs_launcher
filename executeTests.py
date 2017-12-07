@@ -38,7 +38,6 @@ def main():
     args = parser.parse_args()
     args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
     args.tests_root = os.path.abspath(args.tests_root)
-    print(args)
 
     config_devices = {}
     new_config = []
@@ -55,8 +54,6 @@ def main():
 
     if new_config:
         args.cmd_variables['RenderDevice'] = ','.join(new_config)
-
-    print(args)
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)

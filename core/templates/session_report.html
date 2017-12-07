@@ -3,23 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <style media="screen" type="text/css">
-        a:link    {
-        color: "black"}
-        a:visited {color: "black"}
-        a:active  {color: "black"}
-
-        tr.passed    { background-color: "greenyellow"; }
-        tr.failed    { background-color: "red"; }
-        tr.unknown   { background-color: "darkgray"; }
-
         table, th, td {
             border: 1px solid black;
-            padding: 2px;
             border-collapse: collapse;
-        }
-
-        table {
-            width: 100%;
+            width: auto;
+            padding: 5px;
         }
 
         .heap {
@@ -42,7 +30,9 @@
             background-color: "#d0e0e0"
         }
 
-        td.left   { text-align: left; }
+        .logTable td{
+            text-align: left;
+        }
 
         .detailsTable img{
             width: 64px;
@@ -51,7 +41,6 @@
             font-weight: 600;
         }
 
-        /* Базовые стили слоя затемнения и модального окна  */
         .overlay {
             top: 0;
             right: 0;
@@ -59,54 +48,35 @@
             left: 0;
             z-index: 10;
             display: none;
-        /* фон затемнения */
-            background-color: rgba(0, 0, 0, 0.65);
-            position: fixed; /* фиксированное поцизионирование */
-            cursor: default; /* тип курсара */
-        }
 
-        /* активируем слой затемнения */
+            background-color: rgba(0, 0, 0, 0.2);
+            position: fixed;
+            cursor: default;
+        }
         .overlay:target {
             display: block;
         }
 
-        /* стили модального окна */
         .popup {
             top: -100%;
-            right: 0;
-            left: 50%;
+            /*right: 0;*/
+            left: 70%;
             font-size: 14px;
             z-index: 20;
             margin: 0;
-            width: 85%;
+            /*width: 85%;*/
             min-width: 320px;
             max-width: 600px;
-        /* фиксированное позиционирование, окно стабильно при прокрутке */
+
             position: fixed;
             padding: 15px;
             border: 1px solid #383838;
             background: #fefefe;
-        /* скругление углов */
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            -ms-border-radius: 4px;
+
             border-radius: 4px;
             font: 14px/18px 'Tahoma', Arial, sans-serif;
-        /* внешняя тень */
-            -webkit-box-shadow: 0 15px 20px rgba(0,0,0,.22),0 19px 60px rgba(0,0,0,.3);
-            -moz-box-shadow: 0 15px 20px rgba(0,0,0,.22),0 19px 60px rgba(0,0,0,.3);
-            -ms-box-shadow: 0 15px 20px rgba(0,0,0,.22),0 19px 60px rgba(0,0,0,.3);
-            box-shadow: 0 15px 20px rgba(0,0,0,.22),0 19px 60px rgba(0,0,0,.3);
-            -webkit-transform: translate(-50%, -500%);
-            -ms-transform: translate(-50%, -500%);
-            -o-transform: translate(-50%, -500%);
-            transform: translate(-50%, -500%);
-            -webkit-transition: -webkit-transform 0.6s ease-out;
-            -moz-transition: -moz-transform 0.6s ease-out;
-            -o-transition: -o-transform 0.6s ease-out;
-            transition: transform 0.6s ease-out;
         }
-        /* активируем модальный блок */
+
         .overlay:target+.popup {
             -webkit-transform: translate(-50%, 0);
             -ms-transform: translate(-50%, 0);
@@ -114,7 +84,7 @@
             transform: translate(-50%, 0);
             top: 20%;
         }
-        /* формируем кнопку закрытия */
+
         .close {
             top: -10px;
             right: -10px;
@@ -123,24 +93,14 @@
             position: absolute;
             padding: 0;
             border: 2px solid #ccc;
-            -webkit-border-radius: 15px;
-            -moz-border-radius: 15px;
-            -ms-border-radius: 15px;
-            -o-border-radius: 15px;
+
             border-radius: 15px;
             background-color: rgba(61, 61, 61, 0.8);
-            -webkit-box-shadow: 0px 0px 10px #000;
-            -moz-box-shadow: 0px 0px 10px #000;
-            box-shadow: 0px 0px 10px #000;
+
             text-align: center;
             text-decoration: none;
             font: 13px/20px 'Tahoma', Arial, sans-serif;
             font-weight: bold;
-            -webkit-transition: all ease .8s;
-            -moz-transition: all ease .8s;
-            -ms-transition: all ease .8s;
-            -o-transition: all ease .8s;
-            transition: all ease .8s;
         }
         .close:before {
             color: rgba(255, 255, 255, 0.9);
@@ -150,19 +110,34 @@
         }
         .close:hover {
             background-color: rgba(252, 20, 0, 0.8);
-            -webkit-transform: rotate(360deg);
-            -moz-transform: rotate(360deg);
-            -ms-transform: rotate(360deg);
-            -o-transform: rotate(360deg);
-            transform: rotate(360deg);
-        }
-        /* изображения внутри окна */
-        .popup img {
-            width: 100%;
-            height: auto;
         }
 
+        #goTop a{
+            position: fixed;
+            bottom: 0;
+            margin: 1px;
+            padding: 6px;
+            display: block;
+            background-color: #969696;
+            text-align: center;
+            font-size: 20px;
+            color: #000;
+            text-decoration: none;
+            border: 1px solid black;
+        }
 
+        .hatching {
+            background:
+                    linear-gradient(45deg, rgba(0, 0, 0, 0) 49.9%, black 49.9%, black 60%, rgba(0, 0, 0, 0) 60%)
+                    fixed,
+                    linear-gradient(45deg, black 10%, rgba(0, 0, 0, 0) 10%)
+                    fixed;
+            background-size: 0.3em 0.3em;
+        }
+        .hatching img{
+            display: block;
+            margin: auto;
+        }
     </style>
     <script type="text/javascript">
         function switchLogtable(tableId){
@@ -177,6 +152,8 @@
     <title>Title</title>
 </head>
 <body>
+    <div id="goTop"><a href="#tests">Go Top</a></div>
+
     <h2>Summary</h2>
     <table class="heap">
         <tr>
@@ -197,7 +174,7 @@
     <hr>
 
     <h2>Tests</h2>
-    <a name="tests"/>
+    <a name="tests"></a>
     <table class="heap">
         <tr>
             <th>Name</th>
@@ -223,26 +200,26 @@
                 <td>{{ results[result][item].skipped }}</td>
                 <td>{{ results[result][item].duration }}</td>
                 <td>
-                    <a href="#{{ loop.index }}" class="button button-green">Show log</a>
-                    <!--<div class="Button" onclick="switchLogtable('logtable{{ resultsloop.index }}{{ loop.index }}')">Show log</div>-->
-                    <a href="#x" class="overlay" id="{{ loop.index }}"></a>
+                    <a href="#{{ resultsloop.index }}">Show log</a>
+                    <a href="#x" class="overlay" id="{{ resultsloop.index }}"></a>
                     <div class="popup">
-                        <a class="close" title="Close" href="#close">Close</a>
-                        <!--<table class="logTable" id="logTable{{ resultsloop.index }}{{ loop.index }}">-->
-                        <table>
+                        <a class="close" title="Close" href="#close"></a>
+                        <table class="logTable">
                             <tr>
-                                <th>Stage status</th>
+                                <th>Stage ID</th>
                                 <th>Stage log</th>
+                                <th>Stage status</th>
                             </tr>
                             {% for stage in results[result][item].log %}
                             <tr>
-                                <td>{{ stage[0]['status'] }}</td>
+                                <td>{{ loop.index }}</td>
                                 <td>
                                     {% for message in stage[1]['log'] %}
                                     {{ message }}
                                     <br/>
                                     {% endfor %}
                                 </td>
+                                <td>{{ stage[0]['status'] }}</td>
                             </tr>
                             {% endfor %}
                         </table>
@@ -260,7 +237,7 @@
     <table class="detailsTable">
     {% for test in detail_report %}
         <tr>
-            <td colspan="10ru"><h3><a name="{{ test }}">{{ test }}</a></h3></td>
+            <td colspan="10"><h2><a name="{{ test }}">{{ test }}</a></h2></td>
         </tr>
         <tr>
             <th>Scene name</th>
@@ -272,25 +249,30 @@
             {% if detail_report[test]['baseline_color_path'] %}
             <th>Baseline Color</th>
             {% endif %}
-            <th>Baseline Opacity</th>
+            <th>Rendered Opacity</th>
             {% if detail_report[test]['baseline_opacity_path'] %}
             <th>Baseline Opacity</th>
             {% endif %}
         </tr>
         {% for item in detail_report[test] %}
         <tr>
-            <th>{{ item.scene_name }}</th>
-            <th>{{ item.file_name }}</th>
-            <th>{{ item.render_time }}</th>
-            <th>{{ item.render_version }}</th>
-            <th>{{ item.render_device }}</th>
-            <th><img src="{{ item.render_color_path }}"/></th>
+            <td>{{ item.scene_name }}</td>
+            <td>{{ item.file_name }}</td>
+            <td>{{ item.render_time }}</td>
+            <td>{{ item.render_version }}</td>
+            <td>{{ item.render_device }}</td>
+            <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
             {% if item.baseline_color_path %}
-            <th><img src="{{ item.baseline_color_path }}"/></th>
+            <td class="hatching"><img src="{{ item.baseline_color_path }}"/></td>
             {% endif %}
-            <th><img src="{{ item.render_opacity_path }}"/></th>
+            <td class="hatching">
+                {% if item.render_opacity_path %}
+                    <img src="{{ item.render_opacity_path }}"/></td>
+                {% else %}
+                    Opacity not required.
+                {% endif %}
             {% if item.baseline_opacity_path %}
-            <th><img src="{{ item.baseline_opacity_path }}"/></th>
+            <td class="hatching"><img src="{{ item.baseline_opacity_path }}"/></td>
             {% endif %}
         </tr>
         {% endfor %}
