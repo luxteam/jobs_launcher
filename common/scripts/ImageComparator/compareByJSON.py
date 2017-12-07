@@ -62,7 +62,7 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, suffix, result_report
 
 
 def main():
-    stage_report = [{'status': 'INIT'}, {'log': []}]
+    stage_report = [{'status': 'INIT'}, {'log': ['compareByJSON.py started;']}]
     args = createArgParser().parse_args()
     workFolder = args.work_dir
     report = os.path.join(workFolder, args.report_name)
@@ -71,11 +71,13 @@ def main():
     try:
         with open(os.path.abspath(report), 'r') as file:
             jsonReport = file.read()
-            file.close()
     except OSError:
-        print("Not found", os.path.abspath(report))
+        stage_report[1]['log'].append('Report not found;')
+        stage_report[0]['status'] = 'FAILED'
+        # return 1
 
     jsonReport = repairJson(jsonReport)
+    stage_report[1]['log'].append('Report loaded')
 
     if os.path.exists(os.path.abspath(args.base_dir)):
         for path, dirs, files in os.walk(args.base_dir):
@@ -83,12 +85,12 @@ def main():
                 # TODO: change key
                 s = os.path.split(path)
                 key = (os.path.split(s[0])[1])
-                if dir == 'Opacity' or dir == 'Color' or dir == 'images':
+                if dir == 'Opacity' or dir == 'Color':
                     stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
                     compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir), key,
                                        os.path.join(args.work_dir, args.result_name))
     else:
-        stage_report[1]['log'].append('Baseline dose not exist')
+        stage_report[1]['log'].append('Baseline dose not exist;')
 
     stage_report[0]['status'] = 'OK'
 

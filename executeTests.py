@@ -16,12 +16,17 @@ from core.auto_dict import AutoDict
 SCRIPTS = os.path.dirname( os.path.realpath(__file__) )
 # TODO: mb make common simpleRender for Maya and Max
 
+
 def validate_cmd_execution(stage_name, stage_path):
     stage_report = stage_name + '.json'
     if os.path.exists(os.path.join(stage_path, stage_report)):
-        with open(os.path.join(stage_path, stage_report)) as file:
-            report = file.read()
-            report = json.loads(report)
+        try:
+            with open(os.path.join(stage_path, stage_report)) as file:
+                report = file.read()
+                report = json.loads(report)
+        except OSError as err:
+            return 'FAILED'
+
         return report[0]['status']
 
 
@@ -46,7 +51,6 @@ def main():
         config_devices = json.loads(config_devices)
 
     for item in args.cmd_variables['RenderDevice'].split(','):
-        print(item)
         if item in config_devices.values():
             pass
         else:
@@ -97,35 +101,22 @@ def main():
     #     print("JSON JOBS", json_jobs)
 
     for found_job in found_jobs:
-        # TODO: rewrite
         print("Processing ", found_job[0])
-        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 1, 'duration': 0}
+        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
-        # report['results'][found_job[0]][' '.join(found_job[1])] = jobs_launcher.job_launcher.launch_job(found_job[3][0].format(SessionDir=session_dir))
-
         for i in range(len(found_job[3])):
-            print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
+            # print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
+            print("  Executing job {}/{}".format(i+1, len(found_job[3])))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
-
-            # report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.join(temp_path, 'result.html')
             report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
 
-            # if not validate_cmd_execution(found_job[5][i], temp_path):
             if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
-                report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 0
-                report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
                 break
             elif validate_cmd_execution(found_job[5][i], temp_path) == 'TERMINATED':
-                report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 0
-                report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
             else:
-                report['results'][found_job[0]][' '.join(found_job[1])]['total'] = 1
-                report['results'][found_job[0]][' '.join(found_job[1])]['skipped'] = 0
                 if not report['results'][found_job[0]][' '.join(found_job[1])]['failed']:
                     report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1
 

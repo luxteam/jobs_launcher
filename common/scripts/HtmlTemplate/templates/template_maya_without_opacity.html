@@ -1,0 +1,54 @@
+{% extends "main_template.html" %}
+
+{% block main_body_part %}
+
+	<table class="resultsTable">
+		<caption>Rendering results</caption>
+		<tr>
+			<td>Tool</td>
+			<td>Render version</td>
+			<td>Test name</td>
+			<td>Scene name</td>
+			<td>File name</td>
+			<td>Render time</td>
+			<td>Render device</td>
+		</tr>
+		{% for item in rendered %}
+		<tr>
+			<td>{{ item.tool }}</td>
+			<td>{{ item.render_version }}</td>
+			<td>{{ item.test_name }}</td>
+			<td>{{ item.scene_name }}</td>
+			<td>{{ item.file_name }}</td>
+			<td>{{ item.render_time }}</td>
+			<td>{{ item.render_device }}</td>
+		</tr>
+		<tr>
+			<td colspan="4">Difference for color: {{ item.difference_color }}</td>
+			<td colspan="3">Difference for opacity: {{ item.difference_opacity }}</td>
+		</tr>
+
+
+            {% if item.path_color %}
+		<tr>
+			<td colspan="4">Rendered Color</td>
+			<td colspan="3">Baseline Color</td>
+		</tr>
+		<tr>
+			<td colspan="4"><img src="Color/{{ item.file_name }}" onclick="resizeImg(this)"/></td>
+			<td colspan="3"><img src="{{ item.path_color }}" onclick="resizeImg(this)"/></td>
+		</tr>
+            {% else %}
+		<tr>
+			<td colspan="7">Rendered Color</td>
+		</tr>
+		<tr>
+			<td colspan="7"><img src="Color/{{ item.file_name }}" onclick="resizeImg(this)"/></td>
+		</tr>
+            {% endif %}
+
+
+		{% endfor %}
+	</table>
+
+{% endblock %}

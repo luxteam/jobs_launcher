@@ -21,21 +21,24 @@ def build_session_report(report, session_dir):
     for path, dirs, files in os.walk(session_dir):
         for dir in dirs:
             if dir in report['results']:
-                with open(os.path.join(path, dir, 'report_compare.json'), 'r') as file:
-                    current_test_report[dir] = file.read()
-                    current_test_report[dir] = json.loads(current_test_report[dir])
-                report['results'][dir]['']['passed'] = len(current_test_report[dir])
-                with open(os.path.join(path, dir, 'expected.json'), 'r') as file:
-                    current_test_expected[dir] = file.read()
-                    current_test_expected[dir] = json.loads(current_test_expected[dir])
-                report['results'][dir]['']['total'] = len(current_test_expected[dir])
-                report['results'][dir]['']['skipped'] = len(current_test_expected[dir]) - len(current_test_report[dir])
+                try:
+                    with open(os.path.join(path, dir, 'report_compare.json'), 'r') as file:
+                        current_test_report[dir] = file.read()
+                        current_test_report[dir] = json.loads(current_test_report[dir])
+                    report['results'][dir]['']['passed'] = len(current_test_report[dir])
+                    with open(os.path.join(path, dir, 'expected.json'), 'r') as file:
+                        current_test_expected[dir] = file.read()
+                        current_test_expected[dir] = json.loads(current_test_expected[dir])
+                    report['results'][dir]['']['total'] = len(current_test_expected[dir])
+                    report['results'][dir]['']['skipped'] = len(current_test_expected[dir]) - len(current_test_report[dir])
 
-                for item in current_test_report[dir]:
-                    item.update({'render_color_path': os.path.relpath(os.path.join(path, dir, 'Color', item['file_name']), session_dir)})
-                    baseline_img_path = os.path.join(path, dir, 'Opacity', item['file_name'])
-                    if os.path.exists(baseline_img_path):
-                        item.update({'render_opacity_path': os.path.relpath(baseline_img_path, session_dir)})
+                    for item in current_test_report[dir]:
+                        item.update({'render_color_path': os.path.relpath(os.path.join(path, dir, 'Color', item['file_name']), session_dir)})
+                        baseline_img_path = os.path.join(path, dir, 'Opacity', item['file_name'])
+                        if os.path.exists(baseline_img_path):
+                            item.update({'render_opacity_path': os.path.relpath(baseline_img_path, session_dir)})
+                except:
+                    pass
 
     for result in report['results']:
         for item in report['results'][result]:

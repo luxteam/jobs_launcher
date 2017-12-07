@@ -16,14 +16,13 @@ def main():
 
     args = args.parse_args()
 
-    stage_report = [{'status': 'INIT'}, {'log': []}]
+    stage_report = [{'status': 'INIT'}, {'log': ['htmlBuilder.py started;']}]
 
     renderedReport = os.path.join(args.work_dir, "report_compare.json")
     notRenderedReport = os.path.join(args.work_dir, "NOT_RENDERED.json")
 
     with open(os.path.abspath(renderedReport), 'r') as file:
         temp = file.read()
-        file.close()
     renderedJson = json.loads(temp)
 
     try:
@@ -40,13 +39,21 @@ def main():
     )
 
     template = env.get_template(args.template_name)
-
     stage_report[1]['log'].append('Starting html template rendering')
     text = template.render(rendered=renderedJson, notRendered=notRenderedJson, title="Render Results")
 
     with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
         f.write(text)
-        f.close()
+
+    # try:
+    #     template = env.get_template(args.template_name)
+    #     text = template.render(rendered=renderedJson, notRendered=notRenderedJson, title="Render Results")
+    #     stage_report[1]['log'].append('Html report generated;')
+    #     with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
+    #         f.write(text)
+    # except:
+    #     stage_report[1]['log'].append('Error while html report generating;')
+    #     stage_report[0]['status'] = 'FAILED'
 
     stage_report[0]['status'] = 'OK'
     with open(os.path.join(args.work_dir, args.stage_report), 'w') as file:
