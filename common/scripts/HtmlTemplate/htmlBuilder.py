@@ -40,7 +40,7 @@ def main():
 
     template = env.get_template(args.template_name)
     stage_report[1]['log'].append('Starting html template rendering')
-    text = template.render(rendered=renderedJson, notRendered=notRenderedJson, title="Render Results")
+    text = template.render(rendered=renderedJson, not_rendered=notRenderedJson, title="Render Results")
 
     with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
         f.write(text)

@@ -13,41 +13,45 @@ def createArgParser():
     return argparser
 
 
-def check(folder, report_name, stage_report):
-    filesColor = set()
-    filesOpacity = set()
-
-    try:
-        filesColor = {x for x in os.listdir(os.path.join(folder, "Color")) if
-                  os.path.isfile(os.path.join(folder, "Color", x))}
-        # filesOpacity = {x for x in os.listdir(os.path.join(folder, "Opacity")) if
-        #                 os.path.isfile(os.path.join(folder, "Opacity", x))}
-    except:
-        pass
-
-    try:
-        with open(os.path.join(folder, report_name)) as file:
-            expected = file.read()
-            expected = json.loads(expected)
-    except OSError as err:
-        pass
-
-    expected = {x['file_name'] for x in expected}
-
-    stage_report[1]['log'].append('Checking expected files and rendered files')
-    # return ( (filesColor ^ expected) & (filesOpacity ^ expected) )
-    return filesColor ^ expected
-
-
-def main():
-    args = createArgParser().parse_args()
+def check(args):
     stage_report = [{'status': 'INIT'}, {'log': ['checkExpected.py start']}]
 
     folder = os.path.abspath(args.work_dir)
 
-    result = check(folder, args.report_name, stage_report)
+    filesColor = set()
+    filesOpacity = set()
+    expected = set()
 
-    if (result):
+    try:
+        filesColor = {x for x in os.listdir(os.path.join(folder, "Color")) if
+                      os.path.isfile(os.path.join(folder, "Color", x))}
+        # filesOpacity = {x for x in os.listdir(os.path.join(folder, "Opacity")) if
+        #                 os.path.isfile(os.path.join(folder, "Opacity", x))}
+    except:
+        stage_report[0]['status'] = 'FAILED'
+        stage_report[1]['log'].append('Error while reading rendered images;')
+        return stage_report
+
+    try:
+        with open(os.path.join(folder, args.report_name)) as file:
+            expected = file.read()
+        expected = json.loads(expected)
+        expected = {x['file_name'] for x in expected}
+    except OSError as err:
+        stage_report[0]['status'] = 'FAILED'
+        stage_report[1]['log'].append(str(err))
+        return stage_report
+    except json.JSONDecodeError as err:
+        stage_report[0]['status'] = 'FAILED'
+        stage_report[1]['log'].append(str(err))
+        return stage_report
+    else:
+        stage_report[1]['log'].append('Checking expected files and rendered files')
+
+    # ( (filesColor ^ expected) & (filesOpacity ^ expected) )
+    result = filesColor ^ expected
+
+    if result:
         resultJson = []
         for item in result:
             pair = {"not_rendered": item}
@@ -60,7 +64,16 @@ def main():
         stage_report[1]['log'].append('Image count matches;')
 
     stage_report[0]['status'] = 'OK'
-    with open(os.path.join(folder, args.stage_report), 'w') as file:
+
+    return stage_report
+
+
+def main():
+    args = createArgParser().parse_args()
+
+    stage_report = check(args)
+
+    with open(os.path.join(os.path.abspath(args.work_dir), args.stage_report), 'w') as file:
         json.dump(stage_report, file, indent=' ')
 
 

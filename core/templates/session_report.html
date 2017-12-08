@@ -246,11 +246,11 @@
             <th>Plugin version</th>
             <th>Render Device</th>
             <th>Rendered color</th>
-            {% if detail_report[test]['baseline_color_path'] %}
+            {% if detail_report[test][0].baseline_color_path %}
             <th>Baseline Color</th>
             {% endif %}
             <th>Rendered Opacity</th>
-            {% if detail_report[test]['baseline_opacity_path'] %}
+            {% if detail_report[test][0].baseline_opacity_path %}
             <th>Baseline Opacity</th>
             {% endif %}
         </tr>

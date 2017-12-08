@@ -15,26 +15,7 @@ def createArgParser():
     return argparser
 
 
-def repairJson(jsonReport):
-    try:
-        jsonReport = json.loads(jsonReport)
-    except:
-        s = list(jsonReport)
-        if s[-1] == ',':
-            del s[-1]
-        s.append(']')
-        try:
-            jsonReport = json.loads("".join(s))
-        except:
-            print("ERROR: can't fix json report")
-            return
-        else:
-            return jsonReport
-    else:
-        return jsonReport
-
-
-def compareFoldersWalk(jsonReport, workFolder, baseFolder, suffix, result_report):
+def compareFoldersWalk(jsonReport, workFolder, baseFolder):
     for img in jsonReport:
         file1 = os.path.abspath(os.path.join(workFolder, img['file_name']))
         file2 = os.path.abspath(os.path.join(baseFolder, img['file_name']))
@@ -42,7 +23,7 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, suffix, result_report
         try:
             metrics = CompareMetrics.CompareMetrics(file1, file2)
             key_diff = ('difference_' + os.path.basename(workFolder)).lower()
-            key_src = ('path_' + os.path.basename(workFolder)).lower()
+            key_src = ('baseline_' + os.path.basename(workFolder) + '_path').lower()
             # key_diff = ('difference_' + suffix + '_' + os.path.basename(workFolder)).lower()
             # key_src = ('path_' + suffix + '_' + os.path.basename(workFolder)).lower()
 
@@ -55,40 +36,45 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, suffix, result_report
             img.update(diff)
             img.update(src)
 
-    with open(result_report, 'w') as file:
-        json.dump(jsonReport, file, indent=" ", sort_keys=True)
-
-    return
+    return jsonReport
 
 
-def main():
+def main(args):
     stage_report = [{'status': 'INIT'}, {'log': ['compareByJSON.py started;']}]
-    args = createArgParser().parse_args()
-    workFolder = args.work_dir
-    report = os.path.join(workFolder, args.report_name)
 
     jsonReport = ""
     try:
-        with open(os.path.abspath(report), 'r') as file:
+        with open(os.path.abspath(os.path.join(args.work_dir, args.report_name)), 'r') as file:
             jsonReport = file.read()
     except OSError:
         stage_report[1]['log'].append('Report not found;')
         stage_report[0]['status'] = 'FAILED'
-        # return 1
+        return stage_report
 
-    jsonReport = repairJson(jsonReport)
-    stage_report[1]['log'].append('Report loaded')
+    try:
+        jsonReport = json.loads(jsonReport)
+    except json.JSONDecodeError:
+        stage_report[1]['log'].append('Error in json report; Try to fix it;')
+        s = list(jsonReport)
+        if s[-1] == ',':
+            del s[-1]
+        s.append(']')
+        try:
+            jsonReport = json.loads("".join(s))
+        except json.JSONDecodeError:
+            stage_report[1]['log'].append('Error was not fixed;')
+            stage_report[0]['status'] = 'FAILED'
+            return stage_report
+    else:
+        stage_report[1]['log'].append('Error was fixed;')
 
     if os.path.exists(os.path.abspath(args.base_dir)):
         for path, dirs, files in os.walk(args.base_dir):
             for dir in dirs:
-                # TODO: change key
-                s = os.path.split(path)
-                key = (os.path.split(s[0])[1])
                 if dir == 'Opacity' or dir == 'Color':
-                    stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
-                    compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir), key,
-                                       os.path.join(args.work_dir, args.result_name))
+                    if os.path.basename(path) == os.path.basename(args.work_dir):
+                    # stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
+                        jsonReport = compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir))
     else:
         stage_report[1]['log'].append('Baseline dose not exist;')
 
@@ -97,8 +83,12 @@ def main():
     with open(os.path.join(args.work_dir, args.result_name), 'w') as file:
         json.dump(jsonReport, file, indent=" ", sort_keys=True)
 
-    with open(os.path.join(workFolder, args.stage_report), 'w') as file:
-        json.dump(stage_report, file, indent=' ')
+    return stage_report
+
 
 if __name__ == '__main__':
-    main()
+    args = createArgParser().parse_args()
+    stage_report = main(args)
+
+    with open(os.path.join(args.work_dir, args.stage_report), 'w') as file:
+        json.dump(stage_report, file, indent=' ')
