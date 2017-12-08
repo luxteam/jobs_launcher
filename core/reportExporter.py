@@ -2,6 +2,8 @@ import os
 import jinja2
 import json
 import shutil
+import base64
+
 
 def save_json_report(report, session_dir, file_name):
     with open(os.path.join(session_dir, file_name), "w") as file:
@@ -57,6 +59,17 @@ def build_session_report(report, session_dir):
 
     html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
     save_html_report(html_result, session_dir, 'session_report.html')
+
+    # for test in current_test_report:
+    #     for item in current_test_report[test]:
+    #         for img in ['baseline_color_path', 'baseline_opacity_path']:#, 'render_color_path', 'render_opacity_path']:
+    #             with open(os.path.abspath(item[img]), 'rb') as file:
+    #                 src = 'data:image/jpeg;base64,' + str(base64.b64encode(file.read())[2:-2])
+    #                 item.update({img: src})
+    #
+    # html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
+    # save_html_report(html_result, session_dir, 'session_report_embed_img.html')
+    # save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
 
 
 def build_summary_report(work_dir):
