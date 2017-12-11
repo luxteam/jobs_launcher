@@ -79,7 +79,7 @@ def build_session_report(report, session_dir):
                     src = "data:image/jpeg;base64," + str(code)[2:-1]
                     item.update({img: src})
                 except:
-                    return
+                    pass
 
     html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
     save_html_report(html_result, session_dir, 'session_report_embed_img.html')
