@@ -3,6 +3,7 @@ import jinja2
 import json
 import shutil
 import base64
+from PIL import Image
 
 
 def save_json_report(report, session_dir, file_name):
@@ -60,16 +61,29 @@ def build_session_report(report, session_dir):
     html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
     save_html_report(html_result, session_dir, 'session_report.html')
 
-    # for test in current_test_report:
-    #     for item in current_test_report[test]:
-    #         for img in ['baseline_color_path', 'baseline_opacity_path']:#, 'render_color_path', 'render_opacity_path']:
-    #             with open(os.path.abspath(item[img]), 'rb') as file:
-    #                 src = 'data:image/jpeg;base64,' + str(base64.b64encode(file.read())[2:-2])
-    #                 item.update({img: src})
-    #
-    # html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
-    # save_html_report(html_result, session_dir, 'session_report_embed_img.html')
-    # save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+    os.mkdir(os.path.join(session_dir, 'tmp'))
+    for test in current_test_report:
+        for item in current_test_report[test]:
+            for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
+                try:
+                    if not os.path.exists(os.path.abspath(item[img])):
+                        item[img] = os.path.join(session_dir, item[img])
+
+                    cur_img = Image.open(os.path.abspath(item[img]))
+                    tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
+                    tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
+
+                    with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
+                        code = base64.b64encode(file.read())
+
+                    src = "data:image/jpeg;base64," + str(code)[2:-1]
+                    item.update({img: src})
+                except:
+                    return
+
+    html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
+    save_html_report(html_result, session_dir, 'session_report_embed_img.html')
+    save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
 
 
 def build_summary_report(work_dir):
