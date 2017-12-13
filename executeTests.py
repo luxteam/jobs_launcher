@@ -46,15 +46,20 @@ def main():
 
     config_devices = {}
     new_config = []
-    with open(os.path.join(os.path.split(args.tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
-        config_devices = file.read()
-        config_devices = json.loads(config_devices)
+    try:
+        with open(os.path.join(os.path.split(args.tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
+            config_devices = file.read()
+            config_devices = json.loads(config_devices)
+    except:
+        pass
 
     for item in args.cmd_variables['RenderDevice'].split(','):
         if item in config_devices.values():
             pass
-        else:
+        elif config_devices:
             new_config.append(config_devices[item])
+
+    # TODO: add check that 'RendderDevice' is digit, if config.json doesn't exist
 
     if new_config:
         args.cmd_variables['RenderDevice'] = ','.join(new_config)

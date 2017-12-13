@@ -239,43 +239,48 @@
         <tr>
             <td colspan="10"><h2><a name="{{ test }}">{{ test }}</a></h2></td>
         </tr>
-        <tr>
-            <th>Scene name</th>
-            <th>File name</th>
-            <th>Render time</th>
-            <th>Plugin version</th>
-            <th>Render Device</th>
-            <th>Rendered color</th>
-            {% if detail_report[test][0].baseline_color_path %}
-            <th>Baseline Color</th>
-            {% endif %}
-            <th>Rendered Opacity</th>
-            {% if detail_report[test][0].baseline_opacity_path %}
-            <th>Baseline Opacity</th>
-            {% endif %}
-        </tr>
-        {% for item in detail_report[test] %}
-        <tr>
-            <td>{{ item.scene_name }}</td>
-            <td>{{ item.file_name }}</td>
-            <td>{{ item.render_time }}</td>
-            <td>{{ item.render_version }}</td>
-            <td>{{ item.render_device }}</td>
-            <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
-            {% if item.baseline_color_path %}
-            <td class="hatching"><img src="{{ item.baseline_color_path }}"/></td>
-            {% endif %}
-            <td class="hatching">
-                {% if item.render_opacity_path %}
-                    <img src="{{ item.render_opacity_path }}"/></td>
-                {% else %}
-                    Opacity not required.
+        {% if detail_report[test] | length > 0 %}
+
+            <tr>
+                <th>Scene name</th>
+                <th>File name</th>
+                <th>Render time</th>
+                <th>Plugin version</th>
+                <th>Render Device</th>
+                <th>Rendered color</th>
+                {% if detail_report[test][0].baseline_color_path %}
+                <th>Baseline Color</th>
                 {% endif %}
-            {% if item.baseline_opacity_path %}
-            <td class="hatching"><img src="{{ item.baseline_opacity_path }}"/></td>
-            {% endif %}
-        </tr>
-        {% endfor %}
+                <th>Rendered Opacity</th>
+                {% if detail_report[test][0].baseline_opacity_path %}
+                <th>Baseline Opacity</th>
+                {% endif %}
+            </tr>
+            {% for item in detail_report[test] %}
+            <tr>
+                <td>{{ item.scene_name }}</td>
+                <td>{{ item.file_name }}</td>
+                <td>{{ item.render_time }}</td>
+                <td>{{ item.render_version }}</td>
+                <td>{{ item.render_device }}</td>
+                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
+                {% if item.baseline_color_path %}
+                <td class="hatching"><img src="{{ item.baseline_color_path }}"/></td>
+                {% endif %}
+                <td class="hatching">
+                    {% if item.render_opacity_path %}
+                        <img src="{{ item.render_opacity_path }}"/></td>
+                    {% else %}
+                        Opacity not required.
+                    {% endif %}
+                {% if item.baseline_opacity_path %}
+                <td class="hatching"><img src="{{ item.baseline_opacity_path }}"/></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+
+        {% endif %}
+
     {% endfor %}
     </table>
 </body>
