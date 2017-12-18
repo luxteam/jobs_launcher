@@ -38,7 +38,7 @@ def main():
     parser.add_argument('--tests_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_dir', required=False, metavar="<dir>", help="tests root dir")
-    parser.add_argument('--cmd_variables', required=True, nargs="*")
+    parser.add_argument('--cmd_variables', required=False, nargs="*")
 
     args = parser.parse_args()
     args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
@@ -64,6 +64,10 @@ def main():
     if new_config:
         args.cmd_variables['RenderDevice'] = ','.join(new_config)
 
+    temp = args.cmd_variables['RenderDevice'].split(',')
+    temp.sort()
+    args.cmd_variables['RenderDevice'] = ','.join(temp)
+
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
     if not args.work_dir:
@@ -77,7 +81,8 @@ def main():
 
     machine_info = core.system_info.get_machine_info()
 
-    session_dir = os.path.join(work_path, machine_info.get("host"))
+    # session_dir = os.path.join(work_path, machine_info.get("host"))
+    session_dir = work_path
 
     print('Working folder  : ' + work_path)
     print('Tests folder    : ' + tests_path)
@@ -88,7 +93,7 @@ def main():
     try:
         if os.path.isdir(session_dir):
             shutil.rmtree(session_dir)
-        os.mkdir(session_dir)
+        os.makedirs(session_dir)
     except OSError as e:
         print(delim + str(e))
         pass
@@ -105,9 +110,11 @@ def main():
     #     json.dump(found_jobs, file, indent=' ')
     #     print("JSON JOBS", json_jobs)
 
+    core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
+
     for found_job in found_jobs:
         print("Processing ", found_job[0])
-        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
+        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'result_path': '',   'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
@@ -115,6 +122,7 @@ def main():
             print("  Executing job {}/{}".format(i+1, len(found_job[3])))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
+            report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
             if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1

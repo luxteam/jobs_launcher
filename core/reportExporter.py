@@ -21,32 +21,28 @@ def build_session_report(report, session_dir):
 
     current_test_report = {}
     current_test_expected = {}
-    for path, dirs, files in os.walk(session_dir):
-        for dir in dirs:
-            if dir in report['results']:
-                try:
-                    with open(os.path.join(path, dir, 'report_compare.json'), 'r') as file:
-                        current_test_report[dir] = file.read()
-                        current_test_report[dir] = json.loads(current_test_report[dir])
-                    report['results'][dir]['']['passed'] = len(current_test_report[dir])
-                    with open(os.path.join(path, dir, 'expected.json'), 'r') as file:
-                        current_test_expected[dir] = file.read()
-                        current_test_expected[dir] = json.loads(current_test_expected[dir])
-                    report['results'][dir]['']['total'] = len(current_test_expected[dir])
-                    report['results'][dir]['']['skipped'] = len(current_test_expected[dir]) - len(current_test_report[dir])
 
-                    for item in current_test_report[dir]:
-                        item.update({'render_color_path': os.path.relpath(os.path.join(path, dir, 'Color', item['file_name']), session_dir)})
-                        baseline_img_path = os.path.join(path, dir, 'Opacity', item['file_name'])
-                        if os.path.exists(baseline_img_path):
-                            item.update({'render_opacity_path': os.path.relpath(baseline_img_path, session_dir)})
-                except:
-                    pass
+    for result in report['results']:
+        for item in report['results'][result]:
+            with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
+                current_test_report[' '.join([result, item])] = json.loads(file.read())
+            #     TODO: fix bug with space "Materials "
+
+            for jtem in current_test_report[' '.join([result, item])]:
+                jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
+                if jtem['render_opacity_path']:
+                    jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
 
     for result in report['results']:
         for item in report['results'][result]:
             for key in total:
                 total[key] += report['results'][result][item][key]
+
+    try:
+        # report.sort()
+        current_test_report = sorted(current_test_report.items())
+    except Exception as err:
+        print(str(err))
 
     report.update({'summary': total})
     save_json_report(report, session_dir, 'session_report.json')
@@ -61,29 +57,29 @@ def build_session_report(report, session_dir):
     html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
     save_html_report(html_result, session_dir, 'session_report.html')
 
-    os.mkdir(os.path.join(session_dir, 'tmp'))
-    for test in current_test_report:
-        for item in current_test_report[test]:
-            for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
-                try:
-                    if not os.path.exists(os.path.abspath(item[img])):
-                        item[img] = os.path.join(session_dir, item[img])
-
-                    cur_img = Image.open(os.path.abspath(item[img]))
-                    tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
-                    tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
-
-                    with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
-                        code = base64.b64encode(file.read())
-
-                    src = "data:image/jpeg;base64," + str(code)[2:-1]
-                    item.update({img: src})
-                except:
-                    pass
-
-    html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
-    save_html_report(html_result, session_dir, 'session_report_embed_img.html')
-    save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+    # os.mkdir(os.path.join(session_dir, 'tmp'))
+    # for test in current_test_report:
+    #     for item in current_test_report[test]:
+    #         for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
+    #             try:
+    #                 if not os.path.exists(os.path.abspath(item[img])):
+    #                     item[img] = os.path.join(session_dir, item[img])
+    #
+    #                 cur_img = Image.open(os.path.abspath(item[img]))
+    #                 tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
+    #                 tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
+    #
+    #                 with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
+    #                     code = base64.b64encode(file.read())
+    #
+    #                 src = "data:image/jpeg;base64," + str(code)[2:-1]
+    #                 item.update({img: src})
+    #             except:
+    #                 pass
+    #
+    # html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
+    # save_html_report(html_result, session_dir, 'session_report_embed_img.html')
+    # save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
 
 
 def build_summary_report(work_dir):

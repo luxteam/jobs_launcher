@@ -139,16 +139,6 @@
             margin: auto;
         }
     </style>
-    <script type="text/javascript">
-        function switchLogtable(tableId){
-            var table = document.getElementById(tableId);
-            if (table.style.display == "block"){
-                table.style.display = "none";
-            } else {
-                table.style.display = "block";
-            }
-        }
-    </script>
     <title>Title</title>
 </head>
 <body>
@@ -200,8 +190,8 @@
                 <td>{{ results[result][item].skipped }}</td>
                 <td>{{ results[result][item].duration }}</td>
                 <td>
-                    <a href="#{{ resultsloop.index }}">Show log</a>
-                    <a href="#x" class="overlay" id="{{ resultsloop.index }}"></a>
+                    <a href="#{{ resultsloop.index }}{{ loop.index }}">Show log</a>
+                    <a href="#x" class="overlay" id="{{ resultsloop.index }}{{ loop.index }}"></a>
                     <div class="popup">
                         <a class="close" title="Close" href="#close"></a>
                         <table class="logTable">
@@ -234,6 +224,18 @@
 
     <hr>
     <h2>Details</h2>
+
+    <table class="detailsTable">
+        <tr>
+            <th>Plugin version</th>
+            <th>Render Device</th>
+        </tr>
+        <tr>
+            <td>item.render_version</td>
+            <td>item.render_device</td>
+        </tr>
+    </table>
+
     <table class="detailsTable">
     {% for test in detail_report %}
         <tr>
@@ -245,15 +247,13 @@
                 <th>Scene name</th>
                 <th>File name</th>
                 <th>Render time</th>
-                <th>Plugin version</th>
-                <th>Render Device</th>
-                <th>Rendered color</th>
-                {% if detail_report[test][0].baseline_color_path %}
-                <th>Baseline Color</th>
-                {% endif %}
                 <th>Rendered Opacity</th>
                 {% if detail_report[test][0].baseline_opacity_path %}
                 <th>Baseline Opacity</th>
+                {% endif %}
+                <th>Rendered color</th>
+                {% if detail_report[test][0].baseline_color_path %}
+                <th>Baseline Color</th>
                 {% endif %}
             </tr>
             {% for item in detail_report[test] %}
@@ -261,12 +261,7 @@
                 <td>{{ item.scene_name }}</td>
                 <td>{{ item.file_name }}</td>
                 <td>{{ item.render_time }}</td>
-                <td>{{ item.render_version }}</td>
-                <td>{{ item.render_device }}</td>
-                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
-                {% if item.baseline_color_path %}
-                <td class="hatching"><img src="{{ item.baseline_color_path }}"/></td>
-                {% endif %}
+
                 <td class="hatching">
                     {% if item.render_opacity_path %}
                         <img src="{{ item.render_opacity_path }}"/></td>
@@ -275,6 +270,11 @@
                     {% endif %}
                 {% if item.baseline_opacity_path %}
                 <td class="hatching"><img src="{{ item.baseline_opacity_path }}"/></td>
+                {% endif %}
+
+                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
+                {% if item.baseline_color_path %}
+                <td class="hatching"><img src="{{ item.baseline_color_path }}"/></td>
                 {% endif %}
             </tr>
             {% endfor %}

@@ -166,10 +166,10 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         for command in summary_command_parts:
             execute_command.append(' '.join(command))
 
-        # TODO: fix it
-        # config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir), os.path.sep.join(config_dirs))
-        # print("____ELSE", os.path.sep.join(config_dirs))
-        config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir))
+        if config_dirs:
+            config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir), os.path.sep.join(config_dirs))
+        else:
+            config_output_dir = os.path.join(os.path.join("{SessionDir}", job_rel_dir))
 
         #try:
         #    os.makedirs(config_output_dir)
