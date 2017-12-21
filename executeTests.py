@@ -2,9 +2,8 @@ import argparse
 import datetime
 import os
 import shutil
-import webbrowser
 import json
-# TODO: do smth with testExecutor.core etc
+
 import core.reportExporter
 import core.system_info
 
@@ -146,15 +145,8 @@ def main():
 
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
-    # print("Saving summary report")
-    # core.reportExporter.build_summary_report(work_path)
-    # print("Sending report to server (now just copy to c:/reports_storage")
-
-    # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Maya_Plugin', '2.2.3.3', session_dir)
-    # core.reportExporter.build_export_reports('c:/reports_storage/app/packages', 'RPR_Max_Plugin', '2.1.3.3', session_dir)
-
-    # webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").\
-    #     open(os.path.join(work_path, 'summary_report.html'))
+    print("Saving summary report")
+    core.reportExporter.build_summary_report(args.work_root)
 
 
 if __name__ == "__main__":

@@ -21,32 +21,28 @@ def build_session_report(report, session_dir):
 
     current_test_report = {}
     current_test_expected = {}
+    all_test_summary = {}
 
     for result in report['results']:
         for item in report['results'][result]:
             with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
-                current_test_report[' '.join([result, item])] = json.loads(file.read())
-            #     TODO: fix bug with space "Materials "
+                current_test_report.update({' '.join([result, item]): json.loads(file.read())})
 
             for jtem in current_test_report[' '.join([result, item])]:
                 jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
-                if jtem['render_opacity_path']:
+                if 'render_opacity_path' in jtem.keys():
                     jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
+
+            all_test_summary.update(current_test_report)
 
     for result in report['results']:
         for item in report['results'][result]:
             for key in total:
                 total[key] += report['results'][result][item][key]
 
-    try:
-        # report.sort()
-        current_test_report = sorted(current_test_report.items())
-    except Exception as err:
-        print(str(err))
-
     report.update({'summary': total})
     save_json_report(report, session_dir, 'session_report.json')
-    save_json_report(current_test_report, session_dir, 'all_tests_summary.json')
+    save_json_report(all_test_summary, session_dir, 'all_tests_summary.json')
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -57,34 +53,35 @@ def build_session_report(report, session_dir):
     html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
     save_html_report(html_result, session_dir, 'session_report.html')
 
-    # os.mkdir(os.path.join(session_dir, 'tmp'))
-    # for test in current_test_report:
-    #     for item in current_test_report[test]:
-    #         for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
-    #             try:
-    #                 if not os.path.exists(os.path.abspath(item[img])):
-    #                     item[img] = os.path.join(session_dir, item[img])
-    #
-    #                 cur_img = Image.open(os.path.abspath(item[img]))
-    #                 tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
-    #                 tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
-    #
-    #                 with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
-    #                     code = base64.b64encode(file.read())
-    #
-    #                 src = "data:image/jpeg;base64," + str(code)[2:-1]
-    #                 item.update({img: src})
-    #             except:
-    #                 pass
-    #
-    # html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
-    # save_html_report(html_result, session_dir, 'session_report_embed_img.html')
-    # save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+    os.mkdir(os.path.join(session_dir, 'tmp'))
+    for test in current_test_report:
+        for item in current_test_report[test]:
+            for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
+                try:
+                    if not os.path.exists(os.path.abspath(item[img])):
+                        item[img] = os.path.join(session_dir, item[img])
+
+                    cur_img = Image.open(os.path.abspath(item[img]))
+                    tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
+                    tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
+
+                    with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
+                        code = base64.b64encode(file.read())
+
+                    src = "data:image/jpeg;base64," + str(code)[2:-1]
+                    item.update({img: src})
+                except:
+                    pass
+
+    html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
+    save_html_report(html_result, session_dir, 'session_report_embed_img.html')
+    save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
 
 
 def build_summary_report(work_dir):
-    # TODO: make simpler
+
     summary_report = []
+    summary_report_all_tests = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             if file.endswith('session_report.json'):
@@ -92,6 +89,10 @@ def build_summary_report(work_dir):
                     text = json.loads(file.read())
                     text['execution_info'] = os.path.basename(path)
                     summary_report.append(text)
+            elif file.endswith('all_tests_summary.json'):
+                with open(os.path.join(path, file), 'r') as file:
+                    # summary_report_all_tests[os.path.basename(path)] = json.loads(file.read())
+                    summary_report_all_tests.update(json.loads(file.read()))
 
     details_report = {}
     for execution in summary_report:
@@ -107,16 +108,18 @@ def build_summary_report(work_dir):
         details_report[execution['execution_info']] = temp_report
 
     save_json_report(summary_report, work_dir, 'summary_report.json')
+    save_json_report(details_report, work_dir, 'summary_report_details.json')
+    save_json_report(summary_report_all_tests, work_dir, 'summary_report_all_tests.json')
 
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=jinja2.select_autoescape(['html'])
-    )
-    template = env.get_template('summary_report.html')
+    # env = jinja2.Environment(
+    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+    #     autoescape=jinja2.select_autoescape(['html'])
+    # )
+    # template = env.get_template('summary_report.html')
 
     # print(json.dumps(summary_report, indent=4))
-    html_result = template.render(summary_report=summary_report, details_report=details_report)
-    save_html_report(html_result, work_dir, 'summary_report.html')
+    # html_result = template.render(summary_report=summary_report, details_report=details_report)
+    # save_html_report(html_result, work_dir, 'summary_report.html')
 
 
 def build_export_reports(server_root, package_name, plugin_version, session_dir):
