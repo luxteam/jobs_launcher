@@ -16,46 +16,11 @@ def save_html_report(report, session_dir, file_name):
         file.write(report)
 
 
-def build_session_report(report, session_dir):
-    total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
-
-    current_test_report = {}
-    current_test_expected = {}
-    all_test_summary = {}
-
-    for result in report['results']:
-        for item in report['results'][result]:
-            with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
-                current_test_report.update({' '.join([result, item]): json.loads(file.read())})
-
-            for jtem in current_test_report[' '.join([result, item])]:
-                jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
-                if 'render_opacity_path' in jtem.keys():
-                    jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
-
-            all_test_summary.update(current_test_report)
-
-    for result in report['results']:
-        for item in report['results'][result]:
-            for key in total:
-                total[key] += report['results'][result][item][key]
-
-    report.update({'summary': total})
-    save_json_report(report, session_dir, 'session_report.json')
-    save_json_report(all_test_summary, session_dir, 'all_tests_summary.json')
-
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=jinja2.select_autoescape(['html'])
-    )
-    template = env.get_template('session_report.html')
-
-    html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
-    save_html_report(html_result, session_dir, 'session_report.html')
-
+def make_base64_img(session_dir, report):
     os.mkdir(os.path.join(session_dir, 'tmp'))
-    for test in current_test_report:
-        for item in current_test_report[test]:
+
+    for test in report:
+        for item in report[test]:
             for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
                 try:
                     if not os.path.exists(os.path.abspath(item[img])):
@@ -73,58 +38,100 @@ def build_session_report(report, session_dir):
                 except:
                     pass
 
-    html_result = template.render(results=report['results'], total=total, detail_report=current_test_report)
-    save_html_report(html_result, session_dir, 'session_report_embed_img.html')
-    save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+    return report
+
+
+def build_session_report(report, session_dir):
+    total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
+
+    current_test_report = {}
+    current_test_expected = {}
+    all_test_summary = {}
+
+    for result in report['results']:
+        for item in report['results'][result]:
+            with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
+                current_test_report.update({' '.join([result, item]): json.loads(file.read())})
+
+            for jtem in current_test_report[' '.join([result, item])]:
+                jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
+                if 'render_opacity_path' in jtem.keys():
+                    jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
+
+                if 'baseline_opacity_path' in jtem.keys():
+                    jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_opacity_path']), session_dir)})
+                if 'baseline_color_path' in jtem.keys():
+                    jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
+
+            all_test_summary.update(current_test_report)
+
+    for result in report['results']:
+        for item in report['results'][result]:
+            for key in total:
+                total[key] += report['results'][result][item][key]
+
+    report.update({'summary': total})
+
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=jinja2.select_autoescape(['html'])
+    )
+    template = env.get_template('session_report.html')
+
+    save_json_report(report, session_dir, 'session_report.json')
+    save_json_report(all_test_summary, session_dir, 'all_tests_summary.json')
+
+    html_result = template.render(total={'_cur_': total}, results={'_cur_': report['results']}, detail_report={'_cur_': all_test_summary})
+    save_html_report(html_result, session_dir, 'session_report.html')
+
+    # current_test_report = make_base64_img(session_dir, current_test_report)
+    # save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+
+    # html_result = template.render(results=report['results'], total=[total], detail_report=current_test_report)
+    # save_html_report(html_result, session_dir, 'session_report_embed_img.html')
 
 
 def build_summary_report(work_dir):
 
-    summary_report = []
+    summary_report = {}
     summary_report_all_tests = {}
+    summary_total = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             if file.endswith('session_report.json'):
                 with open(os.path.join(path, file), 'r') as file:
                     text = json.loads(file.read())
-                    text['execution_info'] = os.path.basename(path)
-                    summary_report.append(text)
+                execution_name = os.path.basename(path)
+                summary_report[execution_name] = text['results']
+                for item in summary_report[execution_name]:
+                    for jtem in summary_report[execution_name][item]:
+                        summary_report[execution_name][item][jtem].update({'reportlink': os.path.relpath(os.path.join(work_dir, execution_name,summary_report[execution_name][item][jtem]['reportlink']), work_dir)})
+
+                summary_total[os.path.basename(path)] = text['summary']
             elif file.endswith('all_tests_summary.json'):
                 with open(os.path.join(path, file), 'r') as file:
-                    # summary_report_all_tests[os.path.basename(path)] = json.loads(file.read())
-                    summary_report_all_tests.update(json.loads(file.read()))
+                    execution_name = os.path.basename(path)
+                    summary_report_all_tests[execution_name] = json.loads(file.read())
+                    for test in summary_report_all_tests[execution_name]:
+                        for jtem in summary_report_all_tests[execution_name][test]:
+                            jtem.update({'render_color_path': os.path.join(execution_name, jtem['render_color_path'])})
+                            if 'render_opacity_path' in jtem.keys():
+                                jtem.update({'render_opacity_path': os.path.join(execution_name, jtem['render_opacity_path'])})
 
-    details_report = {}
-    for execution in summary_report:
-        temp_report = []
-        for test in execution['results']:
-            total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
-            for test_configuration in execution['results'][test]:
-                for key in total:
-                    total[key] += execution['results'][test][test_configuration][key]
-            total.update({'test': test})
-            temp_report.append(total)
+                            if 'baseline_opacity_path' in jtem.keys():
+                                jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(work_dir, execution_name, jtem['baseline_opacity_path']), work_dir)})
+                            if 'baseline_color_path' in jtem.keys():
+                                jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, execution_name, jtem['baseline_color_path']), work_dir)})
 
-        details_report[execution['execution_info']] = temp_report
 
     save_json_report(summary_report, work_dir, 'summary_report.json')
-    save_json_report(details_report, work_dir, 'summary_report_details.json')
     save_json_report(summary_report_all_tests, work_dir, 'summary_report_all_tests.json')
 
-    # env = jinja2.Environment(
-    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-    #     autoescape=jinja2.select_autoescape(['html'])
-    # )
-    # template = env.get_template('summary_report.html')
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=jinja2.select_autoescape(['html'])
+    )
+    template = env.get_template('session_report.html')
 
-    # print(json.dumps(summary_report, indent=4))
-    # html_result = template.render(summary_report=summary_report, details_report=details_report)
-    # save_html_report(html_result, work_dir, 'summary_report.html')
-
-
-def build_export_reports(server_root, package_name, plugin_version, session_dir):
-    # TODO: in future export json and img on different servers
-    # TODO: add cheack to unique folder name
-    server_path = os.path.abspath(os.path.join(server_root, package_name, plugin_version, os.path.basename(session_dir)))
-
-    shutil.copytree(session_dir, server_path)
+    html_result = template.render(total=summary_total, results=summary_report, detail_report=summary_report_all_tests)
+    save_html_report(html_result, work_dir, 'summary_report.html')

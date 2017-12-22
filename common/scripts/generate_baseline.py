@@ -34,7 +34,7 @@ def main():
                             rendered_img_path = os.path.join(path, test[img])
                             baseline_img_path = os.path.relpath(rendered_img_path, args.results_root)
 
-                            # TODO: replace to if exists
+                            # if not os.path.exists(os.path.join(args.baseline_root, baseline_name, os.path.split(baseline_img_path)[0])):
                             try:
                                 os.makedirs(os.path.join(args.baseline_root, baseline_name, os.path.split(baseline_img_path)[0]))
                             except Exception as err:

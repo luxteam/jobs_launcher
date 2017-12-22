@@ -29,7 +29,7 @@
 		</tr>
 
 
-            {% if item.path_color %}
+            {% if item.baseline_color_path %}
 		<tr>
 			<td colspan="2">Rendered Color</td>
 			<td colspan="2">Baseline Color</td>
@@ -37,10 +37,10 @@
 			<td>Baseline Opacity</td>
 		</tr>
 		<tr>
-			<td colspan="2"><img src="Color/{{ item.file_name }}" onclick="resizeImg(this)"/></td>
-			<td colspan="2"><img src="{{ item.path_color }}" onclick="resizeImg(this)"/></td>
-			<td colspan="2"><img src="Opacity/{{ item.file_name }}" onclick="resizeImg(this)"/></td>
-			<td><img src="{{ item.path_opacity }}" onclick="resizeImg(this)"/></td>
+			<td colspan="2"><img src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="2"><img src="{{ item.baseline_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="2"><img src="{{ item.render_opacity_path}}" onclick="resizeImg(this)"/></td>
+			<td><img src="{{ item.baseline_opacity_path }}" onclick="resizeImg(this)"/></td>
 		</tr>
             {% else %}
 		<tr>
@@ -48,8 +48,8 @@
 			<td colspan="3">Rendered Opacity</td>
 		</tr>
 		<tr>
-			<td colspan="4"><img src="Color/{{ item.file_name }}" onclick="resizeImg(this)"/></td>
-			<td colspan="3"><img src="Opacity/{{ item.file_name }}" onclick="resizeImg(this)"/></td>
+			<td colspan="4"><img src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="3"><img src="{{ item.render_opacity_path }}" onclick="resizeImg(this)"/></td>
 		</tr>
             {% endif %}
 

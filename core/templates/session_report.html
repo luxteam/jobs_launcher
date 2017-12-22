@@ -138,6 +138,14 @@
             display: block;
             margin: auto;
         }
+
+        #footer{
+            text-align: center;
+            width: 100%;
+            position: relative;
+            float: left;
+            padding: 3px;
+        }
     </style>
     <title>Title</title>
 </head>
@@ -145,6 +153,10 @@
     <div id="goTop"><a href="#tests">Go Top</a></div>
 
     <h2>Summary</h2>
+    {% for i in total %}
+        {% if i != "_cur_" %}
+            <h3>{{ i }}</h3>
+        {% endif %}
     <table class="heap">
         <tr>
             <th>Total</th>
@@ -154,134 +166,161 @@
             <th>Time taken</th>
         </tr>
         <tr>
-            <td>{{ total.total }}</td>
-            <td>{{ total.passed }}</td>
-            <td>{{ total.failed }}</td>
-            <td>{{ total.skipped }}</td>
-            <td>{{ total.duration }}</td>
+            <td>{{ total[i].total }}</td>
+            <td>{{ total[i].passed }}</td>
+            <td>{{ total[i].failed }}</td>
+            <td>{{ total[i].skipped }}</td>
+            <td>{{ total[i].duration }}</td>
         </tr>
     </table>
+    {% endfor %}
     <hr>
+
+
 
     <h2>Tests</h2>
     <a name="tests"></a>
-    <table class="heap">
-        <tr>
-            <th>Name</th>
-            <th>Config</th>
-            <th>Report</th>
-            <th>Total</th>
-            <th>Passed</th>
-            <th>Failed</th>
-            <th>Skipped</th>
-            <th>Time taken</th>
-            <th>LOG</th>
-        </tr>
-        {% for result in results %}
-            {% set resultsloop = loop %}
-        <tr>
-            <td rowspan="{{ results[result]|length }}"><a href="#{{ result }}">{{ result }}</a></td>
-            {% for item in results[result] %}
-                <td>{{ item }}</td>
-                <td><a href="{{ results[result][item].reportlink }}">Report</a></td>
-                <td>{{ results[result][item].total }}</td>
-                <td>{{ results[result][item].passed }}</td>
-                <td>{{ results[result][item].failed }}</td>
-                <td>{{ results[result][item].skipped }}</td>
-                <td>{{ results[result][item].duration }}</td>
-                <td>
-                    <a href="#{{ resultsloop.index }}{{ loop.index }}">Show log</a>
-                    <a href="#x" class="overlay" id="{{ resultsloop.index }}{{ loop.index }}"></a>
-                    <div class="popup">
-                        <a class="close" title="Close" href="#close"></a>
-                        <table class="logTable">
-                            <tr>
-                                <th>Stage ID</th>
-                                <th>Stage log</th>
-                                <th>Stage status</th>
-                            </tr>
-                            {% for stage in results[result][item].log %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    {% for message in stage[1]['log'] %}
-                                    {{ message }}
-                                    <br/>
-                                    {% endfor %}
-                                </td>
-                                <td>{{ stage[0]['status'] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </td>
-        </tr>
-        <tr>
+
+    {% for i in results %}
+        {% set toploop = loop %}
+        {% if i != "_cur_" %}
+            <h3>{{ i }}</h3>
+        {% endif %}
+        <table class="heap">
+            <tr>
+                <th>Name</th>
+                <th>Config</th>
+                <th>Report</th>
+                <th>Total</th>
+                <th>Passed</th>
+                <th>Failed</th>
+                <th>Skipped</th>
+                <th>Time taken</th>
+                <th>LOG</th>
+            </tr>
+            {% for result in results[i] %}
+                {% set resultsloop = loop %}
+            <tr>
+                <td rowspan="{{ results[i][result]|length }}"><a href="#    {{ result }}">{{ result }}</a></td>
+                {% for item in results[i][result] %}
+                    <td>{{ item }}</td>
+                    <td><a href="{{ results[i][result][item].reportlink }}">Report</a></td>
+                    <td>{{ results[i][result][item].total }}</td>
+                    <td>{{ results[i][result][item].passed }}</td>
+                    <td>{{ results[i][result][item].failed }}</td>
+                    <td>{{ results[i][result][item].skipped }}</td>
+                    <td>{{ results[i][result][item].duration }}</td>
+                    <td>
+                        <a href="#{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}">Show log</a>
+                        <a href="#x" class="overlay" id="{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}"></a>
+                        <div class="popup">
+                            <a class="close" title="Close" href="#close"></a>
+                            <table class="logTable">
+                                <tr>
+                                    <th>Stage ID</th>
+                                    <th>Stage log</th>
+                                    <th>Stage status</th>
+                                </tr>
+                                {% for stage in results[i][result][item].log %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        {% for message in stage[1]['log'] %}
+                                        {{ message }}
+                                        <br/>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ stage[0]['status'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </td>
+            </tr>
+            <tr>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
+        </table>
+    {% endfor %}
 
     <hr>
+
+
     <h2>Details</h2>
 
     <table class="detailsTable">
-        <tr>
-            <th>Plugin version</th>
-            <th>Render Device</th>
-        </tr>
-        <tr>
-            <td>item.render_version</td>
-            <td>item.render_device</td>
-        </tr>
-    </table>
+    {% for i in detail_report %}
 
-    <table class="detailsTable">
-    {% for test in detail_report %}
-        <tr>
-            <td colspan="10"><h2><a name="{{ test }}">{{ test }}</a></h2></td>
-        </tr>
-        {% if detail_report[test] | length > 0 %}
-
+        {% if i != "_cur_" %}
             <tr>
-                <th>Scene name</th>
-                <th>File name</th>
-                <th>Render time</th>
-                <th>Rendered Opacity</th>
-                {% if detail_report[test][0].baseline_opacity_path %}
-                <th>Baseline Opacity</th>
-                {% endif %}
-                <th>Rendered color</th>
-                {% if detail_report[test][0].baseline_color_path %}
-                <th>Baseline Color</th>
-                {% endif %}
+                <td colspan="10"><h2>{{ i }}</h2></td>
             </tr>
-            {% for item in detail_report[test] %}
-            <tr>
-                <td>{{ item.scene_name }}</td>
-                <td>{{ item.file_name }}</td>
-                <td>{{ item.render_time }}</td>
-
-                <td class="hatching">
-                    {% if item.render_opacity_path %}
-                        <img src="{{ item.render_opacity_path }}"/></td>
-                    {% else %}
-                        Opacity not required.
-                    {% endif %}
-                {% if item.baseline_opacity_path %}
-                <td class="hatching"><img src="{{ item.baseline_opacity_path }}"/></td>
-                {% endif %}
-
-                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
-                {% if item.baseline_color_path %}
-                <td class="hatching"><img src="{{ item.baseline_color_path }}"/></td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-
         {% endif %}
 
+        {% for test in detail_report[i] %}
+            <tr>
+                <td colspan="8">
+                    <h3><a name="{{ test }}">{{ test }}</a></h3>
+                    Plugin version: {{ detail_report[i][test][0].render_version }}
+                    <br>
+                    Hardware: {{ detail_report[i][test][0].render_device }}
+                </td>
+            </tr>
+            {% if detail_report[i][test] | length > 0 %}
+
+                <tr>
+                    <th>Scene name</th>
+                    <th>Scene options</th>
+                    <th>File name</th>
+                    <th>Render time, s</th>
+                    <th>Baseline Opacity</th>
+                    <th>Rendered Opacity</th>
+                    <th>Baseline Color</th>
+                    <th>Rendered color</th>
+                </tr>
+                {% for item in detail_report[i][test] %}
+                <tr>
+                    <td>{{ item.scene_name }}</td>
+                    <td></td>
+                    <td>{{ item.file_name }}</td>
+                    <td>{{ item.render_time }}</td>
+
+                    <td class="hatching">
+                    {% if item.baseline_opacity_path %}
+                        <img src="{{ item.baseline_opacity_path }}"/>
+                    {% elif item.render_opacity_path %}
+                        Not compared
+                    {% else %}
+                        Not required
+                    {% endif %}
+                    </td>
+                    <td class="hatching">
+                    {% if item.render_opacity_path %}
+                        <img src="{{ item.render_opacity_path }}"/>
+                    {% else %}
+                        Not required
+                    {% endif %}
+                    </td>
+
+                    <td class="hatching">
+                    {% if item.baseline_color_path %}
+                        <img src="{{ item.baseline_color_path }}"/>
+                    {% else %}
+                        Not compared
+                    {% endif %}
+                    </td>
+                    <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
     {% endfor %}
     </table>
+    <div id="footer">
+        Luxoft RPR CIS
+        <br>
+        2017
+    </div>
 </body>
 </html>

@@ -15,7 +15,7 @@ def createArgParser():
     return argparser
 
 
-def compareFoldersWalk(jsonReport, workFolder, baseFolder):
+def compareFoldersWalk(jsonReport, workFolder, baseFolder, root_dir):
     for img in jsonReport:
         file1 = os.path.abspath(os.path.join(workFolder, img['file_name']))
         file2 = os.path.abspath(os.path.join(baseFolder, img['file_name']))
@@ -28,7 +28,7 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder):
             # key_src = ('path_' + suffix + '_' + os.path.basename(workFolder)).lower()
 
             diff = {key_diff: metrics.getDiffPixeles()}
-            src = {key_src: file2}
+            src = {key_src: os.path.relpath(file2, root_dir)}
         except:
             # print("Diff tool can't find path")
             pass
@@ -74,7 +74,7 @@ def main(args):
                 if dir == 'Opacity' or dir == 'Color':
                     if os.path.basename(path) == os.path.basename(args.work_dir):
                     # stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
-                        jsonReport = compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir))
+                        jsonReport = compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir), args.work_dir)
     else:
         stage_report[1]['log'].append('Baseline dose not exist;')
 
