@@ -84,17 +84,18 @@ def build_session_report(report, session_dir):
     html_result = template.render(total={'_cur_': total}, results={'_cur_': report['results']}, detail_report={'_cur_': all_test_summary})
     save_html_report(html_result, session_dir, 'session_report.html')
 
-    # current_test_report = make_base64_img(session_dir, current_test_report)
-    # save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+    current_test_report = make_base64_img(session_dir, current_test_report)
+    save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
 
-    # html_result = template.render(results=report['results'], total=[total], detail_report=current_test_report)
-    # save_html_report(html_result, session_dir, 'session_report_embed_img.html')
+    html_result = template.render(total={'_cur_': total}, results={'_cur_': report['results']}, detail_report={'_cur_': current_test_report})
+    save_html_report(html_result, session_dir, 'session_report_embed_img.html')
 
 
 def build_summary_report(work_dir):
 
     summary_report = {}
     summary_report_all_tests = {}
+    summary_report_all_tests_embed_img = {}
     summary_total = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
@@ -123,9 +124,14 @@ def build_summary_report(work_dir):
                             if 'baseline_color_path' in jtem.keys():
                                 jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, execution_name, jtem['baseline_color_path']), work_dir)})
 
+            elif file.endswith('all_tests_summary_embed_img.json'):
+                with open(os.path.join(path, file), 'r') as file:
+                    execution_name = os.path.basename(path)
+                    summary_report_all_tests_embed_img[execution_name] = json.loads(file.read())
 
     save_json_report(summary_report, work_dir, 'summary_report.json')
     save_json_report(summary_report_all_tests, work_dir, 'summary_report_all_tests.json')
+    save_json_report(summary_report_all_tests_embed_img, work_dir, 'summary_report_all_tests_embed_img.json')
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -135,3 +141,6 @@ def build_summary_report(work_dir):
 
     html_result = template.render(total=summary_total, results=summary_report, detail_report=summary_report_all_tests)
     save_html_report(html_result, work_dir, 'summary_report.html')
+
+    html_result = template.render(total=summary_total, results=summary_report, detail_report=summary_report_all_tests_embed_img)
+    save_html_report(html_result, work_dir, 'summary_report_embed_img.html')

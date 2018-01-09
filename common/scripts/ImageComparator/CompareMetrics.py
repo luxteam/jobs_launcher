@@ -16,153 +16,153 @@ from scipy.spatial.distance import cosine
 
 class CompareMetrics(object):
 
-	def __init__ (self, file1, file2):
-		self.file1 = file1
-		self.file2 = file2
+    def __init__ (self, file1, file2):
+        self.file1 = file1
+        self.file2 = file2
 
-		self.img1 = 0
-		self.img2 = 0
+        self.img1 = 0
+        self.img2 = 0
 
-		if self.readImages():
+        if self.readImages():
 
-			self.diff_pixeles = 0
+            self.diff_pixeles = 0
 
-			self.nrmds_norm = 0
-			self.hamming_norm = 0
-			self.manhattan_norm = 0
-			self.correlation_norm = 0
-			self.euclidean_norm = 0
-			self.sqeuclidean_norm = 0
-			self.chebyshev_norm = 0
-			self.braycurtis_norm = 0
-			self.cosine_norm = 0
-			self.canberra_norm = 0
-
-
-	def normalize(self, arr):
-	    rng = arr.max()-arr.min()
-	    amin = arr.min()
-	    return (arr-amin)*255/rng
+            self.nrmds_norm = 0
+            self.hamming_norm = 0
+            self.manhattan_norm = 0
+            self.correlation_norm = 0
+            self.euclidean_norm = 0
+            self.sqeuclidean_norm = 0
+            self.chebyshev_norm = 0
+            self.braycurtis_norm = 0
+            self.cosine_norm = 0
+            self.canberra_norm = 0
 
 
-	def getDiffPixeles(self, tolerance=3):
-
-		if self.diff_pixeles:
-			return self.diff_pixeles
-		else:
-			# self.img1 = self.normalize(self.img1)
-			# self.img2 = self.normalize(self.img2)
-
-			img1R = self.img1[:, :, 0]
-			img1G = self.img1[:, :, 1]
-			img1B = self.img1[:, :, 2]
-			# img1A = self.img1[:, :, 3]
-
-			img2R = self.img2[:, :, 0]
-			img2G = self.img2[:, :, 1]
-			img2B = self.img2[:, :, 2]
-			# img2A = self.img2[:, :, 3]
-
-			diffR = abs(img1R - img2R)
-			diffG = abs(img1G - img2G)
-			diffB = abs(img1B - img2B)
-			# diffA = abs(img1A - img2A)
-
-			self.diff_pixeles = len(list(filter(
-				lambda x: x[0] <= tolerance and x[1] <= tolerance and x[2] <= tolerance, zip(diffR.ravel(), diffG.ravel(), diffB.ravel())
-				)))
-
-			# get percent
-			self.diff_pixeles = len(diffR.ravel()) - self.diff_pixeles
-			self.diff_pixeles = float (self.diff_pixeles / len(diffR.ravel())) * 100
-			
-			return round(self.diff_pixeles, 2)
+    def normalize(self, arr):
+        rng = arr.max()-arr.min()
+        amin = arr.min()
+        return (arr-amin)*255/rng
 
 
-	def readImages(self):
-		try:
-			self.img1 = imread(self.file1).astype(float)
-			self.img1ravel = self.img1.ravel()
-		except FileNotFoundError:
-			print ('File %s does not exist' % self.file1)
-			return False
-		
-		try:
-			self.img2 = imread(self.file2).astype(float)
-			self.img2ravel = self.img2.ravel()
-		except FileNotFoundError:
-			print ('File %s does not exist' % self.file2)
-			return False
+    def getDiffPixeles(self, tolerance=3):
 
-		return True
+        if self.diff_pixeles:
+            return self.diff_pixeles
+        else:
+            # self.img1 = self.normalize(self.img1)
+            # self.img2 = self.normalize(self.img2)
+
+            img1R = self.img1[:, :, 0]
+            img1G = self.img1[:, :, 1]
+            img1B = self.img1[:, :, 2]
+            # img1A = self.img1[:, :, 3]
+
+            img2R = self.img2[:, :, 0]
+            img2G = self.img2[:, :, 1]
+            img2B = self.img2[:, :, 2]
+            # img2A = self.img2[:, :, 3]
+
+            diffR = abs(img1R - img2R)
+            diffG = abs(img1G - img2G)
+            diffB = abs(img1B - img2B)
+            # diffA = abs(img1A - img2A)
+
+            self.diff_pixeles = len(list(filter(
+                lambda x: x[0] <= tolerance and x[1] <= tolerance and x[2] <= tolerance, zip(diffR.ravel(), diffG.ravel(), diffB.ravel())
+            )))
+
+            # get percent
+            self.diff_pixeles = len(diffR.ravel()) - self.diff_pixeles
+            self.diff_pixeles = float (self.diff_pixeles / len(diffR.ravel())) * 100
+
+            return round(self.diff_pixeles, 2)
 
 
-	def getNrmsd(self):
-		if self.nrmds_norm:
-			return self.nrmds_norm
-		else:
-			self.nrmds_norm = np.sqrt(np.mean((self.img1 - self.img2) ** 2)) / 255
-			return self.nrmds_norm
+    def readImages(self):
+        try:
+            self.img1 = imread(self.file1).astype(float)
+            self.img1ravel = self.img1.ravel()
+        except FileNotFoundError:
+            print ('File %s does not exist' % self.file1)
+            return False
 
-	def getHamming(self):
-		if self.hamming_norm:
-			return self.hamming_norm
-		else:
-			self.hamming_norm = hamming(self.img1ravel, self.img2ravel)
-			return self.hamming_norm
+        try:
+            self.img2 = imread(self.file2).astype(float)
+            self.img2ravel = self.img2.ravel()
+        except FileNotFoundError:
+            print ('File %s does not exist' % self.file2)
+            return False
 
-	def getManhattan(self):
-		if self.manhattan_norm:
-			return self.manhattan_norm
-		else:
-			self.manhattan_norm = cityblock(self.img1ravel, self.img2ravel)
-			return self.manhattan_norm
+        return True
 
-	def getCorrelation(self):
-		if self.correlation_norm:
-			return self.correlation_norm
-		else:
-			self.correlation_norm = correlation(self.img1ravel, self.img2ravel)
-			return self.correlation_norm
 
-	def getEuclidean(self):
-		if self.euclidean_norm:
-			return self.euclidean_norm
-		else:
-			self.euclidean_norm = euclidean(self.img1ravel, self.img2ravel)
-			return self.euclidean_norm
+    def getNrmsd(self):
+        if self.nrmds_norm:
+            return self.nrmds_norm
+        else:
+            self.nrmds_norm = np.sqrt(np.mean((self.img1 - self.img2) ** 2)) / 255
+            return self.nrmds_norm
 
-	def getSqueclidean(self):
-		if self.sqeuclidean_norm:
-			return self.sqeuclidean_norm
-		else:
-			self.sqeuclidean_norm = sqeuclidean(self.img1ravel, self.img2ravel)
-			return self.sqeuclidean_norm
+    def getHamming(self):
+        if self.hamming_norm:
+            return self.hamming_norm
+        else:
+            self.hamming_norm = hamming(self.img1ravel, self.img2ravel)
+            return self.hamming_norm
 
-	def getChebyshev(self):
-		if self.chebyshev_norm:
-			return self.chebyshev_norm
-		else:
-			self.chebyshev_norm = chebyshev(self.img1ravel, self.img2ravel)
-			return self.chebyshev_norm
+    def getManhattan(self):
+        if self.manhattan_norm:
+            return self.manhattan_norm
+        else:
+            self.manhattan_norm = cityblock(self.img1ravel, self.img2ravel)
+            return self.manhattan_norm
 
-	def getBraycurtis(self):
-		if self.braycurtis_norm:
-			return self.braycurtis_norm
-		else:
-			self.braycurtis_norm = braycurtis(self.img1ravel, self.img2ravel)
-			return self.braycurtis_norm
+    def getCorrelation(self):
+        if self.correlation_norm:
+            return self.correlation_norm
+        else:
+            self.correlation_norm = correlation(self.img1ravel, self.img2ravel)
+            return self.correlation_norm
 
-	def getCanberra(self):
-		if self.canberra_norm:
-			return self.canberra_norm
-		else:
-			self.canberra_norm = canberra(self.img1ravel, self.img2ravel)
-			return self.canberra_norm
+    def getEuclidean(self):
+        if self.euclidean_norm:
+            return self.euclidean_norm
+        else:
+            self.euclidean_norm = euclidean(self.img1ravel, self.img2ravel)
+            return self.euclidean_norm
 
-	def getCosine(self):
-		if self.cosine_norm:
-			return self.cosine_norm
-		else:
-			self.cosine_norm = cosine(self.img1ravel, self.img2ravel)
-			return self.cosine_norm
+    def getSqueclidean(self):
+        if self.sqeuclidean_norm:
+            return self.sqeuclidean_norm
+        else:
+            self.sqeuclidean_norm = sqeuclidean(self.img1ravel, self.img2ravel)
+            return self.sqeuclidean_norm
+
+    def getChebyshev(self):
+        if self.chebyshev_norm:
+            return self.chebyshev_norm
+        else:
+            self.chebyshev_norm = chebyshev(self.img1ravel, self.img2ravel)
+            return self.chebyshev_norm
+
+    def getBraycurtis(self):
+        if self.braycurtis_norm:
+            return self.braycurtis_norm
+        else:
+            self.braycurtis_norm = braycurtis(self.img1ravel, self.img2ravel)
+            return self.braycurtis_norm
+
+    def getCanberra(self):
+        if self.canberra_norm:
+            return self.canberra_norm
+        else:
+            self.canberra_norm = canberra(self.img1ravel, self.img2ravel)
+            return self.canberra_norm
+
+    def getCosine(self):
+        if self.cosine_norm:
+            return self.cosine_norm
+        else:
+            self.cosine_norm = cosine(self.img1ravel, self.img2ravel)
+            return self.cosine_norm

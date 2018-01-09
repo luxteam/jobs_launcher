@@ -36,6 +36,7 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, root_dir):
             img.update(diff)
             img.update(src)
 
+
     return jsonReport
 
 
