@@ -42,28 +42,36 @@ def make_base64_img(session_dir, report):
 
 
 def build_session_report(report, session_dir):
-    total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
+    total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
-    current_test_report = {}
-    current_test_expected = {}
+    # current_test_report = {}
+    # current_test_expected = {}
     all_test_summary = {}
 
     for result in report['results']:
         for item in report['results'][result]:
-            with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
-                current_test_report.update({' '.join([result, item]): json.loads(file.read())})
+            try:
+                # get report_compare.json by one tests group
+                with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
+                    all_test_summary.update({' '.join(filter(None, [result, item])): json.loads(file.read())})
+            except:
+                pass
+            else:
+                render_duration = 0.0
+                for jtem in all_test_summary[' '.join(filter(None, [result, item]))]:
+                    jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
+                    if 'render_opacity_path' in jtem.keys():
+                        jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
 
-            for jtem in current_test_report[' '.join([result, item])]:
-                jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
-                if 'render_opacity_path' in jtem.keys():
-                    jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
+                    if 'baseline_opacity_path' in jtem.keys():
+                        jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_opacity_path']), session_dir)})
+                    if 'baseline_color_path' in jtem.keys():
+                        jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
 
-                if 'baseline_opacity_path' in jtem.keys():
-                    jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_opacity_path']), session_dir)})
-                if 'baseline_color_path' in jtem.keys():
-                    jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
-
-            all_test_summary.update(current_test_report)
+                    render_duration += jtem['render_time']
+                report['results'][result][item].update({'render_duration': render_duration})
+            # collect all tests groups results in one dict
+            # all_test_summary.update(current_test_report)
 
     for result in report['results']:
         for item in report['results'][result]:
@@ -84,10 +92,11 @@ def build_session_report(report, session_dir):
     html_result = template.render(total={'_cur_': total}, results={'_cur_': report['results']}, detail_report={'_cur_': all_test_summary})
     save_html_report(html_result, session_dir, 'session_report.html')
 
-    current_test_report = make_base64_img(session_dir, current_test_report)
-    save_json_report(current_test_report, session_dir, 'all_tests_summary_embed_img.json')
+    # make embed_img reports
+    all_test_summary = make_base64_img(session_dir, all_test_summary)
+    save_json_report(all_test_summary, session_dir, 'all_tests_summary_embed_img.json')
 
-    html_result = template.render(total={'_cur_': total}, results={'_cur_': report['results']}, detail_report={'_cur_': current_test_report})
+    html_result = template.render(total={'_cur_': total}, results={'_cur_': report['results']}, detail_report={'_cur_': all_test_summary})
     save_html_report(html_result, session_dir, 'session_report_embed_img.html')
 
 
@@ -99,21 +108,26 @@ def build_summary_report(work_dir):
     summary_total = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
+            # collect all reports with execution info
             if file.endswith('session_report.json'):
                 with open(os.path.join(path, file), 'r') as file:
                     text = json.loads(file.read())
                 execution_name = os.path.basename(path)
+                # build dict {Folder_name: 'results' }
                 summary_report[execution_name] = text['results']
                 for item in summary_report[execution_name]:
                     for jtem in summary_report[execution_name][item]:
+                        # update relative links to local reports
                         summary_report[execution_name][item][jtem].update({'reportlink': os.path.relpath(os.path.join(work_dir, execution_name,summary_report[execution_name][item][jtem]['reportlink']), work_dir)})
 
                 summary_total[os.path.basename(path)] = text['summary']
+            # collect all reports with render info
             elif file.endswith('all_tests_summary.json'):
                 with open(os.path.join(path, file), 'r') as file:
                     execution_name = os.path.basename(path)
                     summary_report_all_tests[execution_name] = json.loads(file.read())
                     for test in summary_report_all_tests[execution_name]:
+                        # update relative links to images
                         for jtem in summary_report_all_tests[execution_name][test]:
                             jtem.update({'render_color_path': os.path.join(execution_name, jtem['render_color_path'])})
                             if 'render_opacity_path' in jtem.keys():
