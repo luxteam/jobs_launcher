@@ -146,6 +146,24 @@
             float: left;
             padding: 3px;
         }
+
+        .totalTR{
+            background-color: #d1d1d1;
+        }
+
+        .machineTR{
+            background-color: #afafaf;
+        }
+
+        .testTR{
+            background-color: #ccdee5;
+            font-size: 18px;
+        }
+
+        .badResultTR{
+            background-color: #ff9d8c;
+        }
+
     </style>
     <title>Title</title>
 </head>
@@ -246,7 +264,7 @@
                 {% endfor %}
             </tr>
             {% endfor %}
-            <tr>
+            <tr class="totalTR">
                 <td colspan="3"></td>
                 <td>{{ total[i].total }}</td>
                 <td>{{ total[i].passed }}</td>
@@ -268,18 +286,23 @@
     {% for i in detail_report %}
         {% set toploop = loop %}
         {% if i != "_cur_" %}
-            <tr>
+            <tr class="machineTR">
                 <td colspan="10"><h2>{{ i }}</h2></td>
             </tr>
         {% endif %}
 
         {% for test in detail_report[i] %}
-            <tr>
-                <td colspan="8">
-                    <h3><a name="{{ i }}{{ test }}">{{ test }}</a></h3>
+            <tr class="testTR">
+                <td colspan="10">
+                    Test: <a name="{{ i }}{{ test }}">{{ test }}</a>
+                    <br>
                     Plugin version: {{ detail_report[i][test][0].render_version }}
                     <br>
                     Hardware: {{ detail_report[i][test][0].render_device }}
+                    <br>
+                    Time border: 15.0 s
+                    <br>
+                    Color difference border: 10.0
                 </td>
             </tr>
             {% if detail_report[i][test] | length > 0 %}
@@ -289,18 +312,29 @@
                     <th>Scene options</th>
                     <th>File name</th>
                     <th>Render time, s</th>
+                    <th>Opacity Difference</th>
                     <th>Baseline Opacity</th>
                     <th>Rendered Opacity</th>
+                    <th>Color Difference</th>
                     <th>Baseline Color</th>
                     <th>Rendered color</th>
                 </tr>
                 {% for item in detail_report[i][test] %}
+                {% if item.render_time > 15 %}
+                <tr class="badResultTR">
+                {% elif not item.difference_color is string %}
+                    {% if item.difference_color > 10 %}
+                <tr class="badResultTR">
+                    {% endif %}
+                {% else %}
                 <tr>
+                {% endif %}
                     <td>{{ item.scene_name }}</td>
                     <td></td>
                     <td>{{ item.file_name }}</td>
                     <td>{{ item.render_time }}</td>
 
+                    <td>{{ item.difference_opacity }}</td>
                     <td class="hatching">
                     {% if item.baseline_opacity_path %}
                         <img src="{{ item.baseline_opacity_path }}"/>
@@ -318,6 +352,7 @@
                     {% endif %}
                     </td>
 
+                    <td>{{ item.difference_color }}</td>
                     <td class="hatching">
                     {% if item.baseline_color_path %}
                         <img src="{{ item.baseline_color_path }}"/>

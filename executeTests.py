@@ -29,6 +29,36 @@ def validate_cmd_execution(stage_name, stage_path):
         return report[0]['status']
 
 
+def parse_cmd_variables(tests_root, cmd_variables):
+    config_devices = {}
+    new_config = []
+    try:
+        with open(os.path.join(os.path.split(tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
+            config_devices = file.read()
+            config_devices = json.loads(config_devices)
+    except:
+        pass
+
+    for item in cmd_variables['RenderDevice'].split(','):
+        # if its int index of device
+        if item in config_devices.values():
+            pass
+        # else - get index by name from json file
+        elif config_devices:
+            new_config.append(config_devices[item])
+
+    # TODO: add check that 'RenderDevice' is digit, if config.json doesn't exist
+
+    if new_config:
+        cmd_variables['RenderDevice'] = ','.join(new_config)
+
+    temp = cmd_variables['RenderDevice'].split(',')
+    temp.sort()
+    cmd_variables['RenderDevice'] = ','.join(temp)
+
+    return cmd_variables
+
+
 def main():
     level = 0
     delim = ' '*level
@@ -43,29 +73,7 @@ def main():
     args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
     args.tests_root = os.path.abspath(args.tests_root)
 
-    config_devices = {}
-    new_config = []
-    try:
-        with open(os.path.join(os.path.split(args.tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
-            config_devices = file.read()
-            config_devices = json.loads(config_devices)
-    except:
-        pass
-
-    for item in args.cmd_variables['RenderDevice'].split(','):
-        if item in config_devices.values():
-            pass
-        elif config_devices:
-            new_config.append(config_devices[item])
-
-    # TODO: add check that 'RendderDevice' is digit, if config.json doesn't exist
-
-    if new_config:
-        args.cmd_variables['RenderDevice'] = ','.join(new_config)
-
-    temp = args.cmd_variables['RenderDevice'].split(',')
-    temp.sort()
-    args.cmd_variables['RenderDevice'] = ','.join(temp)
+    args.cmd_variables = parse_cmd_variables(args.tests_root, args.cmd_variables)
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
