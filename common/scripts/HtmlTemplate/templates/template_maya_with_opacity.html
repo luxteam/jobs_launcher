@@ -37,10 +37,10 @@
 			<td>Baseline Opacity</td>
 		</tr>
 		<tr>
-			<td colspan="2"><img src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
-			<td colspan="2"><img src="{{ item.baseline_color_path }}" onclick="resizeImg(this)"/></td>
-			<td colspan="2"><img src="{{ item.render_opacity_path}}" onclick="resizeImg(this)"/></td>
-			<td><img src="{{ item.baseline_opacity_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="2"><img class="zoomImg" src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="2"><img class="zoomImg" src="{{ item.baseline_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="2"><img class="zoomImg" src="{{ item.render_opacity_path}}" onclick="resizeImg(this)"/></td>
+			<td><img class="zoomImg" src="{{ item.baseline_opacity_path }}" onclick="resizeImg(this)"/></td>
 		</tr>
             {% else %}
 		<tr>
@@ -48,8 +48,8 @@
 			<td colspan="3">Rendered Opacity</td>
 		</tr>
 		<tr>
-			<td colspan="4"><img src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
-			<td colspan="3"><img src="{{ item.render_opacity_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="4"><img class="zoomImg" src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="3"><img class="zoomImg" src="{{ item.render_opacity_path }}" onclick="resizeImg(this)"/></td>
 		</tr>
             {% endif %}
 

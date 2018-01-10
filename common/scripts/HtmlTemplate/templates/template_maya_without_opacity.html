@@ -35,15 +35,15 @@
 			<td colspan="3">Baseline Color</td>
 		</tr>
 		<tr>
-			<td colspan="4"><img src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
-			<td colspan="3"><img src="{{ item.baseline_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="4"><img class="zoomImg" src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="3"><img class="zoomImg" src="{{ item.baseline_color_path }}" onclick="resizeImg(this)"/></td>
 		</tr>
             {% else %}
 		<tr>
 			<td colspan="7">Rendered Color</td>
 		</tr>
 		<tr>
-			<td colspan="7"><img src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
+			<td colspan="7"><img class="zoomImg" src="{{ item.render_color_path }}" onclick="resizeImg(this)"/></td>
 		</tr>
             {% endif %}
 
