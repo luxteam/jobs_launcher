@@ -117,7 +117,7 @@ def main():
     #     json.dump(found_jobs, file, indent=' ')
     #     print("JSON JOBS", json_jobs)
 
-    core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
+    # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:
         print("Processing ", found_job[0])

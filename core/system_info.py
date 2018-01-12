@@ -39,11 +39,13 @@ def get_machine_info():
     try:
         info = {}
         info['os'] = get_os()
-        #info['driver'] = get_driver_ver()
+        info['driver'] = get_driver_ver()
         info['host'] = platform.node()
         info['cpu_count'] = str(psutil.cpu_count())
-        #info['asic'] = ''#get_gpu_name()
-        #inf#o['asic_count'] = "{}".format(len(info['asic'].split('+')))
+        # info['asic'] = get_gpu_name()
+        # info['asic_count'] = "{}".format(len(info['asic'].split('+')))
+        info['ram'] = psutil.virtual_memory().total / 1024 ** 3
+        info['cpu'] = platform.processor()
         return info
     except Exception as err:
         print("Exception: {0}".format(err))
