@@ -124,6 +124,7 @@
             color: #000;
             text-decoration: none;
             border: 1px solid black;
+            z-index: 2;
         }
 
         .hatching {
@@ -247,9 +248,9 @@
         {% for test_package in report[i].results %}
             {% set resultsloop = loop %}
         <tr>
-            <td rowspan="{{ report[i].results[test_package] | length }}"><a href="#{{ i }}">{{ test_package }}</a></td>
+            <td rowspan="{{ report[i].results[test_package] | length }}"><a href="#{{ i }}{{ test_package }}">{{ test_package }}</a></td>
             {% for test_conf in report[i].results[test_package] %}
-                <td><a href="#{{ i }}">{{ test_conf }}</a></td>
+                <td><a href="#{{ i }}{{ test_package }}{{ test_conf }}">{{ test_conf }}</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].reportlink }}">Report</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
@@ -321,7 +322,7 @@
 
         <tr class="testTR">
             <td colspan="10">
-                Test: <a name="{{ i }}">{{ test_package }} {{ test_conf }}</a>
+                Test: <a name="{{ i }}{{ test_package }}{{ test_conf }}">{{ test_package }} {{ test_conf }}</a>
                 <br>
                 Plugin version: {{ report[i].results[test_package][test_conf].render_results[0].render_version }}
                 <br>
