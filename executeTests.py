@@ -70,10 +70,14 @@ def main():
     parser.add_argument('--cmd_variables', required=False, nargs="*")
 
     args = parser.parse_args()
-    args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
-    args.tests_root = os.path.abspath(args.tests_root)
+    print(args.cmd_variables)
+    if args.cmd_variables:
+        args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
+        args.cmd_variables = parse_cmd_variables(args.tests_root, args.cmd_variables)
+    else:
+        args.cmd_variables = {}
 
-    args.cmd_variables = parse_cmd_variables(args.tests_root, args.cmd_variables)
+    args.tests_root = os.path.abspath(args.tests_root)
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
@@ -112,15 +116,10 @@ def main():
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables)
 
-    # with open('d:\works.json', 'w') as file:
-    #     json_jobs = json.dumps(found_jobs, indent = 4)
-    #     json.dump(found_jobs, file, indent=' ')
-    #     print("JSON JOBS", json_jobs)
-
     # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:
-        print("Processing ", found_job[0])
+        print("Processing {}  {}/{}".format(found_job[0], len(found_jobs), len(found_jobs)))
         report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'result_path': '',   'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
@@ -133,7 +132,6 @@ def main():
 
             if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                break
             elif validate_cmd_execution(found_job[5][i], temp_path) == 'TERMINATED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
             else:

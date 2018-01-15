@@ -2,6 +2,7 @@ import os
 import json
 import argparse
 import time
+import random
 
 
 def createArgParser():
@@ -20,7 +21,7 @@ def main():
     stage_report = [{'status': 'INIT'}, {'log': ['test_stage.py start; __ ' + args.stage_report]}]
     previous_report = []
 
-    time.sleep(1)
+    time.sleep(random.randint(1, 3))
 
     try:
         os.makedirs(os.path.abspath(args.output_folder))

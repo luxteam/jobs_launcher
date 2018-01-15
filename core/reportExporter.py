@@ -1,7 +1,7 @@
 import os
 import jinja2
 import json
-import shutil
+
 import base64
 from PIL import Image
 
@@ -47,8 +47,6 @@ def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     current_test_report = {}
-    # current_test_expected = {}
-    # all_test_summary = {}
 
     for result in report['results']:
         for item in report['results'][result]:
@@ -57,27 +55,35 @@ def build_session_report(report, session_dir):
                 with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
                     current_test_report = json.loads(file.read())
                     # all_test_summary.update({' '.join(filter(None, [result, item])): current_test_report})
-            except:
-                pass
+            except Exception as err:
+                print("Expected 'report_compare.json' not found: " + str(err))
+                report['results'][result][item].update({'render_results': {}})
+                report['results'][result][item].update({'render_duration': -0.1})
             else:
+                print('_______ELSE')
                 render_duration = 0.0
-                # for jtem in all_test_summary[' '.join(filter(None, [result, item]))]:
-                for jtem in current_test_report:
-                    jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
-                    if 'render_opacity_path' in jtem.keys():
-                        jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
-                    if 'baseline_opacity_path' in jtem.keys():
-                        jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_opacity_path']), session_dir)})
-                    if 'baseline_color_path' in jtem.keys():
-                        jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
+                try:
+                    for jtem in current_test_report:
+                        jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
+                        if 'render_opacity_path' in jtem.keys():
+                            jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
+                        if 'baseline_opacity_path' in jtem.keys():
+                            jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_opacity_path']), session_dir)})
+                        if 'baseline_color_path' in jtem.keys():
+                            jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
 
-                    render_duration += jtem['render_time']
-                # unite launcher report and render report
+                        render_duration += jtem['render_time']
+                    # unite launcher report and render report
+
+                except Exception as err:
+                    print("Exception while update render report: " + str(err))
+                    render_duration = -0.1
+
                 report['results'][result][item].update({'render_results': current_test_report})
                 report['results'][result][item].update({'render_duration': render_duration})
 
+    save_json_report(report, session_dir, 'session_report_temp.json')
     # get summary results
-    # TODO: catch if test failed and render_duration doesn't exist
     for result in report['results']:
         for item in report['results'][result]:
             for key in total:
@@ -107,47 +113,6 @@ def build_session_report(report, session_dir):
 def build_summary_report(work_dir):
 
     summary_report = {}
-    summary_report_all_tests = {}
-    summary_report_all_tests_embed_img = {}
-    summary_total = {}
-    # for path, dirs, files in os.walk(os.path.abspath(work_dir)):
-    #     for file in files:
-    #         # collect all reports with execution info
-    #         if file.endswith('session_report.json'):
-    #             with open(os.path.join(path, file), 'r') as file:
-    #                 text = json.loads(file.read())
-    #             execution_name = os.path.basename(path)
-    #             # build dict {Folder_name: 'results' }
-    #             summary_report[execution_name] = text['results']
-    #             for item in summary_report[execution_name]:
-    #                 for jtem in summary_report[execution_name][item]:
-    #                     # update relative links to local reports
-    #                     summary_report[execution_name][item][jtem].update({'reportlink': os.path.relpath(os.path.join(work_dir, execution_name,summary_report[execution_name][item][jtem]['reportlink']), work_dir)})
-    #
-    #             summary_total[os.path.basename(path)] = text['summary']
-    #         # collect all reports with render info
-    #         elif file.endswith('all_tests_summary.json'):
-    #             with open(os.path.join(path, file), 'r') as file:
-    #                 execution_name = os.path.basename(path)
-    #                 summary_report_all_tests[execution_name] = json.loads(file.read())
-    #                 for test in summary_report_all_tests[execution_name]:
-    #                     # update relative links to images
-    #                     for jtem in summary_report_all_tests[execution_name][test]:
-    #                         jtem.update({'render_color_path': os.path.join(execution_name, jtem['render_color_path'])})
-    #                         if 'render_opacity_path' in jtem.keys():
-    #                             jtem.update({'render_opacity_path': os.path.join(execution_name, jtem['render_opacity_path'])})
-    #
-    #                         if 'baseline_opacity_path' in jtem.keys():
-    #                             jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(work_dir, execution_name, jtem['baseline_opacity_path']), work_dir)})
-    #                         if 'baseline_color_path' in jtem.keys():
-    #                             jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, execution_name, jtem['baseline_color_path']), work_dir)})
-    #
-    #         elif file.endswith('all_tests_summary_embed_img.json'):
-    #             with open(os.path.join(path, file), 'r') as file:
-    #                 execution_name = os.path.basename(path)
-    #                 summary_report_all_tests_embed_img[execution_name] = json.loads(file.read())
-
-    summary_report = {}
     summary_report_embed_img = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
@@ -171,8 +136,6 @@ def build_summary_report(work_dir):
                                 jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_opacity_path']), work_dir)})
                             if 'baseline_color_path' in jtem.keys():
                                 jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_color_path']), work_dir)})
-
-
 
     save_json_report(summary_report, work_dir, 'summary_report.json')
     # save_json_report(summary_report_all_tests, work_dir, 'summary_report_all_tests.json')
