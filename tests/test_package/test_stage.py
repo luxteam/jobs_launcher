@@ -4,7 +4,6 @@ import argparse
 import time
 import random
 
-
 def createArgParser():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--stage_report')
@@ -17,6 +16,7 @@ def createArgParser():
 
 
 def main():
+
     args = createArgParser().parse_args()
     stage_report = [{'status': 'INIT'}, {'log': ['test_stage.py start; __ ' + args.stage_report]}]
     previous_report = []

@@ -1,6 +1,6 @@
-sudo apt install gcc python-dev python3.5-dev python-pip
+# sudo apt install gcc python-dev python3.5-dev python-pip
 
-alias python=python3
+# alias python=python3
 
 python get-pip.py
 python -m pip install --upgrade pip wheel setuptools

@@ -6,11 +6,11 @@ import json
 
 import core.reportExporter
 import core.system_info
+from core.auto_dict import AutoDict
+from core.config import *
 
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
-
-from core.auto_dict import AutoDict
 
 SCRIPTS = os.path.dirname( os.path.realpath(__file__) )
 # TODO: mb make common simpleRender for Maya and Max
@@ -60,6 +60,7 @@ def parse_cmd_variables(tests_root, cmd_variables):
 
 
 def main():
+
     level = 0
     delim = ' '*level
 
@@ -70,6 +71,9 @@ def main():
     parser.add_argument('--cmd_variables', required=False, nargs="*")
 
     args = parser.parse_args()
+
+    main_logger.info('Started with args: {}'.format(args))
+
     print(args.cmd_variables)
     if args.cmd_variables:
         args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
@@ -116,10 +120,12 @@ def main():
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables)
 
-    # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
+    core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:
-        print("Processing {}  {}/{}".format(found_job[0], len(found_jobs), len(found_jobs)))
+        main_logger.info('Started job: {}'.format(found_job[0]))
+
+        print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
         report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'result_path': '',   'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
@@ -132,8 +138,10 @@ def main():
 
             if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
+                main_logger.error('Job FAILED')
             elif validate_cmd_execution(found_job[5][i], temp_path) == 'TERMINATED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
+                main_logger.error('Job was TERMINATED')
             else:
                 if not report['results'][found_job[0]][' '.join(found_job[1])]['failed']:
                     report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1

@@ -6,6 +6,7 @@ import re
 
 from xml.etree import ElementTree as ET
 
+from core.config import *
 
 class ParsingError(Exception): pass
 
@@ -14,6 +15,8 @@ default_package_options = {'variables': {}, 'options': collections.OrderedDict()
 
 
 def parse_package_manifest(level, filename, cmd_variables, package_options=copy.deepcopy(default_package_options)):
+    main_logger.info('Start processing package {}'.format(filename))
+
     delim = ' '*level
     file_dir = os.path.dirname(filename)
     root = None
@@ -38,15 +41,17 @@ def parse_package_manifest(level, filename, cmd_variables, package_options=copy.
 
     for elem in root:
 
+        for key, value in cmd_variables.items():
+            package_options['variables'][key] = value
+
+        package_options['variables']['CWD'] = file_dir
+
         if elem.tag == 'variable':
             name = elem.attrib.get('name')
             value = elem.attrib.get('value')
-            value = value.format(CWD=file_dir)
+            value = value.format(**package_options['variables'])
             #print(name + '=' + value)
             package_options['variables'][name] = value
-
-        for key, value in cmd_variables.items():
-            package_options['variables'][key] = value
 
         if elem.tag == 'option':
             option_name = elem.attrib.get('name')

@@ -60,7 +60,6 @@ def build_session_report(report, session_dir):
                 report['results'][result][item].update({'render_results': {}})
                 report['results'][result][item].update({'render_duration': -0.1})
             else:
-                print('_______ELSE')
                 render_duration = 0.0
                 try:
                     for jtem in current_test_report:
@@ -74,7 +73,6 @@ def build_session_report(report, session_dir):
 
                         render_duration += jtem['render_time']
                     # unite launcher report and render report
-
                 except Exception as err:
                     print("Exception while update render report: " + str(err))
                     render_duration = -0.1
@@ -97,10 +95,9 @@ def build_session_report(report, session_dir):
     template = env.get_template('session_report.html')
 
     save_json_report(report, session_dir, 'session_report.json')
-    # save_json_report(all_test_summary, session_dir, 'all_tests_summary.json')
 
     html_result = template.render(title='Session report', report={'_cur_': report})
-    # save_html_report(html_result, session_dir, 'session_report.html')
+    save_html_report(html_result, session_dir, 'session_report.html')
 
     # make embed_img reports
     report = make_base64_img(session_dir, report)
