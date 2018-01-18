@@ -160,8 +160,8 @@ def main():
 
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
-    # print("Saving summary report")
-    # core.reportExporter.build_summary_report(args.work_root)
+    print("Saving summary report")
+    core.reportExporter.build_summary_report(args.work_root)
 
 
 if __name__ == "__main__":

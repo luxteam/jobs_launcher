@@ -78,7 +78,6 @@ def build_session_report(report, session_dir):
                     render_duration = -0.1
 
                 if current_test_report:
-                    print('add render_results')
                     report['results'][result][item].update({'render_results': current_test_report})
 
                 report['results'][result][item].update({'render_duration': render_duration})
