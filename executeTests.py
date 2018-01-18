@@ -126,13 +126,14 @@ def main():
         main_logger.info('Started job: {}'.format(found_job[0]))
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
-        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'result_path': '',   'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
+        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
             # print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             print("  Executing job {}/{}".format(i+1, len(found_job[3])))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
+            # TODO: del reportlink
             report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
@@ -159,8 +160,8 @@ def main():
 
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
-    print("Saving summary report")
-    core.reportExporter.build_summary_report(args.work_root)
+    # print("Saving summary report")
+    # core.reportExporter.build_summary_report(args.work_root)
 
 
 if __name__ == "__main__":

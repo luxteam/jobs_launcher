@@ -43,7 +43,12 @@ def main():
 
         try:
             with open(os.path.join(args.output_folder, args.current_report), 'w') as file:
-                previous_report.append({'stage_name': args.stage_report.replace('.json', '')})
+                previous_report.append({'stage_name': args.stage_report.replace('.json', ''),
+                                        'render_version': 10,
+                                        'render_device': 'smh',
+                                        'render_time': 10,
+                                        'difference_color': 10
+                                        })
                 json.dump(previous_report, file, indent=' ')
         except OSError as e:
             stage_report[0]['status'] = 'ERROR'

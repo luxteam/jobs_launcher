@@ -324,9 +324,9 @@
             <td colspan="10">
                 Test: <a name="{{ i }}{{ test_package }}{{ test_conf }}">{{ test_package }} {{ test_conf }}</a>
                 <br>
-                Plugin version: {{ report[i].results[test_package][test_conf].render_results[0].render_version }}
+                Plugin version: {# report[i].results[test_package][test_conf].render_results[0].render_version #}
                 <br>
-                Hardware: {{ report[i].results[test_package][test_conf].render_results[0].render_device }}
+                Hardware: {# report[i].results[test_package][test_conf].render_results[0].render_device #}
             </td>
         </tr>
 

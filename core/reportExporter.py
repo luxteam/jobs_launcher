@@ -77,7 +77,10 @@ def build_session_report(report, session_dir):
                     print("Exception while update render report: " + str(err))
                     render_duration = -0.1
 
-                report['results'][result][item].update({'render_results': current_test_report})
+                if current_test_report:
+                    print('add render_results')
+                    report['results'][result][item].update({'render_results': current_test_report})
+
                 report['results'][result][item].update({'render_duration': render_duration})
 
     save_json_report(report, session_dir, 'session_report_temp.json')

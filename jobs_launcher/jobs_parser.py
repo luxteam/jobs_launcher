@@ -212,7 +212,7 @@ def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd
     current_job_dir = os.path.join(job_root_dir, job_sub_path)
     dir_items = os.listdir(path=current_job_dir)
 
-    for dir_item in dir_items:
+    for dir_item in   dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
         if dir_item_path.endswith('.package-manifest.xml') and os.path.isfile(dir_item_path):
             parse_package_manifest(level, dir_item_path, cmd_variables, package_options)
