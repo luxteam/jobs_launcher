@@ -93,7 +93,7 @@ def build_session_report(report, session_dir):
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=jinja2.select_autoescape(['html'])
+        autoescape=True
     )
     template = env.get_template('session_report.html')
 
@@ -143,7 +143,7 @@ def build_summary_report(work_dir):
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=jinja2.select_autoescape(['html'])
+        autoescape=True
     )
     template = env.get_template('session_report.html')
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style media="screen" type="text/css">
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            width: auto;
+            padding: 5px;
+	    text-align: center;
+        }
+    </style>
+    <title>{{ title }}</title>
+</head>
+
+<body>
+    <table>
+        <tr>
+            {% for folder in folders %}
+            <th>{{ folder }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for file in files_list %}
+        <tr>
+            <td  colspan={{ folders|length }} >{{ file }}<br>{# files_list[file] #}</td>
+        </tr>
+	<tr>
+            {% for folder in folders %}
+            <td><img src='{{ folder }}/{{ file }}'/>
+            <br>
+            {{ files_hash[folder + file] }}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+
+</html>

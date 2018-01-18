@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from jinja2 import Environment
 from jinja2 import PackageLoader
-from jinja2 import select_autoescape
 
 import argparse
 import os
@@ -35,7 +34,7 @@ def main():
 
     env = Environment(
         loader=PackageLoader('htmlBuilder', 'templates'),
-        autoescape=select_autoescape(['html'])
+        autoescape=True
     )
 
     template = env.get_template(args.template_name)
