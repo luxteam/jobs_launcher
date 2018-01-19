@@ -29,13 +29,11 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, root_dir):
 
             diff = {key_diff: metrics.getDiffPixeles()}
             src = {key_src: os.path.relpath(file2, root_dir)}
-        except:
-            # print("Diff tool can't find path")
-            pass
+        except Exception as err:
+            print("Error: " + str(err))
         else:
             img.update(diff)
             img.update(src)
-
 
     return jsonReport
 
