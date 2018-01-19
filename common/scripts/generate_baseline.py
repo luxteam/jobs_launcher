@@ -28,24 +28,28 @@ def main():
                     report = json.loads(json_report.read())
 
                 for test in  report:
-                    baseline_name = '.'.join([test['tool'], test['render_device'], test['render_version']])
+                    # baseline_name = '.'.join([test['tool'], test['render_device'], test['render_version']])
                     for img in ['render_color_path', 'render_opacity_path']:
-                        if test[img]:
+                        try:
                             rendered_img_path = os.path.join(path, test[img])
                             baseline_img_path = os.path.relpath(rendered_img_path, args.results_root)
 
                             # if not os.path.exists(os.path.join(args.baseline_root, baseline_name, os.path.split(baseline_img_path)[0])):
                             try:
-                                os.makedirs(os.path.join(args.baseline_root, baseline_name, os.path.split(baseline_img_path)[0]))
+                                os.makedirs(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0]))
+                                # os.makedirs(os.path.join(args.baseline_root, baseline_name, os.path.split(baseline_img_path)[0]))
                             except Exception as err:
                                 print(str(err))
 
                             try:
-                                shutil.copyfile(rendered_img_path, os.path.join(args.baseline_root, baseline_name, baseline_img_path))
+                                shutil.copyfile(rendered_img_path, os.path.join(args.baseline_root, baseline_img_path))
+                                # shutil.copyfile(rendered_img_path, os.path.join(args.baseline_root, baseline_name, baseline_img_path))
                             except Exception as err:
                                 print(str(err))
-
-                shutil.copyfile(os.path.join(path, file), os.path.join(args.baseline_root, baseline_name,
+                        except:
+                            pass
+                # shutil.copyfile(os.path.join(path, file), os.path.join(args.baseline_root, baseline_name,
+                shutil.copyfile(os.path.join(path, file), os.path.join(args.baseline_root,
                                                                        os.path.relpath(os.path.join(path, file),
                                                                                        args.results_root)))
 

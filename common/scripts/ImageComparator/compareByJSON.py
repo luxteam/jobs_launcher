@@ -72,7 +72,7 @@ def main(args):
     if os.path.exists(os.path.abspath(args.base_dir)):
         for path, dirs, files in os.walk(args.base_dir):
             for dir in dirs:
-                if dir == 'Opacity' or dir == 'Color':
+                if dir == 'Opacity' or dir == 'Color' or dir == 'images':
                     if os.path.basename(path) == os.path.basename(args.work_dir):
                     # stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
                         jsonReport = compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir), args.work_dir)

@@ -37,8 +37,8 @@ def make_base64_img(session_dir, report):
 
                         src = "data:image/jpeg;base64," + str(code)[2:-1]
                         test_execution.update({img: src})
-                    except:
-                        pass
+                    except Exception as err:
+                        print("Base64 error: " + str(err))
 
     return report
 
@@ -82,7 +82,6 @@ def build_session_report(report, session_dir):
 
                 report['results'][result][item].update({'render_duration': render_duration})
 
-    save_json_report(report, session_dir, 'session_report_temp.json')
     # get summary results
     for result in report['results']:
         for item in report['results'][result]:
