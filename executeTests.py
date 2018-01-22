@@ -120,7 +120,7 @@ def main():
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables)
 
-    core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
+    # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
