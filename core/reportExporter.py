@@ -7,12 +7,12 @@ from PIL import Image
 
 
 def save_json_report(report, session_dir, file_name):
-    with open(os.path.join(session_dir, file_name), "w") as file:
+    with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         json.dump(report, file, indent=" ", sort_keys=True)
 
 
 def save_html_report(report, session_dir, file_name):
-    with open(os.path.join(session_dir, file_name), "w") as file:
+    with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         file.write(report)
 
 
