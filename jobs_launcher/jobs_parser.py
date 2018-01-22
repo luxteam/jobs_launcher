@@ -74,7 +74,11 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
     delim = ' ' * level
     job_file_path = os.path.join(job_root_dir, job_rel_path)
     job_rel_dir = os.path.dirname(job_rel_path)
+
+    # for remove Tests dir
+    job_rel_dir = os.path.split(job_rel_dir)[1]
     #output_dir = job_rel_dir #os.path.join(session_dir, job_rel_dir)
+
     #print(delim + 'processing job... {} to dir {} '.format(os.path.abspath(job_file_path), output_dir))
 
     root = None

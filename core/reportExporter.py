@@ -38,7 +38,9 @@ def make_base64_img(session_dir, report):
                         src = "data:image/jpeg;base64," + str(code)[2:-1]
                         test_execution.update({img: src})
                     except Exception as err:
-                        print("Base64 error: " + str(err))
+                        # print("Base64 error: " + str(err))
+                        # TODO: add logger
+                        pass
 
     return report
 

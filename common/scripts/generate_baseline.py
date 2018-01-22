@@ -27,7 +27,7 @@ def main():
                 with open(os.path.join(path, file), 'r') as json_report:
                     report = json.loads(json_report.read())
 
-                for test in  report:
+                for test in report:
                     # baseline_name = '.'.join([test['tool'], test['render_device'], test['render_version']])
                     for img in ['render_color_path', 'render_opacity_path']:
                         try:
@@ -39,19 +39,35 @@ def main():
                                 os.makedirs(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0]))
                                 # os.makedirs(os.path.join(args.baseline_root, baseline_name, os.path.split(baseline_img_path)[0]))
                             except Exception as err:
-                                print(str(err))
+                                # print(str(err))
+                                pass
 
                             try:
                                 shutil.copyfile(rendered_img_path, os.path.join(args.baseline_root, baseline_img_path))
                                 # shutil.copyfile(rendered_img_path, os.path.join(args.baseline_root, baseline_name, baseline_img_path))
                             except Exception as err:
-                                print(str(err))
+                                # print(str(err))
+                                pass
                         except:
                             pass
                 # shutil.copyfile(os.path.join(path, file), os.path.join(args.baseline_root, baseline_name,
-                shutil.copyfile(os.path.join(path, file), os.path.join(args.baseline_root,
-                                                                       os.path.relpath(os.path.join(path, file),
-                                                                                       args.results_root)))
+                shutil.copyfile(os.path.join(path, file),
+                                os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, file),args.results_root))
+                                )
+            elif file == 'result.html':
+                shutil.copyfile(os.path.join(path,file),
+                                os.path.join(args.baseline_root, os.path.relpath(os.path.join(path,file), args.results_root))
+                                )
+
+    try:
+        report = 'session_report.html'
+        shutil.copyfile(os.path.join(args.results_root, report),
+            os.path.join(os.path.abspath(args.baseline_root), report)
+                        )
+    except Exception as err:
+        print(str(err))
+        # pass
+
 
 if __name__ == '__main__':
     main()
