@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <style media="screen" type="text/css">
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
+        tr, th, td {
             width: auto;
             padding: 5px;
+            border: 1px solid black;
+        }
+        table{
+            border-collapse: collapse;
+
         }
 
         .heap {
@@ -152,21 +155,25 @@
             background-color: #d1d1d1;
         }
 
-        .machineTR{
-            background-color: #afafaf;
+        .machineTR td{
+            border: hidden;
         }
 
-        .testTR{
-            background-color: #ccdee5;
-            font-size: 18px;
+        .testTR td{
+            font-size: 24px;
+            font-weight: 900;
+            border-left: hidden;
+            border-right: hidden;
         }
 
-        .badResultTR{
+        .badResultTR td{
             background-color: #ff9d8c;
         }
 
-        .trHeader{
-            border 0px;
+        .no3borderTR{
+            border-top: hidden;
+            border-left: hidden;
+            border-right: hidden;
         }
 
     </style>
@@ -188,41 +195,59 @@
         <th>Skipped</th>
         <th>Time taken, s</th>
         <th>Render time, s</th>
-        <th>RAM, Gb</th>
-        <th>OS</th>
-        <th>CPU</th>
-        <th>CPU count</th>
     </tr>
 {% for i in report %}
     <tr>
         <td>{{ i }}</td>
-        <td>{{ report[i].machine_info.host }}</td>
+        <td>
+            <a href="#machineInfo{{ loop.index }}">{{ report[i].machine_info.host }}</a>
+            <a href="#x" class="overlay" id="machineInfo{{ loop.index }}"></a>
+            <div class="popup">
+                <a class="close" title="Close" href="#close"></a>
+                <table class="logTable">
+                    <tr>
+                        <th>RAM, Gb</th>
+                        <th>OS</th>
+                        <th>CPU</th>
+                        <th>CPU count</th>
+                        <th>GPU</th>
+                        <th>Plugin</th>
+                    </tr>
+                    <tr>
+                        <td>{{ report[i].machine_info.ram | round }}</td>
+                        <td>{{ report[i].machine_info.os }}</td>
+                        <td>{{ report[i].machine_info.cpu }}</td>
+                        <td>{{ report[i].machine_info.cpu_count }}</td>
+                        {% set test_name = report[i].results | first %}
+                        {% set test_conf = report[i].results[test_name] | first %}
+                        <td>{{ report[i].results[test_name][test_conf].render_results[0].render_device }}</td>
+                        <td>{{ report[i].results[test_name][test_conf].render_results[0].render_version }}</td>
+                    </tr>
+                </table>
+            </div>
+        </td>
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
         <td>{{ report[i].summary.failed }}</td>
         <td>{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
-        <td>{{ report[i].summary.render_duration }}</td>
-        <td>{{ report[i].machine_info.ram }}</td>
-        <td>{{ report[i].machine_info.os }}</td>
-        <td>{{ report[i].machine_info.cpu }}</td>
-        <td>{{ report[i].machine_info.cpu_count }}</td>
+        <td>{{ report[i].summary.render_duration | round(3) }}</td>
     </tr>
 {% endfor %}
-    <tr class="totalTR">
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
+    <!--<tr class="totalTR">-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+        <!--<td></td>-->
+    <!--</tr>-->
 </table>
 <hr>
 
@@ -234,9 +259,9 @@
 {% for i in report %}
     {% set toploop = loop %}
     {% if i != "_cur_" %}
-        <tr class="trHeader">
+        <tr class="no3borderTR">
             <td colspan="10">
-            <h3>{{ i }}</h3>
+                <h3>{{ i }}</h3>
             </td>
         </tr>
     {% endif %}
@@ -266,7 +291,7 @@
                 <td>{{ report[i].results[test_package][test_conf].failed }}</td>
                 <td>{{ report[i].results[test_package][test_conf].skipped }}</td>
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-                <td>{{ report[i].results[test_package][test_conf].render_duration }}</td>
+                <td>{{ report[i].results[test_package][test_conf].render_duration | round(3) }}</td>
                 <td>
                     <a href="#{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}">Show log</a>
                     <a href="#x" class="overlay" id="{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}"></a>
@@ -310,6 +335,8 @@
             <td>{{ report[i].summary.render_duration }}</td>
             <td></td>
         </tr>
+
+        <tr></tr>
 {% endfor %}
 </table>
 <hr>
@@ -331,17 +358,13 @@
         <tr class="testTR">
             <td colspan="10">
                 Test: <a name="{{ i }}{{ test_package }}{{ test_conf }}">{{ test_package }} {{ test_conf }}</a>
-                <br>
-                Plugin version: {{ report[i].results[test_package][test_conf].render_results[0].render_version }}
-                <br>
-                Hardware: {{ report[i].results[test_package][test_conf].render_results[0].render_device }}
             </td>
         </tr>
 
-    {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
+        {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
             <tr>
                 <th>Scene name</th>
-                <th>Scene options</th>
+                <!--<th>Scene options</th>-->
                 <th>File name</th>
                 <th>Render time, s</th>
                 <th>Opacity Difference</th>
@@ -352,21 +375,25 @@
                 <th>Rendered color</th>
             </tr>
             {% for item in report[i].results[test_package][test_conf].render_results %}
-            {% if item.render_time > 15 %}
+            {% if item.render_time > 3000 %}
             <tr class="badResultTR">
             {% elif not item.difference_color is string %}
-                {% if item.difference_color > 10 %}
+                {% if item.difference_color > 15 %}
             <tr class="badResultTR">
                 {% endif %}
             {% else %}
             <tr>
             {% endif %}
                 <td>{{ item.scene_name }}</td>
-                <td></td>
+                <!--<td></td>-->
                 <td>{{ item.file_name }}</td>
                 <td>{{ item.render_time }}</td>
 
-                <td>{{ item.difference_opacity }}</td>
+                {% if item.difference_opacity %}
+                    <td>{{ item.difference_opacity }}</td>
+                {% else %}
+                    <td>Not required</td>
+                {% endif %}
                 <td class="hatching">
                 {% if item.baseline_opacity_path %}
                     <img src="{{ item.baseline_opacity_path }}"/>
@@ -399,6 +426,7 @@
 
 
         {% endfor %}
+    <tr></tr>
     {% endfor %}
 {% endfor %}
 </table>
