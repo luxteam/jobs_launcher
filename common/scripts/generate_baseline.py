@@ -55,6 +55,10 @@ def main():
                                 os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, file),args.results_root))
                                 )
             elif file == 'result.html':
+                try:
+                    os.makedirs(os.path.join(args.baseline_root, path))
+                except Exception as err:
+                    pass
                 shutil.copyfile(os.path.join(path,file),
                                 os.path.join(args.baseline_root, os.path.relpath(os.path.join(path,file), args.results_root))
                                 )
