@@ -39,7 +39,7 @@ def get_machine_info():
     try:
         info = {}
         info['os'] = get_os()
-        info['driver'] = get_driver_ver()
+        # info['driver'] = get_driver_ver()
         info['host'] = platform.node()
         info['cpu_count'] = str(psutil.cpu_count())
         # info['asic'] = get_gpu_name()
