@@ -69,12 +69,12 @@ def main():
     parser.add_argument('--work_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_dir', required=False, metavar="<dir>", help="tests root dir")
     parser.add_argument('--cmd_variables', required=False, nargs="*")
+    parser.add_argument('--test_package', required=False, nargs="*")
 
     args = parser.parse_args()
 
     main_logger.info('Started with args: {}'.format(args))
 
-    print(args.cmd_variables)
     if args.cmd_variables:
         args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
         args.cmd_variables = parse_cmd_variables(args.tests_root, args.cmd_variables)
@@ -118,7 +118,7 @@ def main():
     report['failed_tests'] = []
     report['machine_info'] = machine_info
 
-    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables)
+    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables, package_filter=args.test_package)
 
     # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 

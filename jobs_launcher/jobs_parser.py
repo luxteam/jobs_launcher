@@ -211,12 +211,12 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         #execute_job(level, execute_command, report['results'][job_name][job_config_name])
 
 
-def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd_variables, package_options=copy.deepcopy(default_package_options)):
+def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd_variables, package_options=copy.deepcopy(default_package_options), package_filter=None):
     delim = ' '*level
     current_job_dir = os.path.join(job_root_dir, job_sub_path)
     dir_items = os.listdir(path=current_job_dir)
 
-    for dir_item in   dir_items:
+    for dir_item in dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
         if dir_item_path.endswith('.package-manifest.xml') and os.path.isfile(dir_item_path):
             parse_package_manifest(level, dir_item_path, cmd_variables, package_options)
@@ -224,8 +224,13 @@ def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd
     for dir_item in dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
         if dir_item_path.endswith('.job-manifest.xml') and os.path.isfile(dir_item_path):
-            parse_job_manifest(level, job_root_dir, os.path.join(job_sub_path, dir_item),
+            if package_filter:
+                if os.path.basename(os.path.dirname(dir_item_path)) in package_filter:
+                    parse_job_manifest(level, job_root_dir, os.path.join(job_sub_path, dir_item),
                                                     session_dir, found_jobs, package_options)
+            else:
+                parse_job_manifest(level, job_root_dir, os.path.join(job_sub_path, dir_item),
+                                   session_dir, found_jobs, package_options)
 
     for dir_item in dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
