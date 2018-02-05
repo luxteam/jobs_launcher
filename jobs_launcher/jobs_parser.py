@@ -236,4 +236,4 @@ def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd
         dir_item_path = os.path.join(current_job_dir, dir_item)
         if os.path.isdir(dir_item_path):
             parse_folder(level + 1, job_root_dir, os.path.join(job_sub_path, dir_item), session_dir, found_jobs,
-                         cmd_variables, copy.deepcopy(package_options))
+                         cmd_variables, copy.deepcopy(package_options), package_filter=package_filter)
