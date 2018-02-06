@@ -1,7 +1,7 @@
 import os
 import jinja2
 import json
-
+from core.config import *
 import base64
 from PIL import Image
 
@@ -38,9 +38,7 @@ def make_base64_img(session_dir, report):
                         src = "data:image/jpeg;base64," + str(code)[2:-1]
                         test_execution.update({img: src})
                     except Exception as err:
-                        # print("Base64 error: " + str(err))
-                        # TODO: add logger
-                        pass
+                        main_logger.error('Error in base64 encoding: {}'.format(str(err)))
 
     return report
 
@@ -49,7 +47,6 @@ def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     current_test_report = {}
-
     for result in report['results']:
         for item in report['results'][result]:
             try:
@@ -59,6 +56,7 @@ def build_session_report(report, session_dir):
                     # all_test_summary.update({' '.join(filter(None, [result, item])): current_test_report})
             except Exception as err:
                 print("Expected 'report_compare.json' not found: " + str(err))
+                main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
                 report['results'][result][item].update({'render_duration': -0.1})
             else:
@@ -74,9 +72,11 @@ def build_session_report(report, session_dir):
                             jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
 
                         render_duration += jtem['render_time']
+                    # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
                 except Exception as err:
                     print("Exception while update render report: " + str(err))
+                    main_logger.error('Exception while update render report {}'.format(str(err)))
                     render_duration = -0.1
 
                 if current_test_report:
@@ -97,17 +97,17 @@ def build_session_report(report, session_dir):
     )
     template = env.get_template('session_report.html')
 
-    save_json_report(report, session_dir, 'session_report.json')
+    save_json_report(report, session_dir, SESSION_REPORT)
 
     html_result = template.render(title='Session report', report={'_cur_': report})
-    save_html_report(html_result, session_dir, 'session_report.html')
+    save_html_report(html_result, session_dir, SESSION_REPORT_HTML)
 
     # make embed_img reports
     report = make_base64_img(session_dir, report)
-    save_json_report(report, session_dir, 'session_report_embed_img.json')
+    save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG)
 
     html_result = template.render(title='Session report', report={'_cur_': report})
-    save_html_report(html_result, session_dir, 'session_report_embed_img.html')
+    save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG)
 
 
 def build_summary_report(work_dir):
@@ -116,10 +116,10 @@ def build_summary_report(work_dir):
     summary_report_embed_img = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
-            if file.endswith('session_report_embed_img.json'):
+            if file.endswith(SESSION_REPORT_EMBED_IMG):
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
-            elif file.endswith('session_report.json'):
+            elif file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report[basename] = json.loads(report_file.read())
@@ -137,9 +137,10 @@ def build_summary_report(work_dir):
                             if 'baseline_color_path' in jtem.keys():
                                 jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_color_path']), work_dir)})
 
-    save_json_report(summary_report, work_dir, 'summary_report.json')
-    # save_json_report(summary_report_all_tests, work_dir, 'summary_report_all_tests.json')
-    save_json_report(summary_report_embed_img, work_dir, 'summary_report_embed_img.json')
+                        summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
+
+    save_json_report(summary_report, work_dir, SUMMARY_REPORT)
+    save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG)
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -148,7 +149,7 @@ def build_summary_report(work_dir):
     template = env.get_template('session_report.html')
 
     html_result = template.render(title='Summary report', report=summary_report)
-    save_html_report(html_result, work_dir, 'summary_report.html')
+    save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML)
 
     html_result = template.render(title='Summary report', report=summary_report_embed_img)
-    save_html_report(html_result, work_dir, 'summary_report_embed_img.html')
+    save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)

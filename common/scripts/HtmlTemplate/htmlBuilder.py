@@ -31,6 +31,7 @@ def main():
         notRenderedJson = json.loads(temp)
     except Exception as e:
         notRenderedJson = {}
+        stage_report[1]['log'].append('Check... All files was rendered. Or notRenderedReport error' + str(e))
 
     env = Environment(
         loader=PackageLoader('htmlBuilder', 'templates'),

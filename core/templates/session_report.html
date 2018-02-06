@@ -189,6 +189,7 @@
 <table class="heap">
     <tr>
         <th>GUID</th>
+        <th>Jenkins-Name</th>
         <th>Host</th>
         <th>Total</th>
         <th>Passed</th>
@@ -199,6 +200,7 @@
     </tr>
 {% for i in report %}
     <tr>
+        <td>{{ report[i].guid }}</td>
         <td>{{ i }}</td>
         <td>
             <a href="#machineInfo{{ loop.index }}">{{ report[i].machine_info.host }}</a>
@@ -286,7 +288,7 @@
             <td rowspan="{{ report[i].results[test_package] | length }}"><a href="#{{ i }}{{ test_package }}">{{ test_package }}</a></td>
             {% for test_conf in report[i].results[test_package] %}
                 <td><a href="#{{ i }}{{ test_package }}{{ test_conf }}">{{ test_conf }}</a></td>
-                <td><a href="{{ report[i].results[test_package][test_conf].reportlink }}">Report</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/result.html">Report</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
                 <td>{{ report[i].results[test_package][test_conf].failed }}</td>

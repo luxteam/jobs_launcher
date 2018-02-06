@@ -3,6 +3,7 @@ import datetime
 import os
 import shutil
 import json
+import uuid
 
 import core.reportExporter
 import core.system_info
@@ -12,8 +13,7 @@ from core.config import *
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
-SCRIPTS = os.path.dirname( os.path.realpath(__file__) )
-# TODO: mb make common simpleRender for Maya and Max
+SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
 
 def validate_cmd_execution(stage_name, stage_path):
@@ -23,7 +23,8 @@ def validate_cmd_execution(stage_name, stage_path):
             with open(os.path.join(stage_path, stage_report)) as file:
                 report = file.read()
                 report = json.loads(report)
-        except OSError as err:
+        except OSError as e:
+            main_logger.error('Error during stage validation {}'.format(str(e)))
             return 'FAILED'
 
         return report[0]['status']
@@ -36,8 +37,8 @@ def parse_cmd_variables(tests_root, cmd_variables):
         with open(os.path.join(os.path.split(tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
             config_devices = file.read()
             config_devices = json.loads(config_devices)
-    except:
-        pass
+    except Exception as e:
+        main_logger.error('Error while parse cmd {}'.format(str(e)))
 
     for item in cmd_variables['RenderDevice'].split(','):
         # if its int index of device
@@ -91,8 +92,8 @@ def main():
 
     try:
         os.mkdir(work_path)
-    except:
-        pass
+    except OSError as e:
+        main_logger.error(str(e))
 
     machine_info = core.system_info.get_machine_info()
 
@@ -101,6 +102,9 @@ def main():
 
     print('Working folder  : ' + work_path)
     print('Tests folder    : ' + tests_path)
+
+    main_logger.info('Working folder: {}'.format(work_path))
+    main_logger.info('Tests folder: {}'.format(tests_path))
 
     for mi in machine_info.keys():
         print('{0: <16}: {1}'.format(mi, machine_info[mi]))
@@ -111,12 +115,13 @@ def main():
         os.makedirs(session_dir)
     except OSError as e:
         print(delim + str(e))
-        pass
+        main_logger.error(str(e))
 
     found_jobs = []
     report = AutoDict()
     report['failed_tests'] = []
     report['machine_info'] = machine_info
+    report['guid'] = uuid.uuid1().__str__()
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables, package_filter=args.test_package)
 
@@ -133,16 +138,16 @@ def main():
             # print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             print("  Executing job {}/{}".format(i+1, len(found_job[3])))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
-            # TODO: del reportlink
-            report['results'][found_job[0]][' '.join(found_job[1])]['reportlink'] = os.path.relpath(os.path.join(temp_path, 'result.html'), session_dir)
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
+            # read state from stage report to check correct complete previous job
+            # we still continue work to get report
             if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                main_logger.error('Job FAILED')
+                main_logger.warning('Job FAILED')
             elif validate_cmd_execution(found_job[5][i], temp_path) == 'TERMINATED':
                 report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                main_logger.error('Job was TERMINATED')
+                main_logger.warning('Job was TERMINATED')
             else:
                 if not report['results'][found_job[0]][' '.join(found_job[1])]['failed']:
                     report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1
@@ -153,6 +158,7 @@ def main():
             if os.path.isfile(temp_report):
                 with open(temp_report, 'r') as file:
                     log.append(json.loads(file.read()))
+
         report['results'][found_job[0]][' '.join(found_job[1])].update({'log': log})
 
     # json_report = json.dumps(report, indent = 4)
@@ -160,8 +166,10 @@ def main():
 
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
+    main_logger.info('Saved session report')
     print("Saving summary report")
     core.reportExporter.build_summary_report(args.work_root)
+    main_logger.info('Saved summary report')
 
 
 if __name__ == "__main__":

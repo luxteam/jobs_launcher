@@ -6,7 +6,7 @@ import re
 
 from xml.etree import ElementTree as ET
 
-from core.config import *
+import core.config
 
 class ParsingError(Exception): pass
 
@@ -15,7 +15,7 @@ default_package_options = {'variables': {}, 'options': collections.OrderedDict()
 
 
 def parse_package_manifest(level, filename, cmd_variables, package_options=copy.deepcopy(default_package_options)):
-    main_logger.info('Start processing package {}'.format(filename))
+    core.config.main_logger.info('Start processing package {}'.format(filename))
 
     delim = ' '*level
     file_dir = os.path.dirname(filename)
@@ -25,10 +25,12 @@ def parse_package_manifest(level, filename, cmd_variables, package_options=copy.
         root = xml.getroot()
     except ET.ParseError as e:
         print(delim + 'Bad xml: ' + str(e))
+        core.config.main_logger.warning('Bad xml: {}'.format(str(e)))
         return
 
     if root.tag != 'package-manifest':
         print(delim + 'Package parse error "{}": root node "package-manifest" not found'.format(filename))
+        core.config.main_logger.warning('Package parse error "{}": root node "package-manifest" not found'.format(filename))
         return
 
     package_name = root.attrib.get('name')
@@ -80,6 +82,7 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
     #output_dir = job_rel_dir #os.path.join(session_dir, job_rel_dir)
 
     #print(delim + 'processing job... {} to dir {} '.format(os.path.abspath(job_file_path), output_dir))
+    core.config.main_logger.info('Processing job: {}'.format(job_file_path))
 
     root = None
     try:
@@ -87,10 +90,12 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         root = xml.getroot()
     except ET.ParseError as e:
         print(delim + 'Bad xml: ' + str(e))
+        core.config.main_logger.warning('Bad xml: {}'.format(str(e)))
         return
 
     if root.tag != 'job-manifest':
         print(delim + 'Package parse error "{}": root node "package-manifest" not found'.format(job_file_path))
+        core.config.main_logger.warning(delim + 'Package parse error "{}": root node "package-manifest" not found'.format(job_file_path))
         return
 
     job_name = os.path.split(os.path.dirname(job_rel_path))[1]
