@@ -121,6 +121,7 @@ def build_summary_report(work_dir):
                     summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
             elif file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
+                basename = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report[basename] = json.loads(report_file.read())
 
