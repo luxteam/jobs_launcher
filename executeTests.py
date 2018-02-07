@@ -82,6 +82,10 @@ def main():
     else:
         args.cmd_variables = {}
 
+    # crutch for Linux
+    if '' in args.test_package:
+        args.test_package = None
+        
     args.tests_root = os.path.abspath(args.tests_root)
 
     tests_path = os.path.abspath(args.tests_root)
