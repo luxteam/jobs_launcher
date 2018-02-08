@@ -84,8 +84,8 @@ def main():
 
     # crutch for Linux
     if '' in args.test_package:
-        args.test_package = None
-        
+        args.test_package = []
+
     args.tests_root = os.path.abspath(args.tests_root)
 
     tests_path = os.path.abspath(args.tests_root)
