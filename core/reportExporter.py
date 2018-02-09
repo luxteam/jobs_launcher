@@ -6,14 +6,22 @@ import base64
 from PIL import Image
 
 
-def save_json_report(report, session_dir, file_name):
+def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
-        json.dump(report, file, indent=" ", sort_keys=True)
+        if replace_pathsep:
+            s = json.dumps(report, indent=" ", sort_keys=True)
+            s.replace(os.path.sep, '/')
+            file.write(s)
+        else:
+            json.dump(report, file, indent=" ", sort_keys=True)
 
 
-def save_html_report(report, session_dir, file_name):
+def save_html_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
-        file.write(report)
+        if replace_pathsep:
+            file.write(report.replace(os.path.sep, '/'))
+        else:
+            file.write(report)
 
 
 def make_base64_img(session_dir, report):
@@ -97,22 +105,22 @@ def build_session_report(report, session_dir):
     )
     template = env.get_template('session_report.html')
 
-    save_json_report(report, session_dir, SESSION_REPORT)
+    save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
 
     try:
         html_result = template.render(title='Session report', report={'_cur_': report})
-        save_html_report(html_result, session_dir, SESSION_REPORT_HTML)
+        save_html_report(html_result, session_dir, SESSION_REPORT_HTML, replace_pathsep=True)
     except Exception as e:
         main_logger.error("Error while render html report {}".format(str(e)))
         save_html_report('error', session_dir, SESSION_REPORT_HTML)
 
     # make embed_img reports
     report = make_base64_img(session_dir, report)
-    save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG)
+    save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG, replace_pathsep=True)
 
     try:
         html_result = template.render(title='Session report', report={'_cur_': report})
-        save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG)
+        save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
     except Exception as e:
         main_logger.error("Error while render html report {}".format(str(e)))
         save_html_report('error', session_dir, SESSION_REPORT_HTML_EMBED_IMG)
@@ -148,8 +156,8 @@ def build_summary_report(work_dir):
 
                         summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
 
-    save_json_report(summary_report, work_dir, SUMMARY_REPORT)
-    save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG)
+    save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+    save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG, replace_pathsep=True)
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -159,10 +167,10 @@ def build_summary_report(work_dir):
 
     try:
         html_result = template.render(title='Summary report', report=summary_report)
-        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML)
+        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         html_result = template.render(title='Summary report', report=summary_report_embed_img)
-        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
+        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
     except Exception as e:
         main_logger.error("Error while render summary html report: {}".format(str(e)))
         save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
