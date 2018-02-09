@@ -10,8 +10,7 @@ def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         if replace_pathsep:
             s = json.dumps(report, indent=" ", sort_keys=True)
-            s.replace(os.path.sep, '/')
-            file.write(s)
+            file.write(s.replace(os.path.sep, '/'))
         else:
             json.dump(report, file, indent=" ", sort_keys=True)
 
