@@ -135,7 +135,7 @@ def main():
         main_logger.info('Started job: {}'.format(found_job[0]))
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
-        report['results'][found_job[0]][' '.join(found_job[1])] = {'reportlink': '', 'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
+        report['results'][found_job[0]][' '.join(found_job[1])] = {'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):

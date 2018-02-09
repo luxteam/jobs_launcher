@@ -99,15 +99,23 @@ def build_session_report(report, session_dir):
 
     save_json_report(report, session_dir, SESSION_REPORT)
 
-    html_result = template.render(title='Session report', report={'_cur_': report})
-    save_html_report(html_result, session_dir, SESSION_REPORT_HTML)
+    try:
+        html_result = template.render(title='Session report', report={'_cur_': report})
+        save_html_report(html_result, session_dir, SESSION_REPORT_HTML)
+    except Exception as e:
+        main_logger.error("Error while render html report {}".format(str(e)))
+        save_html_report('error', session_dir, SESSION_REPORT_HTML)
 
     # make embed_img reports
     report = make_base64_img(session_dir, report)
     save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG)
 
-    html_result = template.render(title='Session report', report={'_cur_': report})
-    save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG)
+    try:
+        html_result = template.render(title='Session report', report={'_cur_': report})
+        save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG)
+    except Exception as e:
+        main_logger.error("Error while render html report {}".format(str(e)))
+        save_html_report('error', session_dir, SESSION_REPORT_HTML_EMBED_IMG)
 
 
 def build_summary_report(work_dir):
@@ -149,8 +157,13 @@ def build_summary_report(work_dir):
     )
     template = env.get_template('session_report.html')
 
-    html_result = template.render(title='Summary report', report=summary_report)
-    save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML)
+    try:
+        html_result = template.render(title='Summary report', report=summary_report)
+        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML)
 
-    html_result = template.render(title='Summary report', report=summary_report_embed_img)
-    save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
+        html_result = template.render(title='Summary report', report=summary_report_embed_img)
+        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
+    except Exception as e:
+        main_logger.error("Error while render summary html report: {}".format(str(e)))
+        save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
+        save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
