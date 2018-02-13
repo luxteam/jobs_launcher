@@ -1,6 +1,6 @@
 import logging
 
-logging.basicConfig(filename='top-level.log', level=logging.INFO, format=u'%(filename)-21s[LINE:%(lineno)d] in:%(funcName)-21s #%(levelname)-8s [%(asctime)s] %(message)s')
+logging.basicConfig(filename='launcher.engine.log', level=logging.INFO, format=u'%(filename)-21s[LINE:%(lineno)d] in:%(funcName)-21s #%(levelname)-8s [%(asctime)s] %(message)s')
 main_logger = logging.getLogger('main_logger')
 
 SIMPLE_RENDER_TIMEOUT = 10
