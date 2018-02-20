@@ -1,4 +1,4 @@
 __pycache__/
-/tests/UnitTestsResults/
+UnitTests/Results/*
 .idea/
-top-level.log
+*.log

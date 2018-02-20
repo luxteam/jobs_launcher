@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<package-manifest name="Engine test package">
+    <variable name="Script" value = "{CWD}/../../"/>
+</package-manifest>

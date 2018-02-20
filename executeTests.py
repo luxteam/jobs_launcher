@@ -70,7 +70,7 @@ def main():
     parser.add_argument('--work_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_dir', required=False, metavar="<dir>", help="tests root dir")
     parser.add_argument('--cmd_variables', required=False, nargs="*")
-    parser.add_argument('--test_package', required=False, nargs="*")
+    parser.add_argument('--test_package', required=False, nargs="*", default=[])
 
     args = parser.parse_args()
 
@@ -82,7 +82,6 @@ def main():
     else:
         args.cmd_variables = {}
 
-    # crutch for Linux
     if '' in args.test_package:
         args.test_package = []
 
