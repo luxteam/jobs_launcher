@@ -31,21 +31,22 @@ def make_base64_img(session_dir, report):
             for test_execution in report['results'][test_package][test_conf]['render_results']:
 
                 for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
-                    try:
-                        if not os.path.exists(os.path.abspath(test_execution[img])):
-                            test_execution[img] = os.path.join(session_dir, test_execution[img])
+                    if img in test_execution:
+                        try:
+                            if not os.path.exists(os.path.abspath(test_execution[img])):
+                                test_execution[img] = os.path.join(session_dir, test_execution[img])
 
-                        cur_img = Image.open(os.path.abspath(test_execution[img]))
-                        tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
-                        tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
+                            cur_img = Image.open(os.path.abspath(test_execution[img]))
+                            tmp_img = cur_img.resize((64,64), Image.ANTIALIAS)
+                            tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
 
-                        with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
-                            code = base64.b64encode(file.read())
+                            with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
+                                code = base64.b64encode(file.read())
 
-                        src = "data:image/jpeg;base64," + str(code)[2:-1]
-                        test_execution.update({img: src})
-                    except Exception as err:
-                        main_logger.error('Error in base64 encoding: {}'.format(str(err)))
+                            src = "data:image/jpeg;base64," + str(code)[2:-1]
+                            test_execution.update({img: src})
+                        except Exception as err:
+                            main_logger.error('Error in base64 encoding: {}'.format(str(err)))
 
     return report
 
@@ -58,11 +59,10 @@ def build_session_report(report, session_dir):
         for item in report['results'][result]:
             try:
                 # get report_compare.json by one tests group
-                with open(os.path.join(session_dir, report['results'][result][item]['result_path'], 'report_compare.json'), 'r') as file:
+                with open(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED), 'r') as file:
                     current_test_report = json.loads(file.read())
                     # all_test_summary.update({' '.join(filter(None, [result, item])): current_test_report})
             except Exception as err:
-                print("Expected 'report_compare.json' not found: " + str(err))
                 main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
                 report['results'][result][item].update({'render_duration': -0.1})
@@ -140,20 +140,23 @@ def build_summary_report(work_dir):
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report[basename] = json.loads(report_file.read())
 
-                for test_package in summary_report[basename]['results']:
-                    for test_conf in summary_report[basename]['results'][test_package]:
-                        for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
+                try:
+                    for test_package in summary_report[basename]['results']:
+                        for test_conf in summary_report[basename]['results'][test_package]:
+                            for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
 
-                            jtem.update({'render_color_path': os.path.join(basename, jtem['render_color_path'])})
-                            if 'render_opacity_path' in jtem.keys():
-                                jtem.update({'render_opacity_path': os.path.join(basename, jtem['render_opacity_path'])})
+                                jtem.update({'render_color_path': os.path.join(basename, jtem['render_color_path'])})
+                                if 'render_opacity_path' in jtem.keys():
+                                    jtem.update({'render_opacity_path': os.path.join(basename, jtem['render_opacity_path'])})
 
-                            if 'baseline_opacity_path' in jtem.keys():
-                                jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_opacity_path']), work_dir)})
-                            if 'baseline_color_path' in jtem.keys():
-                                jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_color_path']), work_dir)})
+                                if 'baseline_opacity_path' in jtem.keys():
+                                    jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_opacity_path']), work_dir)})
+                                if 'baseline_color_path' in jtem.keys():
+                                    jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_color_path']), work_dir)})
 
-                        summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
+                            summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
+                except Exception as e:
+                    main_logger.error(str(e))
 
     save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
     save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG, replace_pathsep=True)

@@ -162,7 +162,7 @@ def main():
                 with open(temp_report, 'r') as file:
                     log.append(json.loads(file.read()))
 
-        report['results'][found_job[0]][' '.join(found_job[1])].update({'log': log})
+        # report['results'][found_job[0]][' '.join(found_job[1])].update({'log': log})
 
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)

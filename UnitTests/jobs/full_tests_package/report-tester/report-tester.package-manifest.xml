@@ -5,6 +5,6 @@
         <configuration name="Second"/>
     </option>
 
-    <variable name="Script" value = "{CWD}/../../"/>
+    <variable name="Script" value = "{CWD}/../../../"/>
 
 </package-manifest>

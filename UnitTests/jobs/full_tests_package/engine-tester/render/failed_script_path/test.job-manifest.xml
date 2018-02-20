@@ -3,7 +3,7 @@
 
     <outpath value="{OutputDir}"/>
 
-    <execute command='python "{Script}/test_stage.py"' stage="stage1">
+    <execute command='python "{Script}/test_stage1.py"' stage="stage1">
         <argument>--stage_report stage1.json</argument>
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
@@ -12,7 +12,7 @@
 
     <execute command='python "{Script}/test_stage.py"' stage="stage2">
         <argument>--stage_report stage2.json</argument>
-        <argument>--terminate_status FAILED</argument>
+        <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
         <argument>--previous_report report1.json</argument>
         <argument>--current_report report2.json</argument>
@@ -31,7 +31,7 @@
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
         <argument>--previous_report report3.json</argument>
-        <argument>--current_report report4.json</argument>
+        <argument>--current_report report_compare.json</argument>
     </execute>
 
 </job-manifest>

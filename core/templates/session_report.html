@@ -279,7 +279,6 @@
             <th>Skipped</th>
             <th>Time taken, s</th>
             <th>Render time, s</th>
-            <th>LOG</th>
         </tr>
 
         {% for test_package in report[i].results %}
@@ -295,32 +294,6 @@
                 <td>{{ report[i].results[test_package][test_conf].skipped }}</td>
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
                 <td>{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
-                <td>
-                    <a href="#{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}">Show log</a>
-                    <a href="#x" class="overlay" id="{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}"></a>
-                    <div class="popup">
-                        <a class="close" title="Close" href="#close"></a>
-                        <table class="logTable">
-                            <tr>
-                                <th>Stage ID</th>
-                                <th>Stage log</th>
-                                <th>Stage status</th>
-                            </tr>
-                            {% for stage in report[i].results[test_package][test_conf].log %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    {% for message in stage[1]['log'] %}
-                                    {{ message }}
-                                    <br/>
-                                    {% endfor %}
-                                </td>
-                                <td>{{ stage[0]['status'] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </td>
         </tr>
 
         <tr>
@@ -336,7 +309,6 @@
             <td>{{ report[i].summary.skipped }}</td>
             <td>{{ report[i].summary.duration }}</td>
             <td>{{ report[i].summary.render_duration | round(1) }}</td>
-            <td></td>
         </tr>
 
         <tr></tr>

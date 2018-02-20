@@ -47,7 +47,9 @@ def main():
                                         'render_version': 10,
                                         'render_device': 'smh',
                                         'render_time': 10,
-                                        'difference_color': 10
+                                        'difference_color': 10,
+                                        'render_color_path': 'img.jpg',
+                                        'file_name': 'file'
                                         })
                 json.dump(previous_report, file, indent=' ')
         except OSError as e:

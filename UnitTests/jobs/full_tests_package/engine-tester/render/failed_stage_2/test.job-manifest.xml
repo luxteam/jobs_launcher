@@ -12,7 +12,7 @@
 
     <execute command='python "{Script}/test_stage.py"' stage="stage2">
         <argument>--stage_report stage2.json</argument>
-        <argument>--terminate_status OK</argument>
+        <argument>--terminate_status FAILED</argument>
         <argument>--output_folder "{OutputDir}"</argument>
         <argument>--previous_report report1.json</argument>
         <argument>--current_report report2.json</argument>

@@ -5,7 +5,7 @@
 
     <execute command='python "{Script}/test_stage.py"' stage="stage1">
         <argument>--stage_report stage1.json</argument>
-        <argument>--terminate_status OK</argument>
+        <argument>--terminate_status FAILED</argument>
         <argument>--output_folder "{OutputDir}"</argument>
         <argument>--current_report report1.json</argument>
     </execute>
