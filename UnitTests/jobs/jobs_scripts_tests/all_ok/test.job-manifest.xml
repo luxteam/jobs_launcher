@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<job-manifest enable="False">
+
+    <outpath value="{OutputDir}"/>
+
+    <execute command='python "{JobScripts}/test_expected.py"' stage="stage1">
+        <argument>--work_dir "{OutputDir}"</argument>
+    </execute>
+
+    <execute command='python "{EngineScripts}/check_expected.py"' stage="stage2">
+        <argument>--work_dir "{OutputDir}"</argument>
+        <argument>--expected_report expected.json</argument>
+        <argument>--render_report report.json</argument>
+        <argument>--result_report not_rendered.json</argument>
+    </execute>
+
+</job-manifest>

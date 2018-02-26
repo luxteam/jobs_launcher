@@ -30,7 +30,7 @@ def make_base64_img(session_dir, report):
         for test_conf in report['results'][test_package]:
             for test_execution in report['results'][test_package][test_conf]['render_results']:
 
-                for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
+                for img in POSSIBLE_JSON_IMG_KEYS:
                     if img in test_execution:
                         try:
                             if not os.path.exists(os.path.abspath(test_execution[img])):
@@ -70,7 +70,7 @@ def build_session_report(report, session_dir):
                 render_duration = 0.0
                 try:
                     for jtem in current_test_report:
-                        for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
+                        for img in POSSIBLE_JSON_IMG_KEYS:
                             if img in jtem.keys():
                                 jtem.update({img: os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]), session_dir)})
 
@@ -149,6 +149,7 @@ def build_summary_report(work_dir):
                         for test_conf in summary_report[basename]['results'][test_package]:
                             for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
 
+                                # TODO: make unique loop
                                 if 'render_color_path' in jtem.keys():
                                     jtem.update({'render_color_path': os.path.join(basename, jtem['render_color_path'])})
                                 if 'render_opacity_path' in jtem.keys():
