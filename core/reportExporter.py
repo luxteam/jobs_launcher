@@ -65,20 +65,24 @@ def build_session_report(report, session_dir):
             except Exception as err:
                 main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
-                report['results'][result][item].update({'render_duration': -0.1})
+                report['results'][result][item].update({'render_duration': -0.0})
             else:
                 render_duration = 0.0
                 try:
                     for jtem in current_test_report:
-                        jtem.update({'render_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_color_path']), session_dir)})
-                        if 'render_opacity_path' in jtem.keys():
-                            jtem.update({'render_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['render_opacity_path']), session_dir)})
-                        if 'baseline_opacity_path' in jtem.keys():
-                            jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_opacity_path']), session_dir)})
-                        if 'baseline_color_path' in jtem.keys():
-                            jtem.update({'baseline_color_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem['baseline_color_path']), session_dir)})
+                        for img in ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']:
+                            if img in jtem.keys():
+                                jtem.update({img: os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]), session_dir)})
 
                         render_duration += jtem['render_time']
+
+                        try:
+                            # TODO: good solution - update only ones
+                            report['machine_info'].update({'render_device': jtem['render_device']})
+                            report['machine_info'].update({'render_version': jtem['render_version']})
+                        except:
+                            pass
+
                     # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
                 except Exception as err:
@@ -145,7 +149,8 @@ def build_summary_report(work_dir):
                         for test_conf in summary_report[basename]['results'][test_package]:
                             for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
 
-                                jtem.update({'render_color_path': os.path.join(basename, jtem['render_color_path'])})
+                                if 'render_color_path' in jtem.keys():
+                                    jtem.update({'render_color_path': os.path.join(basename, jtem['render_color_path'])})
                                 if 'render_opacity_path' in jtem.keys():
                                     jtem.update({'render_opacity_path': os.path.join(basename, jtem['render_opacity_path'])})
 

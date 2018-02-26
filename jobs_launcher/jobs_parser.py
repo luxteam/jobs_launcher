@@ -24,7 +24,7 @@ def parse_package_manifest(level, filename, cmd_variables, package_options=copy.
         xml = ET.parse(filename)
         root = xml.getroot()
     except ET.ParseError as e:
-        print(delim + 'Bad xml: ' + str(e))
+        # print(delim + 'Bad xml: ' + str(e))
         core.config.main_logger.warning('Bad xml: {}'.format(str(e)))
         return
 
@@ -197,21 +197,24 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
 
         execute_command1 = execute_command
         execute_command = []
-        for command in execute_command1:
-            execute_command.append(command.format(**config_map, **package_options['variables'], OutputDir=config_output_dir))
 
-        # outdir = [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)]
-
-        found_jobs.append(
-            (
-                job_name,
-                config_dirs,
-                config_map,
-                execute_command,
-                [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)],
-                stages
+        try:
+            for command in execute_command1:
+                execute_command.append(command.format(**config_map, **package_options['variables'], OutputDir=config_output_dir))
+        except KeyError as err:
+            core.config.main_logger.error("XML variable error: {}".format(str(err)))
+        else:
+            # outdir = [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)]
+            found_jobs.append(
+                (
+                    job_name,
+                    config_dirs,
+                    config_map,
+                    execute_command,
+                    [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)],
+                    stages
+                )
             )
-        )
         #print(delim + execute_command)
         #execute_job(level, execute_command, report['results'][job_name][job_config_name])
 

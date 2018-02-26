@@ -189,7 +189,7 @@
 <table class="heap">
     <tr>
         <th>GUID</th>
-        <th>Jenkins-Name</th>
+        <th>Job-Name</th>
         <th>Host</th>
         <th>Total</th>
         <th>Passed</th>
@@ -201,7 +201,10 @@
 {% for i in report %}
     <tr>
         <td>{{ report[i].guid }}</td>
-        <td>{{ i }}</td>
+        <td>{% if i != "_cur_" %}
+                {{ i }}
+            {% endif %}
+        </td>
         <td>
             <a href="#machineInfo{{ loop.index }}">{{ report[i].machine_info.host }}</a>
             <a href="#x" class="overlay" id="machineInfo{{ loop.index }}"></a>
@@ -223,8 +226,10 @@
                         <td>{{ report[i].machine_info.cpu_count }}</td>
                         {% set test_name = report[i].results | first %}
                         {% set test_conf = report[i].results[test_name] | first %}
-                        <td>{{ report[i].results[test_name][test_conf].render_results[0].render_device }}</td>
-                        <td>{{ report[i].results[test_name][test_conf].render_results[0].render_version }}</td>
+                        <td>{# report[i].results[test_name][test_conf].render_results[0].render_device #}
+                            {{ report[i].machine_info.render_device }}</td>
+                        <td>{# report[i].results[test_name][test_conf].render_results[0].render_version #}
+                            {{ report[i].machine_info.render_version }}</td>
                     </tr>
                 </table>
             </div>
