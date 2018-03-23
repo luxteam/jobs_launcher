@@ -1,10 +1,11 @@
 import os
 import jinja2
 import json
-from core.config import *
 import base64
 from PIL import Image
 
+from core.config import *
+from core.auto_dict import AutoDict
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
@@ -77,18 +78,23 @@ def build_session_report(report, session_dir):
                         render_duration += jtem['render_time']
 
                         try:
-                            # TODO: good solution - update only ones
                             report['machine_info'].update({'render_device': jtem['render_device']})
+                            report['machine_info'].update({'tool': jtem['tool']})
                             report['machine_info'].update({'render_version': jtem['render_version']})
                         except:
                             pass
+
+                        # if not report['machine_info']['render_device'] and jtem['render_device']:
+                        #     report['machine_info'].update({'render_device': jtem['render_device']})
+                        # if not report['machine_info']['render_version'] and jtem['render_version']:
+                        #     report['machine_info'].update({'render_version': jtem['render_version']})
 
                     # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
                 except Exception as err:
                     print("Exception while update render report: " + str(err))
                     main_logger.error('Exception while update render report {}'.format(str(err)))
-                    render_duration = -0.1
+                    render_duration = -0.0
 
                 if current_test_report:
                     report['results'][result][item].update({'render_results': current_test_report})
@@ -137,6 +143,7 @@ def build_summary_report(work_dir):
         for file in files:
             if file.endswith(SESSION_REPORT_EMBED_IMG):
                 with open(os.path.join(path, file), 'r') as report_file:
+                    # TODO: basename like session_report
                     summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
             elif file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
@@ -183,3 +190,47 @@ def build_summary_report(work_dir):
         main_logger.error("Error while render summary html report: {}".format(str(e)))
         save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
         save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
+
+
+def build_performance_report(work_dir):
+
+    performance_report = AutoDict()
+    performance_report_detail = AutoDict()
+    hardware = []
+    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
+        for file in files:
+            if file.endswith(SESSION_REPORT):
+                with open(os.path.join(path, file), 'r') as report_file:
+                    temp_report = json.loads(report_file.read())
+
+                hw = temp_report['machine_info']['render_device']
+                if hw not in hardware:
+                    hardware.append(hw)
+                tool = temp_report['machine_info']['tool']
+
+                results = temp_report.pop('results', None)
+                info = temp_report
+                for test_package in results:
+                    for test_config in results[test_package]:
+                        results[test_package][test_config].pop('render_results', None)
+
+                performance_report[tool].update({hw: info})
+
+                for test_package in results:
+                    for test_config in results[test_package]:
+                        performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
+
+    # save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
+    # save_json_report(performance_report_detail, work_dir, "re.json", replace_pathsep=True)
+        env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=True
+    )
+    template = env.get_template('performance_compare.html')
+
+    try:
+        html_result = template.render(title='Performance report', report=performance_report, hardware=hardware, detail_report=performance_report_detail)
+        save_html_report(html_result, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+    except Exception as e:
+        main_logger.error("Error while render performance html report: {}".format(str(e)))
+        save_html_report('error', work_dir, PERFORMANCE_REPORT_HTML)

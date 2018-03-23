@@ -166,14 +166,17 @@ def main():
 
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
-
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report')
+
     print("Saving summary report")
     core.reportExporter.build_summary_report(args.work_root)
     main_logger.info('Saved summary report')
 
+    print("Saving peformance report")
+    core.reportExporter.build_performance_report(args.work_root)
+    main_logger.info('Saved performance report')
 
 if __name__ == "__main__":
     if not main():

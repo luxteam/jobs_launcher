@@ -61,7 +61,7 @@ def main():
         report = core.config.SESSION_REPORT
         # copy report to
         shutil.copyfile(os.path.join(args.results_root, report),
-            os.path.join(os.path.abspath(args.baseline_root), report)
+            os.path.join(os.path.abspath(args.baseline_root), 'baseline_manifest.json')
                         )
     except Exception as err:
         core.config.main_logger.warning("Error copy session report to baseline: {}".format(str(err)))

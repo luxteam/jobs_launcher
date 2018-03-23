@@ -45,11 +45,12 @@ def main():
             with open(os.path.join(args.output_folder, args.current_report), 'w') as file:
                 previous_report.append({'stage_name': args.stage_report.replace('.json', ''),
                                         'render_version': 10,
-                                        'render_device': 'smh',
-                                        'render_time': 10,
+                                        'render_device': random.choice(['smh', 'Nvidia', 'Radeon']),
+                                        'render_time': random.choice([2, 4, 5]),
                                         'difference_color': 10,
                                         'render_color_path': 'img.jpg',
-                                        'file_name': 'file'
+                                        'file_name': 'file',
+                                        'tool': random.choice(['Maya', 'Render', 'Ne render', 'Solid works'])
                                         })
                 json.dump(previous_report, file, indent=' ')
         except OSError as e:
