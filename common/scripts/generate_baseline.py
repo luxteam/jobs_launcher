@@ -21,6 +21,7 @@ def main():
     args.baseline_root = os.path.abspath(args.baseline_root)
 
     report = []
+    baseline_manifest = {}
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
             # find report_compare.json
@@ -36,6 +37,8 @@ def main():
                             rendered_img_path = os.path.join(path, test[img])
                             baseline_img_path = os.path.relpath(rendered_img_path, args.results_root)
 
+                            # add img to baseline manifest
+                            baseline_manifest.update({test['file_name']: baseline_img_path})
                             # create folder in first step for current folder
                             if not os.path.exists(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0])):
                                 os.makedirs(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0]))
@@ -57,11 +60,15 @@ def main():
                                 os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), file)
                                 )
 
+
+    with open(os.path.join(args.baseline_root, core.config.BASELINE_MANIFEST), 'w') as file:
+        json.dump(baseline_manifest, file)
+
     try:
         report = core.config.SESSION_REPORT
         # copy report to
         shutil.copyfile(os.path.join(args.results_root, report),
-            os.path.join(os.path.abspath(args.baseline_root), 'baseline_manifest.json')
+            os.path.join(os.path.abspath(args.baseline_root), core.config.BASELINE_SESSION_REPORT)
                         )
     except Exception as err:
         core.config.main_logger.warning("Error copy session report to baseline: {}".format(str(err)))

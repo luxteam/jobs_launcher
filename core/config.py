@@ -25,6 +25,8 @@ SUMMARY_REPORT_HTML_EMBED_IMG = 'summary_report_embed_img.html'
 
 POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']
 POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'render_opacity_path']
+BASELINE_MANIFEST = 'baseline_manifest.json'
+BASELINE_SESSION_REPORT = 'baseline_session_report.json'
 
 PERFORMANCE_REPORT = 'performance_report.json'
 PERFORMANCE_REPORT_HTML = 'performance_report.html'

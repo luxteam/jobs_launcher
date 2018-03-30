@@ -8,11 +8,9 @@ import core.config
 
 def createArgParser():
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--stage_report')
-    argparser.add_argument('--work_dir')
-    argparser.add_argument('--base_dir')
-    argparser.add_argument('--report_name')
-    argparser.add_argument('--result_name')
+    argparser.add_argument('--renderer_json_path')
+    argparser.add_argument('--baseline_json_path')
+    argparser.add_argument('--result_json', require=False)
 
     return argparser
 
@@ -40,17 +38,20 @@ def compareFoldersWalk(jsonReport, workFolder, baseFolder, root_dir):
     return jsonReport
 
 
-def main(args):
-    stage_report = [{'status': 'INIT'}, {'log': ['compareByJSON.py started;']}]
+def main():
+    args = createArgParser().parse_args()
 
-    jsonReport = ""
-    try:
-        with open(os.path.abspath(os.path.join(args.work_dir, args.report_name)), 'r') as file:
-            jsonReport = file.read()
-    except OSError:
-        stage_report[1]['log'].append('Report not found;')
-        stage_report[0]['status'] = 'FAILED'
-        return stage_report
+    render_json = []
+    baseline_json = []
+
+    with open(args.renderer_json_path, 'r') as file:
+        render_json = json.loads(file.read())
+
+    with open(args.baseline_json_path, 'r') as file:
+        baseline_json = json.loads(file.read())
+
+    for img in render_json:
+
 
     try:
         jsonReport = json.loads(jsonReport)
@@ -88,8 +89,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    args = createArgParser().parse_args()
-    stage_report = main(args)
-
-    with open(os.path.join(args.work_dir, args.stage_report), 'w') as file:
-        json.dump(stage_report, file, indent=' ')
+    main()
