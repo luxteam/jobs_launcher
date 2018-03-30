@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
 <package-manifest name="Small tests">
-    <variable name="EngineScripts" value = "{CWD}/../../../jobs_scripts/"/>
+    <variable name="EngineScripts" value="{CWD}/../../../common/scripts"/>
     <variable name="JobScripts" value = "{CWD}/../../"/>
 </package-manifest>

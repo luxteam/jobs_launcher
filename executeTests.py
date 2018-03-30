@@ -70,7 +70,8 @@ def main():
     parser.add_argument('--work_root', required=True, metavar="<dir>", help="tests root dir")
     parser.add_argument('--work_dir', required=False, metavar="<dir>", help="tests root dir")
     parser.add_argument('--cmd_variables', required=False, nargs="*")
-    parser.add_argument('--test_package', required=False, nargs="*", default=[])
+    parser.add_argument('--test_filter', required=False, nargs="*", default=[])
+    parser.add_argument('--package_filter', required=False, nargs="*", default=[])
 
     args = parser.parse_args()
 
@@ -82,8 +83,11 @@ def main():
     else:
         args.cmd_variables = {}
 
-    if '' in args.test_package:
-        args.test_package = []
+    if '' in args.test_filter:
+        args.test_filter = []
+
+    if '' in args.package_filter:
+        args.package_filter = []
 
     args.tests_root = os.path.abspath(args.tests_root)
 
@@ -126,7 +130,7 @@ def main():
     report['machine_info'] = machine_info
     report['guid'] = uuid.uuid1().__str__()
 
-    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables, package_filter=args.test_package)
+    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables, test_filter=args.test_filter, package_filter=args.package_filter)
 
     # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 

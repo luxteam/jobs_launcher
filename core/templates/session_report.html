@@ -188,7 +188,7 @@
 
 <table class="heap">
     <tr>
-        <th>GUID</th>
+        <!--<th>GUID</th>-->
         <th>Job-Name</th>
         <th>Host</th>
         <th>Total</th>
@@ -200,7 +200,7 @@
     </tr>
 {% for i in report %}
     <tr>
-        <td>{{ report[i].guid }}</td>
+        <!--<td>{{ report[i].guid }}</td>-->
         <td>{% if i != "_cur_" %}
                 {{ i }}
             {% endif %}
@@ -355,13 +355,13 @@
                 <th>Rendered color</th>
             </tr>
             {% for item in report[i].results[test_package][test_conf].render_results %}
-            {% if item.render_time > 3000 %}
+            {#% if item.render_time > 3000 %#}
+            <!--<tr class="badResultTR">-->
+            {#% elif not item.difference_color is string %#}
+                {% if item.difference_color > 30 %}
             <tr class="badResultTR">
-            {% elif not item.difference_color is string %}
-                {% if item.difference_color > 15 %}
-            <tr class="badResultTR">
-                {% endif %}
-            {% else %}
+                {#% endif %#}
+            {#% else %#}
             <tr>
             {% endif %}
                 <td>{{ item.scene_name }}</td>
