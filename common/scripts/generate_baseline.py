@@ -2,6 +2,7 @@ import argparse
 import shutil
 import os
 import json
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
 
 
@@ -9,7 +10,7 @@ def create_args_parser():
     args = argparse.ArgumentParser()
     args.add_argument('--results_root')
     args.add_argument('--baseline_root')
-
+    args.add_argument('--report_name')
     return args
 
 
@@ -20,13 +21,16 @@ def main():
     args.results_root = os.path.abspath(args.results_root)
     args.baseline_root = os.path.abspath(args.baseline_root)
 
+    if os.path.exists(args.baseline_root):
+        shutil.rmtree(args.baseline_root)
+
     report = []
     baseline_manifest = {}
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
             # find report_compare.json
-            if file == core.config.TEST_REPORT_NAME_COMPARED:
-
+            # if file == core.config.TEST_REPORT_NAME_COMPARED:
+            if file == args.report_name:
                 with open(os.path.join(path, file), 'r') as json_report:
                     report = json.loads(json_report.read())
 
@@ -60,11 +64,10 @@ def main():
                                 os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), file)
                                 )
 
-
-    with open(os.path.join(args.baseline_root, core.config.BASELINE_MANIFEST), 'w') as file:
-        json.dump(baseline_manifest, file)
-
     try:
+        with open(os.path.join(args.baseline_root, core.config.BASELINE_MANIFEST), 'w') as file:
+            json.dump(baseline_manifest, file, indent=" ")
+
         report = core.config.SESSION_REPORT
         # copy report to
         shutil.copyfile(os.path.join(args.results_root, report),
