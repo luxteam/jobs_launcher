@@ -344,66 +344,34 @@
         {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
             <tr>
                 <th>Scene name</th>
-                <!--<th>Scene options</th>-->
                 <th>File name</th>
                 <th>Render time, s</th>
-                <th>Opacity Difference</th>
-                <th>Baseline Opacity</th>
-                <th>Rendered Opacity</th>
                 <th>Color Difference</th>
                 <th>Baseline Color</th>
                 <th>Rendered color</th>
             </tr>
             {% for item in report[i].results[test_package][test_conf].render_results %}
-            {#% if item.render_time > 3000 %#}
-            <!--<tr class="badResultTR">-->
-            {#% elif not item.difference_color is string %#}
                 {% if item.difference_color > 30 %}
             <tr class="badResultTR">
-                {#% endif %#}
-            {#% else %#}
+                {% else %}
             <tr>
-            {% endif %}
+                {% endif %}
+
                 <td>{{ item.scene_name }}</td>
-                <!--<td></td>-->
                 <td>{{ item.file_name }}</td>
                 <td>{{ item.render_time }}</td>
-
-                {% if item.difference_opacity %}
-                    <td>{{ item.difference_opacity }}</td>
-                {% else %}
-                    <td>Not required</td>
-                {% endif %}
-                <td class="hatching">
-                {% if item.baseline_opacity_path %}
-                    <img src="{{ item.baseline_opacity_path }}"/>
-                {% elif item.render_opacity_path %}
-                    Not compared
-                {% else %}
-                    Not required
-                {% endif %}
-                </td>
-                <td class="hatching">
-                {% if item.render_opacity_path %}
-                    <img src="{{ item.render_opacity_path }}"/>
-                {% else %}
-                    Not required
-                {% endif %}
-                </td>
-
                 <td>{{ item.difference_color }}</td>
                 <td class="hatching">
                 {% if item.baseline_color_path %}
-                    <img src="{{ item.baseline_color_path }}"/>
+                    <img src="{{ item.baseline_path }}"/>
                 {% else %}
                     Not compared
                 {% endif %}
                 </td>
-                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
+                <td class="hatching"><img src="{{ item.render_path }}"/></td>
             </tr>
             {% endfor %}
         {% endif %}
-
 
         {% endfor %}
     <tr></tr>

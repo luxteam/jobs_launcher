@@ -2,6 +2,7 @@ import os
 import argparse
 import json
 import CompareMetrics
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
 

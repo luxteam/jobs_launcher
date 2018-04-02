@@ -12,6 +12,7 @@ TIMEOUT_PAR = 3
 
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
+TEST_REPORT_HTML_NAME = 'report.html'
 
 SESSION_REPORT = 'session_report.json'
 SESSION_REPORT_EMBED_IMG = 'session_report_embed_img.json'
@@ -24,7 +25,7 @@ SUMMARY_REPORT_HTML = 'summary_report.html'
 SUMMARY_REPORT_HTML_EMBED_IMG = 'summary_report_embed_img.html'
 
 POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']
-POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'render_opacity_path']
+POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'render_opacity_path', 'render_path']
 BASELINE_MANIFEST = 'baseline_manifest.json'
 BASELINE_SESSION_REPORT = 'baseline_session_report.json'
 
