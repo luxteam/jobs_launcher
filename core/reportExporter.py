@@ -7,6 +7,7 @@ from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
 
+
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         if replace_pathsep:
@@ -84,11 +85,6 @@ def build_session_report(report, session_dir):
                         except:
                             pass
 
-                        # if not report['machine_info']['render_device'] and jtem['render_device']:
-                        #     report['machine_info'].update({'render_device': jtem['render_device']})
-                        # if not report['machine_info']['render_version'] and jtem['render_version']:
-                        #     report['machine_info'].update({'render_version': jtem['render_version']})
-
                     # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
                 except Exception as err:
@@ -159,17 +155,6 @@ def build_summary_report(work_dir):
                                 for img in POSSIBLE_JSON_IMG_KEYS:
                                     if img in jtem.keys():
                                         jtem.update({img: os.path.relpath(os.path.join(work_dir, basename, jtem[img]), work_dir)})
-
-                                # # TODO: make unique loop
-                                # if 'render_color_path' in jtem.keys():
-                                #     jtem.update({'render_color_path': os.path.join(basename, jtem['render_color_path'])})
-                                # if 'render_opacity_path' in jtem.keys():
-                                #     jtem.update({'render_opacity_path': os.path.join(basename, jtem['render_opacity_path'])})
-                                #
-                                # if 'baseline_opacity_path' in jtem.keys():
-                                #     jtem.update({'baseline_opacity_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_opacity_path']), work_dir)})
-                                # if 'baseline_color_path' in jtem.keys():
-                                #     jtem.update({'baseline_color_path': os.path.relpath(os.path.join(work_dir, basename, jtem['baseline_color_path']), work_dir)})
 
                             summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
                 except Exception as e:

@@ -1,63 +1,40 @@
 # -*- coding: utf-8 -*-
 from jinja2 import Environment
 from jinja2 import PackageLoader
-
 import argparse
 import os
 import json
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+import core.config
 
 
 def main():
     args = argparse.ArgumentParser()
-    args.add_argument('--stage_report')
-    args.add_argument('--work_dir')
-    args.add_argument('--template_name')
+    args.add_argument('--render_path')
 
     args = args.parse_args()
 
-    stage_report = [{'status': 'INIT'}, {'log': ['htmlBuilder.py started;']}]
+    rendered_json = []
+    notRenderedJson = {}
+    compared = False
+    with open(os.path.join(args.render_path, core.config.TEST_REPORT_NAME_COMPARED), 'r') as file:
+        rendered_json = json.loads(file.read())
 
-    renderedReport = os.path.join(args.work_dir, "report_compare.json")
-    notRenderedReport = os.path.join(args.work_dir, "NOT_RENDERED.json")
-
-    with open(os.path.abspath(renderedReport), 'r') as file:
-        temp = file.read()
-    renderedJson = json.loads(temp)
-
-    try:
-        with open(os.path.abspath(notRenderedReport), 'r') as file:
-            temp = file.read()
-            file.close()
-        notRenderedJson = json.loads(temp)
-    except Exception as e:
-        notRenderedJson = {}
-        stage_report[1]['log'].append('Check... All files was rendered. Or notRenderedReport error' + str(e))
+    for img in rendered_json:
+        if img.pix_difference != "not compared yet":
+            compared = True
+            break
 
     env = Environment(
         loader=PackageLoader('htmlBuilder', 'templates'),
         autoescape=True
     )
-
-    template = env.get_template(args.template_name)
-    stage_report[1]['log'].append('Starting html template rendering')
-    text = template.render(rendered=renderedJson, not_rendered=notRenderedJson, title="Render Results")
+    template = env.get_template('local_report.html')
+    text = template.render(title="Render Results", compared=compared, rendered=rendered_json, not_rendered=notRenderedJson)
 
     with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
         f.write(text)
-
-    # try:
-    #     template = env.get_template(args.template_name)
-    #     text = template.render(rendered=renderedJson, notRendered=notRenderedJson, title="Render Results")
-    #     stage_report[1]['log'].append('Html report generated;')
-    #     with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
-    #         f.write(text)
-    # except:
-    #     stage_report[1]['log'].append('Error while html report generating;')
-    #     stage_report[0]['status'] = 'FAILED'
-
-    stage_report[0]['status'] = 'OK'
-    with open(os.path.join(args.work_dir, args.stage_report), 'w') as file:
-        json.dump(stage_report, file, indent=' ')
 
 
 if __name__ == '__main__':
