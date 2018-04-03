@@ -8,8 +8,16 @@
             border-collapse: collapse;
             width: auto;
             padding: 5px;
-	    text-align: center;
+	        text-align: center;
         }
+
+        .bitExact td {
+            background: #d9fcd9;
+        }
+
+         .notBitExact td {
+            background: #f4d7d2;
+         }
     </style>
     <title>{{ title }}</title>
 </head>
@@ -23,14 +31,16 @@
         </tr>
 
         {% for file in files_list %}
-        <tr>
-            <td  colspan={{ folders|length }} >{{ file }}<br>{# files_list[file] #}</td>
-        </tr>
-	<tr>
-            {% for folder in folders %}
-            <td><img src='{{ folder }}/{{ file }}'/>
-            <br>
-            {{ files_hash[folder + file] }}
+            {% if exact[file] %}
+        <tr class="bitExact">
+            {% else %}
+        <tr class="notBitExact">
+            {% endif %}
+            {% for folder in files_list[file] %}
+            <td>
+                {{ file }}
+                <img src="{{folder}}/{{file}}"/>
+                {{ files_list[file][folder] }}
             </td>
             {% endfor %}
         </tr>

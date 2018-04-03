@@ -346,12 +346,12 @@
                 <th>Scene name</th>
                 <th>File name</th>
                 <th>Render time, s</th>
-                <th>Color Difference</th>
+                <th>Pixel Difference, %</th>
                 <th>Baseline Color</th>
                 <th>Rendered color</th>
             </tr>
             {% for item in report[i].results[test_package][test_conf].render_results %}
-                {% if item.difference_color > 30 %}
+                {% if not item.pix_difference is string and item.pix_difference > 30 %}
             <tr class="badResultTR">
                 {% else %}
             <tr>
@@ -360,9 +360,9 @@
                 <td>{{ item.scene_name }}</td>
                 <td>{{ item.file_name }}</td>
                 <td>{{ item.render_time }}</td>
-                <td>{{ item.difference_color }}</td>
+                <td>{{ item.pix_difference }}</td>
                 <td class="hatching">
-                {% if item.baseline_color_path %}
+                {% if item.baseline_path %}
                     <img src="{{ item.baseline_path }}"/>
                 {% else %}
                     Not compared

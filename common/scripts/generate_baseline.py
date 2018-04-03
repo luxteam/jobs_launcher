@@ -36,7 +36,7 @@ def main():
                     report = json.loads(json_report.read())
 
                 for test in report:
-                    for img in ['render_color_path', 'render_opacity_path']:
+                    for img in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
                         # copy files which described in json
                         if img in test.keys():
                             rendered_img_path = os.path.join(path, test[img])
