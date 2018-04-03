@@ -359,7 +359,7 @@
 
                 <td>{{ item.scene_name }}</td>
                 <td>{{ item.file_name }}</td>
-                <td>{{ item.render_time }}</td>
+                <td>{{ item.render_time | round(3) }}</td>
                 <td>{{ item.pix_difference }}</td>
                 <td class="hatching">
                 {% if item.baseline_path %}

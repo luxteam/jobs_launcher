@@ -137,10 +137,19 @@ def build_summary_report(work_dir):
     summary_report_embed_img = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
+            # build embeded summary report
             if file.endswith(SESSION_REPORT_EMBED_IMG):
+                basename = os.path.basename(path)
+                basename = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
-                    # TODO: basename like session_report
                     summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
+                try:
+                    for test_package in summary_report_embed_img[basename]['results']:
+                        for test_conf in summary_report_embed_img[basename]['results'][test_package]:
+                            summary_report_embed_img[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename,summary_report_embed_img[basename]['results'][test_package][test_conf]['result_path']),work_dir)})
+                except Exception as e:
+                    main_logger.error(str(e))
+            # build summary report
             elif file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
                 basename = os.path.relpath(path, work_dir)
@@ -209,9 +218,7 @@ def build_performance_report(work_dir):
                     for test_config in results[test_package]:
                         performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
 
-    # save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
-    # save_json_report(performance_report_detail, work_dir, "re.json", replace_pathsep=True)
-        env = jinja2.Environment(
+    env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
