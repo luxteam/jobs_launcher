@@ -11,7 +11,6 @@ def create_args_parser():
     args = argparse.ArgumentParser()
     args.add_argument('--results_root')
     args.add_argument('--baseline_root')
-    args.add_argument('--report_name')
     return args
 
 
@@ -30,8 +29,7 @@ def main():
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
             # find report_compare.json
-            # if file == core.config.TEST_REPORT_NAME_COMPARED:
-            if file == args.report_name:
+            if file == core.config.TEST_REPORT_NAME_COMPARED:
                 with open(os.path.join(path, file), 'r') as json_report:
                     report = json.loads(json_report.read())
 

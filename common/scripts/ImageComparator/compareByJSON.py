@@ -2,94 +2,55 @@ import os
 import argparse
 import json
 import CompareMetrics
+import sys
+import shutil
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
 
 
 def createArgParser():
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--stage_report')
     argparser.add_argument('--work_dir')
     argparser.add_argument('--base_dir')
-    argparser.add_argument('--report_name')
-    argparser.add_argument('--result_name')
-
     return argparser
 
 
-def compareFoldersWalk(jsonReport, workFolder, baseFolder, root_dir):
-    for img in jsonReport:
-        file1 = os.path.abspath(os.path.join(workFolder, img['file_name']))
-        file2 = os.path.abspath(os.path.join(baseFolder, img['file_name']))
+def main():
+    args = createArgParser().parse_args()
 
-        try:
-            metrics = CompareMetrics.CompareMetrics(file1, file2)
-            key_diff = ('difference_' + os.path.basename(workFolder)).lower()
-            key_src = ('baseline_' + os.path.basename(workFolder) + '_path').lower()
-            # key_diff = ('difference_' + suffix + '_' + os.path.basename(workFolder)).lower()
-            # key_src = ('path_' + suffix + '_' + os.path.basename(workFolder)).lower()
+    if not os.path.exists(args.base_dir):
+        core.config.main_logger.info("Baseline not found by path: {}".format(args.base_dir))
+        shutil.copyfile(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED))
+        return
 
-            diff = {key_diff: metrics.getDiffPixeles()}
-            src = {key_src: os.path.relpath(file2, root_dir)}
-        except Exception as err:
-            print("Error: " + str(err))
-        else:
-            img.update(diff)
-            img.update(src)
+    render_json = []
+    baseline_json = []
 
-    return jsonReport
+    with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
+        render_json = json.loads(file.read())
 
+    with open(os.path.join(args.base_dir, core.config.BASELINE_MANIFEST), 'r') as file:
+        baseline_json = json.loads(file.read())
 
-def main(args):
-    stage_report = [{'status': 'INIT'}, {'log': ['compareByJSON.py started;']}]
+    for img in render_json:
+        for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
+            if key in img.keys():
+                render_img_path = os.path.join(args.work_dir, img[key])
+                try:
+                    baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
+                except KeyError as err:
+                    core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
+                    continue
 
-    jsonReport = ""
-    try:
-        with open(os.path.abspath(os.path.join(args.work_dir, args.report_name)), 'r') as file:
-            jsonReport = file.read()
-    except OSError:
-        stage_report[1]['log'].append('Report not found;')
-        stage_report[0]['status'] = 'FAILED'
-        return stage_report
+                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
 
-    try:
-        jsonReport = json.loads(jsonReport)
-    except json.JSONDecodeError:
-        stage_report[1]['log'].append('Error in json report; Try to fix it;')
-        s = list(jsonReport)
-        if s[-1] == ',':
-            del s[-1]
-        s.append(']')
-        try:
-            jsonReport = json.loads("".join(s))
-        except json.JSONDecodeError:
-            stage_report[1]['log'].append('Error was not fixed;')
-            stage_report[0]['status'] = 'FAILED'
-            return stage_report
-    else:
-        stage_report[1]['log'].append('No errors in json;')
+                img.update({'pix_difference': metrics.getDiffPixeles()})
+                img.update({'baseline_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)
+                            })
 
-    if os.path.exists(os.path.abspath(args.base_dir)):
-        for path, dirs, files in os.walk(args.base_dir):
-            for dir in dirs:
-                if dir == 'Opacity' or dir == 'Color' or dir == 'images':
-                    if os.path.basename(path) == os.path.basename(args.work_dir):
-                        stage_report[1]['log'].append('Comparison: ' + os.path.join(path, dir))
-                        jsonReport = compareFoldersWalk(jsonReport, os.path.join(args.work_dir, dir), os.path.join(path, dir), args.work_dir)
-    else:
-        stage_report[1]['log'].append('Baseline dose not exist;')
-
-    stage_report[0]['status'] = 'OK'
-
-    with open(os.path.join(args.work_dir, args.result_name), 'w') as file:
-        json.dump(jsonReport, file, indent=" ", sort_keys=True)
-
-    return stage_report
+    with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+        json.dump(render_json, file, indent=" ")
 
 
 if __name__ == '__main__':
-    args = createArgParser().parse_args()
-    stage_report = main(args)
-
-    with open(os.path.join(args.work_dir, args.stage_report), 'w') as file:
-        json.dump(stage_report, file, indent=' ')
+    main()

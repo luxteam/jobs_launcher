@@ -3,9 +3,6 @@
 <head>
 	<meta charset="utf-8">
 	<style media="screen" type="text/css">
-		body{
-			background-color: #dddddd;
-		}
 		table{
 			width: 100%;
 			border: 2px solid #000;
@@ -17,33 +14,16 @@
 			font-weight: 700;
 			padding: 10px;
 		}
-		table tr{
-			background-color: #ddd;
-		}
-		table tr:nth-child(1) td{
-			font-size: 15pt;
-			background-color: #777;
-			text-shadow: 0px 0px 2px #a8a8a8;
-		}
 		table tr, td{
 			border: 1px solid #000;
 			padding: 2px;
 			font-size: 13pt;
 		}
-		table tr:hover td{
-			background-color: #d6dbff;
-		}
-
-		.resultsTable tr:nth-child(4n-2){
-			background-color: #aaa;
-		}
-
 		.zoomImg{
 			display: block;
 			margin: auto;
 			width: 30%;
 		}
-
 	</style>
     <title>{{ title }}</title>
     <script type="text/javascript">
@@ -62,8 +42,28 @@
 </head>
 <body>
 
-    {% block main_body_part %}
-    {% endblock %}
+	<table class="resultsTable">
+		<tr>
+			<th>Rendered picture</th>
+			{% if compared %}
+			<th>Baseline picture</th>
+			{% endif %}
+			<th>Info</th>
+		</tr>
+		{% for img in rendered %}
+		<tr>
+			<td><img src="{{ img.render_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+			{% if compared %}
+			<td><img src="{{ img.basline_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+			{% endif %}
+			<td>Scene: {{ img.scene_name }}
+				File name: {{ img.file_name }}
+				Pix difference: {{ img.pix_difference }}
+				Render time: {{ img.render_time | round(3) }}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
 
 	<br/>
 	<br/>

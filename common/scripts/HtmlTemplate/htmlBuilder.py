@@ -11,18 +11,18 @@ import core.config
 
 def main():
     args = argparse.ArgumentParser()
-    args.add_argument('--render_path')
+    args.add_argument('--work_dir')
 
     args = args.parse_args()
 
     rendered_json = []
     notRenderedJson = {}
     compared = False
-    with open(os.path.join(args.render_path, core.config.TEST_REPORT_NAME_COMPARED), 'r') as file:
+    with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'r') as file:
         rendered_json = json.loads(file.read())
 
     for img in rendered_json:
-        if img.pix_difference != "not compared yet":
+        if img['pix_difference'] != "not compared yet":
             compared = True
             break
 
@@ -30,7 +30,7 @@ def main():
         loader=PackageLoader('htmlBuilder', 'templates'),
         autoescape=True
     )
-    template = env.get_template('local_report.html')
+    template = env.get_template('report.html')
     text = template.render(title="Render Results", compared=compared, rendered=rendered_json, not_rendered=notRenderedJson)
 
     with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
