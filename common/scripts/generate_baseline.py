@@ -51,11 +51,10 @@ def main():
                             except Exception as err:
                                 core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
 
-                # shutil.copyfile(os.path.join(path, file), os.path.join(args.baseline_root, baseline_name,
                 shutil.copyfile(os.path.join(path, file),
-                                os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, file),args.results_root))
+                                os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, BASELINE_REPORT_NAME), args.results_root))
                                 )
-            elif file == 'result.html':
+            elif file == core.config.TEST_REPORT_HTML_NAME:
                 # duplicate folder creation because of results.html can be first file
                 if not os.path.exists(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root))):
                     os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))
@@ -67,9 +66,8 @@ def main():
         with open(os.path.join(args.baseline_root, core.config.BASELINE_MANIFEST), 'w') as file:
             json.dump(baseline_manifest, file, indent=" ")
 
-        report = core.config.SESSION_REPORT
         # copy report to
-        shutil.copyfile(os.path.join(args.results_root, report),
+        shutil.copyfile(os.path.join(args.results_root, core.config.SESSION_REPORT),
             os.path.join(os.path.abspath(args.baseline_root), core.config.BASELINE_SESSION_REPORT)
                         )
     except Exception as err:
