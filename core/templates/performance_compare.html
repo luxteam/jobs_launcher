@@ -152,7 +152,7 @@
         <td>{{ tool }}</td>
         {% for hw in hardware %}
             {% if report[tool][hw] %}
-        <td>{{ report[tool][hw].summary.render_duration }}</td>
+        <td>{{ report[tool][hw].summary.render_duration | round(1) }}</td>
             {% else %}
         <td></td>
             {% endif %}
@@ -181,7 +181,7 @@
     <tr>
         <td>{{ test_package }} {{ test_config }}</td>
         {% for hw in hardware %}
-        <td>{{ detail_report[tool][test_package][test_config][hw].render_duration if detail_report[tool][test_package][test_config][hw] else '' }}</td>
+        <td>{{ detail_report[tool][test_package][test_config][hw].render_duration | round(3) if detail_report[tool][test_package][test_config][hw] else '' }}</td>
         {% endfor %}
     </tr>
             {% endfor %}
