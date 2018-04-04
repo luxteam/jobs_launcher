@@ -52,7 +52,7 @@ def main():
                                 core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
 
                 shutil.copyfile(os.path.join(path, file),
-                                os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, BASELINE_REPORT_NAME), args.results_root))
+                                os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, core.config.BASELINE_REPORT_NAME), args.results_root))
                                 )
             elif file == core.config.TEST_REPORT_HTML_NAME:
                 # duplicate folder creation because of results.html can be first file
