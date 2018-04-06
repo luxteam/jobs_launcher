@@ -4,7 +4,7 @@ logging.basicConfig(filename='launcher.engine.log', level=logging.INFO, format=u
 main_logger = logging.getLogger('main_logger')
 
 SIMPLE_RENDER_TIMEOUT = 10
-TIMEOUT = 6000
+TIMEOUT = 10000
 TIMEOUT_PAR = 3
 
 TEST_REPORT_NAME = 'report.json'
