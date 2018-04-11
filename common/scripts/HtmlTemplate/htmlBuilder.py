@@ -22,7 +22,7 @@ def main():
         rendered_json = json.loads(file.read())
 
     for img in rendered_json:
-        if img['pix_difference'] != "not compared yet":
+        if img['difference_color'] != "not compared yet":
             compared = True
             break
 

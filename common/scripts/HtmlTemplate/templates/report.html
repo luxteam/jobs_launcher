@@ -52,13 +52,13 @@
 		</tr>
 		{% for img in rendered %}
 		<tr>
-			<td><img src="{{ img.render_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+			<td><img src="{{ img.render_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
 			{% if compared %}
-			<td><img src="{{ img.baseline_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+			<td><img src="{{ img.baseline_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
 			{% endif %}
 			<td>Scene: {{ img.scene_name }}<br/>
 				File name: {{ img.file_name }}<br/>
-				Pix difference: {{ img.pix_difference }}<br/>
+				Pix difference: {{ img.difference_color }}<br/>
 				Render time: {{ img.render_time | round(3) }}<br/>
 			</td>
 		</tr>
