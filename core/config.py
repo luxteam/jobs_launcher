@@ -1,7 +1,7 @@
 import logging
 
 logging.basicConfig(filename='launcher.engine.log',
-                    filemode='w',
+                    filemode='a',
                     level=logging.INFO,
                     format=u'%(filename)-21s[LINE:%(lineno)-3d] #%(levelname)-8s in:%(funcName)-23s [%(asctime)s] %(message)s')
 main_logger = logging.getLogger('main_logger')
@@ -12,6 +12,7 @@ TIMEOUT_PAR = 3
 
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
+TEST_REPORT_EXPECTED_NAME = 'expected.json'
 TEST_REPORT_HTML_NAME = 'result.html'
 
 SESSION_REPORT = 'session_report.json'

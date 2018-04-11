@@ -16,20 +16,6 @@ import jobs_launcher.job_launcher
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
 
-def validate_cmd_execution(stage_name, stage_path):
-    stage_report = stage_name + '.json'
-    if os.path.exists(os.path.join(stage_path, stage_report)):
-        try:
-            with open(os.path.join(stage_path, stage_report)) as file:
-                report = file.read()
-                report = json.loads(report)
-        except OSError as e:
-            main_logger.error('Error during stage validation {}'.format(str(e)))
-            return 'FAILED'
-
-        return report[0]['status']
-
-
 def parse_cmd_variables(tests_root, cmd_variables):
     config_devices = {}
     new_config = []
@@ -72,6 +58,7 @@ def main():
     parser.add_argument('--cmd_variables', required=False, nargs="*")
     parser.add_argument('--test_filter', required=False, nargs="*", default=[])
     parser.add_argument('--package_filter', required=False, nargs="*", default=[])
+    parser.add_argument('--file_filter', required=False)
 
     args = parser.parse_args()
 
@@ -88,6 +75,10 @@ def main():
 
     if '' in args.package_filter:
         args.package_filter = []
+
+    if args.file_filter:
+        with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
+            args.test_filter = file.read().splitlines()
 
     args.tests_root = os.path.abspath(args.tests_root)
 
@@ -147,27 +138,6 @@ def main():
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
-            # read state from stage report to check correct complete previous job
-            # we still continue work to get report
-            if validate_cmd_execution(found_job[5][i], temp_path) == 'FAILED':
-                report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                main_logger.warning('Job FAILED')
-            elif validate_cmd_execution(found_job[5][i], temp_path) == 'TERMINATED':
-                report['results'][found_job[0]][' '.join(found_job[1])]['failed'] = 1
-                main_logger.warning('Job was TERMINATED')
-            else:
-                if not report['results'][found_job[0]][' '.join(found_job[1])]['failed']:
-                    report['results'][found_job[0]][' '.join(found_job[1])]['passed'] = 1
-
-        log = []
-        for stage_report in found_job[5]:
-            temp_report = os.path.join(temp_path, stage_report+'.json')
-            if os.path.isfile(temp_report):
-                with open(temp_report, 'r') as file:
-                    log.append(json.loads(file.read()))
-
-        # report['results'][found_job[0]][' '.join(found_job[1])].update({'log': log})
-
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
     print("Saving session report")
@@ -178,7 +148,7 @@ def main():
     core.reportExporter.build_summary_report(args.work_root)
     main_logger.info('Saved summary report')
 
-    print("Saving peformance report")
+    print("Saving performance report")
     core.reportExporter.build_performance_report(args.work_root)
     main_logger.info('Saved performance report')
 

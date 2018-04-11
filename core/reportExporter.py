@@ -82,6 +82,7 @@ def build_session_report(report, session_dir):
                             report['machine_info'].update({'render_device': jtem['render_device']})
                             report['machine_info'].update({'tool': jtem['tool']})
                             report['machine_info'].update({'render_version': jtem['render_version']})
+                            report['machine_info'].update({'core_version': jtem['core_version']})
                         except:
                             pass
 

@@ -6,33 +6,23 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import core.config
 
 
-def createArgParser():
+def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--work_dir')
-    argparser.add_argument('--expected_report')
-    argparser.add_argument('--render_report')
-    argparser.add_argument('--result_report')
-
-    return argparser
-
-
-def main():
-    args = createArgParser().parse_args()
-    args.work_dir = os.path.abspath(args.work_dir)
+    args = argparser.parse_args()
 
     expected = set()
     rendered = set()
 
-    # try:
-    with open(os.path.join(args.work_dir, args.expected_report), 'r') as file:
-        expected = json.loads(file.read())
+    try:
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_EXPECTED_NAME), 'r') as file:
+            expected = json.loads(file.read())
 
-    with open(os.path.join(args.work_dir, args.render_report), 'r') as file:
-        rendered = json.loads(file.read())
-    # except Exception as err:
-    #     pass
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
+            rendered = json.loads(file.read())
+    except Exception as err:
+        core.config.main_logger.error("Not found reports: {}".format(str(err)))
 
-    # TODO: check if img exist?
     rendered = {x[img] for x in rendered for img in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS}
     expected = {x['file_path'] for x in expected}
 
