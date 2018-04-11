@@ -83,8 +83,9 @@ def build_session_report(report, session_dir):
                             report['machine_info'].update({'tool': jtem['tool']})
                             report['machine_info'].update({'render_version': jtem['render_version']})
                             report['machine_info'].update({'core_version': jtem['core_version']})
-                        except:
+                        except Exception as err:
                             pass
+                            main_logger.warning(str(err))
 
                     # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
