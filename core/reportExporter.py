@@ -2,8 +2,8 @@ import os
 import jinja2
 import json
 import base64
+import shutil
 from PIL import Image
-
 from core.config import *
 from core.auto_dict import AutoDict
 
@@ -106,6 +106,8 @@ def build_session_report(report, session_dir):
                 total[key] += report['results'][result][item][key]
     report.update({'summary': total})
 
+    return report
+
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
@@ -171,6 +173,8 @@ def build_summary_report(work_dir):
                 except Exception as e:
                     main_logger.error(str(e))
 
+    return summary_report
+
     save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
     save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG, replace_pathsep=True)
 
@@ -220,6 +224,8 @@ def build_performance_report(work_dir):
                     for test_config in results[test_package]:
                         performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
 
+    return performance_report, hardware, performance_report_detail
+
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
@@ -232,3 +238,36 @@ def build_performance_report(work_dir):
     except Exception as e:
         main_logger.error("Error while render performance html report: {}".format(str(e)))
         save_html_report('error', work_dir, PERFORMANCE_REPORT_HTML)
+
+
+def build_reports(report, session_dir, work_dir):
+    shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(session_dir, 'report_resources'))
+    try:
+        shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(work_dir, 'report_resources'))
+    except:
+        pass
+
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=True
+    )
+    summary_template = env.get_template('summary_template.html')
+
+    session_report = build_session_report(report, session_dir)
+    save_json_report(session_report, session_dir, SESSION_REPORT, replace_pathsep=True)
+    session_html = summary_template.render(title="Session report", report={'_cur_': session_report})
+    save_html_report(session_html, session_dir, "summary.html", replace_pathsep=True)
+
+    summary_report = build_summary_report(work_dir)
+    save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+    summary_html = summary_template.render(title="Summary report", report=summary_report)
+    save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
+
+    # performance_template = env.get_template('performance_template.html')
+    # compare_template = env.get_template('compare_template.html')
+
+    # performance_html = performance_template.render(title="Performance", report=performance_report, hardware=hardware, detail_report=performance_report_detail)
+    # compare_html = compare_template.render(title="Compare")
+
+    # save_html_report(performance_html, session_dir, "performance.html", replace_pathsep=True)
+    # save_html_report(compare_html, session_dir, "compare.html", replace_pathsep=True)

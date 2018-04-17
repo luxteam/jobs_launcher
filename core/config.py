@@ -20,6 +20,8 @@ SESSION_REPORT_EMBED_IMG = 'session_report_embed_img.json'
 SESSION_REPORT_HTML = 'session_report.html'
 SESSION_REPORT_HTML_EMBED_IMG = 'session_report_embed_img.html'
 
+NOT_RENDERED_REPORT = "not_rendered.json"
+
 SUMMARY_REPORT = 'summary_report.json'
 SUMMARY_REPORT_EMBED_IMG = 'summary_report_embed_img.json'
 SUMMARY_REPORT_HTML = 'summary_report.html'
@@ -34,3 +36,5 @@ BASELINE_REPORT_NAME = 'render_copied_report.json'
 
 PERFORMANCE_REPORT = 'performance_report.json'
 PERFORMANCE_REPORT_HTML = 'performance_report.html'
+
+REPORT_RESOURCES_PATH = 'resources'

@@ -1,0 +1,58 @@
+{% extends "base_template.html"%}
+
+{% block report_body %}
+<h2>summary</h2>
+
+<table>
+    <tr>
+        <th>Tool</th>
+        {% for hw in hardware %}
+        <th>{{ hw }}</th>
+        {% endfor %}
+    </tr>
+
+    {% for tool in report %}
+    <tr>
+        <td>{{ tool }}</td>
+        {% for hw in hardware %}
+            {% if report[tool][hw] %}
+        <td>{{ report[tool][hw].summary.render_duration | round(1) }}</td>
+            {% else %}
+        <td></td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+<hr/>
+
+<h2>details</h2>
+
+<table>
+
+    <tr>
+        <th>Test</th>
+        {% for hw in hardware %}
+        <td>{{ hw }}</td>
+        {% endfor %}
+    </tr>
+
+    {% for tool in detail_report %}
+    <tr class="summary_tr">
+        <td colspan="{{ hardware | length + 1}}">{{ tool }}</td>
+    </tr>
+        {% for test_package in detail_report[tool] %}
+            {% for test_config in detail_report[tool][test_package] %}
+    <tr>
+        <td>{{ test_package }} {{ test_config }}</td>
+        {% for hw in hardware %}
+        <td>{{ detail_report[tool][test_package][test_config][hw].render_duration | round(3) if detail_report[tool][test_package][test_config][hw] else '' }}</td>
+        {% endfor %}
+    </tr>
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+</table>
+
+{% endblock %}

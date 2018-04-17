@@ -50,6 +50,7 @@ def main():
                                         'difference_color': 10,
                                         'render_color_path': 'img.jpg',
                                         'file_name': 'file',
+                                        'core_version': '1.23',
                                         'tool': random.choice(['Maya', 'Render', 'Ne render', 'Solid works'])
                                         })
                 json.dump(previous_report, file, indent=' ')

@@ -9,9 +9,6 @@
 
     <execute command='python "{EngineScripts}/checkExpected.py"' stage="stage2">
         <argument>--work_dir "{OutputDir}"</argument>
-        <argument>--expected_report expected.json</argument>
-        <argument>--render_report report.json</argument>
-        <argument>--result_report not_rendered.json</argument>
     </execute>
 
 </job-manifest>

@@ -63,5 +63,8 @@ if __name__ == '__main__':
     with open(os.path.join(args.work_dir, 'report.json'), 'w') as file:
         file.write(report)
 
+    with open(os.path.join(args.work_dir, 'report_compare.json'), 'w') as file:
+        file.write(report)
+
     with open(os.path.join(args.work_dir, 'expected.json'), 'w') as file:
         file.write(expected)

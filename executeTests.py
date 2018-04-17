@@ -140,6 +140,11 @@ def main():
 
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
+
+    print("Experimental report")
+    core.reportExporter.build_reports(report, session_dir, args.work_root)
+    return
+
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report')

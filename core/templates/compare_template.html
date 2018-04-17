@@ -1,0 +1,16 @@
+{% extends "base_template.html"%}
+
+{% block report_body %}
+<h1>compare table</h1>
+
+<table>
+    <thead>
+    {% for hw in hardware %}
+        <th>{{ hw }}</th>
+    {% endfor %}
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+{% endblock %}

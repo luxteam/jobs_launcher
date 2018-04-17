@@ -32,7 +32,7 @@ def main():
     if result:
         result_json = [{"file_path": x} for x in result]
 
-        with open(os.path.join(args.work_dir, args.result_report), 'w') as file:
+        with open(os.path.join(args.work_dir, core.config.NOT_RENDERED_REPORT), 'w') as file:
             json.dump(result_json, file, indent=" ")
     else:
         pass
