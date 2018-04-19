@@ -17,3 +17,11 @@ function buildTable(tableID) {
   dynatable.sorts.add("testCase", 1);
   dynatable.process();
 }
+
+function setActive(elem) {
+    var a = document.getElementsByTagName('a');
+    for (i = 0; i < a.length; i++) {
+        a[i].classList.remove('active_header');
+    }
+    elem.classList.add('active_header');
+}

@@ -5,20 +5,20 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="report_resources/css/style.css"/>
     <link rel="stylesheet" type="text/css" href="report_resources/css/jquery.dynatable.css"/>
+
     <script src="report_resources/js/jquery-1.7.2.min.js" type="text/javascript"></script>
     <script src="report_resources/js/jquery.dynatable.js" type="text/javascript"></script>
-    <script src="report_resources/js/buildTable.js" type="text/javascript"></script>
+    <script src="report_resources/js/scripts.js" type="text/javascript"></script>
 
-    <!--<link rel="stylesheet" type="text/css" href="report_resources/css/jquery.dataTables.min.css"/>-->
-    <!--<script src="report_resources/js/jquery.dataTables.min.js" type="text/javascript"></script>-->
+{% if report %}
     <script type="text/javascript">
         $(document).ready(function init(){
-            //$('#test').DataTable();
             {% for i, value in report | dictsort %}
             buildTable('#{{ i | lower }}');
             {% endfor %}
         });
     </script>
+{% endif %}
 
     <title>{{ title }}</title>
 </head>
@@ -31,9 +31,9 @@
         <img src="report_resources/img/logo.png"/>
 
         <ul>
-            <li><a href='compare.html'>compare</a></li>
-            <li><a href='performance.html'>performance</a></li>
-            <li><a href='summary.html' class='active_header'>summary</a></li>
+            <li><a href='compare_report.html' onclick="setActive(this)">compare</a></li>
+            <li><a href='performance_report.html' onclick="setActive(this)">performance</a></li>
+            <li><a href='summary_report.html' onclick="setActive(this)">summary</a></li>
         </ul>
 
     </div>

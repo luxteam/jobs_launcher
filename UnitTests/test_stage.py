@@ -3,6 +3,7 @@ import json
 import argparse
 import time
 import random
+import shutil
 
 def createArgParser():
     argparser = argparse.ArgumentParser()
@@ -42,13 +43,16 @@ def main():
                 return
 
         try:
+            chosen_img = random.choice(['u211.jpg', 'u217.jpg'])
+            shutil.copy(os.path.join(os.path.split(__file__)[0], chosen_img), os.path.join(args.output_folder, chosen_img))
             with open(os.path.join(args.output_folder, args.current_report), 'w') as file:
                 previous_report.append({'stage_name': args.stage_report.replace('.json', ''),
                                         'render_version': 10,
                                         'render_device': random.choice(['smh', 'Nvidia', 'Radeon']),
                                         'render_time': random.choice([2, 4, 5]),
                                         'difference_color': 10,
-                                        'render_color_path': 'img.jpg',
+                                        'render_color_path': chosen_img,
+                                        'test_case': chosen_img.replace('.jpg', ''),
                                         'file_name': 'file',
                                         'core_version': '1.23',
                                         'tool': random.choice(['Maya', 'Render', 'Ne render', 'Solid works'])

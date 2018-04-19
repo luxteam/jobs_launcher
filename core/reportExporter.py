@@ -240,6 +240,28 @@ def build_performance_report(work_dir):
         save_html_report('error', work_dir, PERFORMANCE_REPORT_HTML)
 
 
+def build_compare_report(work_dir):
+    compare_report = AutoDict()
+    hardware = []
+    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
+        for file in files:
+            if file.endswith(SESSION_REPORT):
+                with open(os.path.join(path, file), 'r') as report_file:
+                    temp_report = json.loads(report_file.read())
+
+                hw = temp_report['machine_info']['render_device']
+                hardware.append(hw)
+
+                for test_package in temp_report['results']:
+                    for test_config in temp_report['results'][test_package]:
+                        for item in temp_report['results'][test_package][test_config]['render_results']:
+                            if not compare_report[item['test_case']]:
+                                compare_report[item['test_case']] = {}
+                            compare_report[item['test_case']].update({item['render_device']: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir) })
+
+    return compare_report, hardware
+
+
 def build_reports(report, session_dir, work_dir):
     shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(session_dir, 'report_resources'))
     try:
@@ -263,11 +285,14 @@ def build_reports(report, session_dir, work_dir):
     summary_html = summary_template.render(title="Summary report", report=summary_report)
     save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
-    # performance_template = env.get_template('performance_template.html')
-    # compare_template = env.get_template('compare_template.html')
-
-    # performance_html = performance_template.render(title="Performance", report=performance_report, hardware=hardware, detail_report=performance_report_detail)
-    # compare_html = compare_template.render(title="Compare")
-
+    performance_template = env.get_template('performance_template.html')
+    performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
+    performance_html = performance_template.render(title="Performance", report=performance_json_report, hardware=hardware, detail_report=performance_report_detail)
     # save_html_report(performance_html, session_dir, "performance.html", replace_pathsep=True)
-    # save_html_report(compare_html, session_dir, "compare.html", replace_pathsep=True)
+    save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+
+    compare_template = env.get_template('compare_template.html')
+    compare_report, hardware = build_compare_report(work_dir)
+    save_json_report(compare_report, work_dir, 'compare.json', True)
+    compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report)
+    save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)

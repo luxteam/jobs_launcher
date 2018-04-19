@@ -17,7 +17,8 @@ report = '''
   "render_version": "2.2.128",
   "scene_name": "Camera_Cube_Map.mb",
   "test_name": "Cameras",
-  "tool": "maya2017"
+  "tool": "maya2017",
+  "test_case": "CS_10"
  },
  {
   "baseline_color_path": "../../../Baseline/Cameras/Color/Camera_Cube_Map_Stereo.jpg",
@@ -33,7 +34,8 @@ report = '''
   "render_version": "2.2.128",
   "scene_name": "Camera_Cube_Map_Stereo.mb",
   "test_name": "Cameras",
-  "tool": "maya2017"
+  "tool": "maya2017",
+  "test_case": "CS_12"
  }
 ]
 '''

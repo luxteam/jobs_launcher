@@ -1,16 +1,28 @@
 {% extends "base_template.html"%}
 
 {% block report_body %}
+
 <h1>compare table</h1>
 
 <table>
-    <thead>
-    {% for hw in hardware %}
+    <tr>
+        <th>Test case</th>
+        {% for hw in hardware %}
         <th>{{ hw }}</th>
-    {% endfor %}
-    </thead>
-    <tbody>
+        {% endfor %}
+    </tr>
 
-    </tbody>
+    {% for file in compare_report %}
+    <tr>
+        <td>{{ file }}</td>
+        {% for hw in hardware %}
+        <td>
+            {{ file }}<br/>
+            <img src="{{ compare_report[file][hw] }}"/><br/>
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
 </table>
+
 {% endblock %}

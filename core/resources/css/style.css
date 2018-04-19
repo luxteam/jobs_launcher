@@ -8,6 +8,12 @@ body {
   text-align:left;
   background-color: rgba(242, 242, 242, 1);
 }
+
+img {
+    width: 64px;
+    height: 64px;
+}
+
 @font-face {
     font-family: "AMDRTG";
     src: url(../fonts/AMDRTG.ttf) format("truetype");
@@ -26,6 +32,8 @@ body {
   display: block;
   margin-right: auto;
   margin-left: auto;
+  width: auto;
+  height: auto;
 }
 #header ul{
 /*    overflow: hidden;
@@ -36,10 +44,12 @@ body {
     display: inline;
     padding: 5%;
     margin: 5px;
+    z-index: 2;
 }
 .active_header {
   background-color: rgba(237, 237, 237, 1);
 }
+
 #header a{
     font-family: AMDRTG, sans-serif;
     font-size: 22px;
@@ -52,7 +62,7 @@ body {
     color: #000;
 }
 #header a:visited{
-    color: #bbb;
+    color: #000;
 }
 #header a:hover{
     color: #000;
