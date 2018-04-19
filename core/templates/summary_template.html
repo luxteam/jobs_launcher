@@ -135,7 +135,10 @@
             <tr>
                         {% endif %}
                 <td>{{ item.file_name }}</td>
-                <td>{{ item.script_info }}</td>
+                <td>{% for param in item.script_info %}
+                    {{ param }}
+                    {% endfor %}
+                </td>
                 <td>{{ item.render_time | round(3) }}</td>
                 <td>{{ item.difference_color }}</td>
                 <td class="hatching">
