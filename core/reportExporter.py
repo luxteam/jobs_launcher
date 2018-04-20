@@ -292,9 +292,10 @@ def build_summary_reports(work_dir):
 
     try:
         performance_template = env.get_template('performance_template.html')
-        performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
-        save_json_report(performance_json_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
-        performance_html = performance_template.render(title="Performance", report_performance=performance_json_report, hardware=hardware, performance_report=performance_report_detail, pageID="performanceA")
+        performance_report, hardware, performance_report_detail = build_performance_report(work_dir)
+        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
+        save_json_report(performance_report_detail, work_dir, 'perf.json', replace_pathsep=True)
+        performance_html = performance_template.render(title="Performance", performance_report=performance_report, hardware=hardware, performance_report_detail=performance_report_detail, pageID="performanceA")
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))

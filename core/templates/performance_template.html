@@ -11,12 +11,12 @@
         {% endfor %}
     </tr>
 
-    {% for tool in report_performance %}
+    {% for tool in performance_report %}
     <tr>
         <td>{{ tool }}</td>
         {% for hw in hardware %}
-            {% if report_performance[tool][hw] %}
-        <td>{{ report_performance[tool][hw].summary.render_duration | round(1) }}</td>
+            {% if performance_report[tool][hw] %}
+        <td>{{ performance_report[tool][hw].summary.render_duration }}</td>
             {% else %}
         <td></td>
             {% endif %}
@@ -28,32 +28,32 @@
 <hr/>
 
 <h1>Graph</h1>
-<div id="columnchart" style="width: 800px; height: 500px;"></div>
+<div id="columnchart"></div>
 
 <hr/>
 
 <h1>details</h1>
-{% for tool in performance_report %}
+{% for tool in performance_report_detail %}
 <h2>{{ tool }}</h2>
     <table>
 
         <tr>
             <th>Test</th>
             {% for hw in hardware %}
-            <td>{{ hw }}</td>
+            <th>{{ hw }}</th>
             {% endfor %}
         </tr>
 
-        {% for test_package in performance_report[tool] %}
-            {% for test_config in performance_report[tool][test_package] %}
+    {% for test_package in performance_report_detail[tool] %}
+        {% for test_config in performance_report_detail[tool][test_package] %}
         <tr>
             <td>{{ test_package }} {{ test_config }}</td>
             {% for hw in hardware %}
-            <td>{{ performance_report[tool][test_package][test_config][hw].render_duration | round(3) if performance_report[tool][test_package][test_config][hw] else '' }}</td>
+            <td>{{ performance_report_detail[tool][test_package][test_config][hw].render_duration | round(3) if performance_report_detail[tool][test_package][test_config][hw] else '' }}</td>
             {% endfor %}
         </tr>
-            {% endfor %}
         {% endfor %}
+    {% endfor %}
     </table>
 {% endfor %}
 

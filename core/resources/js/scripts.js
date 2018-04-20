@@ -24,7 +24,7 @@ function setActive(elem) {
 
 function resizeImgs(){
   imgs = document.getElementsByTagName('img');
-  if (imgs[0].style.width == 'auto') {
+  if (imgs[0].style.width == 'auto' || imgs[0].style.width == '') {
     for (var i = 0; i < imgs.length; i++) {
         imgs[i].style.width = "30%";
     }
