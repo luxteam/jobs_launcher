@@ -3,7 +3,6 @@ import jinja2
 import json
 import base64
 import shutil
-import matplotlib.pyplot as plt
 from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
