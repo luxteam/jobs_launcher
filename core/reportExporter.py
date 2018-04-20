@@ -296,3 +296,32 @@ def build_reports(report, session_dir, work_dir):
     save_json_report(compare_report, work_dir, 'compare.json', True)
     compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report)
     save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+
+
+def build_summary_reports(work_dir):
+    try:
+        shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(work_dir, 'report_resources'))
+    except:
+        pass
+
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=True
+    )
+    summary_template = env.get_template('summary_template.html')
+
+    summary_report = build_summary_report(work_dir)
+    save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+    summary_html = summary_template.render(title="Summary report", report=summary_report)
+    save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
+
+    performance_template = env.get_template('performance_template.html')
+    performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
+    performance_html = performance_template.render(title="Performance", report=performance_json_report, hardware=hardware, detail_report=performance_report_detail)
+    save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+
+    compare_template = env.get_template('compare_template.html')
+    compare_report, hardware = build_compare_report(work_dir)
+    save_json_report(compare_report, work_dir, 'compare.json', True)
+    compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report)
+    save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
