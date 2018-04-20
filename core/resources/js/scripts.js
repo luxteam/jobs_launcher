@@ -19,9 +19,18 @@ function buildTable(tableID) {
 }
 
 function setActive(elem) {
-//    var a = document.getElementsByTagName('a');
-//    for (i = 0; i < a.length; i++) {
-//        a[i].classList.remove('active_header');
-//    }
     elem.classList.add('active_header');
+}
+
+function resizeImgs(){
+  imgs = document.getElementsByTagName('img');
+  if (imgs[0].style.width == 'auto') {
+    for (var i = 0; i < imgs.length; i++) {
+        imgs[i].style.width = "30%";
+    }
+  } else {
+    for (var i = 0; i < imgs.length; i++) {
+        imgs[i].style.width = "auto";
+    }
+  }
 }

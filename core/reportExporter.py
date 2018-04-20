@@ -3,6 +3,7 @@ import jinja2
 import json
 import base64
 import shutil
+import matplotlib.pyplot as plt
 from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
@@ -147,7 +148,7 @@ def build_summary_report(work_dir):
             # build embeded summary report
             if file.endswith(SESSION_REPORT_EMBED_IMG):
                 basename = os.path.basename(path)
-                basename = os.path.relpath(path, work_dir)
+                basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
                 try:
@@ -159,7 +160,7 @@ def build_summary_report(work_dir):
             # build summary report
             elif file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
-                basename = os.path.relpath(path, work_dir)
+                basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report[basename] = json.loads(report_file.read())
 
@@ -291,6 +292,7 @@ def build_summary_reports(work_dir):
     try:
         performance_template = env.get_template('performance_template.html')
         performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
+        save_json_report(performance_json_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
         performance_html = performance_template.render(title="Performance", report_performance=performance_json_report, hardware=hardware, detail_report=performance_report_detail, pageID="performanceA")
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
@@ -301,6 +303,7 @@ def build_summary_reports(work_dir):
     try:
         compare_template = env.get_template('compare_template.html')
         compare_report, hardware = build_compare_report(work_dir)
+        # TODO
         save_json_report(compare_report, work_dir, 'compare.json', True)
         compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report, pageID="compareA")
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
