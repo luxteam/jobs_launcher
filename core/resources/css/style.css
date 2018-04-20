@@ -299,3 +299,8 @@ h6 {
     width: auto;
     height: auto;
 }
+
+#columnchart {
+  display: block;
+  margin: auto;
+}

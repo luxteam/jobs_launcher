@@ -148,18 +148,20 @@ def build_summary_report(work_dir):
             if file.endswith(SESSION_REPORT_EMBED_IMG):
                 basename = os.path.basename(path)
                 basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
+                basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
                 try:
                     for test_package in summary_report_embed_img[basename]['results']:
                         for test_conf in summary_report_embed_img[basename]['results'][test_package]:
-                            summary_report_embed_img[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename,summary_report_embed_img[basename]['results'][test_package][test_conf]['result_path']),work_dir)})
+                            summary_report_embed_img[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath,summary_report_embed_img[basename]['results'][test_package][test_conf]['result_path']),work_dir)})
                 except Exception as e:
                     main_logger.error(str(e))
             # build summary report
             elif file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
                 basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
+                basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report[basename] = json.loads(report_file.read())
 
@@ -170,9 +172,9 @@ def build_summary_report(work_dir):
 
                                 for img in POSSIBLE_JSON_IMG_KEYS:
                                     if img in jtem.keys():
-                                        jtem.update({img: os.path.relpath(os.path.join(work_dir, basename, jtem[img]), work_dir)})
+                                        jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
 
-                            summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basename, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
+                            summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
                 except Exception as e:
                     main_logger.error(str(e))
 
@@ -292,7 +294,7 @@ def build_summary_reports(work_dir):
         performance_template = env.get_template('performance_template.html')
         performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
         save_json_report(performance_json_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
-        performance_html = performance_template.render(title="Performance", report_performance=performance_json_report, hardware=hardware, detail_report=performance_report_detail, pageID="performanceA")
+        performance_html = performance_template.render(title="Performance", report_performance=performance_json_report, hardware=hardware, performance_report=performance_report_detail, pageID="performanceA")
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))

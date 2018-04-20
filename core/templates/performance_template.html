@@ -27,8 +27,13 @@
 
 <hr/>
 
+<h1>Graph</h1>
+<div id="columnchart" style="width: 800px; height: 500px;"></div>
+
+<hr/>
+
 <h1>details</h1>
-{% for tool in detail_report %}
+{% for tool in performance_report %}
 <h2>{{ tool }}</h2>
     <table>
 
@@ -39,12 +44,12 @@
             {% endfor %}
         </tr>
 
-        {% for test_package in detail_report[tool] %}
-            {% for test_config in detail_report[tool][test_package] %}
+        {% for test_package in performance_report[tool] %}
+            {% for test_config in performance_report[tool][test_package] %}
         <tr>
             <td>{{ test_package }} {{ test_config }}</td>
             {% for hw in hardware %}
-            <td>{{ detail_report[tool][test_package][test_config][hw].render_duration | round(3) if detail_report[tool][test_package][test_config][hw] else '' }}</td>
+            <td>{{ performance_report[tool][test_package][test_config][hw].render_duration | round(3) if performance_report[tool][test_package][test_config][hw] else '' }}</td>
             {% endfor %}
         </tr>
             {% endfor %}
