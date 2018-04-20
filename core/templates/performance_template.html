@@ -11,12 +11,12 @@
         {% endfor %}
     </tr>
 
-    {% for tool in report %}
+    {% for tool in report_performance %}
     <tr>
         <td>{{ tool }}</td>
         {% for hw in hardware %}
-            {% if report[tool][hw] %}
-        <td>{{ report[tool][hw].summary.render_duration | round(1) }}</td>
+            {% if report_performance[tool][hw] %}
+        <td>{{ report_performance[tool][hw].summary.render_duration | round(1) }}</td>
             {% else %}
         <td></td>
             {% endif %}

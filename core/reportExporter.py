@@ -53,7 +53,7 @@ def make_base64_img(session_dir, report):
     return report
 
 
-def build_session_report(report, session_dir):
+def build_session_report(report, session_dir, template=None):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     current_test_report = {}
@@ -77,6 +77,8 @@ def build_session_report(report, session_dir):
                                 jtem.update({img: os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]), session_dir)})
 
                         render_duration += jtem['render_time']
+                        # TODO: count failed - need expected.json
+                        report['results'][result][item]['passed'] += 1
 
                         try:
                             report['machine_info'].update({'render_device': jtem['render_device']})
@@ -86,7 +88,7 @@ def build_session_report(report, session_dir):
                         except Exception as err:
                             pass
                             main_logger.warning(str(err))
-
+                    report['results'][result][item]['total'] = report['results'][result][item]['passed'] + report['results'][result][item]['failed']
                     # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
                 except Exception as err:
@@ -106,33 +108,34 @@ def build_session_report(report, session_dir):
                 total[key] += report['results'][result][item][key]
     report.update({'summary': total})
 
+    if template:
+        env = jinja2.Environment(
+            loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+            autoescape=True
+        )
+        template = env.get_template(template)
+
+        save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
+
+        try:
+            html_result = template.render(title='Session report', report={'_cur_': report})
+            save_html_report(html_result, session_dir, SESSION_REPORT_HTML, replace_pathsep=True)
+        except Exception as e:
+            main_logger.error("Error while render html report {}".format(str(e)))
+            save_html_report('error', session_dir, SESSION_REPORT_HTML)
+
+        # # make embed_img reports
+        # report = make_base64_img(session_dir, report)
+        # save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG, replace_pathsep=True)
+        #
+        # try:
+        #     html_result = template.render(title='Session report', report={'_cur_': report})
+        #     save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
+        # except Exception as e:
+        #     main_logger.error("Error while render html report {}".format(str(e)))
+        #     save_html_report('error', session_dir, SESSION_REPORT_HTML_EMBED_IMG)
+
     return report
-
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=True
-    )
-    template = env.get_template('session_report.html')
-
-    save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
-
-    try:
-        html_result = template.render(title='Session report', report={'_cur_': report})
-        save_html_report(html_result, session_dir, SESSION_REPORT_HTML, replace_pathsep=True)
-    except Exception as e:
-        main_logger.error("Error while render html report {}".format(str(e)))
-        save_html_report('error', session_dir, SESSION_REPORT_HTML)
-
-    # make embed_img reports
-    report = make_base64_img(session_dir, report)
-    save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG, replace_pathsep=True)
-
-    try:
-        html_result = template.render(title='Session report', report={'_cur_': report})
-        save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
-    except Exception as e:
-        main_logger.error("Error while render html report {}".format(str(e)))
-        save_html_report('error', session_dir, SESSION_REPORT_HTML_EMBED_IMG)
 
 
 def build_summary_report(work_dir):
@@ -173,27 +176,27 @@ def build_summary_report(work_dir):
                 except Exception as e:
                     main_logger.error(str(e))
 
+    # save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+    # save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG, replace_pathsep=True)
+    #
+    # env = jinja2.Environment(
+    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+    #     autoescape=True
+    # )
+    # template = env.get_template('session_report.html')
+    #
+    # try:
+    #     html_result = template.render(title='Summary report', report=summary_report)
+    #     save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
+    #
+    #     html_result = template.render(title='Summary report', report=summary_report_embed_img)
+    #     save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
+    # except Exception as e:
+    #     main_logger.error("Error while render summary html report: {}".format(str(e)))
+    #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
+    #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
+
     return summary_report
-
-    save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
-    save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG, replace_pathsep=True)
-
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=True
-    )
-    template = env.get_template('session_report.html')
-
-    try:
-        html_result = template.render(title='Summary report', report=summary_report)
-        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
-
-        html_result = template.render(title='Summary report', report=summary_report_embed_img)
-        save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
-    except Exception as e:
-        main_logger.error("Error while render summary html report: {}".format(str(e)))
-        save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
-        save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
 
 
 def build_performance_report(work_dir):
@@ -224,20 +227,21 @@ def build_performance_report(work_dir):
                     for test_config in results[test_package]:
                         performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
 
+    # env = jinja2.Environment(
+    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+    #     autoescape=True
+    # )
+    # template = env.get_template('performance_compare.html')
+    #
+    # try:
+    #     html_result = template.render(title='Performance report', report=performance_report, hardware=hardware,
+    #                                   detail_report=performance_report_detail)
+    #     save_html_report(html_result, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+    # except Exception as e:
+    #     main_logger.error("Error while render performance html report: {}".format(str(e)))
+    #     save_html_report('error', work_dir, PERFORMANCE_REPORT_HTML)
+
     return performance_report, hardware, performance_report_detail
-
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=True
-    )
-    template = env.get_template('performance_compare.html')
-
-    try:
-        html_result = template.render(title='Performance report', report=performance_report, hardware=hardware, detail_report=performance_report_detail)
-        save_html_report(html_result, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-    except Exception as e:
-        main_logger.error("Error while render performance html report: {}".format(str(e)))
-        save_html_report('error', work_dir, PERFORMANCE_REPORT_HTML)
 
 
 def build_compare_report(work_dir):
@@ -262,66 +266,45 @@ def build_compare_report(work_dir):
     return compare_report, hardware
 
 
-def build_reports(report, session_dir, work_dir):
-    shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(session_dir, 'report_resources'))
-    try:
-        shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(work_dir, 'report_resources'))
-    except:
-        pass
-
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=True
-    )
-    summary_template = env.get_template('summary_template.html')
-
-    session_report = build_session_report(report, session_dir)
-    save_json_report(session_report, session_dir, SESSION_REPORT, replace_pathsep=True)
-    session_html = summary_template.render(title="Session report", report={'_cur_': session_report})
-    save_html_report(session_html, session_dir, "summary.html", replace_pathsep=True)
-
-    summary_report = build_summary_report(work_dir)
-    save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
-    summary_html = summary_template.render(title="Summary report", report=summary_report)
-    save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
-
-    performance_template = env.get_template('performance_template.html')
-    performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
-    performance_html = performance_template.render(title="Performance", report=performance_json_report, hardware=hardware, detail_report=performance_report_detail)
-    # save_html_report(performance_html, session_dir, "performance.html", replace_pathsep=True)
-    save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-
-    compare_template = env.get_template('compare_template.html')
-    compare_report, hardware = build_compare_report(work_dir)
-    save_json_report(compare_report, work_dir, 'compare.json', True)
-    compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report)
-    save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
-
-
 def build_summary_reports(work_dir):
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(work_dir, 'report_resources'))
-    except:
-        pass
+    except Exception as err:
+        main_logger.error("Failed to copy report resources: {}".format(str(err)))
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
-    summary_template = env.get_template('summary_template.html')
 
-    summary_report = build_summary_report(work_dir)
-    save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
-    summary_html = summary_template.render(title="Summary report", report=summary_report)
-    save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
+    try:
+        summary_template = env.get_template('summary_template.html')
+        summary_report = build_summary_report(work_dir)
+        save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+        summary_html = summary_template.render(title="Summary report", report=summary_report, pageID="summaryA")
+        save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
+    except Exception as err:
+        summary_html = "Error while building summary report: {}".format(str(err))
+        main_logger.error(summary_html)
+        save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
-    performance_template = env.get_template('performance_template.html')
-    performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
-    performance_html = performance_template.render(title="Performance", report=performance_json_report, hardware=hardware, detail_report=performance_report_detail)
-    save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+    try:
+        performance_template = env.get_template('performance_template.html')
+        performance_json_report, hardware, performance_report_detail = build_performance_report(work_dir)
+        performance_html = performance_template.render(title="Performance", report_performance=performance_json_report, hardware=hardware, detail_report=performance_report_detail, pageID="performanceA")
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+    except Exception as err:
+        performance_html = "Error while building performance report: {}".format(str(err))
+        main_logger.error(performance_html)
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
 
-    compare_template = env.get_template('compare_template.html')
-    compare_report, hardware = build_compare_report(work_dir)
-    save_json_report(compare_report, work_dir, 'compare.json', True)
-    compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report)
-    save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+    try:
+        compare_template = env.get_template('compare_template.html')
+        compare_report, hardware = build_compare_report(work_dir)
+        save_json_report(compare_report, work_dir, 'compare.json', True)
+        compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report, pageID="compareA")
+        save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+    except Exception as err:
+        compare_html = "Error while building compare report: {}".format(str(err))
+        main_logger.error(compare_html)
+        save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)

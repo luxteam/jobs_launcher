@@ -3,7 +3,7 @@
 {% block report_body %}
 <h1>info</h1>
 
-<table>
+<table class="summaryResults">
     <tr>
         <th>Job-Name</th>
         <th>Host</th>
@@ -26,7 +26,7 @@
             <a href="#x" class="overlay" id="machineInfo{{ loop.index }}"></a>
             <div class="popup">
                 <a class="close" title="Close" href="#close"></a>
-                <table class="logTable">
+                <table>
                     <tr>
                         <th>OS</th>
                         <th>RAM, Gb</th>
@@ -62,7 +62,7 @@
 <h1>tests</h1>
 
 {% for i, value in report | dictsort %}
-<h2>{{ i | lower }}</h2>
+<h3>{{ i | lower }}</h3>
 
 <table>
     <tr>
@@ -81,7 +81,7 @@
     <tr>
         <td rowspan="{{ report[i].results[test_package] | length }}"><a href="#{{ i }}{{ test_package }}">{{ test_package }}</a></td>
     {% for test_conf, value in report[i].results[test_package] | dictsort %}
-        <td><a href="#{{ i }}{{ test_package }}{{ test_conf }}">{{ test_conf }}</a></td>
+        <td>{{ test_conf }}</td>
         <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/result.html">Report</a></td>
         <td>{{ report[i].results[test_package][test_conf].total }}</td>
         <td>{{ report[i].results[test_package][test_conf].passed }}</td>
@@ -111,7 +111,7 @@
 <h1>details</h1>
 
 {% for i, value in report | dictsort %}
-<h2>{{ i | lower }}</h2>
+<h3>{{ i | lower }}</h3>
 
 <div class="dyna_table">
     <table id="{{ i | lower }}">
@@ -140,7 +140,11 @@
                     {% endfor %}
                 </td>
                 <td>{{ item.render_time | round(3) }}</td>
+                {% if not item.difference_color is string and item.difference_color > 30 %}
+                <td class="badResult">{{ item.difference_color }}</td>
+                {% else %}
                 <td>{{ item.difference_color }}</td>
+                {% endif %}
                 <td class="hatching">
                 {% if item.baseline_color_path %}
                     <img src="{{ item.baseline_color_path }}"/>

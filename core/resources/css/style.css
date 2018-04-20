@@ -9,11 +9,6 @@ body {
   background-color: rgba(242, 242, 242, 1);
 }
 
-img {
-    width: 64px;
-    height: 64px;
-}
-
 @font-face {
     font-family: "AMDRTG";
     src: url(../fonts/AMDRTG.ttf) format("truetype");
@@ -47,7 +42,7 @@ img {
     z-index: 2;
 }
 .active_header {
-  background-color: rgba(237, 237, 237, 1);
+  background-color: rgba(247, 247, 247, 1);
 }
 
 #header a{
@@ -136,7 +131,7 @@ h2 {
   margin-left: 6%;
 }
 h3 {
-  font-family:'AMDRTG';
+  font-family:'Open Sans';
   font-weight:bold;
   font-style:normal;
   font-size:18px;
@@ -172,7 +167,7 @@ h6 {
     z-index: 10;
     display: none;
 
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.1);
     position: fixed;
     cursor: default;
 }
@@ -189,15 +184,13 @@ h6 {
     margin: 0;
     /*width: 85%;*/
     min-width: 320px;
-    max-width: 600px;
-
+    /*max-width: 600px;*/
     position: fixed;
     padding: 15px;
     border: 1px solid #383838;
     background: #fefefe;
-
     border-radius: 4px;
-    font: 14px/18px 'Tahoma', Arial, sans-serif;
+    font: 14px/18px 'Open Sans', Arial, sans-serif;
 }
 
 .overlay:target+.popup {
@@ -278,4 +271,31 @@ h6 {
 
 #goTop:active {
   box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.25);
+}
+
+.badResult {
+   background: #e86755;
+}
+
+.hatching {
+    background:
+            linear-gradient(45deg, rgba(0, 0, 0, 0) 49.9%, black 49.9%, black 60%, rgba(0, 0, 0, 0) 60%)
+            fixed,
+            linear-gradient(45deg, black 10%, rgba(0, 0, 0, 0) 10%)
+            fixed;
+    background-size: 0.3em 0.3em;
+}
+.hatching img{
+    display: block;
+    margin: auto;
+}
+
+.dyna_table table img {
+    width: 64px;
+    height: 64px;
+}
+
+#compareTable img {
+    width: auto;
+    height: auto;
 }

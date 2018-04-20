@@ -141,21 +141,17 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
-    print("Experimental report")
-    core.reportExporter.build_reports(report, session_dir, args.work_root)
-    return
-
     print("Saving session report")
-    core.reportExporter.build_session_report(report, session_dir)
+    core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
     main_logger.info('Saved session report')
 
-    print("Saving summary report")
-    core.reportExporter.build_summary_report(args.work_root)
-    main_logger.info('Saved summary report')
+    # print("Saving summary report")
+    # core.reportExporter.build_summary_report(args.work_root)
+    # main_logger.info('Saved summary report')
 
-    print("Saving performance report")
-    core.reportExporter.build_performance_report(args.work_root)
-    main_logger.info('Saved performance report')
+    # print("Saving performance report")
+    # core.reportExporter.build_performance_report(args.work_root)
+    # main_logger.info('Saved performance report')
 
 if __name__ == "__main__":
     if not main():

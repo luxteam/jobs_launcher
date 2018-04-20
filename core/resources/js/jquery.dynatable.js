@@ -303,6 +303,15 @@
       td += '"';
     }
 
+    // TODO: del this duct tape
+    if (html.indexOf('img') !== -1) {
+      td += 'class="hatching"';
+    }
+
+    if (column.id === "pixelDifference" & parseFloat(html) > 15) {
+      td += 'class="badResult"';
+    }
+
     return td + '>' + html + '</td>';
   };
 

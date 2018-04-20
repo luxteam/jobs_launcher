@@ -4,25 +4,25 @@
 
 <h1>compare table</h1>
 
-<table>
-    <tr>
-        <th>Test case</th>
-        {% for hw in hardware %}
-        <th>{{ hw }}</th>
-        {% endfor %}
-    </tr>
+<div class="dyna_table">
+    <table id="compareTable">
+        <thead>
+            <th>Test case</th>
+            {% for hw in hardware %}
+            <th>{{ hw }}</th>
+            {% endfor %}
+        </thead>
 
-    {% for file in compare_report %}
-    <tr>
-        <td>{{ file }}</td>
-        {% for hw in hardware %}
-        <td>
-            {{ file }}<br/>
-            <img src="{{ compare_report[file][hw] }}"/><br/>
-        </td>
+        {% for file in compare_report %}
+        <tr>
+            <td>{{ file }}</td>
+            {% for hw in hardware %}
+            <td>
+                <img src="{{ compare_report[file][hw] }}"/><br/>
+            </td>
+            {% endfor %}
+        </tr>
         {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
-
+    </table>
+</div>
 {% endblock %}

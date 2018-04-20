@@ -3,3 +3,6 @@ rem call UnitTests\\full_test.bat
 rmdir /S /Q UnitTests\\Results
 call UnitTests\\scripts_test.bat
 call UnitTests\\full_test.bat
+
+set PATH=c:\python35\;c:\python35\scripts\;%PATH%
+python -c "import core.reportExporter; core.reportExporter.build_summary_reports('UnitTests\\Results')"
