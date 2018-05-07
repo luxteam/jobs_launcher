@@ -121,12 +121,18 @@ def build_session_report(report, session_dir, template=None):
 
         try:
             shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
-                            os.path.join(work_dir, 'report_resources'))
+                            os.path.join(session_dir, 'report_resources'))
         except Exception as err:
             main_logger.error("Failed to copy report resources: {}".format(str(err)))
 
         try:
-            html_result = template.render(title='Session report', report={'_cur_': report})
+            # html_result = template.render(title='Session report', report={'_cur_': report})
+            html_result = template.render(title="Session report", report={'_cur_': report}, pageID="summaryA",
+                                                   common_info={'reporting_date': report['machine_info']['reporting_date'],
+                                                                'core_version': report['machine_info']['core_version'],
+                                                                'render_version': report['machine_info']['render_version']
+                                                                })
+
             save_html_report(html_result, session_dir, SESSION_REPORT_HTML, replace_pathsep=True)
         except Exception as e:
             main_logger.error("Error while render html report {}".format(str(e)))
@@ -188,12 +194,13 @@ def build_summary_report(work_dir):
                     if common_info:
                         for key in common_info:
                             if not summary_report[basename]['machine_info'][key] == common_info[key]:
+                                main_logger.warning("Different versions in {}: {} vs. {}".format(key, summary_report[basename]['machine_info'][key], common_info[key]))
                                 common_info[key] = '! Different values !'
                     else:
-                        common_info = {'reporting_date': summary_report[basename]['machine_info']['reporting_date'],
+                        common_info.update({'reporting_date': summary_report[basename]['machine_info']['reporting_date'],
                                        'render_version': summary_report[basename]['machine_info']['render_version'],
                                        'core_version': summary_report[basename]['machine_info']['core_version']
-                                       }
+                                       })
 
                 except Exception as e:
                     main_logger.error(str(e))
@@ -218,7 +225,6 @@ def build_summary_report(work_dir):
     #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
     #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
 
-    print(common_info)
     return summary_report, common_info
 
 
@@ -272,11 +278,14 @@ def build_compare_report(work_dir):
     hardware = []
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
-            if file.endswith(SESSION_REPORT):
+            if file == SESSION_REPORT or file == BASELINE_SESSION_REPORT:
                 with open(os.path.join(path, file), 'r') as report_file:
                     temp_report = json.loads(report_file.read())
 
                 hw = temp_report['machine_info']['render_device']
+
+                if file == BASELINE_SESSION_REPORT:
+                    hw = hw + '[Baseline]'
                 hardware.append(hw)
 
                 for test_package in temp_report['results']:

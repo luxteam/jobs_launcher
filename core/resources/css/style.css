@@ -97,7 +97,7 @@ table.baseTable {
   width: auto;
   padding: 10px;
   border: 1px solid black;
-  text-aling: center;
+  text-align: center;
 }
 
 .summary_tr td {
@@ -275,7 +275,7 @@ h6 {
 }
 
 .badResult {
-   background: #e86755;
+   background: #e86755 !important;
 }
 
 .hatching {

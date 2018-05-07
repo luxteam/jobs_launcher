@@ -145,9 +145,9 @@ def main():
     core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
     main_logger.info('Saved session report')
 
-    # print("Saving summary report")
-    # core.reportExporter.build_summary_report(args.work_root)
-    # main_logger.info('Saved summary report')
+    print("Saving summary report")
+    core.reportExporter.build_summary_reports(args.work_root)
+    main_logger.info('Saved summary report')
 
     # print("Saving performance report")
     # core.reportExporter.build_performance_report(args.work_root)
