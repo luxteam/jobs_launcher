@@ -3,7 +3,7 @@
 {% block report_body %}
 <h1>summary</h1>
 
-<table>
+<table class="baseTable">
     <tr>
         <th>Tool</th>
         {% for hw in hardware %}
@@ -27,15 +27,15 @@
 
 <hr/>
 
-<h1>Graph</h1>
+<h1>graph</h1>
 <div id="columnchart"></div>
 
 <hr/>
 
 <h1>details</h1>
 {% for tool in performance_report_detail %}
-<h2>{{ tool }}</h2>
-    <table>
+<h3>{{ tool }}</h3>
+    <table class="baseTable">
 
         <tr>
             <th>Test</th>

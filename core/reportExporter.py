@@ -3,6 +3,7 @@ import jinja2
 import json
 import base64
 import shutil
+import datetime
 from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
@@ -107,6 +108,7 @@ def build_session_report(report, session_dir, template=None):
             for key in total:
                 total[key] += report['results'][result][item][key]
     report.update({'summary': total})
+    report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
     if template:
         env = jinja2.Environment(
@@ -116,6 +118,12 @@ def build_session_report(report, session_dir, template=None):
         template = env.get_template(template)
 
         save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
+
+        try:
+            shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
+                            os.path.join(work_dir, 'report_resources'))
+        except Exception as err:
+            main_logger.error("Failed to copy report resources: {}".format(str(err)))
 
         try:
             html_result = template.render(title='Session report', report={'_cur_': report})
@@ -139,26 +147,27 @@ def build_session_report(report, session_dir, template=None):
 
 
 def build_summary_report(work_dir):
-
     summary_report = {}
     summary_report_embed_img = {}
+    common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             # build embeded summary report
-            if file.endswith(SESSION_REPORT_EMBED_IMG):
-                basename = os.path.basename(path)
-                basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
-                basepath = os.path.relpath(path, work_dir)
-                with open(os.path.join(path, file), 'r') as report_file:
-                    summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
-                try:
-                    for test_package in summary_report_embed_img[basename]['results']:
-                        for test_conf in summary_report_embed_img[basename]['results'][test_package]:
-                            summary_report_embed_img[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath,summary_report_embed_img[basename]['results'][test_package][test_conf]['result_path']),work_dir)})
-                except Exception as e:
-                    main_logger.error(str(e))
+            # if file.endswith(SESSION_REPORT_EMBED_IMG):
+            #     basename = os.path.basename(path)
+            #     basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
+            #     basepath = os.path.relpath(path, work_dir)
+            #     with open(os.path.join(path, file), 'r') as report_file:
+            #         summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
+            #     try:
+            #         for test_package in summary_report_embed_img[basename]['results']:
+            #             for test_conf in summary_report_embed_img[basename]['results'][test_package]:
+            #                 summary_report_embed_img[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath,summary_report_embed_img[basename]['results'][test_package][test_conf]['result_path']),work_dir)})
+            #     except Exception as e:
+            #         main_logger.error(str(e))
+
             # build summary report
-            elif file.endswith(SESSION_REPORT):
+            if file.endswith(SESSION_REPORT):
                 basename = os.path.basename(path)
                 basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 basepath = os.path.relpath(path, work_dir)
@@ -175,6 +184,17 @@ def build_summary_report(work_dir):
                                         jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
 
                             summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
+
+                    if common_info:
+                        for key in common_info:
+                            if not summary_report[basename]['machine_info'][key] == common_info[key]:
+                                common_info[key] = '! Different values !'
+                    else:
+                        common_info = {'reporting_date': summary_report[basename]['machine_info']['reporting_date'],
+                                       'render_version': summary_report[basename]['machine_info']['render_version'],
+                                       'core_version': summary_report[basename]['machine_info']['core_version']
+                                       }
+
                 except Exception as e:
                     main_logger.error(str(e))
 
@@ -198,7 +218,8 @@ def build_summary_report(work_dir):
     #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
     #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
 
-    return summary_report
+    print(common_info)
+    return summary_report, common_info
 
 
 def build_performance_report(work_dir):
@@ -281,9 +302,9 @@ def build_summary_reports(work_dir):
 
     try:
         summary_template = env.get_template('summary_template.html')
-        summary_report = build_summary_report(work_dir)
+        summary_report, common_info = build_summary_report(work_dir)
         save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
-        summary_html = summary_template.render(title="Summary report", report=summary_report, pageID="summaryA")
+        summary_html = summary_template.render(title="Summary report", report=summary_report, pageID="summaryA", common_info=common_info)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
@@ -295,7 +316,7 @@ def build_summary_reports(work_dir):
         performance_report, hardware, performance_report_detail = build_performance_report(work_dir)
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
         save_json_report(performance_report_detail, work_dir, 'perf.json', replace_pathsep=True)
-        performance_html = performance_template.render(title="Performance", performance_report=performance_report, hardware=hardware, performance_report_detail=performance_report_detail, pageID="performanceA")
+        performance_html = performance_template.render(title="Performance", performance_report=performance_report, hardware=hardware, performance_report_detail=performance_report_detail, pageID="performanceA", common_info=common_info)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))
@@ -307,7 +328,7 @@ def build_summary_reports(work_dir):
         compare_report, hardware = build_compare_report(work_dir)
         # TODO
         save_json_report(compare_report, work_dir, 'compare.json', True)
-        compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report, pageID="compareA")
+        compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report, pageID="compareA", common_info=common_info)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
     except Exception as err:
         compare_html = "Error while building compare report: {}".format(str(err))

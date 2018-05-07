@@ -4,16 +4,30 @@
 
 <h1>compare table</h1>
 
-<div class="dyna_table">
+<div class="jsTableWrapper">
 
     <button onclick="resizeImgs()">Resize images</button>
 
-    <table id="compareTable">
+    <table id="compareTable"
+           class="baseTable"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-sort-order="asc"
+           data-sort-name="test_case"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-page-list="[10, 15, 30, 50, ALL]"
+    >
         <thead>
-            <th>Test case</th>
-            {% for hw in hardware %}
-            <th>{{ hw }}</th>
-            {% endfor %}
+            <tr>
+                <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
+                {% for hw in hardware %}
+                <th data-halign="center">{{ hw }}</th>
+                {% endfor %}
+            </tr>
         </thead>
 
         {% for file in compare_report %}
