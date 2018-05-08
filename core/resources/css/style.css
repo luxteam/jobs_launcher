@@ -1,4 +1,3 @@
-
 body {
   margin:0px;
   background-image:none;
@@ -305,9 +304,16 @@ h6 {
   width: 100%;
 }
 
+#compareTable {
+    width: 100%;
+}
+
+.resizedImg {
+    width: 30%;
+}
+
 #compareTable img {
-    width: auto;
-    height: auto;
+    max-width: 300px;
 }
 
 #columnchart {

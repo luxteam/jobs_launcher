@@ -14,16 +14,12 @@
 
     <script type="text/javascript">
         $(document).ready(function init(){
-        $( "h3:contains('NVIDIA')" ).css( "color", "rgba(68, 98, 216, 1)" );
-        $( "h3:contains('Radeon')" ).css( "color", "rgba(68, 98, 216, 1)" );
-        $( "h3:contains('AMD')" ).css( "color", "rgba(216, 68, 71, 1)" );
-        $( "table.baseTable th:contains('AMD')" ).css( "color", "rgba(68, 98, 216, 1)" );
-        $( "table.baseTable th:contains('Radeon')" ).css( "color", "rgba(68, 98, 216, 1)" );
-        $( "table.baseTable th:contains('NVIDIA')" ).css( "color", "rgba(216, 68, 71, 1)" );
-
-        {% if compare_report is defined %}
-            buildTable('#compareTable');
-        {% endif %}
+        $( "h3:containsCI('NVIDIA')" ).css( "color", "rgba(216, 68, 71, 1)" );
+        $( "h3:containsCI('Radeon')" ).css( "color", "rgba(68, 98, 216, 1)" );
+        $( "h3:containsCI('AMD')" ).css( "color", "rgba(68, 98, 216, 1)" );
+        $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(68, 98, 216, 1)" );
+        $( "table.baseTable th:containsCI('Radeon')" ).css( "color", "rgba(68, 98, 216, 1)" );
+        $( "table.baseTable th:containsCI('NVIDIA')" ).css( "color", "rgba(216, 68, 71, 1)" );
 
         {% if pageID is defined %}
             setActive({{ pageID }});

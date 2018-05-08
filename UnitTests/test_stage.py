@@ -49,7 +49,7 @@ def main():
                 previous_report.append({'stage_name': args.stage_report.replace('.json', ''),
                                         'render_version': 10,
                                         'render_device': random.choice(['smh', 'Nvidia', 'Radeon']),
-                                        'render_time': random.choice([2, 4, 5]),
+                                        'render_time': random.choice([2.12903, 4.136912331, 5.62398]),
                                         'difference_color': 10,
                                         'render_color_path': chosen_img,
                                         'test_case': chosen_img.replace('.jpg', ''),

@@ -4,42 +4,40 @@
 
 <h1>compare table</h1>
 
-<div class="jsTableWrapper">
+<button onclick="resizeAllImg()">Resize images</button>
 
-    <button onclick="resizeImgs()">Resize images</button>
-
-    <table id="compareTable"
-           class="baseTable"
-           data-toggle="table"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-sort-order="asc"
-           data-sort-name="test_case"
-           data-show-pagination-switch="true"
-           data-pagination="true"
-           data-page-list="[10, 15, 30, 50, ALL]"
-    >
-        <thead>
-            <tr>
-                <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
-                {% for hw in hardware %}
-                <th data-halign="center">{{ hw }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-
-        {% for file in compare_report %}
+<table id="compareTable"
+       class="baseTable"
+       data-toggle="table"
+       data-search="true"
+       data-show-refresh="true"
+       data-show-toggle="true"
+       data-show-columns="true"
+       data-sort-order="asc"
+       data-sort-name="test_case"
+       data-show-pagination-switch="true"
+       data-pagination="true"
+       data-page-list="[10, 15, 30, 50, ALL]"
+>
+    <thead>
         <tr>
-            <td>{{ file }}</td>
+            <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
             {% for hw in hardware %}
-            <td>
-                <img src="{{ compare_report[file][hw] }}"/><br/>
-            </td>
+            <th data-halign="center">{{ hw }}</th>
             {% endfor %}
         </tr>
+    </thead>
+
+    {% for file in compare_report %}
+    <tr>
+        <td>{{ file }}</td>
+        {% for hw in hardware %}
+        <td>
+            <img class="resizedImg" src="{{ compare_report[file][hw] }}" onclick="resizeImg(this)"/><br/>
+        </td>
         {% endfor %}
-    </table>
-</div>
+    </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}

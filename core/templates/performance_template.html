@@ -2,7 +2,7 @@
 
 {% block report_body %}
 <h1>summary</h1>
-
+<h2>total render duration in seconds</h2>
 <table class="baseTable">
     <tr>
         <th>Tool</th>
@@ -16,7 +16,7 @@
         <td>{{ tool }}</td>
         {% for hw in hardware %}
             {% if performance_report[tool][hw] %}
-        <td>{{ performance_report[tool][hw].summary.render_duration }}</td>
+        <td>{{ performance_report[tool][hw].summary.render_duration | round(1) }}</td>
             {% else %}
         <td></td>
             {% endif %}
@@ -33,6 +33,7 @@
 <hr/>
 
 <h1>details</h1>
+<h2>render duration by test groups in seconds</h2>
 {% for tool in performance_report_detail %}
 <h3>{{ tool }}</h3>
     <table class="baseTable">

@@ -295,6 +295,7 @@ def build_compare_report(work_dir):
                                 compare_report[item['test_case']] = {}
                             compare_report[item['test_case']].update({item['render_device']: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir) })
 
+    print(hardware)
     return compare_report, hardware
 
 
