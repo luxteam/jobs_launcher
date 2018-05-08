@@ -79,7 +79,7 @@ def build_session_report(report, session_dir, template=None):
 
                         render_duration += jtem['render_time']
                         # TODO: count failed - need expected.json
-                        report['results'][result][item]['passed'] += 1
+                        report['results'][result][item][jtem['test_status']] += 1
 
                         try:
                             report['machine_info'].update({'render_device': jtem['render_device']})
@@ -295,7 +295,6 @@ def build_compare_report(work_dir):
                                 compare_report[item['test_case']] = {}
                             compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir) })
 
-    print(hardware)
     return compare_report, hardware
 
 

@@ -36,15 +36,16 @@ def main():
         for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
             if key in img.keys():
                 render_img_path = os.path.join(args.work_dir, img[key])
-                try:
-                    baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
-                except KeyError as err:
-                    core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
-                    continue
+                if img['test_status'] == 'passed':
+                    try:
+                        baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
+                    except KeyError as err:
+                        core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
+                        continue
 
-                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                    metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
 
-                img.update({'difference_color': metrics.getDiffPixeles()})
+                    img.update({'difference_color': metrics.getDiffPixeles()})
                 img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)})
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:

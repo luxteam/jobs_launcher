@@ -12,6 +12,7 @@
         <th>Total</th>
         <th>Passed</th>
         <th>Failed</th>
+        <th>Skipped</th>
         <th>Time taken, s</th>
         <th>Render time, s</th>
     </tr>
@@ -51,6 +52,7 @@
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
         <td>{{ report[i].summary.failed }}</td>
+        <td>{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
         <td>{{ report[i].summary.render_duration | round(1) }}</td>
     </tr>
@@ -72,6 +74,7 @@
         <th>Total</th>
         <th>Passed</th>
         <th>Failed</th>
+        <th>Skipped</th>
         <th>Time taken</th>
         <th>Render time</th>
     </tr>
@@ -86,6 +89,7 @@
         <td>{{ report[i].results[test_package][test_conf].total }}</td>
         <td>{{ report[i].results[test_package][test_conf].passed }}</td>
         <td>{{ report[i].results[test_package][test_conf].failed }}</td>
+        <td>{{ report[i].results[test_package][test_conf].skipped }}</td>
         <td>{{ report[i].results[test_package][test_conf].duration }}</td>
         <td>{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
     </tr>
@@ -99,6 +103,7 @@
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
         <td>{{ report[i].summary.failed }}</td>
+        <td>{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
         <td>{{ report[i].summary.render_duration | round(1) }}</td>
     </tr>
