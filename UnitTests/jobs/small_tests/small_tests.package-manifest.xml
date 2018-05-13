@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<package-manifest name="Small tests">
+    <variable name="Script" value = "{CWD}/../../"/>
+</package-manifest>

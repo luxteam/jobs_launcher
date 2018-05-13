@@ -1,4 +1,7 @@
-set PATH=c:\python35\;c:\python35\scripts\;%PATH%
-python executeTests.py --tests_root tests --work_root tests --work_dir UnitTestsResults
+rem call UnitTests\\keys_errors.bat
+rem call UnitTests\\full_test.bat
+rmdir /S /Q UnitTests\\Results
+call UnitTests\\full_test.bat
 
-pause
+set PATH=c:\python35\;c:\python35\scripts\;%PATH%
+python -c "import core.reportExporter; core.reportExporter.build_summary_reports('UnitTests\\Results')"

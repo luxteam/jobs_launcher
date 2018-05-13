@@ -1,0 +1,182 @@
+{% extends "base_template.html"%}
+
+{% block report_body %}
+<h1>info</h1>
+
+<table class="baseTable">
+    <tr>
+        <th>Job-Name</th>
+        <th>Host</th>
+        <th>Plugin version</th>
+        <th>Core version</th>
+        <th>Total</th>
+        <th>Passed</th>
+        <th>Failed</th>
+        <th>Skipped</th>
+        <th>Time taken, s</th>
+        <th>Render time, s</th>
+    </tr>
+{% for i, value in report | dictsort %}
+    <tr>
+        <td>{% if i != "_cur_" %}
+            <a href="#{{ i }}">{{ i }}</a>
+            {% else %}
+            "Job name"
+            {% endif %}
+        </td>
+        <td>
+            <a href="#machineInfo{{ loop.index }}">{{ report[i].machine_info.host }}</a>
+            <a href="#x" class="overlay" id="machineInfo{{ loop.index }}"></a>
+            <div class="popup">
+                <a class="close" title="Close" href="#close"></a>
+                <table>
+                    <tr>
+                        <th>OS</th>
+                        <th>RAM, Gb</th>
+                        <th>CPU</th>
+                        <th>CPU count</th>
+                        <th>GPU</th>
+                    </tr>
+                    <tr>
+                        <td>{{ report[i].machine_info.os }}</td>
+                        <td>{{ report[i].machine_info.ram | round }}</td>
+                        <td>{{ report[i].machine_info.cpu }}</td>
+                        <td>{{ report[i].machine_info.cpu_count }}</td>
+                        <td>{{ report[i].machine_info.render_device }}</td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+        <td>{{ report[i].machine_info.render_version }}</td>
+        <td>{{ report[i].machine_info.core_version }}</td>
+        <td>{{ report[i].summary.total }}</td>
+        <td>{{ report[i].summary.passed }}</td>
+        <td>{{ report[i].summary.failed }}</td>
+        <td>{{ report[i].summary.skipped }}</td>
+        <td>{{ report[i].summary.duration }}</td>
+        <td>{{ report[i].summary.render_duration | round(1) }}</td>
+    </tr>
+{% endfor %}
+</table>
+
+<hr>
+
+<h1>tests</h1>
+
+{% for i, value in report | dictsort %}
+<h3>{{ i }}</h3>
+
+<table class="baseTable">
+    <tr>
+        <th>Test package name</th>
+        <th>Config</th>
+        <th>Local report link</th>
+        <th>Total</th>
+        <th>Passed</th>
+        <th>Failed</th>
+        <th>Skipped</th>
+        <th>Time taken</th>
+        <th>Render time</th>
+    </tr>
+
+{% for test_package, value in report[i].results | dictsort %}
+    {% set resultsloop = loop %}
+    <tr>
+        <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
+    {% for test_conf, value in report[i].results[test_package] | dictsort %}
+        <td>{{ test_conf }}</td>
+        <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/result.html">Report</a></td>
+        <td>{{ report[i].results[test_package][test_conf].total }}</td>
+        <td>{{ report[i].results[test_package][test_conf].passed }}</td>
+        <td>{{ report[i].results[test_package][test_conf].failed }}</td>
+        <td>{{ report[i].results[test_package][test_conf].skipped }}</td>
+        <td>{{ report[i].results[test_package][test_conf].duration }}</td>
+        <td>{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
+    </tr>
+    <tr>
+    {% endfor %}
+    </tr>
+{% endfor %}
+
+    <tr class="summary_tr">
+        <td colspan="3">Sum</td>
+        <td>{{ report[i].summary.total }}</td>
+        <td>{{ report[i].summary.passed }}</td>
+        <td>{{ report[i].summary.failed }}</td>
+        <td>{{ report[i].summary.skipped }}</td>
+        <td>{{ report[i].summary.duration }}</td>
+        <td>{{ report[i].summary.render_duration | round(1) }}</td>
+    </tr>
+
+</table>
+{% endfor %}
+
+<hr>
+
+<h1>details</h1>
+
+{% for i, value in report | dictsort %}
+<h3>{{ i }}</h3>
+<a name="{{ i }}"></a>
+
+<div class="jsTableWrapper">
+    <table id="{{ i | lower }}"
+           class="baseTable"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-sort-order="desc"
+           data-sort-name="pix_difference"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-page-list="[5, 10, 20, 45, ALL]"
+    >
+        <thead>
+            <tr>
+                <th data-halign="center" data-sortable="true">Test case</th>
+                <th data-halign="center" data-sortable="true">Parameters</th>
+                <th data-halign="center" data-sortable="true">Render time, s</th>
+                <th data-field="pix_difference" data-halign="center" data-sortable="true" data-cell-style="pixDifferenceCellStyle">Pixel Difference, %</th>
+                <th data-halign="center" data-sortable="true">Baseline Color</th>
+                <th data-halign="center" data-sortable="true">Rendered color</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for test_package, value in report[i].results | dictsort %}
+            {% for test_conf, value in report[i].results[test_package] | dictsort%}
+                {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
+
+                {% for item in report[i].results[test_package][test_conf].render_results %}
+            <tr>
+                <td>{{ item.file_name }}</td>
+                <td>{% for param in item.script_info %}
+                    {{ param }}<br>
+                    {% endfor %}
+                </td>
+                <td>{{ item.render_time | round(3) }}</td>
+                {% if not item.difference_color is string and item.difference_color > 30 %}
+                <td class="badResult">{{ item.difference_color }}</td>
+                {% else %}
+                <td>{{ item.difference_color }}</td>
+                {% endif %}
+                <td class="hatching">
+                {% if item.baseline_color_path %}
+                    <img src="{{ item.baseline_color_path }}"/>
+                {% else %}
+                    Not compared
+                {% endif %}
+                </td>
+                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
+            </tr>
+                {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+
+{% endblock %}

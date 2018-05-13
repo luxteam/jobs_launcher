@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<package-manifest name="Render">
+
+    <variable name="ReportCompare" value="report_compare.json"/>
+
+</package-manifest>

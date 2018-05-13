@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="report_resources/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="report_resources/css/bootstrap-table.css"/>
+    <link rel="stylesheet" type="text/css" href="report_resources/css/style.css"/>
+
+    <script src="report_resources/js/jquery.min.js" type="text/javascript"></script>
+    <script src="report_resources/js/bootstrap.js" type="text/javascript"></script>
+    <script src="report_resources/js/bootstrap-table.js" type="text/javascript"></script>
+    <script src="report_resources/js/scripts.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function init(){
+            $( "h3:containsCI('NVIDIA')" ).css( "color", "rgba(216, 68, 71, 1)" );
+            $( "h3:containsCI('Radeon')" ).css( "color", "rgba(68, 98, 216, 1)" );
+            $( "h3:containsCI('AMD')" ).css( "color", "rgba(68, 98, 216, 1)" );
+            $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(68, 98, 216, 1)" );
+            $( "table.baseTable th:containsCI('Radeon')" ).css( "color", "rgba(68, 98, 216, 1)" );
+            $( "table.baseTable th:containsCI('NVIDIA')" ).css( "color", "rgba(216, 68, 71, 1)" );
+
+        {% if pageID is defined %}
+            setActive({{ pageID }});
+        {% endif %}
+        });
+    </script>
+
+    {% if performance_report is defined %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Hadrware'
+          {% for hw in hardware %}
+          , '{{ hw }}'
+          {% endfor %}
+          ]
+
+          {% for tool in performance_report %}
+          ,['{{ tool }}'
+            {% for hw in hardware %}
+            , {{ performance_report[tool][hw].summary.render_duration }}
+            {% endfor %}
+            ]
+          {% endfor %}
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Render Time',
+            subtitle: 'The lower is better'
+          },
+          axes: {
+            y: {0: {side: 'left', label: 'Time, s'}},
+            x: {0: {side: 'bottom', label: 'Hardware, grouped by applications'}}
+          },
+          bar: { groupWidth: "80%" }
+
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+    {% endif %}
+
+    <title>{{ title }}</title>
+</head>
+
+<body>
+    <a name="#top"/>
+    <a id="goTop" href="#top" title="Go top"></a>
+
+    <div id="header">
+        <img src="report_resources/img/logo.png"/>
+
+        <ul>
+            <li><a id="summaryA" href='summary_report.html'>summary</a></li>
+            <li><a id="performanceA" href='performance_report.html'>performance</a></li>
+            <li><a id="compareA" href='compare_report.html'>compare</a></li>
+        </ul>
+    </div>
+
+    <h3>Testing date: {{ common_info.reporting_date }}</h3>
+    <h3>Plugin version: {{ common_info.render_version }}</h3>
+    <h3>Core version: {{ common_info.core_version }}</h3>
+
+    {% block report_body %}
+    {% endblock %}
+
+    <div id="footer">
+        Luxoft RPR CIS
+        <br>
+        2017-2018
+    </div>
+
+</body>
+</html>

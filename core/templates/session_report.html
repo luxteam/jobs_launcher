@@ -188,8 +188,8 @@
 
 <table class="heap">
     <tr>
-        <th>GUID</th>
-        <th>Jenkins-Name</th>
+        <!--<th>GUID</th>-->
+        <th>Job-Name</th>
         <th>Host</th>
         <th>Total</th>
         <th>Passed</th>
@@ -200,8 +200,11 @@
     </tr>
 {% for i in report %}
     <tr>
-        <td>{{ report[i].guid }}</td>
-        <td>{{ i }}</td>
+        <!--<td>{{ report[i].guid }}</td>-->
+        <td>{% if i != "_cur_" %}
+                {{ i }}
+            {% endif %}
+        </td>
         <td>
             <a href="#machineInfo{{ loop.index }}">{{ report[i].machine_info.host }}</a>
             <a href="#x" class="overlay" id="machineInfo{{ loop.index }}"></a>
@@ -215,6 +218,7 @@
                         <th>CPU count</th>
                         <th>GPU</th>
                         <th>Plugin</th>
+                        <th>Core</th>
                     </tr>
                     <tr>
                         <td>{{ report[i].machine_info.os }}</td>
@@ -223,8 +227,11 @@
                         <td>{{ report[i].machine_info.cpu_count }}</td>
                         {% set test_name = report[i].results | first %}
                         {% set test_conf = report[i].results[test_name] | first %}
-                        <td>{{ report[i].results[test_name][test_conf].render_results[0].render_device }}</td>
-                        <td>{{ report[i].results[test_name][test_conf].render_results[0].render_version }}</td>
+                        <td>{# report[i].results[test_name][test_conf].render_results[0].render_device #}
+                            {{ report[i].machine_info.render_device }}</td>
+                        <td>{# report[i].results[test_name][test_conf].render_results[0].render_version #}
+                            {{ report[i].machine_info.render_version }}</td>
+                        <td>{{ report[i].machine_info.core_version }}</td>
                     </tr>
                 </table>
             </div>
@@ -279,7 +286,6 @@
             <th>Skipped</th>
             <th>Time taken, s</th>
             <th>Render time, s</th>
-            <th>LOG</th>
         </tr>
 
         {% for test_package in report[i].results %}
@@ -295,32 +301,6 @@
                 <td>{{ report[i].results[test_package][test_conf].skipped }}</td>
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
                 <td>{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
-                <td>
-                    <a href="#{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}">Show log</a>
-                    <a href="#x" class="overlay" id="{{ toploop.index }}{{ resultsloop.index }}{{ loop.index }}"></a>
-                    <div class="popup">
-                        <a class="close" title="Close" href="#close"></a>
-                        <table class="logTable">
-                            <tr>
-                                <th>Stage ID</th>
-                                <th>Stage log</th>
-                                <th>Stage status</th>
-                            </tr>
-                            {% for stage in report[i].results[test_package][test_conf].log %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    {% for message in stage[1]['log'] %}
-                                    {{ message }}
-                                    <br/>
-                                    {% endfor %}
-                                </td>
-                                <td>{{ stage[0]['status'] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </td>
         </tr>
 
         <tr>
@@ -336,7 +316,6 @@
             <td>{{ report[i].summary.skipped }}</td>
             <td>{{ report[i].summary.duration }}</td>
             <td>{{ report[i].summary.render_duration | round(1) }}</td>
-            <td></td>
         </tr>
 
         <tr></tr>
@@ -367,53 +346,22 @@
         {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
             <tr>
                 <th>Scene name</th>
-                <!--<th>Scene options</th>-->
                 <th>File name</th>
                 <th>Render time, s</th>
-                <th>Opacity Difference</th>
-                <th>Baseline Opacity</th>
-                <th>Rendered Opacity</th>
-                <th>Color Difference</th>
+                <th>Pixel Difference, %</th>
                 <th>Baseline Color</th>
                 <th>Rendered color</th>
             </tr>
             {% for item in report[i].results[test_package][test_conf].render_results %}
-            {% if item.render_time > 3000 %}
+                {% if not item.difference_color is string and item.difference_color > 30 %}
             <tr class="badResultTR">
-            {% elif not item.difference_color is string %}
-                {% if item.difference_color > 15 %}
-            <tr class="badResultTR">
-                {% endif %}
-            {% else %}
+                {% else %}
             <tr>
-            {% endif %}
+                {% endif %}
+
                 <td>{{ item.scene_name }}</td>
-                <!--<td></td>-->
                 <td>{{ item.file_name }}</td>
-                <td>{{ item.render_time }}</td>
-
-                {% if item.difference_opacity %}
-                    <td>{{ item.difference_opacity }}</td>
-                {% else %}
-                    <td>Not required</td>
-                {% endif %}
-                <td class="hatching">
-                {% if item.baseline_opacity_path %}
-                    <img src="{{ item.baseline_opacity_path }}"/>
-                {% elif item.render_opacity_path %}
-                    Not compared
-                {% else %}
-                    Not required
-                {% endif %}
-                </td>
-                <td class="hatching">
-                {% if item.render_opacity_path %}
-                    <img src="{{ item.render_opacity_path }}"/>
-                {% else %}
-                    Not required
-                {% endif %}
-                </td>
-
+                <td>{{ item.render_time | round(3) }}</td>
                 <td>{{ item.difference_color }}</td>
                 <td class="hatching">
                 {% if item.baseline_color_path %}
@@ -426,7 +374,6 @@
             </tr>
             {% endfor %}
         {% endif %}
-
 
         {% endfor %}
     <tr></tr>

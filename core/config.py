@@ -1,6 +1,9 @@
 import logging
 
-logging.basicConfig(filename='launcher.engine.log', level=logging.INFO, format=u'%(filename)-21s[LINE:%(lineno)d] in:%(funcName)-21s #%(levelname)-8s [%(asctime)s] %(message)s')
+logging.basicConfig(filename='launcher.engine.log',
+                    filemode='a',
+                    level=logging.INFO,
+                    format=u'%(filename)-21s[LINE:%(lineno)-3d] #%(levelname)-8s in:%(funcName)-23s [%(asctime)s] %(message)s')
 main_logger = logging.getLogger('main_logger')
 
 SIMPLE_RENDER_TIMEOUT = 10
@@ -9,13 +12,29 @@ TIMEOUT_PAR = 3
 
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
+TEST_REPORT_EXPECTED_NAME = 'expected.json'
+TEST_REPORT_HTML_NAME = 'result.html'
 
 SESSION_REPORT = 'session_report.json'
 SESSION_REPORT_EMBED_IMG = 'session_report_embed_img.json'
 SESSION_REPORT_HTML = 'session_report.html'
 SESSION_REPORT_HTML_EMBED_IMG = 'session_report_embed_img.html'
 
+NOT_RENDERED_REPORT = "not_rendered.json"
+
 SUMMARY_REPORT = 'summary_report.json'
 SUMMARY_REPORT_EMBED_IMG = 'summary_report_embed_img.json'
 SUMMARY_REPORT_HTML = 'summary_report.html'
 SUMMARY_REPORT_HTML_EMBED_IMG = 'summary_report_embed_img.html'
+
+POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']
+POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'render_opacity_path']
+
+BASELINE_MANIFEST = 'baseline_manifest.json'
+BASELINE_SESSION_REPORT = 'session_baseline_report.json'
+BASELINE_REPORT_NAME = 'render_copied_report.json'
+
+PERFORMANCE_REPORT = 'performance_report.json'
+PERFORMANCE_REPORT_HTML = 'performance_report.html'
+
+REPORT_RESOURCES_PATH = 'resources'
