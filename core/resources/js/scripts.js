@@ -1,5 +1,5 @@
 function pixDifferenceCellStyle(value, row, index) {
-  if (value > 0.0) {
+  if (value > 30.0) {
         return {
             classes: 'badResult'
         };

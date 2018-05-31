@@ -138,7 +138,7 @@
                 <th data-halign="center" data-sortable="true">Test case</th>
                 <th data-halign="center" data-sortable="true">Parameters</th>
                 <th data-halign="center" data-sortable="true">Render time, s</th>
-                <th data-field="pix_difference" data-halign="center" data-sortable="true" data-cell-style="pixDifferenceCellStyle">Pixel Difference, %</th>
+                <th data-field="pix_difference" data-halign="center" data-sortable="true" data-cell-style="pixDifferenceCellStyle">Test status</th>
                 <th data-halign="center" data-sortable="true">Baseline Color</th>
                 <th data-halign="center" data-sortable="true">Rendered color</th>
             </tr>
@@ -156,11 +156,17 @@
                     {% endfor %}
                 </td>
                 <td>{{ item.render_time | round(3) }}</td>
-                {% if not item.difference_color is string and item.difference_color > 30 %}
+
+                {% if item.test_status == "passed" %}
+                    {% if not item.difference_color is string and item.difference_color > 30 %}
                 <td class="badResult">{{ item.difference_color }}</td>
-                {% else %}
+                    {% else %}
                 <td>{{ item.difference_color }}</td>
+                    {% endif %}
+                {% else %}
+                <td class="badResult">{{ item.error_title }}</td>
                 {% endif %}
+
                 <td class="hatching">
                 {% if item.baseline_color_path %}
                     <img src="{{ item.baseline_color_path }}"/>

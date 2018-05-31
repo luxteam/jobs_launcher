@@ -55,6 +55,8 @@ def main():
                                         'test_case': chosen_img.replace('.jpg', ''),
                                         'file_name': 'file',
                                         'core_version': '1.23',
+                                        'test_status': random.choice(['passed', 'failed', 'skipped']),
+                                        'error_title': random.choice(['some error', 'fatal error']),
                                         'tool': random.choice(['Maya', 'Render', 'Ne render', 'Solid works'])
                                         })
                 json.dump(previous_report, file, indent=' ')
