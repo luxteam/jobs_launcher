@@ -68,7 +68,7 @@ class CompareMetrics(object):
             diffB = abs(img1B - img2B)
             # diffA = abs(img1A - img2A)
 
-            if img1R != img2R or img1G != img2G or img1B != img2B:
+            if len(img1R) != len(img2R):
                 self.diff_pixeles = "Imgs resolution error"
                 return
 
