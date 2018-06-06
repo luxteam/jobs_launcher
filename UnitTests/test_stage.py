@@ -50,7 +50,7 @@ def main():
                                         'render_version': 10,
                                         'render_device': random.choice(['smh', 'Nvidia', 'Radeon']),
                                         'render_time': random.choice([2.12903, 4.136912331, 5.62398]),
-                                        'difference_color': 10,
+                                        'difference_color': random.randint(0, 50),
                                         'render_color_path': chosen_img,
                                         'test_case': chosen_img.replace('.jpg', ''),
                                         'file_name': 'file',
@@ -73,6 +73,9 @@ def main():
 
         with open(os.path.join(args.output_folder, 'result.html'), 'w') as file:
             file.write('<html><head><title>Great work</title></head><body><h1>Great work!</h1></body></html>')
+
+        with open(os.path.join(args.output_folder, 'renderTool.log'), 'w') as file:
+            file.write('[info] some log')
     else:
         stage_report[0]['status'] = 'FAILED'
         stage_report[1]['log'].append('Some error')

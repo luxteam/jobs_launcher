@@ -65,7 +65,9 @@ def main():
     main_logger.info('Started with args: {}'.format(args))
 
     if args.cmd_variables:
-        args.cmd_variables = {args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)}
+        args.cmd_variables = {
+            args.cmd_variables[i]: args.cmd_variables[i+1] for i in range(0, len(args.cmd_variables), 2)
+        }
         args.cmd_variables = parse_cmd_variables(args.tests_root, args.cmd_variables)
     else:
         args.cmd_variables = {}
@@ -121,7 +123,8 @@ def main():
     report['machine_info'] = machine_info
     report['guid'] = uuid.uuid1().__str__()
 
-    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables, test_filter=args.test_filter, package_filter=args.package_filter)
+    jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
+                                           test_filter=args.test_filter, package_filter=args.package_filter)
 
     # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
@@ -129,13 +132,16 @@ def main():
         main_logger.info('Started job: {}'.format(found_job[0]))
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
-        report['results'][found_job[0]][' '.join(found_job[1])] = {'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0}
+        report['results'][found_job[0]][' '.join(found_job[1])] = {
+            'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0
+        }
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
             # print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             print("  Executing job {}/{}".format(i+1, len(found_job[3])))
-            report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
+            report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
+                jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir))['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
     # json_report = json.dumps(report, indent = 4)
@@ -145,9 +151,7 @@ def main():
     core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
     main_logger.info('Saved session report')
 
-    # print("Saving summary report")
-    # core.reportExporter.build_summary_reports(args.work_root)
-    # main_logger.info('Saved summary report')
+    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":

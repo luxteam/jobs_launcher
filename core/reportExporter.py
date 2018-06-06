@@ -78,7 +78,6 @@ def build_session_report(report, session_dir, template=None):
                                 jtem.update({img: os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]), session_dir)})
 
                         render_duration += jtem['render_time']
-                        # TODO: count failed - need expected.json
                         report['results'][result][item][jtem['test_status']] += 1
 
                         try:
@@ -204,26 +203,6 @@ def build_summary_report(work_dir):
 
                 except Exception as e:
                     main_logger.error(str(e))
-
-    # save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
-    # save_json_report(summary_report_embed_img, work_dir, SUMMARY_REPORT_EMBED_IMG, replace_pathsep=True)
-    #
-    # env = jinja2.Environment(
-    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-    #     autoescape=True
-    # )
-    # template = env.get_template('session_report.html')
-    #
-    # try:
-    #     html_result = template.render(title='Summary report', report=summary_report)
-    #     save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
-    #
-    #     html_result = template.render(title='Summary report', report=summary_report_embed_img)
-    #     save_html_report(html_result, work_dir, SUMMARY_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
-    # except Exception as e:
-    #     main_logger.error("Error while render summary html report: {}".format(str(e)))
-    #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML)
-    #     save_html_report('error', work_dir, SUMMARY_REPORT_HTML_EMBED_IMG)
 
     return summary_report, common_info
 

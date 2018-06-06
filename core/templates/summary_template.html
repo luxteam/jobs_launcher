@@ -15,6 +15,7 @@
         <th>Skipped</th>
         <th>Time taken, s</th>
         <th>Render time, s</th>
+        <th>Engine log</th>
     </tr>
 {% for i, value in report | dictsort %}
     <tr>
@@ -55,6 +56,11 @@
         <td>{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
         <td>{{ report[i].summary.render_duration | round(1) }}</td>
+        <td><a href="
+        {% if i != "_cur_" -%}
+        {{- i -}}/
+        {%- endif -%}
+        launcher.engine.log">Engine log</a></td>
     </tr>
 {% endfor %}
 </table>
@@ -70,7 +76,8 @@
     <tr>
         <th>Test package name</th>
         <th>Config</th>
-        <th>Local report link</th>
+        <th>Local report</th>
+        <th>Tool's log</th>
         <th>Total</th>
         <th>Passed</th>
         <th>Failed</th>
@@ -86,6 +93,7 @@
     {% for test_conf, value in report[i].results[test_package] | dictsort %}
         <td>{{ test_conf }}</td>
         <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/result.html">Report</a></td>
+        <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
         <td>{{ report[i].results[test_package][test_conf].total }}</td>
         <td>{{ report[i].results[test_package][test_conf].passed }}</td>
         <td>{{ report[i].results[test_package][test_conf].failed }}</td>
@@ -99,7 +107,7 @@
 {% endfor %}
 
     <tr class="summary_tr">
-        <td colspan="3">Sum</td>
+        <td colspan="4">Sum</td>
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
         <td>{{ report[i].summary.failed }}</td>
@@ -118,6 +126,9 @@
 {% for i, value in report | dictsort %}
 <h3>{{ i }}</h3>
 <a name="{{ i }}"></a>
+<!--data-sort-order="desc"-->
+<!--data-sort-name="pix_difference"-->
+<!--data-cell-style="pixDifferenceCellStyle"-->
 
 <div class="jsTableWrapper">
     <table id="{{ i | lower }}"
@@ -127,18 +138,19 @@
            data-show-refresh="true"
            data-show-toggle="true"
            data-show-columns="true"
-           data-sort-order="desc"
-           data-sort-name="pix_difference"
            data-show-pagination-switch="true"
            data-pagination="true"
            data-page-list="[5, 10, 20, 45, ALL]"
+           data-show-multi-sort="true"
+           data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'
     >
         <thead>
             <tr>
                 <th data-halign="center" data-sortable="true">Test case</th>
                 <th data-halign="center" data-sortable="true">Parameters</th>
                 <th data-halign="center" data-sortable="true">Render time, s</th>
-                <th data-field="pix_difference" data-halign="center" data-sortable="true" data-cell-style="pixDifferenceCellStyle">Test status</th>
+                <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
+                <th data-field="pix_difference" data-halign="center" data-sortable="true">Pixel difference, %</th>
                 <th data-halign="center" data-sortable="true">Baseline Color</th>
                 <th data-halign="center" data-sortable="true">Rendered color</th>
             </tr>
@@ -157,14 +169,19 @@
                 </td>
                 <td>{{ item.render_time | round(3) }}</td>
 
-                {% if item.test_status == "passed" %}
-                    {% if not item.difference_color is string and item.difference_color > 30 %}
-                <td class="badResult">{{ item.difference_color }}</td>
-                    {% else %}
-                <td>{{ item.difference_color }}</td>
-                    {% endif %}
+                {% if item.test_status != "passed" %}
+                <td class="badResult">{{ item.test_status }}<br>
+                {{ item.error_title }}
+                </td>
                 {% else %}
-                <td class="badResult">{{ item.error_title }}</td>
+                <td>{{ item.test_status }}
+                {% endif %}
+
+
+                {% if not item.difference_color is string and item.difference_color > 30 %}
+                <td class="badResult">{{ item.difference_color }}</td>
+                {% else %}
+                <td>{{ item.difference_color }}</td>
                 {% endif %}
 
                 <td class="hatching">

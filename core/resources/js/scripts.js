@@ -7,6 +7,19 @@ function pixDifferenceCellStyle(value, row, index) {
     return {};
 }
 
+function statusSorter(a, b) {
+    console.log(a, b);
+    if (a == b){
+        console.log(a, b, 'equals');
+        return 0;
+    }
+    if (a.includes("failed") || (a.includes("skipped") && !b.includes("failed"))) {
+        console.log(a, b, '1');
+        return 1;
+    }
+    return -1;
+}
+
 function setActive(elem) {
     elem.classList.add('active_header');
 }
