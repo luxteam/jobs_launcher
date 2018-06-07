@@ -47,14 +47,14 @@ def main():
             shutil.copy(os.path.join(os.path.split(__file__)[0], chosen_img), os.path.join(args.output_folder, chosen_img))
             with open(os.path.join(args.output_folder, args.current_report), 'w') as file:
                 previous_report.append({'stage_name': args.stage_report.replace('.json', ''),
-                                        'render_version': 10,
+                                        'render_version': '10',
                                         'render_device': random.choice(['smh', 'Nvidia', 'Radeon']),
                                         'render_time': random.choice([2.12903, 4.136912331, 5.62398]),
                                         'difference_color': random.randint(0, 50),
                                         'render_color_path': chosen_img,
                                         'test_case': chosen_img.replace('.jpg', ''),
                                         'file_name': 'file',
-                                        'core_version': '1.23',
+                                        'core_version': random.choice(['1.23', '1.24', '1.25']),
                                         'test_status': random.choice(['passed', 'failed', 'skipped']),
                                         'error_title': random.choice(['some error', 'fatal error']),
                                         'tool': random.choice(['Maya', 'Render', 'Ne render', 'Solid works'])

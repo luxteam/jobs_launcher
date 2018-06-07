@@ -54,6 +54,10 @@ def make_base64_img(session_dir, report):
     return report
 
 
+def env_override(value, key):
+    return os.getenv(key, value)
+
+
 def build_session_report(report, session_dir, template=None):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
@@ -88,7 +92,7 @@ def build_session_report(report, session_dir, template=None):
                         except Exception as err:
                             pass
                             main_logger.warning(str(err))
-                    report['results'][result][item]['total'] = report['results'][result][item]['passed'] + report['results'][result][item]['failed']
+                    report['results'][result][item]['total'] = report['results'][result][item]['passed'] + report['results'][result][item]['failed'] + report['results'][result][item]['skipped']
                     # report['results'][result][item].update({'result_path': os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path']), session_dir)})
                     # unite launcher report and render report
                 except Exception as err:
@@ -114,6 +118,9 @@ def build_session_report(report, session_dir, template=None):
             loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
             autoescape=True
         )
+
+        env.filters['env_override'] = env_override
+
         template = env.get_template(template)
 
         save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
@@ -136,17 +143,6 @@ def build_session_report(report, session_dir, template=None):
         except Exception as e:
             main_logger.error("Error while render html report {}".format(str(e)))
             save_html_report('error', session_dir, SESSION_REPORT_HTML)
-
-        # # make embed_img reports
-        # report = make_base64_img(session_dir, report)
-        # save_json_report(report, session_dir, SESSION_REPORT_EMBED_IMG, replace_pathsep=True)
-        #
-        # try:
-        #     html_result = template.render(title='Session report', report={'_cur_': report})
-        #     save_html_report(html_result, session_dir, SESSION_REPORT_HTML_EMBED_IMG, replace_pathsep=True)
-        # except Exception as e:
-        #     main_logger.error("Error while render html report {}".format(str(e)))
-        #     save_html_report('error', session_dir, SESSION_REPORT_HTML_EMBED_IMG)
 
     return report
 
@@ -178,6 +174,7 @@ def build_summary_report(work_dir):
                 basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     summary_report[basename] = json.loads(report_file.read())
+                    summary_report[basename].update({'session_dir': basepath})
 
                 try:
                     for test_package in summary_report[basename]['results']:
@@ -192,17 +189,19 @@ def build_summary_report(work_dir):
 
                     if common_info:
                         for key in common_info:
-                            if not summary_report[basename]['machine_info'][key] == common_info[key]:
-                                main_logger.warning("Different versions in {}: {} vs. {}".format(key, summary_report[basename]['machine_info'][key], common_info[key]))
-                                common_info[key] = '! Different values !'
+                            if not summary_report[basename]['machine_info'][key] in common_info[key]:
+                                common_info[key].append(summary_report[basename]['machine_info'][key])
                     else:
-                        common_info.update({'reporting_date': summary_report[basename]['machine_info']['reporting_date'],
-                                       'render_version': summary_report[basename]['machine_info']['render_version'],
-                                       'core_version': summary_report[basename]['machine_info']['core_version']
+                        common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
+                                       'render_version': [summary_report[basename]['machine_info']['render_version']],
+                                       'core_version': [summary_report[basename]['machine_info']['core_version']]
                                        })
 
                 except Exception as e:
                     main_logger.error(str(e))
+
+    for key in common_info:
+        common_info[key] = ', '.join(common_info[key])
 
     return summary_report, common_info
 
@@ -235,20 +234,6 @@ def build_performance_report(work_dir):
                     for test_config in results[test_package]:
                         performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
 
-    # env = jinja2.Environment(
-    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-    #     autoescape=True
-    # )
-    # template = env.get_template('performance_compare.html')
-    #
-    # try:
-    #     html_result = template.render(title='Performance report', report=performance_report, hardware=hardware,
-    #                                   detail_report=performance_report_detail)
-    #     save_html_report(html_result, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-    # except Exception as e:
-    #     main_logger.error("Error while render performance html report: {}".format(str(e)))
-    #     save_html_report('error', work_dir, PERFORMANCE_REPORT_HTML)
-
     return performance_report, hardware, performance_report_detail
 
 
@@ -278,6 +263,7 @@ def build_compare_report(work_dir):
 
 
 def build_summary_reports(work_dir):
+
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(work_dir, 'report_resources'))
     except Exception as err:
@@ -287,6 +273,8 @@ def build_summary_reports(work_dir):
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+
+    env.filters['env_override'] = env_override
 
     try:
         summary_template = env.get_template('summary_template.html')

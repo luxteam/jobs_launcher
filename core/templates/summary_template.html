@@ -58,7 +58,7 @@
         <td>{{ report[i].summary.render_duration | round(1) }}</td>
         <td><a href="
         {% if i != "_cur_" -%}
-        {{- i -}}/
+        {{- report[i].session_dir -}}/
         {%- endif -%}
         launcher.engine.log">Engine log</a></td>
     </tr>
@@ -70,7 +70,9 @@
 <h1>tests</h1>
 
 {% for i, value in report | dictsort %}
+    {% if i != "_cur_" %}
 <h3>{{ i }}</h3>
+    {% endif %}
 
 <table class="baseTable">
     <tr>
@@ -124,12 +126,12 @@
 <h1>details</h1>
 
 {% for i, value in report | dictsort %}
+    {% if i != "_cur_" %}
 <h3>{{ i }}</h3>
 <a name="{{ i }}"></a>
-<!--data-sort-order="desc"-->
-<!--data-sort-name="pix_difference"-->
-<!--data-cell-style="pixDifferenceCellStyle"-->
+    {% endif %}
 
+<!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
 <div class="jsTableWrapper">
     <table id="{{ i | lower }}"
            class="baseTable"
@@ -141,8 +143,10 @@
            data-show-pagination-switch="true"
            data-pagination="true"
            data-page-list="[5, 10, 20, 45, ALL]"
+           data-sort-order="desc"
+           data-sort-name="pix_difference"
+           data-cell-style="pixDifferenceCellStyle"
            data-show-multi-sort="true"
-           data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'
     >
         <thead>
             <tr>
@@ -162,7 +166,7 @@
 
                 {% for item in report[i].results[test_package][test_conf].render_results %}
             <tr>
-                <td>{{ item.file_name }}</td>
+                <td>{{ item.test_case }}</td>
                 <td>{% for param in item.script_info %}
                     {{ param }}<br>
                     {% endfor %}

@@ -88,12 +88,28 @@
         </ul>
     </div>
 
-    <h3>Testing date: {{ common_info.reporting_date }}</h3>
-    <h3>Plugin version: {{ common_info.render_version }}</h3>
-    <h3>Core version: {{ common_info.core_version }}</h3>
+
+    <table class="baseTable">
+        <tr>
+            <th>Testing date</th>
+            <th>Plugin version</th>
+            <th>Core version</th>
+            <th>Branch name</th>
+        </tr>
+        <tr>
+            <td>{{ common_info.reporting_date }}</td>
+            <td>{{ common_info.render_version }}</td>
+            <td>{{ common_info.core_version }}</td>
+            <td>{{ "undefiend" | env_override('BRANCH_NAME') }}</td>
+        </tr>
+    </table>
+
+    <hr>
 
     {% block report_body %}
     {% endblock %}
+
+    <hr>
 
     <div id="footer">
         Luxoft RPR CIS
