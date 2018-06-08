@@ -262,7 +262,7 @@ def build_compare_report(work_dir):
     return compare_report, hardware
 
 
-def build_summary_reports(work_dir):
+def build_summary_reports(work_dir, major_title, commit_sha='undefiend'):
 
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH), os.path.join(work_dir, 'report_resources'))
@@ -279,8 +279,9 @@ def build_summary_reports(work_dir):
     try:
         summary_template = env.get_template('summary_template.html')
         summary_report, common_info = build_summary_report(work_dir)
+        common_info.update({'commit_sha': commit_sha})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
-        summary_html = summary_template.render(title="Summary report", report=summary_report, pageID="summaryA", common_info=common_info)
+        summary_html = summary_template.render(title=major_title + " Summary", report=summary_report, pageID="summaryA", common_info=common_info)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
@@ -292,7 +293,7 @@ def build_summary_reports(work_dir):
         performance_report, hardware, performance_report_detail = build_performance_report(work_dir)
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
         save_json_report(performance_report_detail, work_dir, 'perf.json', replace_pathsep=True)
-        performance_html = performance_template.render(title="Performance", performance_report=performance_report, hardware=hardware, performance_report_detail=performance_report_detail, pageID="performanceA", common_info=common_info)
+        performance_html = performance_template.render(title=major_title +" Performance", performance_report=performance_report, hardware=hardware, performance_report_detail=performance_report_detail, pageID="performanceA", common_info=common_info)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))
@@ -304,7 +305,7 @@ def build_summary_reports(work_dir):
         compare_report, hardware = build_compare_report(work_dir)
         # TODO
         save_json_report(compare_report, work_dir, 'compare.json', True)
-        compare_html = compare_template.render(title="Compare", hardware=hardware, compare_report=compare_report, pageID="compareA", common_info=common_info)
+        compare_html = compare_template.render(title=major_title + " Compare", hardware=hardware, compare_report=compare_report, pageID="compareA", common_info=common_info)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
     except Exception as err:
         compare_html = "Error while building compare report: {}".format(str(err))
