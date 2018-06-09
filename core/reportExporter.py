@@ -266,7 +266,7 @@ def build_compare_report(work_dir):
                         for item in temp_report['results'][test_package][test_config]['render_results']:
                             if not compare_report[item['test_case']]:
                                 compare_report[item['test_case']] = {}
-                            compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumbnail_render_color_path']), work_dir) })
+                            compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir) })
 
     return compare_report, hardware
 
