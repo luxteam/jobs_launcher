@@ -190,12 +190,12 @@
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}
-                    <img src="{{ item.baseline_color_path }}"/>
+                    <img src="{{ item.thumbnail_baseline_color_path }}"/>
                 {% else %}
                     Not compared
                 {% endif %}
                 </td>
-                <td class="hatching"><img src="{{ item.render_color_path }}"/></td>
+                <td class="hatching"><img src="{{ item.thumbnail_render_color_path }}"/></td>
             </tr>
                 {% endfor %}
                 {% endif %}

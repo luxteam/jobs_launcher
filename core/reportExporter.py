@@ -79,7 +79,16 @@ def build_session_report(report, session_dir, template=None):
                     for jtem in current_test_report:
                         for img in POSSIBLE_JSON_IMG_KEYS:
                             if img in jtem.keys():
-                                jtem.update({img: os.path.relpath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]), session_dir)})
+                                # create thumbnails
+                                cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]))
+                                cur_img = Image.open(cur_img_path)
+                                thumbnail_img = cur_img.resize((64, 64), Image.ANTIALIAS)
+                                thumbnail_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], 'thumbnail_'+jtem[img]))
+                                thumbnail_img.save(thumbnail_img_path)
+
+                                jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
+                                jtem.update({'thumbnail_'+img: os.path.relpath(thumbnail_img_path, session_dir)})
+
 
                         render_duration += jtem['render_time']
                         report['results'][result][item][jtem['test_status']] += 1
@@ -181,7 +190,7 @@ def build_summary_report(work_dir):
                         for test_conf in summary_report[basename]['results'][test_package]:
                             for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
 
-                                for img in POSSIBLE_JSON_IMG_KEYS:
+                                for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
                                     if img in jtem.keys():
                                         jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
 
@@ -257,7 +266,7 @@ def build_compare_report(work_dir):
                         for item in temp_report['results'][test_package][test_config]['render_results']:
                             if not compare_report[item['test_case']]:
                                 compare_report[item['test_case']] = {}
-                            compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir) })
+                            compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumbnail_render_color_path']), work_dir) })
 
     return compare_report, hardware
 
