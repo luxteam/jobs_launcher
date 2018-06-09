@@ -83,7 +83,7 @@ def build_session_report(report, session_dir, template=None):
                                 cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]))
                                 cur_img = Image.open(cur_img_path)
                                 thumbnail_img = cur_img.resize((64, 64), Image.ANTIALIAS)
-                                thumbnail_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], 'thumbnail_'+jtem[img]))
+                                thumbnail_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img].replace(jtem['test_case'], 'thumbnail_'+jtem['test_case'])))
                                 thumbnail_img.save(thumbnail_img_path)
 
                                 jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
