@@ -31,7 +31,7 @@
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
         <argument>--previous_report report3.json</argument>
-        <argument>--current_report report_сompare.json</argument>
+        <argument>--current_report report_compare.json</argument>
     </execute>
 
 </job-manifest>

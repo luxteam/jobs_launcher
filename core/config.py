@@ -10,6 +10,8 @@ SIMPLE_RENDER_TIMEOUT = 10
 TIMEOUT = 10000
 TIMEOUT_PAR = 3
 
+PIX_DIFF_MAX = 30
+
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
 TEST_REPORT_EXPECTED_NAME = 'expected.json'
@@ -22,20 +24,26 @@ SESSION_REPORT_HTML_EMBED_IMG = 'session_report_embed_img.html'
 
 NOT_RENDERED_REPORT = "not_rendered.json"
 
-SUMMARY_REPORT = 'summary_report.json'
-SUMMARY_REPORT_EMBED_IMG = 'summary_report_embed_img.json'
-SUMMARY_REPORT_HTML = 'summary_report.html'
-SUMMARY_REPORT_HTML_EMBED_IMG = 'summary_report_embed_img.html'
-
-POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path' ]
-POSSIBLE_JSON_IMG_KEYS_THUMBNAIL = ['thumbnail_baseline_color_path', 'thumbnail_baseline_opacity_path', 'thumbnail_render_color_path', 'thumbnail_render_opacity_path']
+POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'baseline_opacity_path', 'render_color_path', 'render_opacity_path']
+POSSIBLE_JSON_IMG_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_KEYS]
+POSSIBLE_JSON_IMG_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_KEYS]
 POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'render_opacity_path']
+POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_RENDERED_KEYS]
+POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_RENDERED_KEYS]
 
 BASELINE_MANIFEST = 'baseline_manifest.json'
 BASELINE_SESSION_REPORT = 'session_baseline_report.json'
 BASELINE_REPORT_NAME = 'render_copied_report.json'
 
+SUMMARY_REPORT = 'summary_report.json'
+SUMMARY_REPORT_EMBED_IMG = 'summary_report_embed_img.json'
+SUMMARY_REPORT_HTML = 'summary_report.html'
+SUMMARY_REPORT_HTML_EMBED_IMG = 'summary_report_embed_img.html'
+
 PERFORMANCE_REPORT = 'performance_report.json'
 PERFORMANCE_REPORT_HTML = 'performance_report.html'
+
+COMPARE_REPORT = 'compare_report.json'
+COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'

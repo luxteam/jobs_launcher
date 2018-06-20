@@ -181,8 +181,7 @@
                 <td>{{ item.test_status }}
                 {% endif %}
 
-
-                {% if not item.difference_color is string and item.difference_color > 30 %}
+                {% if not item.difference_color is string and item.difference_color > PIX_DIFF_MAX %}
                 <td class="badResult">{{ item.difference_color }}</td>
                 {% else %}
                 <td>{{ item.difference_color }}</td>
@@ -190,12 +189,22 @@
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}
-                    <img src="{{ item.thumbnail_baseline_color_path }}"/>
+                    {% if 'thumb64_baseline_color_path' in item %}
+                    <img src="{{ item.thumb64_baseline_color_path }}"/>
+                    {% else %}
+                    <img src="{{ item.baseline_color_path }}"/>
+                    {% endif %}
                 {% else %}
                     Not compared
                 {% endif %}
                 </td>
-                <td class="hatching"><img src="{{ item.thumbnail_render_color_path }}"/></td>
+                <td class="hatching">
+                    {% if 'thumb64_render_color_path' in item %}
+                    <img src="{{ item.thumb64_render_color_path }}"/>
+                    {% else %}
+                    <img src="{{ item.render_color_path }}"/>
+                    {% endif %}
+                </td>
             </tr>
                 {% endfor %}
                 {% endif %}

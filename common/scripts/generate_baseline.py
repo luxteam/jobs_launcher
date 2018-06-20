@@ -61,6 +61,26 @@ def main():
                                     shutil.copyfile(rendered_img_path, os.path.join(args.baseline_root, baseline_img_path))
                                 except Exception as err:
                                     core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
+
+                        # copy images thumbnails
+                        for img in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL:
+                            if img in test.keys():
+                                rendered_img_path = os.path.join(path, test[img])
+                                baseline_img_path = os.path.relpath(rendered_img_path, args.results_root)
+
+                                # add img to baseline manifest
+                                baseline_manifest.update({os.path.split(test[img])[-1]: baseline_img_path})
+                                # create folder in first step for current folder
+                                if not os.path.exists(
+                                        os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0])):
+                                    os.makedirs(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0]))
+
+                                try:
+                                    shutil.copyfile(rendered_img_path,
+                                                    os.path.join(args.baseline_root, baseline_img_path))
+                                except Exception as err:
+                                    core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
+
     except Exception as err:
         core.config.main_logger.error("Error baseline generation: {}".format(str(err)))
 

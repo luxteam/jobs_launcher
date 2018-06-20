@@ -56,10 +56,14 @@
 			{% if compared %}
 			<td><img src="{{ img.baseline_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
 			{% endif %}
-			<td>Scene: {{ img.scene_name }}<br/>
-				File name: {{ img.file_name }}<br/>
+			<td>Test case: {{ img.test_case }}<br/>
 				Pix difference: {{ img.difference_color }}<br/>
 				Render time: {{ img.render_time | round(3) }}<br/>
+				<br/>
+				Test parameters:<br/>
+				{% for param in img.script_info %}
+                    - {{ param }}<br>
+				{% endfor %}
 			</td>
 		</tr>
 		{% endfor %}

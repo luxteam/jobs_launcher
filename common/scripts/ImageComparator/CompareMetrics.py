@@ -84,19 +84,10 @@ class CompareMetrics(object):
 
 
     def readImages(self):
-        try:
-            self.img1 = imread(self.file1).astype(float)
-            self.img1ravel = self.img1.ravel()
-        except FileNotFoundError:
-            print ('File %s does not exist' % self.file1)
-            return False
-
-        try:
-            self.img2 = imread(self.file2).astype(float)
-            self.img2ravel = self.img2.ravel()
-        except FileNotFoundError:
-            print ('File %s does not exist' % self.file2)
-            return False
+        self.img1 = imread(self.file1).astype(float)
+        self.img1ravel = self.img1.ravel()
+        self.img2 = imread(self.file2).astype(float)
+        self.img2ravel = self.img2.ravel()
 
         return True
 

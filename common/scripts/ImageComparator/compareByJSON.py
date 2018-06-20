@@ -4,6 +4,7 @@ import json
 import CompareMetrics
 import sys
 import shutil
+from PIL import Image
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
 
@@ -36,17 +37,24 @@ def main():
         for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
             if key in img.keys():
                 render_img_path = os.path.join(args.work_dir, img[key])
-                if img['test_status'] == 'passed':
-                    try:
-                        baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
-                    except KeyError as err:
-                        core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
-                        continue
 
+                try:
+                    baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
+                except KeyError as err:
+                    core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
+                    continue
+
+                metrics = None
+                try:
                     metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                except FileNotFoundError as err:
+                    core.config.main_logger.error(str(err))
 
-                    img.update({'difference_color': metrics.getDiffPixeles()})
+                img.update({'difference_color': metrics.getDiffPixeles()})
+                if metrics.getDiffPixeles() > core.config.PIX_DIFF_MAX:
+                    img['test_status'] = 'failed'
                 img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)})
+
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
         json.dump(render_json, file, indent=" ")
