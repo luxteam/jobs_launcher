@@ -24,7 +24,7 @@ def parse_cmd_variables(tests_root, cmd_variables):
             config_devices = file.read()
             config_devices = json.loads(config_devices)
     except Exception as e:
-        main_logger.error('Error while parse cmd {}'.format(str(e)))
+        main_logger.warning('Error while parse cmd {}'.format(str(e)))
 
     for item in cmd_variables['RenderDevice'].split(','):
         # if its int index of device
@@ -43,6 +43,10 @@ def parse_cmd_variables(tests_root, cmd_variables):
     temp.sort()
     cmd_variables['RenderDevice'] = ','.join(temp)
 
+    # if TestsFilter doesn't exist or is empty - set it 'full'
+    if 'TestsFilter' not in cmd_variables.keys() or not cmd_variables['TestsFilter']:
+        cmd_variables.update({'TestsFilter': 'full'})
+
     return cmd_variables
 
 
@@ -59,6 +63,7 @@ def main():
     parser.add_argument('--test_filter', required=False, nargs="*", default=[])
     parser.add_argument('--package_filter', required=False, nargs="*", default=[])
     parser.add_argument('--file_filter', required=False)
+    parser.add_argument('--remove_old', type=bool, required=False, default=True)
 
     args = parser.parse_args()
 
@@ -78,11 +83,14 @@ def main():
     if '' in args.package_filter:
         args.package_filter = []
 
+    # extend test_filter by values in file_filter
     if args.file_filter:
         with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
-            args.test_filter = file.read().splitlines()
+            args.test_filter.extend(file.read().splitlines())
 
     args.tests_root = os.path.abspath(args.tests_root)
+
+    main_logger.info('Args parsed to: {}'.format(args))
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
@@ -109,13 +117,16 @@ def main():
     for mi in machine_info.keys():
         print('{0: <16}: {1}'.format(mi, machine_info[mi]))
 
-    try:
-        if os.path.isdir(session_dir):
-            shutil.rmtree(session_dir)
-        os.makedirs(session_dir)
-    except OSError as e:
-        print(delim + str(e))
-        main_logger.error(str(e))
+    if args.remove_old:
+        try:
+            if os.path.isdir(session_dir):
+                shutil.rmtree(session_dir)
+            os.makedirs(session_dir)
+        except OSError as e:
+            print(delim + str(e))
+            main_logger.error(str(e))
+    else:
+        main_logger.info("Continue work in old workspace")
 
     found_jobs = []
     report = AutoDict()
