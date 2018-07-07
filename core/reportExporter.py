@@ -232,8 +232,8 @@ def build_summary_report(work_dir):
                                 common_info[key].append(summary_report[basename]['machine_info'][key])
                     else:
                         common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
-                                            'render_version': str([summary_report[basename]['machine_info']['render_version']]),
-                                            'core_version': str([summary_report[basename]['machine_info']['core_version']])
+                                            'render_version': [summary_report[basename]['machine_info']['render_version']],
+                                            'core_version': [summary_report[basename]['machine_info']['core_version']]
                                             })
                 except Exception as e:
                     main_logger.error(str(e))
