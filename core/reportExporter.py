@@ -232,8 +232,8 @@ def build_summary_report(work_dir):
                                 common_info[key].append(summary_report[basename]['machine_info'][key])
                     else:
                         common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
-                                            'render_version': [summary_report[basename]['machine_info']['render_version']],
-                                            'core_version': [summary_report[basename]['machine_info']['core_version']]
+                                            'render_version': str([summary_report[basename]['machine_info']['render_version']]),
+                                            'core_version': str([summary_report[basename]['machine_info']['core_version']])
                                             })
                 except Exception as e:
                     main_logger.error(str(e))
@@ -299,13 +299,13 @@ def build_compare_report(work_dir):
                             try:
                                 compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumb256_render_color_path']), work_dir)})
                             except KeyError as err:
-                                main_logger.warning("Thumb can't be found. Full size img will be used.")
+                                # main_logger.warning("Thumb can't be found. Full size img will be used.")
                                 compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir)})
 
     return compare_report, hardware
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefiend'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined'):
 
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
@@ -319,10 +319,13 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend'):
     )
     env.filters['env_override'] = env_override
 
+    common_info = {}
+
     try:
         summary_template = env.get_template('summary_template.html')
         summary_report, common_info = build_summary_report(work_dir)
         common_info.update({'commit_sha': commit_sha})
+        common_info.update({'branch_name': branch_name})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
