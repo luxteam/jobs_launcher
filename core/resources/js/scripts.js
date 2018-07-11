@@ -1,22 +1,23 @@
-function pixDifferenceCellStyle(value, row, index) {
-  if (value > 30.0) {
-        return {
-            classes: 'badResult'
-        };
-    }
-    return {};
-}
-
 function statusSorter(a, b) {
-    console.log(a, b);
-    if (a == b){
-        console.log(a, b, 'equals');
+    if (a == b) {
         return 0;
     }
-    if (a.includes("failed") || (a.includes("skipped") && !b.includes("failed"))) {
-        console.log(a, b, '1');
+
+    if (a.includes('failed') || a.includes('skipped') && (!b.includes('failed') && !b.includes('skipped'))) {
         return 1;
     }
+
+    if (a.includes('failed') && b.includes('skipped')) {
+        return 1;
+    }
+
+    a = a.split('<br>');
+    b = b.split('<br>');
+
+    if (a[0] == b[0]) {
+        return a[2] > b[2] ? 1 : -1;
+    }
+
     return -1;
 }
 

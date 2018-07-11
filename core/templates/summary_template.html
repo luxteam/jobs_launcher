@@ -52,8 +52,16 @@
         <td>{{ report[i].machine_info.core_version }}</td>
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
-        <td>{{ report[i].summary.failed }}</td>
-        <td>{{ report[i].summary.skipped }}</td>
+        <td
+        {% if report[i].summary.failed != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.failed }}</td>
+        <td
+        {% if report[i].summary.skipped != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
         <td>{{ report[i].summary.render_duration | round(1) }}</td>
         <td><a href="
@@ -98,8 +106,16 @@
         <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
         <td>{{ report[i].results[test_package][test_conf].total }}</td>
         <td>{{ report[i].results[test_package][test_conf].passed }}</td>
-        <td>{{ report[i].results[test_package][test_conf].failed }}</td>
-        <td>{{ report[i].results[test_package][test_conf].skipped }}</td>
+        <td
+        {% if report[i].results[test_package][test_conf].failed != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].results[test_package][test_conf].failed }}</td>
+        <td
+        {% if report[i].results[test_package][test_conf].skipped != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].results[test_package][test_conf].skipped }}</td>
         <td>{{ report[i].results[test_package][test_conf].duration }}</td>
         <td>{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
     </tr>
@@ -112,8 +128,16 @@
         <td colspan="4">Sum</td>
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
-        <td>{{ report[i].summary.failed }}</td>
-        <td>{{ report[i].summary.skipped }}</td>
+        <td
+        {% if report[i].summary.failed != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.failed }}</td>
+        <td
+        {% if report[i].summary.skipped != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
         <td>{{ report[i].summary.render_duration | round(1) }}</td>
     </tr>
@@ -132,6 +156,7 @@
     {% endif %}
 
 <!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
+<!--data-cell-style="pixDifferenceCellStyle"-->
 <div class="jsTableWrapper">
     <table id="{{ i | lower }}"
            class="baseTable"
@@ -144,8 +169,7 @@
            data-pagination="true"
            data-page-list="[5, 10, 20, 45, ALL]"
            data-sort-order="desc"
-           data-sort-name="pix_difference"
-           data-cell-style="pixDifferenceCellStyle"
+           data-sort-name="test_status"
            data-show-multi-sort="true"
     >
         <thead>
@@ -154,7 +178,7 @@
                 <th data-halign="center" data-sortable="true">Parameters</th>
                 <th data-halign="center" data-sortable="true">Render time, s</th>
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
-                <th data-field="pix_difference" data-halign="center" data-sortable="true">Pixel difference, %</th>
+                <!--<th data-field="pix_difference" data-halign="center" data-sortable="true">Pixel difference, %</th>-->
                 <th data-halign="center" data-sortable="true">Baseline Color</th>
                 <th data-halign="center" data-sortable="true">Rendered color</th>
             </tr>
@@ -173,19 +197,19 @@
                 </td>
                 <td>{{ item.render_time | round(3) }}</td>
 
+                <td
                 {% if item.test_status != "passed" %}
-                <td class="badResult">{{ item.test_status }}<br>
-                {{ item.error_title }}
+                class="badResult">
+                    {{ item.test_status }}<br/>
+                    {{ item.error_title }}<br/>
+                    Diff: {{ item.difference_color }}, %
+                {% else %}
+                >
+                    {{ item.test_status }}<br/>
+                    <br/>
+                    Diff: {{ item.difference_color }}, %
+                {% endif %}
                 </td>
-                {% else %}
-                <td>{{ item.test_status }}
-                {% endif %}
-
-                {% if not item.difference_color is string and item.difference_color > PIX_DIFF_MAX %}
-                <td class="badResult">{{ item.difference_color }}</td>
-                {% else %}
-                <td>{{ item.difference_color }}</td>
-                {% endif %}
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}

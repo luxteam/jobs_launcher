@@ -71,20 +71,24 @@ def generate_thumbnails(session_dir):
                     for img_key in POSSIBLE_JSON_IMG_KEYS:
                         if img_key in test.keys():
                             # create thumbnails
-                            cur_img_path = os.path.abspath(os.path.join(path, test[img_key]))
-                            cur_img = Image.open(cur_img_path)
-                            thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
-                            thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
+                            try:
+                                cur_img_path = os.path.abspath(os.path.join(path, test[img_key]))
+                                cur_img = Image.open(cur_img_path)
+                                thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
+                                thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
 
-                            thumb64_path = os.path.abspath(
-                                os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
-                            thumb256_path = os.path.abspath(
-                                os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
-                            thumb64.save(thumb64_path)
-                            thumb256.save(thumb256_path)
+                                thumb64_path = os.path.abspath(
+                                    os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
+                                thumb256_path = os.path.abspath(
+                                    os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
+                                thumb64.save(thumb64_path)
+                                thumb256.save(thumb256_path)
+                            except Exception as err:
+                                main_logger.error("Thumbnail didn't created: {}".format(str(err)))
+                            else:
+                                test.update({'thumb64_' + img_key: thumb64_path})
+                                test.update({'thumb256_' + img_key: thumb256_path})
 
-                            test.update({'thumb64_' + img_key: thumb64_path})
-                            test.update({'thumb256_' + img_key: thumb256_path})
 
                 with open(os.path.join(path, TEST_REPORT_NAME_COMPARED), 'w') as file:
                     json.dump(current_test_report, file, indent=" ")
@@ -305,7 +309,7 @@ def build_compare_report(work_dir):
     return compare_report, hardware
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
 
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
@@ -326,6 +330,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         summary_report, common_info = build_summary_report(work_dir)
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
+        common_info.update({'commit_message': commit_message})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
