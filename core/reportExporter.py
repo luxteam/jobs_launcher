@@ -77,10 +77,16 @@ def generate_thumbnails(session_dir):
                                 thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
                                 thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
 
-                                thumb64_path = os.path.abspath(
-                                    os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
-                                thumb256_path = os.path.abspath(
-                                    os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
+                                thumb64_path = os.path.relpath(
+                                    os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case']))),
+                                    session_dir
+                                )
+
+                                thumb256_path = os.path.relpath(
+                                    os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case']))),
+                                    session_dir
+                                )
+
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
                             except Exception as err:
