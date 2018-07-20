@@ -63,7 +63,11 @@
         {% endif %}
         >{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
-        <td>{{ report[i].summary.render_duration | round(1) }}</td>
+        <td
+        {% if report[i].summary.render_duration == -0.0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.render_duration | round(1) }}</td>
         <td><a href="
         {% if i != "_cur_" -%}
         {{- report[i].session_dir -}}/
@@ -117,7 +121,11 @@
         {% endif %}
         >{{ report[i].results[test_package][test_conf].skipped }}</td>
         <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-        <td>{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
+        <td
+        {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
     </tr>
     <tr>
     {% endfor %}
@@ -139,7 +147,11 @@
         {% endif %}
         >{{ report[i].summary.skipped }}</td>
         <td>{{ report[i].summary.duration }}</td>
-        <td>{{ report[i].summary.render_duration | round(1) }}</td>
+        <td
+        {% if report[i].summary.render_duration == -0.0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.render_duration | round(1) }}</td>
     </tr>
 
 </table>

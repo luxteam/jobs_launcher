@@ -24,6 +24,17 @@
 			margin: auto;
 			width: 30%;
 		}
+		.hatching {
+			background:
+					linear-gradient(45deg, rgba(0, 0, 0, 0) 49.9%, black 49.9%, black 60%, rgba(0, 0, 0, 0) 60%)
+					fixed,
+					linear-gradient(45deg, black 10%, rgba(0, 0, 0, 0) 10%)
+					fixed;
+			background-size: 0.3em 0.3em;
+		}
+		.badResult {
+		   background: #e86755 !important;
+		}
 	</style>
     <title>{{ title }}</title>
     <script type="text/javascript">
@@ -52,11 +63,16 @@
 		</tr>
 		{% for img in rendered %}
 		<tr>
-			<td><img src="{{ img.render_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+			<td class="hatching"><img src="{{ img.render_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
 			{% if compared %}
-			<td><img src="{{ img.baseline_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+			<td class="hatching"><img src="{{ img.baseline_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
 			{% endif %}
-			<td>Scene: {{img.scene_name }}<br/>
+			<td
+			{% if img.difference_color is not string and img.difference_color > 30 %}
+			class="badResult"
+			{% endif %}
+				>
+				Scene: {{img.scene_name }}<br/>
 				Test case: {{ img.test_case }}<br/>
 				Pix difference: {{ img.difference_color }}<br/>
 				Render time: {{ img.render_time | round(3) }}<br/>

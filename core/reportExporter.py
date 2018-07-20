@@ -61,6 +61,8 @@ def env_override(value, key):
 def generate_thumbnails(session_dir):
     current_test_report = []
 
+    main_logger.info("Start thumbnails creation")
+
     for path, dirs, files in os.walk(session_dir):
         for json_report in files:
             if json_report == TEST_REPORT_NAME_COMPARED:
@@ -71,6 +73,7 @@ def generate_thumbnails(session_dir):
                     for img_key in POSSIBLE_JSON_IMG_KEYS:
                         if img_key in test.keys():
                             # create thumbnails
+                            # TODO: check if thumb already exists in baseline folder
                             try:
                                 cur_img_path = os.path.abspath(os.path.join(path, test[img_key]))
                                 cur_img = Image.open(cur_img_path)
@@ -95,9 +98,9 @@ def generate_thumbnails(session_dir):
                                 test.update({'thumb64_' + img_key: thumb64_path})
                                 test.update({'thumb256_' + img_key: thumb256_path})
 
-
                 with open(os.path.join(path, TEST_REPORT_NAME_COMPARED), 'w') as file:
                     json.dump(current_test_report, file, indent=" ")
+                    main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
 def build_session_report(report, session_dir, template=None):

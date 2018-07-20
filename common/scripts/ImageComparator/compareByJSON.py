@@ -51,7 +51,8 @@ def main():
                     core.config.main_logger.error(str(err))
 
                 img.update({'difference_color': metrics.getDiffPixeles()})
-                if metrics.getDiffPixeles() > core.config.PIX_DIFF_MAX:
+                print(type(metrics.getDiffPixeles()))
+                if type(metrics.getDiffPixeles()) is not str and metrics.getDiffPixeles() > core.config.PIX_DIFF_MAX:
                     img['test_status'] = 'failed'
                 img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)})
 
