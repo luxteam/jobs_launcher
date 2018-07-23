@@ -80,23 +80,16 @@ def generate_thumbnails(session_dir):
                                 thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
                                 thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
 
-                                thumb64_path = os.path.relpath(
-                                    os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case']))),
-                                    session_dir
-                                )
-
-                                thumb256_path = os.path.relpath(
-                                    os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case']))),
-                                    session_dir
-                                )
+                                thumb64_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
+                                thumb256_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
 
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
                             except Exception as err:
                                 main_logger.error("Thumbnail didn't created: {}".format(str(err)))
                             else:
-                                test.update({'thumb64_' + img_key: thumb64_path})
-                                test.update({'thumb256_' + img_key: thumb256_path})
+                                test.update({'thumb64_' + img_key: os.path.relpath(thumb64_path, path)})
+                                test.update({'thumb256_' + img_key: os.path.relpath(thumb256_path, path)})
 
                 with open(os.path.join(path, TEST_REPORT_NAME_COMPARED), 'w') as file:
                     json.dump(current_test_report, file, indent=" ")
