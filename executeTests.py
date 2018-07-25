@@ -86,8 +86,11 @@ def main():
 
     # extend test_filter by values in file_filter
     if args.file_filter:
-        with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
-            args.test_filter.extend(file.read().splitlines())
+        try:
+            with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
+                args.test_filter.extend(file.read().splitlines())
+        except Exception as e:
+            main_logger.error(str(e))
 
     args.tests_root = os.path.abspath(args.tests_root)
 
@@ -142,6 +145,8 @@ def main():
     test_filter = args.test_filter
     if args.split_execution:
         test_filter = test_filter[0]
+        with open(os.path.join(session_dir, 'remain_tests'), 'w') as file:
+            file.writelines("%s\n" % l for l in args.test_filter[1:])
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
                                            test_filter=test_filter, package_filter=args.package_filter)
@@ -179,8 +184,6 @@ def main():
     main_logger.info('Saved session report')
 
     shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
-
-    return test_filter[1:]
 
 
 if __name__ == "__main__":
