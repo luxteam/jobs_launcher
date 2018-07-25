@@ -63,7 +63,8 @@ def main():
     parser.add_argument('--test_filter', required=False, nargs="*", default=[])
     parser.add_argument('--package_filter', required=False, nargs="*", default=[])
     parser.add_argument('--file_filter', required=False)
-    parser.add_argument('--remove_old', type=bool, required=False, default=True)
+    parser.add_argument('--split_execution', required=False, action='store_true', dest='split_execution', default=False)
+    parser.add_argument('--continue_execution', required=False, action='store_true', dest='continue_execution', default=False)
 
     args = parser.parse_args()
 
@@ -117,7 +118,14 @@ def main():
     for mi in machine_info.keys():
         print('{0: <16}: {1}'.format(mi, machine_info[mi]))
 
-    if args.remove_old:
+    found_jobs = []
+    report = AutoDict()
+    report['failed_tests'] = []
+    report['machine_info'] = machine_info
+
+    if not args.continue_execution:
+        report['guid'] = uuid.uuid1().__str__()
+
         try:
             if os.path.isdir(session_dir):
                 shutil.rmtree(session_dir)
@@ -125,17 +133,18 @@ def main():
         except OSError as e:
             print(delim + str(e))
             main_logger.error(str(e))
+
+        with open(os.path.join(session_dir, 'guid'), 'w') as file:
+            file.write(report['guid'])
     else:
         main_logger.info("Continue work in old workspace")
 
-    found_jobs = []
-    report = AutoDict()
-    report['failed_tests'] = []
-    report['machine_info'] = machine_info
-    report['guid'] = uuid.uuid1().__str__()
+    test_filter = args.test_filter
+    if args.split_execution:
+        test_filter = test_filter[0]
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
-                                           test_filter=args.test_filter, package_filter=args.package_filter)
+                                           test_filter=test_filter, package_filter=args.package_filter)
 
     # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
@@ -158,11 +167,20 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
+    if args.continue_execution:
+        main_logger.info('Merge previous session report')
+        with open(os.path.join(session_dir, core.config.SESSION_REPORT)) as old_report_file:
+            old_report = json.loads(old_report_file.read())
+            old_report['results'].update(report['results'])
+            report = old_report
+
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
     main_logger.info('Saved session report')
 
     shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+
+    return test_filter[1:]
 
 
 if __name__ == "__main__":
