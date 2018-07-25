@@ -78,26 +78,13 @@ def main():
     else:
         args.cmd_variables = {}
 
-    if '' in args.test_filter:
-        args.test_filter = []
-
-    if '' in args.package_filter:
-        args.package_filter = []
-
-    # extend test_filter by values in file_filter
-    if args.file_filter:
-        try:
-            with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
-                args.test_filter.extend(file.read().splitlines())
-        except Exception as e:
-            main_logger.error(str(e))
-
     args.tests_root = os.path.abspath(args.tests_root)
 
     main_logger.info('Args parsed to: {}'.format(args))
 
     tests_path = os.path.abspath(args.tests_root)
     work_path = os.path.abspath(args.work_root)
+
     if not args.work_dir:
         args.work_dir = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     work_path = os.path.join(work_path, args.work_dir)
@@ -111,6 +98,27 @@ def main():
 
     # session_dir = os.path.join(work_path, machine_info.get("host"))
     session_dir = work_path
+
+    if not args.continue_execution:
+        print("not continue")
+        if '' in args.test_filter:
+            args.test_filter = []
+
+        if '' in args.package_filter:
+            args.package_filter = []
+
+        # extend test_filter by values in file_filter
+        if args.file_filter:
+            try:
+                with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
+                    args.test_filter.extend(file.read().splitlines())
+            except Exception as e:
+                main_logger.error(str(e))
+    else:
+        with open(os.path.join(session_dir, 'remain_tests'), 'r') as file:
+            args.test_filter = file.read().splitlines()
+
+    print(args.test_filter)
 
     print('Working folder  : ' + work_path)
     print('Tests folder    : ' + tests_path)
@@ -183,7 +191,12 @@ def main():
     core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
     main_logger.info('Saved session report')
 
-    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+    if os.path.exists(os.path.join(session_dir, 'launcher.engine.log')):
+        with open(os.path.join(session_dir, 'launcher.engine.log'), 'a') as infile:
+            with open('launcher.engine.log', 'r') as outfile:
+                infile.write(outfile.read())
+    else:
+        shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
