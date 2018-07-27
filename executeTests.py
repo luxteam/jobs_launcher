@@ -100,7 +100,6 @@ def main():
     session_dir = work_path
 
     if not args.continue_execution:
-        print("not continue")
         if '' in args.test_filter:
             args.test_filter = []
 
@@ -117,8 +116,6 @@ def main():
     else:
         with open(os.path.join(session_dir, 'remain_tests'), 'r') as file:
             args.test_filter = file.read().splitlines()
-
-    print(args.test_filter)
 
     print('Working folder  : ' + work_path)
     print('Tests folder    : ' + tests_path)
