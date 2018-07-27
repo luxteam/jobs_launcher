@@ -57,3 +57,11 @@ function resizeImg(img){
         img.style.width = "30%";
     }
 }
+
+
+window.openFullImgSize = {
+    'click img': function(e) {
+        console.log(e);
+        //TODO: create modal window with full size img
+    }
+}
