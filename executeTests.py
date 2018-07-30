@@ -186,7 +186,7 @@ def main():
 
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
-    main_logger.info('Saved session report')
+    main_logger.info('Saved session report\n\n')
 
     if os.path.exists(os.path.join(session_dir, 'launcher.engine.log')):
         with open(os.path.join(session_dir, 'launcher.engine.log'), 'a') as infile:

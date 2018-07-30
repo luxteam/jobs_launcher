@@ -3,7 +3,7 @@ import logging
 logging.basicConfig(filename='launcher.engine.log',
                     filemode='a',
                     level=logging.INFO,
-                    format=u'%(filename)-21s[LINE:%(lineno)-3d] #%(levelname)-8s in:%(funcName)-23s [%(asctime)s] %(message)s')
+                    format=u'%(filename)-19s[LINE:%(lineno)-3d] #%(levelname)-8s [%(asctime)s] %(message)s')
 main_logger = logging.getLogger('main_logger')
 
 SIMPLE_RENDER_TIMEOUT = 10
