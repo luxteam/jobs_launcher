@@ -96,7 +96,7 @@ def generate_thumbnails(session_dir):
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
-def build_session_report(report, session_dir, template=None):
+def build_session_report(report, session_dir, template=None, old_report=None):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
@@ -149,6 +149,9 @@ def build_session_report(report, session_dir, template=None):
                     report['results'][result][item].update({'render_results': current_test_report})
 
                 report['results'][result][item].update({'render_duration': render_duration})
+
+    if old_report:
+        report['results'].update(old_report['results'])
 
     # get summary results
     for result in report['results']:

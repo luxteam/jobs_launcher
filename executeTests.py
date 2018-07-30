@@ -177,15 +177,15 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
+    old_report = []
     if args.continue_execution:
         main_logger.info('Merge previous session report')
         with open(os.path.join(session_dir, core.config.SESSION_REPORT)) as old_report_file:
             old_report = json.loads(old_report_file.read())
-            report['results'].update(old_report['results'])
-            report['guid'] = old_report['guid']
+        report['guid'] = old_report['guid']
 
     print("Saving session report")
-    core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
+    core.reportExporter.build_session_report(report, session_dir, template='summary_template.html', old_report=old_report)
     main_logger.info('Saved session report\n\n')
 
     if os.path.exists(os.path.join(session_dir, 'launcher.engine.log')):
