@@ -7,7 +7,7 @@ logging.basicConfig(filename='launcher.engine.log',
 main_logger = logging.getLogger('main_logger')
 
 SIMPLE_RENDER_TIMEOUT = 10
-TIMEOUT = 15000
+TIMEOUT = 6000
 TIMEOUT_PAR = 3
 
 PIX_DIFF_MAX = 30
