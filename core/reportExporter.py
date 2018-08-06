@@ -105,6 +105,7 @@ def build_session_report(report, session_dir, template=None, old_report=None):
     for result in report['results']:
         for item in report['results'][result]:
             try:
+                # TODO: catch case if report_compared.json doen't exist
                 # get report_compare.json by one tests group
                 with open(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED), 'r') as file:
                     current_test_report = json.loads(file.read())
@@ -141,7 +142,6 @@ def build_session_report(report, session_dir, template=None, old_report=None):
                                                                report['results'][result][item]['skipped']
                     # unite launcher report and render report
                 except Exception as err:
-                    print("Exception while update render report: " + str(err))
                     main_logger.error('Exception while update render report {}'.format(str(err)))
                     render_duration = -0.0
 

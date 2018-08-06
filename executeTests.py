@@ -148,7 +148,7 @@ def main():
         main_logger.info("Continue work in old workspace")
 
     test_filter = args.test_filter
-    if args.split_execution:
+    if args.split_execution and test_filter:
         test_filter = test_filter[0]
         with open(os.path.join(session_dir, 'remain_tests'), 'w') as file:
             file.writelines("%s\n" % l for l in args.test_filter[1:])

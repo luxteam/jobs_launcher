@@ -91,7 +91,12 @@ def main():
 
         # copy session report to
         shutil.copyfile(os.path.join(args.results_root, core.config.SESSION_REPORT),
-            os.path.join(os.path.abspath(args.baseline_root), core.config.BASELINE_SESSION_REPORT))
+                        os.path.join(os.path.abspath(args.baseline_root), core.config.BASELINE_SESSION_REPORT))
+        # TODO: copy html report
+        # shutil.copyfile(os.path.join(args.results_root, core.config.SESSION_REPORT_HTML),
+        #                 os.path.join(os.path.abspath(args.baseline_root), 'baseline_report.html'))
+        # shutil.copytree(os.path.join(args.results_root, 'report_resources'),
+        #                 os.path.join(os.path.abspath(args.baseline_root), 'report_resources'))
     except Exception as err:
         core.config.main_logger.warning("Error while baseline reports creating: {}".format(str(err)))
 
