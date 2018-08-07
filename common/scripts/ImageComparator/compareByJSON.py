@@ -34,27 +34,31 @@ def main():
         baseline_json = json.loads(file.read())
 
     for img in render_json:
-        for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
-            if key in img.keys():
-                render_img_path = os.path.join(args.work_dir, img[key])
+        # if failed it means tool crash - no sense to compare images
+        if img['test_status'] != 'failed':
+            for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
+                if key in img.keys():
+                    render_img_path = os.path.join(args.work_dir, img[key])
 
-                try:
-                    baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
-                except KeyError as err:
-                    core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
-                    continue
+                    try:
+                        baseline_img_path = os.path.join(args.base_dir, baseline_json[img['file_name']])
+                    except KeyError as err:
+                        core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
+                        continue
 
-                metrics = None
-                try:
-                    metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
-                except FileNotFoundError as err:
-                    core.config.main_logger.error(str(err))
+                    metrics = None
+                    try:
+                        metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                    except FileNotFoundError as err:
+                        core.config.main_logger.error(str(err))
 
-                pix_difference = metrics.getDiffPixeles()
-                img.update({'difference_color': pix_difference})
-                if type(pix_difference) is not str and pix_difference > core.config.PIX_DIFF_MAX:
-                    img['test_status'] = 'failed'
-                img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)})
+                    pix_difference = metrics.getDiffPixeles()
+                    img.update({'difference_color': pix_difference})
+                    if type(pix_difference) is not str and pix_difference > core.config.PIX_DIFF_MAX:
+                        img['test_status'] = 'error'
+                    img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)})
+        else:
+            img['difference_color'] = 'failed'
 
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:

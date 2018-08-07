@@ -60,7 +60,7 @@ def env_override(value, key):
 
 def generate_thumbnails(session_dir):
     current_test_report = []
-
+    # TODO: don't generate thumbnails if test failed ?
     main_logger.info("Start thumbnails creation")
 
     for path, dirs, files in os.walk(session_dir):
@@ -97,7 +97,7 @@ def generate_thumbnails(session_dir):
 
 
 def build_session_report(report, session_dir, template=None, old_report=None):
-    total = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
+    total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
 
@@ -105,11 +105,9 @@ def build_session_report(report, session_dir, template=None, old_report=None):
     for result in report['results']:
         for item in report['results'][result]:
             try:
-                # TODO: catch case if report_compared.json doen't exist
                 # get report_compare.json by one tests group
                 with open(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED), 'r') as file:
                     current_test_report = json.loads(file.read())
-                    # all_test_summary.update({' '.join(filter(None, [result, item])): current_test_report})
             except Exception as err:
                 main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
@@ -126,7 +124,10 @@ def build_session_report(report, session_dir, template=None, old_report=None):
                                 jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
 
                         render_duration += jtem['render_time']
-                        report['results'][result][item][jtem['test_status']] += 1
+                        if jtem['test_status'] == 'undefined':
+                            report['results'][result][item]['total'] += 1
+                        else:
+                            report['results'][result][item][jtem['test_status']] += 1
 
                         # TODO: set machine_info once only
                         try:
@@ -137,9 +138,10 @@ def build_session_report(report, session_dir, template=None, old_report=None):
                         except Exception as err:
                             main_logger.warning(str(err))
 
-                    report['results'][result][item]['total'] = report['results'][result][item]['passed'] + \
+                    report['results'][result][item]['total'] += report['results'][result][item]['passed'] + \
                                                                report['results'][result][item]['failed'] + \
-                                                               report['results'][result][item]['skipped']
+                                                               report['results'][result][item]['skipped'] + \
+                                                               report['results'][result][item]['error']
                     # unite launcher report and render report
                 except Exception as err:
                     main_logger.error('Exception while update render report {}'.format(str(err)))

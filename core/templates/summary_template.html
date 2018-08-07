@@ -12,6 +12,7 @@
         <th>Total</th>
         <th>Passed</th>
         <th>Failed</th>
+        <th>Error</th>
         <th>Skipped</th>
         <th>Time taken, s</th>
         <th>Render time, s</th>
@@ -57,17 +58,27 @@
         class="badResult"
         {% endif %}
         >{{ report[i].summary.failed }}</td>
+
+        <td
+        {% if report[i].summary.error != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.error }}</td>
+
         <td
         {% if report[i].summary.skipped != 0 %}
         class="badResult"
         {% endif %}
         >{{ report[i].summary.skipped }}</td>
+
         <td>{{ report[i].summary.duration }}</td>
+
         <td
         {% if report[i].summary.render_duration == -0.0 %}
         class="badResult"
         {% endif %}
         >{{ report[i].summary.render_duration | round(1) }}</td>
+
         <td><a href="
         {% if i != "_cur_" -%}
         {{- report[i].session_dir -}}/
@@ -95,6 +106,7 @@
         <th>Total</th>
         <th>Passed</th>
         <th>Failed</th>
+        <th>Error</th>
         <th>Skipped</th>
         <th>Time taken</th>
         <th>Render time</th>
@@ -110,17 +122,27 @@
         <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
         <td>{{ report[i].results[test_package][test_conf].total }}</td>
         <td>{{ report[i].results[test_package][test_conf].passed }}</td>
+
         <td
         {% if report[i].results[test_package][test_conf].failed != 0 %}
         class="badResult"
         {% endif %}
         >{{ report[i].results[test_package][test_conf].failed }}</td>
+
+        <td
+        {% if report[i].results[test_package][test_conf].error != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].results[test_package][test_conf].error }}</td>
+
         <td
         {% if report[i].results[test_package][test_conf].skipped != 0 %}
         class="badResult"
         {% endif %}
         >{{ report[i].results[test_package][test_conf].skipped }}</td>
+
         <td>{{ report[i].results[test_package][test_conf].duration }}</td>
+
         <td
         {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
         class="badResult"
@@ -141,6 +163,11 @@
         class="badResult"
         {% endif %}
         >{{ report[i].summary.failed }}</td>
+        <td
+        {% if report[i].summary.error != 0 %}
+        class="badResult"
+        {% endif %}
+        >{{ report[i].summary.error }}</td>
         <td
         {% if report[i].summary.skipped != 0 %}
         class="badResult"

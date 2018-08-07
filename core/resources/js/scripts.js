@@ -1,3 +1,4 @@
+//TODO: add NOK status to sorting
 function statusSorter(a, b) {
     if (a == b) {
         return 0;

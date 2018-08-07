@@ -163,7 +163,7 @@ def main():
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
         report['results'][found_job[0]][' '.join(found_job[1])] = {
-            'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'duration': 0
+            'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0
         }
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
