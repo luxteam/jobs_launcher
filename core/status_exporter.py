@@ -4,17 +4,19 @@ import argparse
 from core.config import *
 
 
-def main(work_dir):
-    status_to_export = []
+def main():
+    args_parser = argparse.ArgumentParser()
+    args_parser.add_argument('--work_dir')
+    args = args_parser.parse_args()
 
-    if os.path.exists(os.path.join(work_dir, SUMMARY_REPORT)):
-        with open(os.path.join(work_dir, SUMMARY_REPORT), 'r') as file:
+    status_to_export = {}
+
+    if os.path.exists(os.path.join(args.work_dir, SUMMARY_REPORT)):
+        with open(os.path.join(args.work_dir, SUMMARY_REPORT), 'r') as file:
             summary_report = json.load(file.read())
 
-    for execution in summary_report:
-        for status in execution['summary'].keys():
-            status_to_export[status] += execution['summary'][status]
-
+            for execution in summary_report:
+                status_to_export.update({execution: summary_report[execution]['summary']})
 
 
 
