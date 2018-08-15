@@ -100,7 +100,7 @@
 <table class="baseTable">
     <tr>
         <th>Test package name</th>
-        <th>Config</th>
+        <!--<th>Config</th>-->
         <th>Local report</th>
         <th>Tool's log</th>
         <th>Total</th>
@@ -117,7 +117,7 @@
     <tr>
         <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
     {% for test_conf, value in report[i].results[test_package] | dictsort %}
-        <td>{{ test_conf }}</td>
+        <!--<td>{{ test_conf }}</td>-->
         <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/result.html">Report</a></td>
         <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
         <td>{{ report[i].results[test_package][test_conf].total }}</td>
@@ -155,7 +155,7 @@
 {% endfor %}
 
     <tr class="summary_tr">
-        <td colspan="4">Sum</td>
+        <td colspan="3">Sum</td>
         <td>{{ report[i].summary.total }}</td>
         <td>{{ report[i].summary.passed }}</td>
         <td

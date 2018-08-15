@@ -19,10 +19,12 @@ def main(work_dir=''):
 
             for execution in summary_report:
                 # status_to_export.update({execution: summary_report[execution]['summary']})
-                status_to_export += "_{}:_ `failed: {}` `error: {}` `passed: {}` `skipped: {}`\n".format(
-                    execution, summary_report[execution]['summary']['failed'],
-                    summary_report[execution]['summary']['error'],
+                status_to_export += "_{}:_ `total: {}` `passed: {}` `failed: {}` `error: {}` `skipped: {}`\n".format(
+                    execution,
+                    summary_report[execution]['summary']['total'],
                     summary_report[execution]['summary']['passed'],
+                    summary_report[execution]['summary']['failed'],
+                    summary_report[execution]['summary']['error'],
                     summary_report[execution]['summary']['skipped']
                 )
 
