@@ -63,8 +63,6 @@ def main():
     parser.add_argument('--test_filter', required=False, nargs="*", default=[])
     parser.add_argument('--package_filter', required=False, nargs="*", default=[])
     parser.add_argument('--file_filter', required=False)
-    parser.add_argument('--split_execution', required=False, action='store_true', dest='split_execution', default=False)
-    parser.add_argument('--continue_execution', required=False, action='store_true', dest='continue_execution', default=False)
 
     args = parser.parse_args()
 
@@ -90,7 +88,7 @@ def main():
     work_path = os.path.join(work_path, args.work_dir)
 
     try:
-        os.mkdir(work_path)
+        os.makedirs(work_path)
     except OSError as e:
         main_logger.error(str(e))
 
@@ -99,23 +97,19 @@ def main():
     # session_dir = os.path.join(work_path, machine_info.get("host"))
     session_dir = work_path
 
-    if not args.continue_execution:
-        if '' in args.test_filter:
-            args.test_filter = []
+    if '' in args.test_filter:
+        args.test_filter = []
 
-        if '' in args.package_filter:
-            args.package_filter = []
+    if '' in args.package_filter:
+        args.package_filter = []
 
-        # extend test_filter by values in file_filter
-        if args.file_filter:
-            try:
-                with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
-                    args.test_filter.extend(file.read().splitlines())
-            except Exception as e:
-                main_logger.error(str(e))
-    else:
-        with open(os.path.join(session_dir, 'remain_tests'), 'r') as file:
-            args.test_filter = file.read().splitlines()
+    # extend test_filter by values in file_filter
+    if args.file_filter:
+        try:
+            with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
+                args.test_filter.extend(file.read().splitlines())
+        except Exception as e:
+            main_logger.error(str(e))
 
     print('Working folder  : ' + work_path)
     print('Tests folder    : ' + tests_path)
@@ -130,31 +124,18 @@ def main():
     report = AutoDict()
     report['failed_tests'] = []
     report['machine_info'] = machine_info
+    report['guid'] = uuid.uuid1().__str__()
 
-    if not args.continue_execution:
-        report['guid'] = uuid.uuid1().__str__()
-
-        try:
-            if os.path.isdir(session_dir):
-                shutil.rmtree(session_dir)
-            os.makedirs(session_dir)
-        except OSError as e:
-            print(delim + str(e))
-            main_logger.error(str(e))
-
-        with open(os.path.join(session_dir, 'guid'), 'w') as file:
-            file.write(report['guid'])
-    else:
-        main_logger.info("Continue work in old workspace")
-
-    test_filter = args.test_filter
-    if args.split_execution and test_filter:
-        test_filter = test_filter[0]
-        with open(os.path.join(session_dir, 'remain_tests'), 'w') as file:
-            file.writelines("%s\n" % l for l in args.test_filter[1:])
+    try:
+        if os.path.isdir(session_dir):
+            shutil.rmtree(session_dir)
+        os.makedirs(session_dir)
+    except OSError as e:
+        print(delim + str(e))
+        main_logger.error(str(e))
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
-                                           test_filter=test_filter, package_filter=args.package_filter)
+                                           test_filter=args.test_filter, package_filter=args.package_filter)
 
     # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
@@ -177,23 +158,10 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
-    old_report = []
-    if args.continue_execution:
-        main_logger.info('Merge previous session report')
-        with open(os.path.join(session_dir, core.config.SESSION_REPORT)) as old_report_file:
-            old_report = json.loads(old_report_file.read())
-        report['guid'] = old_report['guid']
-
     print("Saving session report")
-    core.reportExporter.build_session_report(report, session_dir, template='summary_template.html', old_report=old_report)
+    core.reportExporter.build_session_report(report, session_dir, template='summary_template.html', old_report=report)
     main_logger.info('Saved session report\n\n')
-
-    if os.path.exists(os.path.join(session_dir, 'launcher.engine.log')):
-        with open(os.path.join(session_dir, 'launcher.engine.log'), 'a') as infile:
-            with open('launcher.engine.log', 'r') as outfile:
-                infile.write(outfile.read())
-    else:
-        shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+    copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
