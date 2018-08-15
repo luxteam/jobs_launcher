@@ -92,8 +92,6 @@ def main():
     except OSError as e:
         main_logger.error(str(e))
 
-    machine_info = core.system_info.get_machine_info()
-
     # session_dir = os.path.join(work_path, machine_info.get("host"))
     session_dir = work_path
 
@@ -117,6 +115,7 @@ def main():
     main_logger.info('Working folder: {}'.format(work_path))
     main_logger.info('Tests folder: {}'.format(tests_path))
 
+    machine_info = core.system_info.get_machine_info()
     for mi in machine_info.keys():
         print('{0: <16}: {1}'.format(mi, machine_info[mi]))
 
