@@ -23,14 +23,14 @@ def main():
 
     baseline_manifest_path = os.path.join(args.baseline_root, core.config.BASELINE_MANIFEST)
 
+    baseline_manifest = {}
+    report = []
     if os.path.exists(baseline_manifest_path):              # if manifest already exists - update it
         with open(baseline_manifest_path, 'r') as file:
             baseline_manifest = json.loads(file.read())
     if os.path.exists(args.baseline_root):
         shutil.rmtree(args.baseline_root)
 
-    report = []
-    baseline_manifest = {}
     # find and process report_compare.json files
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
