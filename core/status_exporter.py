@@ -13,6 +13,8 @@ def main(work_dir=''):
     if work_dir:
         args.work_dir = work_dir
 
+    summary_report = {}
+
     if os.path.exists(os.path.join(args.work_dir, SUMMARY_REPORT)):
         with open(os.path.join(args.work_dir, SUMMARY_REPORT), 'r') as file:
             summary_report = json.load(file)
@@ -30,6 +32,10 @@ def main(work_dir=''):
 
     with open(os.path.join(args.work_dir, 'slack_status.json'), 'w') as file:
         json.dump(status_to_export, file, indent=' ')
+
+    exit_code = sum([int(summary_report[x]['summary']['failed']) + int(summary_report[x]['summary']['error']) for x in summary_report])
+    # exit_code = [x for x in summary_report]
+    return exit_code
 
 
 if __name__ == '__main__':
