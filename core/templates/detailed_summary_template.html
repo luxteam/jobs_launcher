@@ -1,0 +1,94 @@
+{% extends "base_template.html"%}
+
+{% block report_body %}
+
+<h1>details</h1>
+
+    {% if i != "_cur_" %}
+<h3>{{ i }}</h3>
+    {% endif %}
+
+<!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
+<!--data-cell-style="pixDifferenceCellStyle"-->
+<div class="jsTableWrapper">
+    <table id="{{ i | lower }}"
+           class="baseTable"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-page-list="[5, 10, 20, 45, ALL]"
+           data-sort-order="desc"
+           data-sort-name="test_status"
+           data-show-multi-sort="true"
+    >
+        <thead>
+            <tr>
+                <th data-halign="center" data-sortable="true">Test case</th>
+                <th data-halign="center" data-sortable="true">Parameters</th>
+                <th data-halign="center" data-sortable="true" data-formatter="timeFormatter">Render time</th>
+                <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
+                <!--<th data-field="pix_difference" data-halign="center" data-sortable="true">Pixel difference, %</th>-->
+                <th data-halign="center" data-sortable="true" data-events="openFullImgSize">Baseline Color</th>
+                <th data-halign="center" data-sortable="true" data-events="openFullImgSize">Rendered color</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for test_package, value in report[i].results | dictsort %}
+            {% for test_conf, value in report[i].results[test_package] | dictsort%}
+                {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
+
+                {% for item in report[i].results[test_package][test_conf].render_results %}
+            <tr>
+                <td>{{ item.test_case }}</td>
+                <td>{% for param in item.script_info %}
+                    {{ param }}<br>
+                    {% endfor %}
+                </td>
+                <td>{{ item.render_time | round(3) }}</td>
+
+                <td
+                {% if item.test_status != "passed" %}
+                class="badResult">
+                    {{ item.test_status }}<br/>
+                    {{ item.error_title }}<br/>
+                    Diff: {{ item.difference_color }}, %
+                {% else %}
+                >
+                    {{ item.test_status }}<br/>
+                    <br/>
+                    Diff: {{ item.difference_color }}, %
+                {% endif %}
+                </td>
+
+                <td class="hatching">
+                {% if item.baseline_color_path %}
+                    {% if 'thumb64_baseline_color_path' in item %}
+                    <img src="{{ item.thumb64_baseline_color_path }}"/>
+                    {% else %}
+                    <img src="{{ item.baseline_color_path }}"/>
+                    {% endif %}
+                {% else %}
+                    Not compared
+                {% endif %}
+                </td>
+                <td class="hatching">
+                    {% if 'thumb64_render_color_path' in item %}
+                    <img src="{{ item.thumb64_render_color_path }}"/>
+                    {% else %}
+                    <img src="{{ item.render_color_path }}"/>
+                    {% endif %}
+                </td>
+            </tr>
+                {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

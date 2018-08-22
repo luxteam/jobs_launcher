@@ -203,23 +203,8 @@ def build_summary_report(work_dir):
     common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
-            # build embeded summary report
-            # if file.endswith(SESSION_REPORT_EMBED_IMG):
-            #     basename = os.path.basename(path)
-            #     basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
-            #     basepath = os.path.relpath(path, work_dir)
-            #     with open(os.path.join(path, file), 'r') as report_file:
-            #         summary_report_embed_img[os.path.basename(path)] = json.loads(report_file.read())
-            #     try:
-            #         for test_package in summary_report_embed_img[basename]['results']:
-            #             for test_conf in summary_report_embed_img[basename]['results'][test_package]:
-            #                 summary_report_embed_img[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath,summary_report_embed_img[basename]['results'][test_package][test_conf]['result_path']),work_dir)})
-            #     except Exception as e:
-            #         main_logger.error(str(e))
-
             # build summary report
             if file.endswith(SESSION_REPORT):
-                basename = os.path.basename(path)
                 basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
@@ -334,6 +319,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
 
     try:
         summary_template = env.get_template('summary_template.html')
+        detailed_summary_template = env.get_template('detailed_summary_template.html')
+
         summary_report, common_info = build_summary_report(work_dir)
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
@@ -344,7 +331,19 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info)
+
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
+
+        for execution in summary_report.keys():
+            detailed_summary_html = detailed_summary_template.render(title=major_title + " " + execution,
+                                                                     report=summary_report,
+                                                                     pageID="summaryA",
+                                                                     PIX_DIFF_MAX=PIX_DIFF_MAX,
+                                                                     common_info=common_info,
+                                                                     i=execution)
+
+            save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
+
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
         main_logger.error(summary_html)
