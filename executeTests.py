@@ -158,7 +158,7 @@ def main():
     # print(json_report)
 
     print("Saving session report")
-    core.reportExporter.build_session_report(report, session_dir, template='summary_template.html')
+    core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report\n\n')
     shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 

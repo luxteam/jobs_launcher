@@ -205,11 +205,19 @@ def build_summary_report(work_dir):
         for file in files:
             # build summary report
             if file.endswith(SESSION_REPORT):
-                basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 basepath = os.path.relpath(path, work_dir)
+                basename = ""
+                # basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 with open(os.path.join(path, file), 'r') as report_file:
-                    summary_report[basename] = json.loads(report_file.read())
-                    summary_report[basename].update({'session_dir': basepath})
+                    temp_report = json.loads(report_file.read())
+                    basename = " ".join([temp_report['machine_info']['render_device'], temp_report['machine_info']['os']])
+                    # TODO: store machine_info of all executions
+                    if basename in summary_report.keys():
+                        summary_report[basename]['results'].extend(temp_report['results'])
+                    else:
+                        summary_report[basename] = temp_report
+                    # summary_report[basename] = json.loads(report_file.read())
+                    # summary_report[basename].update({'session_dir': basepath})
 
                 try:
                     for test_package in summary_report[basename]['results']:

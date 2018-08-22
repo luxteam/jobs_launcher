@@ -19,7 +19,6 @@
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
                 <th data-formatter="timeFormatter">Render time</th>
-                <th>Engine log</th>
             </tr>
         </thead>
         <tbody>
@@ -83,12 +82,6 @@
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
-
-                <td><a href="
-                {% if i != "_cur_" -%}
-                {{- report[i].session_dir -}}/
-                {%- endif -%}
-                launcher.engine.log">Engine log</a></td>
             </tr>
     {% endfor %}
         </tbody>

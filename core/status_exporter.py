@@ -39,4 +39,5 @@ def main(work_dir=''):
 
 
 if __name__ == '__main__':
-    exit(main())
+    if main():
+        exit(-1)
