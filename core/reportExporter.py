@@ -163,6 +163,8 @@ def build_session_report(report, session_dir, template=None, old_report=None):
     report.update({'summary': total})
     report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
+    save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
+
     if template:
         env = jinja2.Environment(
             loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -172,8 +174,6 @@ def build_session_report(report, session_dir, template=None, old_report=None):
         env.filters['env_override'] = env_override
 
         template = env.get_template(template)
-
-        save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
 
         try:
             shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
@@ -213,7 +213,7 @@ def build_summary_report(work_dir):
                     basename = " ".join([temp_report['machine_info']['render_device'], temp_report['machine_info']['os']])
                     # TODO: store machine_info of all executions
                     if basename in summary_report.keys():
-                        summary_report[basename]['results'].extend(temp_report['results'])
+                        summary_report[basename]['results'].update(temp_report['results'])
                     else:
                         summary_report[basename] = temp_report
                     # summary_report[basename] = json.loads(report_file.read())
