@@ -275,27 +275,33 @@ def build_compare_report(work_dir):
     hardware = []
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
-            if file == SESSION_REPORT or file == BASELINE_SESSION_REPORT:
+            if file == SESSION_REPORT:
                 with open(os.path.join(path, file), 'r') as report_file:
                     temp_report = json.loads(report_file.read())
 
+                # force add gpu from baseline
                 hw = temp_report['machine_info']['render_device']
-
-                if file == BASELINE_SESSION_REPORT:
-                    hw = hw + '[Baseline]'
+                hw_bsln = temp_report['machine_info']['render_device'] + "[Baseline"
                 hardware.append(hw)
+                hardware.append(hw_bsln)
 
-                # TODO: don't show baseline for disabled tests
+                # collect images links
                 for test_package in temp_report['results']:
                     for test_config in temp_report['results'][test_package]:
                         for item in temp_report['results'][test_package][test_config]['render_results']:
+                            # if test is processing first time
                             if not compare_report[item['test_case']]:
                                 compare_report[item['test_case']] = {}
                             try:
                                 compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumb256_render_color_path']), work_dir)})
+                                compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['thumb256_baseline_color_path']), work_dir)})
                             except KeyError as err:
-                                # main_logger.warning("Thumb can't be found. Full size img will be used.")
-                                compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir)})
+                                # TODO: fix
+                                try:
+                                    compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir)})
+                                    compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['baseline_color_path']), work_dir)})
+                                except:
+                                    pass
 
     return compare_report, hardware
 
