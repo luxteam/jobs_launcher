@@ -9,26 +9,29 @@ def main(work_dir=''):
     args_parser.add_argument('--work_dir')
     args = args_parser.parse_args()
 
-    status_to_export = ""
     if work_dir:
         args.work_dir = work_dir
 
     summary_report = {}
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
+    status_to_export = "_Test Machine_ | *total*/passed/`failed`/`error`/skipped\n"
 
     if os.path.exists(os.path.join(args.work_dir, SUMMARY_REPORT)):
         with open(os.path.join(args.work_dir, SUMMARY_REPORT), 'r') as file:
             summary_report = json.load(file)
 
+            max_name = max([len(x) for x in summary_report.keys()])
+            max_name = max(max_name, 12)
+
             for execution in summary_report:
-                # status_to_export.update({execution: summary_report[execution]['summary']})
-                status_to_export += "_{}:_ `total: {}` `passed: {}` `failed: {}` `pixel difference: {}` `skipped: {}`\n".format(
+                status_to_export += "_{: <{name_fill}}_ | *{}*/{}/`{}`/`{}`/{}\n".format(
                     execution,
                     summary_report[execution]['summary']['total'],
                     summary_report[execution]['summary']['passed'],
                     summary_report[execution]['summary']['failed'],
                     summary_report[execution]['summary']['error'],
-                    summary_report[execution]['summary']['skipped']
+                    summary_report[execution]['summary']['skipped'],
+                    name_fill=max_name
                 )
 
     # get summary results
@@ -42,11 +45,6 @@ def main(work_dir=''):
     with open(os.path.join(args.work_dir, 'slack_status.json'), 'w') as file:
         json.dump(status_to_export, file, indent=' ')
 
-    exit_code = sum([int(summary_report[x]['summary']['failed']) + int(summary_report[x]['summary']['error']) for x in summary_report])
-    # exit_code = [x for x in summary_report]
-    return exit_code
-
 
 if __name__ == '__main__':
-    if main():
-        exit(-1)
+    main()
