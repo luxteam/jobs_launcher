@@ -199,7 +199,6 @@ def build_session_report(report, session_dir, template=None, old_report=None):
 
 def build_summary_report(work_dir):
     summary_report = {}
-    summary_report_embed_img = {}
     common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
