@@ -32,8 +32,8 @@
                 <th data-halign="center" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
                 <!--<th data-field="pix_difference" data-halign="center" data-sortable="true">Pixel difference, %</th>-->
-                <th data-halign="center" data-sortable="true" data-events="openFullImgSize">Baseline Color</th>
-                <th data-halign="center" data-sortable="true" data-events="openFullImgSize">Rendered color</th>
+                <th data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
+                <th data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
             </tr>
         </thead>
         <tbody>
@@ -67,9 +67,9 @@
                 <td class="hatching">
                 {% if item.baseline_color_path %}
                     {% if 'thumb64_baseline_color_path' in item %}
-                    <img src="{{ item.thumb64_baseline_color_path }}"/>
+                    <img data-src="{{ item.thumb64_baseline_color_path }}"/>
                     {% else %}
-                    <img src="{{ item.baseline_color_path }}"/>
+                    <img data-src="{{ item.baseline_color_path }}"/>
                     {% endif %}
                 {% else %}
                     Not compared
@@ -77,9 +77,9 @@
                 </td>
                 <td class="hatching">
                     {% if 'thumb64_render_color_path' in item %}
-                    <img src="{{ item.thumb64_render_color_path }}"/>
+                    <img data-src="{{ item.thumb64_render_color_path }}"/>
                     {% else %}
-                    <img src="{{ item.render_color_path }}"/>
+                    <img data-src="{{ item.render_color_path }}"/>
                     {% endif %}
                 </td>
             </tr>

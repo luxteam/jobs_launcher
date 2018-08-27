@@ -73,3 +73,8 @@ function timeFormatter(value, row, index, field) {
     time.setSeconds(value);
     return time.toISOString().substr(11, 8);
 }
+
+//
+function metaAJAX(value, row, index, field) {
+    return value.replace('data-src', 'src');
+}
