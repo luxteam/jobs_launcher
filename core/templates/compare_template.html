@@ -23,7 +23,7 @@
         <tr>
             <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
             {% for hw in hardware %}
-            <th data-halign="center">{{ hw }}</th>
+            <th data-halign="center" data-formatter="metaAJAX">{{ hw }}</th>
             {% endfor %}
         </tr>
     </thead>
@@ -33,7 +33,7 @@
         <td>{{ file }}</td>
         {% for hw in hardware %}
         <td>
-            <img class="resizedImg" src="{{ compare_report[file][hw] }}" onclick="resizeImg(this)"/><br/>
+            <img class="resizedImg" data-src="{{ compare_report[file][hw] }}" onclick="resizeImg(this)"/><br/>
         </td>
         {% endfor %}
     </tr>
