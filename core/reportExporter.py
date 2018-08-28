@@ -96,7 +96,31 @@ def generate_thumbnails(session_dir):
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
-def build_session_report(report, session_dir, template=None, old_report=None):
+def build_local_report(render_report, baseline_report, html_report_path):
+    with open(render_report, 'r') as file:
+        render_report = json.loads(file.read())
+
+    if os.path.exists(baseline_report):
+        with open(baseline_report, 'r') as file:
+            baseline_report = json.loads(file.read())
+    else:
+        baseline_report = None
+
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=True
+    )
+
+    try:
+        template = env.get_template('local_template.html')
+        html = template.render(render_report=render_report,
+                               baseline_report=baseline_report)
+        save_html_report(html, html_report_path, 'report.html', replace_pathsep=True)
+    except Exception as err:
+        main_logger.error(str(err))
+
+
+def build_session_report(report, session_dir, template=None):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
@@ -105,6 +129,10 @@ def build_session_report(report, session_dir, template=None, old_report=None):
     for result in report['results']:
         for item in report['results'][result]:
             try:
+                # build local report
+                build_local_report(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED),
+                                   os.path.join(session_dir, os.path.pardir, os.path.pardir, report['results'][result][item]['result_path'], BASELINE_REPORT_NAME),
+                                   session_dir)
                 # get report_compare.json by one tests group
                 with open(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED), 'r') as file:
                     current_test_report = json.loads(file.read())
@@ -118,7 +146,7 @@ def build_session_report(report, session_dir, template=None, old_report=None):
                     for jtem in current_test_report:
                         for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
                             if img in jtem.keys():
-                                # update pathes
+                                # update paths
                                 cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]))
 
                                 jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
@@ -152,9 +180,6 @@ def build_session_report(report, session_dir, template=None, old_report=None):
 
                 report['results'][result][item].update({'render_duration': render_duration})
 
-    if old_report:
-        report['results'].update(old_report['results'])
-
     # get summary results
     for result in report['results']:
         for item in report['results'][result]:
@@ -165,6 +190,7 @@ def build_session_report(report, session_dir, template=None, old_report=None):
 
     save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
 
+    # TODO: remove it? session report doesn't use in CIS
     if template:
         env = jinja2.Environment(
             loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
