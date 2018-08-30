@@ -31,27 +31,30 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="#machineInfo{{ loop.index }}">{{ report[i].machine_info.host }}</a>
-                    <a href="#x" class="overlay" id="machineInfo{{ loop.index }}"></a>
-                    <div class="popup">
-                        <a class="close" title="Close" href="#close"></a>
-                        <table>
-                            <tr>
-                                <th>OS</th>
-                                <th>RAM, Gb</th>
-                                <th>CPU</th>
-                                <th>CPU count</th>
-                                <th>GPU</th>
-                            </tr>
-                            <tr>
-                                <td>{{ report[i].machine_info.os }}</td>
-                                <td>{{ report[i].machine_info.ram | round }}</td>
-                                <td>{{ report[i].machine_info.cpu }}</td>
-                                <td>{{ report[i].machine_info.cpu_count }}</td>
-                                <td>{{ report[i].machine_info.render_device }}</td>
-                            </tr>
-                        </table>
+                    <a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].machine_info.host }}</a>
+
+                    <div class="popup" id="machineInfo{{ loop.index }}">
+                        <div class="popupContent">
+                            <span class="close" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
+                            <table>
+                                <tr>
+                                    <th>OS</th>
+                                    <th>RAM, Gb</th>
+                                    <th>CPU</th>
+                                    <th>CPU count</th>
+                                    <th>GPU</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ report[i].machine_info.os }}</td>
+                                    <td>{{ report[i].machine_info.ram | round }}</td>
+                                    <td>{{ report[i].machine_info.cpu }}</td>
+                                    <td>{{ report[i].machine_info.cpu_count }}</td>
+                                    <td>{{ report[i].machine_info.render_device }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
+
                 </td>
                 <td>{{ report[i].machine_info.render_version }}</td>
                 <td>{{ report[i].machine_info.core_version }}</td>

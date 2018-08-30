@@ -1,4 +1,5 @@
 //TODO: add NOK status to sorting
+//TODO: fix sorting
 function statusSorter(a, b) {
     if (a == b) {
         return 0;
@@ -59,14 +60,21 @@ function resizeImg(img){
     }
 }
 
-
 window.openFullImgSize = {
-    'click img': function(e) {
-        console.log(e);
-        //TODO: create modal window with full size img
+    'click img': function(e, value, row, index) {
+        console.log(row);
+        var renderImg = document.getElementById('renderedImgPopup');
+        var baselineImg = document.getElementById('baselineImgPopup');
+
+        renderImg.src = row.rendered_img.split('"')[1].replace("thumb64_", "");
+        try {
+            baselineImg.src = row.baseline_img.split('"')[1].replace("thumb64_", "");
+        } catch(e){
+        }
+
+        openModalWindow('imgsModal');
     }
 }
-
 
 function timeFormatter(value, row, index, field) {
     var time = new Date(null);
@@ -74,7 +82,21 @@ function timeFormatter(value, row, index, field) {
     return time.toISOString().substr(11, 8);
 }
 
-//
 function metaAJAX(value, row, index, field) {
     return value.replace('data-src', 'src');
+}
+
+function openModalWindow(id) {
+    var modal = document.getElementById(id);
+    modal.style.display = "block";
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
+function closeModalWindow(id) {
+    document.getElementById(id).style.display = "none";
 }
