@@ -11,6 +11,12 @@
 <div class="popup" id="imgsModal">
     <div class="popupContent" id="imgsModalContent">
         <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
+        <form style="display: block; margin: auto; width: 80%;">
+            <button type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
+            <button type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
+            <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
+            <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
+        </form>
         <table class="baseTable">
             <thead>
                 <tr>
@@ -20,8 +26,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="hatching"><img src="" id="baselineImgPopup"/></td>
-                    <td class="hatching"><img src="" id="renderedImgPopup"/></td>
+                    <td class="hatching"><img src="" id="baselineImgPopup" width="300"/></td>
+                    <td class="hatching"><img src="" id="renderedImgPopup" width="300"/></td>
                 </tr>
             </tbody>
         </table>

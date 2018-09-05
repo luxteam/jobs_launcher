@@ -62,7 +62,6 @@ function resizeImg(img){
 
 window.openFullImgSize = {
     'click img': function(e, value, row, index) {
-        console.log(row);
         var renderImg = document.getElementById('renderedImgPopup');
         var baselineImg = document.getElementById('baselineImgPopup');
 
@@ -102,4 +101,30 @@ function openModalWindow(id) {
 
 function closeModalWindow(id) {
     document.getElementById(id).style.display = "none";
+}
+
+function increaseImgSize() {
+    var renderImg = document.getElementById('renderedImgPopup');
+    var baselineImg = document.getElementById('baselineImgPopup');
+
+    renderImg.width += 50;
+    baselineImg.width +=50;
+}
+
+function reduceImgSize() {
+    var renderImg = document.getElementById('renderedImgPopup');
+    var baselineImg = document.getElementById('baselineImgPopup');
+
+    renderImg.width -= 50;
+    baselineImg.width -=50;
+}
+
+//TODO: finish custom img size
+function setImgSize() {
+    var renderImg = document.getElementById('renderedImgPopup');
+    var baselineImg = document.getElementById('baselineImgPopup');
+    var widthValue = document.getElementsByName('inputImgSize')[0].value;
+
+    renderImg.width = widthValue;
+    baselineImg.width = widthValue;
 }
