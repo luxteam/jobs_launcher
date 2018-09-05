@@ -52,12 +52,13 @@
     >
         <thead>
             <tr>
-                <th data-halign="center" data-sortable="true">Test case</th>
+                <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
                 <th data-halign="center" data-sortable="true">Parameters</th>
                 <th data-halign="center" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
                 <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+                <th data-field="copy_url_button" data-events="copyTestCaseName">Test case link</th>
             </tr>
         </thead>
         <tbody>
@@ -105,6 +106,9 @@
                     {% else %}
                     <img data-src="{{ item.render_color_path }}"/>
                     {% endif %}
+                </td>
+                <td>
+                    <a>Copy direct link</a>
                 </td>
             </tr>
                 {% endfor %}

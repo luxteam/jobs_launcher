@@ -128,3 +128,39 @@ function setImgSize() {
     renderImg.width = widthValue;
     baselineImg.width = widthValue;
 }
+
+window.copyTestCaseName = {
+    'click a': function(e, value, row, index) {
+
+        try {
+            var node = document.createElement('input');
+            //TODO: if previous link has vars - store it too
+            var normalized_link = window.location.hostname + window.location.pathname + "?searchText=";
+            node.setAttribute('value', normalized_link + row.test_case);
+            document.body.appendChild(node);
+            node.select();
+            document.execCommand('copy');
+        } catch(e) {
+            alert("Can't copy to clipboard.");
+        }
+    }
+}
+
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if(pair[0] == variable) {
+            return pair[1];
+        }
+    }
+    return(false);
+}
+
+jQuery(document).ready( function() {
+    var searchText = getQueryVariable('searchText');
+    if (searchText) {
+        $('.jsTableWrapper [id]').bootstrapTable('resetSearch', searchText);
+    }
+});
