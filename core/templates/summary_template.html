@@ -34,7 +34,7 @@
                     <a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].machine_info.host }}</a>
 
                     <div class="popup" id="machineInfo{{ loop.index }}">
-                        <div class="popupContent">
+                        <div class="popupContent popupHalfWidth">
                             <span class="close" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
                             <table>
                                 <tr>

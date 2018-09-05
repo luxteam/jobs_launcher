@@ -11,8 +11,20 @@
 <div class="popup" id="imgsModal">
     <div class="popupContent" id="imgsModalContent">
         <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
-        <img src="" id="baselineImgPopup"/>
-        <img src="" id="renderedImgPopup"/>
+        <table class="baseTable">
+            <thead>
+                <tr>
+                    <th>Baseline Image</th>
+                    <th>Rendered Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="hatching"><img src="" id="baselineImgPopup"/></td>
+                    <td class="hatching"><img src="" id="renderedImgPopup"/></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 

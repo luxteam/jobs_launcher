@@ -66,6 +66,9 @@ window.openFullImgSize = {
         var renderImg = document.getElementById('renderedImgPopup');
         var baselineImg = document.getElementById('baselineImgPopup');
 
+        renderImg.src = "";
+        baselineImg.src = "";
+
         renderImg.src = row.rendered_img.split('"')[1].replace("thumb64_", "");
         try {
             baselineImg.src = row.baseline_img.split('"')[1].replace("thumb64_", "");

@@ -157,6 +157,10 @@ h6 {
   text-align:left;
 }
 
+a {
+  text-decoration: underline;
+}
+
 #goTop {
   margin: 0 !important;
   padding: 0 !important;
@@ -253,9 +257,13 @@ h6 {
 }
 
 .popupContent {
-  width: 50%;
-  padding: 10px;
   margin: auto;
+  margin-top: 300px;
+  padding: 10px;
+}
+
+.popupHalfWidth {
+  width: 50%;
 }
 
 .close {
@@ -276,4 +284,5 @@ h6 {
   align: center;
   display: block;
   margin: auto;
+  max-width: 300px;
 }
