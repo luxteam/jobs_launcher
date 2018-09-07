@@ -96,7 +96,7 @@ def generate_thumbnails(session_dir):
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
-def build_session_report(report, session_dir, template=None):
+def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
@@ -161,36 +161,6 @@ def build_session_report(report, session_dir, template=None):
     report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
     save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
-
-    # TODO: remove it? session report doesn't use in CIS
-    if template:
-        env = jinja2.Environment(
-            loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-            autoescape=True
-        )
-
-        env.filters['env_override'] = env_override
-
-        template = env.get_template(template)
-
-        try:
-            shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
-                            os.path.join(session_dir, 'report_resources'))
-        except Exception as err:
-            main_logger.error("Failed to copy report resources: {}".format(str(err)))
-
-        try:
-            html_result = template.render(title="Session report", report={'_cur_': report}, pageID="summaryA",
-                                          common_info={'reporting_date': report['machine_info']['reporting_date'],
-                                                       'core_version': report['machine_info']['core_version'],
-                                                       'render_version': report['machine_info']['render_version']
-                                                       },
-                                          PIX_DIFF_MAX=PIX_DIFF_MAX
-                                          )
-            save_html_report(html_result, session_dir, SESSION_REPORT_HTML, replace_pathsep=True)
-        except Exception as e:
-            main_logger.error("Error while render html report {}".format(str(e)))
-            save_html_report('error', session_dir, SESSION_REPORT_HTML)
 
     return report
 
