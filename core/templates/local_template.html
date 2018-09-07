@@ -38,8 +38,36 @@
         </ul>
     </div>
 
+    <div class="popup" id="imgsModal">
+        <div class="popupContent" id="imgsModalContent">
+            <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
+            <form style="display: block; margin: auto; width: 80%;">
+                <button type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
+                <button type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
+                <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
+                <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
+            </form>
+            <table class="baseTable">
+                <thead>
+                    <tr>
+                        <th>Baseline Image</th>
+                        <th>Rendered Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="hatching"><img src="" id="baselineImgPopup" width="300"/></td>
+                        <td class="hatching"><img src="" id="renderedImgPopup" width="300"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr/>
+
     <div class="jsTableWrapper">
-        <table class="baseTable"
+        <table class="baseTable localReportTable"
                data-toggle="table"
                data-search="true"
                data-show-refresh="true"
@@ -47,6 +75,7 @@
                data-show-columns="true"
                data-show-pagination-switch="true"
                data-pagination="true"
+               data-page-size="5"
                data-page-list="[5, 10, 20, 45, ALL]"
                data-sort-order="desc"
                data-show-multi-sort="true"
@@ -59,11 +88,31 @@
                 </tr>
             </thead>
             <tbody>
-            {% for img in render_report %}
+            {% for item in render_report %}
                 <tr>
-                    <td class="hatching"><img data-src="{{ img.baseline_color_path }}"/></td>
-                    <td class="hatching"><img data-src="{{ img.render_color_path }}"/></td>
-                    <td>INFO</td>
+                    <td class="hatching">
+                    {% if item.baseline_color_path %}
+                        <img data-src="{{ item.baseline_color_path }}"/>
+                    {% else %}
+                        Not compared
+                    {% endif %}
+                    </td>
+                    <td class="hatching">
+                        <img data-src="{{ item.render_color_path }}"/>
+                    </td>
+                    <td>
+                        {{ item.scene_name }}
+                        {{ item.render_time }}
+                        {{ item.render_device }}
+                        {{ item.difference_color }}
+                        {{ item.script_info }}
+                        {{ item.core_version }}
+                        {{ item.date_time }}
+                        {{ item.render_version }}
+                        {{ item.test_case }}
+                        {{ item.test_group }}
+                        {{ item.tool }}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

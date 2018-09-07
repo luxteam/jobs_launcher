@@ -208,17 +208,13 @@ a {
           fixed;
   background-size: 0.3em 0.3em;
 }
-.hatching img{
-  /*TODO: is it need?*/
-  display: block;
-  margin: auto;
-}
+
 .resizedImg img{
   width: 30%;
 }
 
 /*duck tape*/
-.jsTableWrapper table img {
+.detailedTable img {
   width: 64px;
   height: 64px;
 }
@@ -284,4 +280,8 @@ a {
   align: center;
   display: block;
   margin: auto;
+}
+
+.localReportTable img{
+  width: 300px;
 }
