@@ -305,20 +305,12 @@ def build_local_reports(work_dir, summary_report):
                 try:
                     html = template.render(title=test,
                                            render_report=render_report,
-                                           baseline_report=baseline_report)
+                                           baseline_report=baseline_report,
+                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
                     save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
                 except Exception as err:
                     print(str(err))
                     main_logger.error(str(err))
-
-        # TODO: fix report_resources dublication
-        if os.path.exists(os.path.join(work_dir, report_dir, os.pardir, 'report_resources')):
-            shutil.rmtree(os.path.join(work_dir, report_dir, os.pardir, 'report_resources'))
-        try:
-            shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
-                            os.path.join(work_dir, report_dir, os.pardir, 'report_resources'))
-        except Exception as err:
-            main_logger.error("Failed to copy report resources: {}".format(str(err)))
 
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
