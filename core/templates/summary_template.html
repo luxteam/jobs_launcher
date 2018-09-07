@@ -19,6 +19,7 @@
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
                 <th data-formatter="timeFormatter">Render time</th>
+                <th>Engine log</th>
             </tr>
         </thead>
         <tbody>
@@ -85,6 +86,12 @@
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
+
+                <td><a href="
+                {% if i != "_cur_" -%}
+                    {{- report[i].session_dir -}}/
+                {%- endif -%}
+                launcher.engine.log">Engine log</a></td>
             </tr>
     {% endfor %}
         </tbody>
@@ -126,7 +133,7 @@
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 <!--<td>{{ test_conf }}</td>-->
-                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/result.html">Report</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>

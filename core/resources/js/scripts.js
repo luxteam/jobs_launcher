@@ -164,3 +164,16 @@ jQuery(document).ready( function() {
         $('.jsTableWrapper [id]').bootstrapTable('resetSearch', searchText);
     }
 });
+
+$(document).ready(function init(){
+    $( "h3:containsCI('NVIDIA')" ).css( "color", "rgba(118, 185, 0, 1)" );
+    $( "table.baseTable th:containsCI('NVIDIA')" ).css( "color", "rgba(118, 185, 0, 1)" );
+    $( "h3:containsCI('GeForce')" ).css( "color", "rgba(118, 185, 0, 1)"
+    );
+    $( "table.baseTable th:containsCI('GeForce')" ).css( "color", "rgba(118, 185, 0, 1)" );
+
+    $( "h3:containsCI('Radeon')" ).css( "color", "rgba(92, 136, 200, 1)" );
+    $( "table.baseTable th:containsCI('Radeon')" ).css( "color", "rgba(92, 136, 200, 1)" );
+    $( "h3:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
+    $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
+});

@@ -3,28 +3,18 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="report_resources/css/bootstrap.css"/>
-    <link rel="stylesheet" type="text/css" href="report_resources/css/bootstrap-table.css"/>
-    <link rel="stylesheet" type="text/css" href="report_resources/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../report_resources/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../report_resources/css/bootstrap-table.css"/>
+    <link rel="stylesheet" type="text/css" href="../report_resources/css/style.css"/>
 
-    <script src="report_resources/js/jquery.min.js" type="text/javascript"></script>
-    <script src="report_resources/js/bootstrap.js" type="text/javascript"></script>
-    <script src="report_resources/js/bootstrap-table.js" type="text/javascript"></script>
-    <script src="report_resources/js/scripts.js" type="text/javascript"></script>
-    <script src="report_resources/js/extensions/multiple-sort/bootstrap-table-multiple-sort.js"></script>
+    <script src="../report_resources/js/jquery.min.js" type="text/javascript"></script>
+    <script src="../report_resources/js/bootstrap.js" type="text/javascript"></script>
+    <script src="../report_resources/js/bootstrap-table.js" type="text/javascript"></script>
+    <script src="../report_resources/js/scripts.js" type="text/javascript"></script>
+    <script src="../report_resources/js/extensions/multiple-sort/bootstrap-table-multiple-sort.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function init(){
-            $( "h3:containsCI('NVIDIA')" ).css( "color", "rgba(118, 185, 0, 1)" );
-            $( "table.baseTable th:containsCI('NVIDIA')" ).css( "color", "rgba(118, 185, 0, 1)" );
-            $( "h3:containsCI('GeForce')" ).css( "color", "rgba(118, 185, 0, 1)" );
-            $( "table.baseTable th:containsCI('GeForce')" ).css( "color", "rgba(118, 185, 0, 1)" );
-
-            $( "h3:containsCI('Radeon')" ).css( "color", "rgba(92, 136, 200, 1)" );
-            $( "table.baseTable th:containsCI('Radeon')" ).css( "color", "rgba(92, 136, 200, 1)" );
-            $( "h3:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
-            $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
-
         {% if pageID is defined %}
             setActive({{ pageID }});
         {% endif %}
@@ -39,7 +29,7 @@
     <a id="goTop" href="#top" title="Go top"></a>
 
     <div id="header">
-        <img src="report_resources/img/logo.png"/>
+        <img src="../report_resources/img/logo.png"/>
 
         <ul>
             <li><a id="summaryA" href='summary_report.html'>summary</a></li>
@@ -59,21 +49,20 @@
                data-pagination="true"
                data-page-list="[5, 10, 20, 45, ALL]"
                data-sort-order="desc"
-               data-sort-name="test_status"
                data-show-multi-sort="true"
         >
             <thead>
                 <tr>
-                    <th data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
-                    <th data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
+                    <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
+                    <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
                 </tr>
             </thead>
             <tbody>
-            {% for img in rendered_report %}
+            {% for img in render_report %}
                 <tr>
-                    <td class="hatching"><img src="{{ img.render_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
-                    <td class="hatching"><img src="{{ img.baseline_color_path }}" onclick="resizeImg(this)" class="zoomImg"/></td>
+                    <td class="hatching"><img data-src="{{ img.baseline_color_path }}"/></td>
+                    <td class="hatching"><img data-src="{{ img.render_color_path }}"/></td>
                     <td>INFO</td>
                 </tr>
             {% endfor %}
