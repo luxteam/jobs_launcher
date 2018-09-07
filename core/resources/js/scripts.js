@@ -140,6 +140,7 @@ window.copyTestCaseName = {
             document.body.appendChild(node);
             node.select();
             document.execCommand('copy');
+            node.remove();
         } catch(e) {
             alert("Can't copy to clipboard.");
         }

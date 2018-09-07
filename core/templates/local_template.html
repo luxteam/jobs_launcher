@@ -68,6 +68,7 @@
 
     <div class="jsTableWrapper">
         <table class="baseTable localReportTable"
+               id="local"
                data-toggle="table"
                data-search="true"
                data-show-refresh="true"
@@ -82,14 +83,19 @@
         >
             <thead>
                 <tr>
+                    <th data-field="test_case" data-halign="center" data-sortable="true" data-visible="false">Test case</th>
                     <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
+                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case link</th>
                 </tr>
             </thead>
             <tbody>
             {% for item in render_report %}
                 <tr>
+                    <td>
+                        {{ item.test_case }}
+                    </td>
                     <td class="hatching">
                     {% if item.baseline_color_path %}
                         <img data-src="{{ item.baseline_color_path }}"/>
@@ -112,6 +118,9 @@
                         {{ item.test_case }}
                         {{ item.test_group }}
                         {{ item.tool }}
+                    </td>
+                    <td>
+                        <a>Copy direct link</a>
                     </td>
                 </tr>
             {% endfor %}
