@@ -52,7 +52,7 @@ def main():
                     except FileNotFoundError as err:
                         core.config.main_logger.error(str(err))
 
-                    pix_difference = metrics.getDiffPixeles()
+                    pix_difference = metrics.getDiffPixeles(tolerance=9)
                     img.update({'difference_color': pix_difference})
                     if type(pix_difference) is not str and pix_difference > core.config.PIX_DIFF_MAX:
                         img['test_status'] = 'error'
