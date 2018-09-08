@@ -28,16 +28,6 @@
     <a name="#top"/>
     <a id="goTop" href="#top" title="Go top"></a>
 
-    <div id="header">
-        <img src="{{ pre_path }}/report_resources/img/logo.png"/>
-
-        <ul>
-            <li><a id="summaryA" href='{{ pre_path }}/summary_report.html'>summary</a></li>
-            <li><a id="performanceA" href='{{ pre_path }}/performance_report.html'>performance</a></li>
-            <li><a id="compareA" href='{{ pre_path }}/compare_report.html'>compare</a></li>
-        </ul>
-    </div>
-
     <div class="popup" id="imgsModal">
         <div class="popupContent" id="imgsModalContent">
             <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
@@ -64,6 +54,43 @@
         </div>
     </div>
 
+    <div id="header">
+        <img src="{{ pre_path }}/report_resources/img/logo.png"/>
+
+        <ul>
+            <li><a id="summaryA" href='{{ pre_path }}/summary_report.html'>summary</a></li>
+            <li><a id="performanceA" href='{{ pre_path }}/performance_report.html'>performance</a></li>
+            <li><a id="compareA" href='{{ pre_path }}/compare_report.html'>compare</a></li>
+        </ul>
+    </div>
+
+    <table class="baseTable">
+        <tr>
+            <th>Tool</th>
+            <th>Render device</th>
+            <th>Tests Package</th>
+            <th>Plugin version</th>
+            <th>Core version</th>
+            <th>Testing start</th>
+            <th>Branch name</th>
+            <th>Commit SHA</th>
+            <th>Commit message</th>
+        </tr>
+        <tr>
+            <td>{{ common_info.tool }}</td>
+            <td>{{ common_info.render_device }}</td>
+            <td>{{ common_info.test_group }}</td>
+            <td>{{ common_info.render_version }}</td>
+            <td>{{ common_info.core_version }}</td>
+            <td>{{ common_info.testing_start }}</td>
+            <td>{{ common_info.branch_name }}</td>
+            <td>{{ common_info.commit_sha }}</td>
+            <td>{{ common_info.commit_message }}</td>
+        </tr>
+    </table>
+
+
+
     <hr/>
 
     <div class="jsTableWrapper">
@@ -83,7 +110,7 @@
         >
             <thead>
                 <tr>
-                    <th data-field="test_case" data-halign="center" data-sortable="true" data-visible="false">Test case</th>
+                    <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
                     <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
@@ -96,6 +123,7 @@
                     <td>
                         {{ item.test_case }}
                     </td>
+
                     <td class="hatching">
                     {% if item.baseline_color_path %}
                         <img data-src="{{ item.baseline_color_path }}"/>
@@ -103,22 +131,26 @@
                         Not compared
                     {% endif %}
                     </td>
+
                     <td class="hatching">
                         <img data-src="{{ item.render_color_path }}"/>
                     </td>
-                    <td>
-                        {{ item.scene_name }}
-                        {{ item.render_time }}
-                        {{ item.render_device }}
-                        {{ item.difference_color }}
-                        {{ item.script_info }}
-                        {{ item.core_version }}
-                        {{ item.date_time }}
-                        {{ item.render_version }}
-                        {{ item.test_case }}
-                        {{ item.test_group }}
-                        {{ item.tool }}
+
+                    <td  class="infoColumn
+                    {% if item.test_status != "passed" %}
+                       badResult
+                    {% endif %}
+                    ">
+                        <b>Pixel difference:</b> {{ item.difference_color }}<br/>
+                        <b>Scene:</b> {{ item.scene_name }}<br/>
+                        <b>Render time:</b> {{ item.render_time }}<br/>
+                        <b>Baseline render time:</b> {{ item.baseline_render_time }}<br/>
+                        <b>Test info:</b><br/>
+                        {% for param in item.script_info %}
+                            {{ param }}<br/>
+                        {% endfor %}
                     </td>
+
                     <td>
                         <a>Copy direct link</a>
                     </td>

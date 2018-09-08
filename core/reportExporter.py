@@ -274,7 +274,7 @@ def build_compare_report(work_dir):
     return compare_report, hardware
 
 
-def build_local_reports(work_dir, summary_report):
+def build_local_reports(work_dir, summary_report, common_info):
     work_dir = os.path.abspath(work_dir)
 
     env = jinja2.Environment(
@@ -289,7 +289,7 @@ def build_local_reports(work_dir, summary_report):
             for config in summary_report[execution]['results'][test]:
                 report_dir = summary_report[execution]['results'][test][config]['result_path']
 
-                # TODO: fix baseline path building
+                # TODO: refactor it
                 baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
                 baseline_report = []
                 render_report = []
@@ -297,15 +297,25 @@ def build_local_reports(work_dir, summary_report):
                 if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
                     with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
                         render_report = json.loads(file.read())
+                        common_info.update({'tool': render_report[0]['tool']})
+                        common_info.update({'render_device': render_report[0]['render_device']})
+                        common_info.update({'testing_start': render_report[0]['date_time']})
+                        common_info.update({'test_group': render_report[0]['test_group']})
 
                 if os.path.exists(baseline_report_path):
                     with open(baseline_report_path, 'r') as file:
                         baseline_report = json.loads(file.read())
+                        for render_item in render_report:
+                            try:
+                                baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
+                                render_item.update({'baseline_render_time': baseline_item['render_time']})
+                            except IndexError:
+                                pass
 
                 try:
                     html = template.render(title=test,
+                                           common_info=common_info,
                                            render_report=render_report,
-                                           baseline_report=baseline_report,
                                            pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
                     save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
                 except Exception as err:
@@ -395,4 +405,4 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
-    build_local_reports(work_dir, summary_report)
+    build_local_reports(work_dir, summary_report, common_info)

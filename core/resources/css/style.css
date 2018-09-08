@@ -256,6 +256,12 @@ a {
   margin: auto;
   margin-top: 300px;
   padding: 10px;
+
+  /*position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 50%;
+  transform: translateX(-50%);*/
 }
 
 .popupHalfWidth {
@@ -284,4 +290,8 @@ a {
 
 .localReportTable img{
   width: 300px;
+}
+
+.infoColumn {
+  text-align: left;
 }
