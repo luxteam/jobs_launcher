@@ -4,14 +4,16 @@ import time
 import core.config
 
 
-def launch_job(cmd_line):
+def launch_job(cmd_line, job_timeout=None):
     report = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 1, 'duration': 0}
     core.config.main_logger.info('Started job: {}'.format(cmd_line))
+    if not job_timeout:
+        job_timeout = core.config.TIMEOUT
     started = time.time()
 
     p = psutil.Popen(cmd_line, stdout=subprocess.PIPE, shell=True)
     try:
-        rc = p.wait(timeout=core.config.TIMEOUT)
+        rc = p.wait(timeout=job_timeout)
     except psutil.TimeoutExpired as err:
         rc = 1
         for child in reversed(p.children(recursive=True)):

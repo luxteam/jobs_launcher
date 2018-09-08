@@ -3,7 +3,7 @@
 
     <outpath value="{OutputDir}"/>
 
-    <execute command='python "{Script}/test_stage.py"' stage="stage1">
+    <execute command='python "{Script}/test_stage.py"' stage="stage1" timeout="10">
         <argument>--stage_report stage1.json</argument>
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>

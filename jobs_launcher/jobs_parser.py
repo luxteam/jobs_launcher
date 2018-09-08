@@ -108,6 +108,8 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
     outdir = []
     stage_name = None
     stages = []
+    job_timeout = []
+    timeout = None
 
     for elem in root:
         if elem.tag == 'option':
@@ -128,8 +130,14 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         if elem.tag == 'execute':
             command_parts = [elem.attrib.get('command')]
             stage_name = elem.attrib.get('stage')
+            timeout = elem.attrib.get('timeout')
             for arguments_elem in elem:
                 command_parts.append(arguments_elem.text)
+
+            if timeout:
+                job_timeout.append(int(timeout))
+            else:
+                job_timeout.append(0)
 
         if not command_parts == []:
             summary_command_parts.append(command_parts)
@@ -212,7 +220,8 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
                     config_map,
                     execute_command,
                     [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)],
-                    stages
+                    stages,
+                    job_timeout
                 )
             )
         #print(delim + execute_command)

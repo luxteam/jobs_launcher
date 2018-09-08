@@ -3,14 +3,14 @@
 
     <outpath value="{OutputDir}"/>
 
-    <execute command='python "{Script}/test_stage.py"' stage="stage1">
+    <execute command='python "{Script}/test_stage.py"' stage="stage1" timeout="10">
         <argument>--stage_report stage1.json</argument>
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
         <argument>--current_report report1.json</argument>
     </execute>
 
-    <execute command='python "{Script}/test_stage.py"' stage="stage2">
+    <execute command='python "{Script}/test_stage.py"' stage="stage2" timeout="10">
         <argument>--stage_report stage2.json</argument>
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
@@ -18,7 +18,7 @@
         <argument>--current_report report2.json</argument>
     </execute>
 
-    <execute command='python "{Script}/test_stage.py"' stage="stage3">
+    <execute command='python "{Script}/test_stage.py"' stage="stage3" timeout="10">
         <argument>--stage_report stage3.json</argument>
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
@@ -26,7 +26,7 @@
         <argument>--current_report report3.json</argument>
     </execute>
 
-    <execute command='python "{Script}/test_stage.py"' stage="stage4">
+    <execute command='python "{Script}/test_stage.py"' stage="stage4" timeout="10">
         <argument>--stage_report stage4.json</argument>
         <argument>--terminate_status OK</argument>
         <argument>--output_folder "{OutputDir}"</argument>
