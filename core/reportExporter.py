@@ -96,7 +96,7 @@ def generate_thumbnails(session_dir):
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
-def build_session_report(report, session_dir, template=None, old_report=None):
+def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
@@ -118,7 +118,7 @@ def build_session_report(report, session_dir, template=None, old_report=None):
                     for jtem in current_test_report:
                         for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
                             if img in jtem.keys():
-                                # update pathes
+                                # update paths
                                 cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]))
 
                                 jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
@@ -152,9 +152,6 @@ def build_session_report(report, session_dir, template=None, old_report=None):
 
                 report['results'][result][item].update({'render_duration': render_duration})
 
-    if old_report:
-        report['results'].update(old_report['results'])
-
     # get summary results
     for result in report['results']:
         for item in report['results'][result]:
@@ -164,35 +161,6 @@ def build_session_report(report, session_dir, template=None, old_report=None):
     report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
     save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
-
-    if template:
-        env = jinja2.Environment(
-            loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-            autoescape=True
-        )
-
-        env.filters['env_override'] = env_override
-
-        template = env.get_template(template)
-
-        try:
-            shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
-                            os.path.join(session_dir, 'report_resources'))
-        except Exception as err:
-            main_logger.error("Failed to copy report resources: {}".format(str(err)))
-
-        try:
-            html_result = template.render(title="Session report", report={'_cur_': report}, pageID="summaryA",
-                                          common_info={'reporting_date': report['machine_info']['reporting_date'],
-                                                       'core_version': report['machine_info']['core_version'],
-                                                       'render_version': report['machine_info']['render_version']
-                                                       },
-                                          PIX_DIFF_MAX=PIX_DIFF_MAX
-                                          )
-            save_html_report(html_result, session_dir, SESSION_REPORT_HTML, replace_pathsep=True)
-        except Exception as e:
-            main_logger.error("Error while render html report {}".format(str(e)))
-            save_html_report('error', session_dir, SESSION_REPORT_HTML)
 
     return report
 
@@ -306,6 +274,55 @@ def build_compare_report(work_dir):
     return compare_report, hardware
 
 
+def build_local_reports(work_dir, summary_report, common_info):
+    work_dir = os.path.abspath(work_dir)
+
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=True
+    )
+    template = env.get_template('local_template.html')
+    report_dir = ""
+
+    for execution in summary_report:
+        for test in summary_report[execution]['results']:
+            for config in summary_report[execution]['results'][test]:
+                report_dir = summary_report[execution]['results'][test][config]['result_path']
+
+                # TODO: refactor it
+                baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
+                baseline_report = []
+                render_report = []
+
+                if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
+                    with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
+                        render_report = json.loads(file.read())
+                        common_info.update({'tool': render_report[0]['tool']})
+                        common_info.update({'render_device': render_report[0]['render_device']})
+                        common_info.update({'testing_start': render_report[0]['date_time']})
+                        common_info.update({'test_group': render_report[0]['test_group']})
+
+                if os.path.exists(baseline_report_path):
+                    with open(baseline_report_path, 'r') as file:
+                        baseline_report = json.loads(file.read())
+                        for render_item in render_report:
+                            try:
+                                baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
+                                render_item.update({'baseline_render_time': baseline_item['render_time']})
+                            except IndexError:
+                                pass
+
+                try:
+                    html = template.render(title=test,
+                                           common_info=common_info,
+                                           render_report=render_report,
+                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
+                    save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
+                except Exception as err:
+                    print(str(err))
+                    main_logger.error(str(err))
+
+
 def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
 
     try:
@@ -321,6 +338,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
     env.filters['env_override'] = env_override
 
     common_info = {}
+    summary_report = None
 
     try:
         summary_template = env.get_template('summary_template.html')
@@ -386,3 +404,5 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         compare_html = "Error while building compare report: {}".format(str(err))
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+
+    build_local_reports(work_dir, summary_report, common_info)

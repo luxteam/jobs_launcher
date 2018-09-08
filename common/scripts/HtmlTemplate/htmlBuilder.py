@@ -18,8 +18,11 @@ def main():
     rendered_json = []
     notRenderedJson = {}
     compared = False
-    with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'r') as file:
-        rendered_json = json.loads(file.read())
+    try:
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'r') as file:
+            rendered_json = json.loads(file.read())
+    except Exception as err:
+        core.config.main_logger.error(str(err))
 
     for img in rendered_json:
         if img['difference_color'] != "not compared yet":
