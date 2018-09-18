@@ -213,6 +213,7 @@ def build_performance_report(work_dir):
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
+    summary_info_for_report = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             if file.endswith(SESSION_REPORT):
@@ -235,8 +236,11 @@ def build_performance_report(work_dir):
                 for test_package in results:
                     for test_config in results[test_package]:
                         performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
+
+                tmp_r = sorted(hardware.items(), key=operator.itemgetter(1))
+                summary_info_for_report[tool] = tmp_r
     hardware = sorted(hardware.items(), key=operator.itemgetter(1))
-    return performance_report, hardware, performance_report_detail
+    return performance_report, hardware, performance_report_detail, summary_info_for_report
 
 
 def build_compare_report(work_dir):
@@ -376,7 +380,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
 
     try:
         performance_template = env.get_template('performance_template.html')
-        performance_report, hardware, performance_report_detail = build_performance_report(work_dir)
+        performance_report, hardware, performance_report_detail, su = build_performance_report(work_dir)
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
         save_json_report(performance_report_detail, work_dir, 'perf.json', replace_pathsep=True)
         performance_html = performance_template.render(title=major_title + " Performance",
@@ -384,7 +388,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                        hardware=hardware,
                                                        performance_report_detail=performance_report_detail,
                                                        pageID="performanceA",
-                                                       common_info=common_info)
+                                                       common_info=common_info, su = su)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))
