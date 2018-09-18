@@ -7,7 +7,7 @@
     <tr>
         <th>Tool</th>
         {% for hw in hardware %}
-        <th>{{ hw }}</th>
+        <th>{{ hw[0] }}</th>
         {% endfor %}
     </tr>
 
@@ -15,8 +15,8 @@
     <tr>
         <td>{{ tool }}</td>
         {% for hw in hardware %}
-            {% if performance_report[tool][hw] %}
-        <td>{{ performance_report[tool][hw].summary.render_duration | round(1) }}</td>
+            {% if performance_report[tool][hw[0]] %}
+        <td>{{ hw[1] | round(1) }}</td>
             {% else %}
         <td></td>
             {% endif %}

@@ -4,6 +4,7 @@ import json
 import base64
 import shutil
 import datetime
+import operator
 from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
@@ -211,7 +212,7 @@ def build_performance_report(work_dir):
 
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
-    hardware = []
+    hardware = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             if file.endswith(SESSION_REPORT):
@@ -220,7 +221,7 @@ def build_performance_report(work_dir):
 
                 hw = temp_report['machine_info']['render_device']
                 if hw not in hardware:
-                    hardware.append(hw)
+                    hardware[hw] = temp_report['summary']['render_duration']
                 tool = temp_report['machine_info']['tool']
 
                 results = temp_report.pop('results', None)
@@ -234,7 +235,7 @@ def build_performance_report(work_dir):
                 for test_package in results:
                     for test_config in results[test_package]:
                         performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
-
+    hardware = sorted(hardware.items(), key=operator.itemgetter(1))
     return performance_report, hardware, performance_report_detail
 
 
