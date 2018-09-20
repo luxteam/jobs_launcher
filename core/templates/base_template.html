@@ -31,14 +31,14 @@
         var data = google.visualization.arrayToDataTable([
           ['Hadrware'
           {% for hw in hardware %}
-          , '{{ hw }}'
+          , '{{ hw[0] }}'
           {% endfor %}
           ]
 
           {% for tool in performance_report %}
           ,['{{ tool }}'
             {% for hw in hardware %}
-            , {{ performance_report[tool][hw].summary.render_duration }}
+            , {{ hw[1] }}
             {% endfor %}
             ]
           {% endfor %}
