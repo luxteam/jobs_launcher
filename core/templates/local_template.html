@@ -120,9 +120,7 @@
             <tbody>
             {% for item in render_report %}
                 <tr>
-                    <td>
-                        {{ item.test_case }}
-                    </td>
+                    <td>{{ item.test_case }}</td>
 
                     <td class="hatching">
                     {% if item.baseline_color_path %}
