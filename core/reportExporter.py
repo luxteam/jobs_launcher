@@ -182,15 +182,28 @@ def build_summary_report(work_dir):
                     try:
                         for test_package in temp_report['results']:
                             for test_conf in temp_report['results'][test_package]:
+                                temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
+
+                                if common_info:
+                                    for key in common_info:
+                                        if not temp_report['machine_info'][key] in common_info[key]:
+                                            common_info[key].append(temp_report['machine_info'][key])
+                                else:
+                                    common_info.update(
+                                        {'reporting_date': [temp_report['machine_info']['reporting_date']],
+                                         'render_version': [temp_report['machine_info']['render_version']],
+                                         'core_version': [temp_report['machine_info']['core_version']]
+                                         })
+
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
                                     for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
                                         if img in jtem.keys():
                                             jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
                                 temp_report['results'][test_package][test_conf].update(
-                                    {'result_path':
-                                         os.path.relpath(os.path.join(work_dir, basepath,temp_report['results'][test_package][test_conf]['result_path']), work_dir)})
+                                    {'result_path': os.path.relpath(os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']), work_dir)}
+                                )
                     except Exception as err:
-                        print(str(err))
+                        main_logger.error(str(err))
 
                     if basename in summary_report.keys():
                         summary_report[basename]['results'].update(temp_report['results'])
@@ -200,29 +213,6 @@ def build_summary_report(work_dir):
                         summary_report[basename] = {}
                         summary_report[basename].update({'results': temp_report['results']})
                         summary_report[basename].update({'summary': temp_report['summary']})
-
-                # try:
-                #     for test_package in summary_report[basename]['results']:
-                #         for test_conf in summary_report[basename]['results'][test_package]:
-                #             for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
-                #
-                #                 for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
-                #                     if img in jtem.keys():
-                #                         jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
-                #
-                #             summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
-                #
-                #     # if common_info:
-                #     #     for key in common_info:
-                #     #         if not summary_report[basename]['machine_info'][key] in common_info[key]:
-                #     #             common_info[key].append(summary_report[basename]['machine_info'][key])
-                #     # else:
-                #     #     common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
-                #     #                         'render_version': [summary_report[basename]['machine_info']['render_version']],
-                #     #                         'core_version': [summary_report[basename]['machine_info']['core_version']]
-                #     #                         })
-                # except Exception as e:
-                #     main_logger.error(str(e))
 
     for key in common_info:
         common_info[key] = ', '.join(common_info[key])
@@ -431,4 +421,4 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
-    # build_local_reports(work_dir, summary_report, common_info)
+    build_local_reports(work_dir, summary_report, common_info)
