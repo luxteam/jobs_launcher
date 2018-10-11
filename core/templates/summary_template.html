@@ -9,9 +9,6 @@
         <thead>
             <tr>
                 <th>Job-Name</th>
-                <th>Host</th>
-                <th>Plugin version</th>
-                <th>Core version</th>
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed</th>
@@ -31,34 +28,6 @@
                     "Job name"
                     {% endif %}
                 </td>
-                <td>
-                    <a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].machine_info.host }}</a>
-
-                    <div class="popup" id="machineInfo{{ loop.index }}">
-                        <div class="popupContent popupHalfWidth">
-                            <span class="close" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
-                            <table>
-                                <tr>
-                                    <th>OS</th>
-                                    <th>RAM, Gb</th>
-                                    <th>CPU</th>
-                                    <th>CPU count</th>
-                                    <th>GPU</th>
-                                </tr>
-                                <tr>
-                                    <td>{{ report[i].machine_info.os }}</td>
-                                    <td>{{ report[i].machine_info.ram | round }}</td>
-                                    <td>{{ report[i].machine_info.cpu }}</td>
-                                    <td>{{ report[i].machine_info.cpu_count }}</td>
-                                    <td>{{ report[i].machine_info.render_device }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                </td>
-                <td>{{ report[i].machine_info.render_version }}</td>
-                <td>{{ report[i].machine_info.core_version }}</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -115,6 +84,7 @@
             <tr>
                 <th>Test package name</th>
                 <!--<th>Config</th>-->
+                <th>Host</th>
                 <th>Local report</th>
                 <th>Tool's log</th>
                 <th>Total</th>
@@ -133,6 +103,9 @@
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 <!--<td>{{ test_conf }}</td>-->
+
+                <td>Host</td>
+
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
@@ -170,7 +143,7 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="3">Sum</td>
+                <td colspan="4">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td

@@ -36,7 +36,7 @@
 
 <!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
 <div class="jsTableWrapper">
-    <table id="{{ i | lower }}"
+    <table id="{{ i | lower | replace(' ', '_') | replace('(', '') | replace(')', '') }}"
            class="baseTable detailedTable"
            data-toggle="table"
            data-search="true"
