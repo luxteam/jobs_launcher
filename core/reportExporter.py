@@ -281,7 +281,6 @@ def build_compare_report(work_dir):
 
 def build_local_reports(work_dir, summary_report, common_info):
     work_dir = os.path.abspath(work_dir)
-    print("local")
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -291,11 +290,8 @@ def build_local_reports(work_dir, summary_report, common_info):
     report_dir = ""
 
     for execution in summary_report:
-        print("exec")
         for test in summary_report[execution]['results']:
-            print("test")
             for config in summary_report[execution]['results'][test]:
-                print("config")
                 report_dir = summary_report[execution]['results'][test][config]['result_path']
 
                 # TODO: refactor it
@@ -311,18 +307,14 @@ def build_local_reports(work_dir, summary_report, common_info):
                         common_info.update({'testing_start': render_report[0]['date_time']})
                         common_info.update({'test_group': render_report[0]['test_group']})
 
-                print(baseline_report_path)
                 if os.path.exists(baseline_report_path):
-                    print("true")
                     with open(baseline_report_path, 'r') as file:
                         baseline_report = json.loads(file.read())
                         for render_item in render_report:
                             try:
-                                print("start try")
                                 baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
                                 render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                # render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
-                                print("got baseline item")
+                                render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
                             except IndexError:
                                 main_logger.warning("Not found value in baseline")
 
