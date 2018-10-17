@@ -134,7 +134,7 @@ def build_session_report(report, session_dir):
                         try:
                             report['machine_info'].update({'render_device': jtem['render_device']})
                             report['machine_info'].update({'tool': jtem['tool']})
-                            report['machine_info'].update({'render_version': jtem['render_version']})
+                            report['machine_info'].update({'minor_version': jtem['minor_version']})
                             report['machine_info'].update({'core_version': jtem['core_version']})
                         except Exception as err:
                             main_logger.warning(str(err))
@@ -196,7 +196,7 @@ def build_summary_report(work_dir):
                                 common_info[key].append(summary_report[basename]['machine_info'][key])
                     else:
                         common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
-                                            'render_version': [summary_report[basename]['machine_info']['render_version']],
+                                            'minor_version': [summary_report[basename]['machine_info']['minor_version']],
                                             'core_version': [summary_report[basename]['machine_info']['core_version']]
                                             })
                 except Exception as e:
@@ -281,6 +281,7 @@ def build_compare_report(work_dir):
 
 def build_local_reports(work_dir, summary_report, common_info):
     work_dir = os.path.abspath(work_dir)
+    print("local")
 
     env = jinja2.Environment(
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
@@ -290,8 +291,11 @@ def build_local_reports(work_dir, summary_report, common_info):
     report_dir = ""
 
     for execution in summary_report:
+        print("exec")
         for test in summary_report[execution]['results']:
+            print("test")
             for config in summary_report[execution]['results'][test]:
+                print("config")
                 report_dir = summary_report[execution]['results'][test][config]['result_path']
 
                 # TODO: refactor it
@@ -307,15 +311,20 @@ def build_local_reports(work_dir, summary_report, common_info):
                         common_info.update({'testing_start': render_report[0]['date_time']})
                         common_info.update({'test_group': render_report[0]['test_group']})
 
+                print(baseline_report_path)
                 if os.path.exists(baseline_report_path):
+                    print("true")
                     with open(baseline_report_path, 'r') as file:
                         baseline_report = json.loads(file.read())
                         for render_item in render_report:
                             try:
+                                print("start try")
                                 baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
                                 render_item.update({'baseline_render_time': baseline_item['render_time']})
+                                # render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
+                                print("got baseline item")
                             except IndexError:
-                                pass
+                                main_logger.warning("Not found value in baseline")
 
                 try:
                     html = template.render(title=test,

@@ -53,7 +53,6 @@
         <thead>
             <tr>
                 <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
-                <th data-halign="center" data-sortable="true">Parameters</th>
                 <th data-halign="center" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
                 <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
@@ -69,10 +68,6 @@
                 {% for item in report[i].results[test_package][test_conf].render_results %}
             <tr>
                 <td>{{ item.test_case }}</td>
-                <td>{% for param in item.script_info %}
-                    {{ param }}<br>
-                    {% endfor %}
-                </td>
                 <td>{{ item.render_time | round(3) }}</td>
 
                 <td

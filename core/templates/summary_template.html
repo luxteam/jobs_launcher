@@ -10,8 +10,8 @@
             <tr>
                 <th>Job-Name</th>
                 <th>Host</th>
-                <th>Plugin version</th>
-                <th>Core version</th>
+                <th>Major version</th>
+                <th>Minor version</th>
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed</th>
@@ -57,8 +57,8 @@
                     </div>
 
                 </td>
-                <td>{{ report[i].machine_info.render_version }}</td>
                 <td>{{ report[i].machine_info.core_version }}</td>
+                <td>{{ report[i].machine_info.minor_version }}</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -116,7 +116,6 @@
                 <th>Test package name</th>
                 <!--<th>Config</th>-->
                 <th>Local report</th>
-                <th>Tool's log</th>
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed</th>
@@ -134,7 +133,6 @@
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 <!--<td>{{ test_conf }}</td>-->
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
-                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
@@ -170,7 +168,7 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="3">Sum</td>
+                <td colspan="2">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
