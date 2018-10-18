@@ -147,8 +147,8 @@
                     {% endif %}
                     ">
                         <b>Pixel difference:</b> {{ item.difference_color }}<br/>
-                        <b>Pixel difference:</b> {{ item.difference_time }}<br/>
-                        <b>Pixel difference:</b> {{ item.difference_memory_gpu }}<br/>
+                        <b>Render time difference:</b> {{ item.difference_time }}<br/>
+                        <b>Memory usage difference:</b> {{ item.difference_memory_gpu }}<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                         <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
