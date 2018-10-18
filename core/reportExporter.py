@@ -61,7 +61,7 @@ def env_override(value, key):
 
 def get_change(current, previous):
     if current == previous:
-        return 100.0
+        return 0.0
     try:
         return (abs(current - previous) / previous) * 100.0
     except ZeroDivisionError:
@@ -324,6 +324,7 @@ def build_local_reports(work_dir, summary_report, common_info):
                                 baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
                                 render_item.update({'baseline_render_time': baseline_item['render_time']})
                                 render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
+                                print(baseline_item['render_time'])
                                 render_item.update({'difference_time': get_change(render_item['render_time'], baseline_item['render_time'])})
                                 render_item.update({'difference_memory_gpu': get_change(render_item['gpu_memory_usage'], baseline_item['gpu_memory_usage'])})
                             except IndexError:
