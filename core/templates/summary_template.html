@@ -85,7 +85,7 @@
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
-                >{{ report[i].summary.render_duration | round(1) }}</td>
+                >{{ report[i].summary.render_duration }}</td>
 
                 <td><a href="
                 {% if i != "_cur_" -%}
@@ -160,7 +160,7 @@
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
-                >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
+                >{{ report[i].results[test_package][test_conf].render_duration }}</td>
             </tr>
             <tr>
             {% endfor %}
@@ -191,7 +191,7 @@
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
-                >{{ report[i].summary.render_duration | round(1) }}</td>
+                >{{ report[i].summary.render_duration }}</td>
             </tr>
         </tbody>
     </table>

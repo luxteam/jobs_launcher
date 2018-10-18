@@ -142,10 +142,13 @@
                     ">
                         <b>Pixel difference:</b> {{ item.difference_color }}<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
-                        <b>Render time:</b> {{ item.render_time }}<br/>
-                        <b>Baseline render time:</b> {{ item.baseline_render_time }}<br/>
+                        <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
+                        <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
                         <b>GPU memory usage:</b> {{ item.gpu_memory_usage }}<br/>
                         <b>Baseline GPU memory usage:</b> {{ item.baseline_gpu_memory_usage }}<br/>
+                        <b>GPU memory total:</b> {{ item.gpu_memory_total }}<br/>
+                        <b>GPU memory max:</b> {{ item.gpu_memory_max }}<br/>
+                        <b>System memory usage:</b> {{ item.system_memory_usage }}<br/>
                     </td>
 
                     <td>

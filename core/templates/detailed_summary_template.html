@@ -68,7 +68,7 @@
                 {% for item in report[i].results[test_package][test_conf].render_results %}
             <tr>
                 <td>{{ item.test_case }}</td>
-                <td>{{ item.render_time | round(3) }}</td>
+                <td>{{ item.render_time }}</td>
 
                 <td
                 {% if item.test_status != "passed" %}

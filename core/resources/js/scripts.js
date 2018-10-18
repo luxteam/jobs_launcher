@@ -80,8 +80,8 @@ window.openFullImgSize = {
 
 function timeFormatter(value, row, index, field) {
     var time = new Date(null);
-    time.setSeconds(value);
-    return time.toISOString().substr(11, 8);
+    time.setMilliseconds(value * 1000);
+    return time.toISOString().substr(14, 11);
 }
 
 function metaAJAX(value, row, index, field) {
