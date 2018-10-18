@@ -111,6 +111,7 @@
             <thead>
                 <tr>
                     <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
+                    <th data-field="parameters" data-halign="center">Parameters</th>
                     <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
@@ -122,6 +123,11 @@
             {% for item in render_report %}
                 <tr>
                     <td>{{ item.test_case }}</td>
+
+                    <td><b>Width:</b> {{ item.width }}<br/>
+                        <b>Height:</b> {{ item.height }}<br/>
+                        <b>Iterations:</b> {{ item.iterations }}
+                    </td>
 
                     <td class="hatching">
                     {% if item.baseline_color_path %}
@@ -141,6 +147,8 @@
                     {% endif %}
                     ">
                         <b>Pixel difference:</b> {{ item.difference_color }}<br/>
+                        <b>Pixel difference:</b> {{ item.difference_time }}<br/>
+                        <b>Pixel difference:</b> {{ item.difference_memory_gpu }}<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                         <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
