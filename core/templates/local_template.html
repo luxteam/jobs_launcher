@@ -54,6 +54,8 @@
         </div>
     </div>
 
+    <div id="infoBox"></div>
+
     <div id="header">
         <img src="{{ pre_path }}/report_resources/img/logo.png"/>
 
@@ -114,7 +116,8 @@
                     <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
-                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case link</th>
+                    <th data-filed="render_log">Render log</th>
+                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case direct link</th>
                 </tr>
             </thead>
             <tbody>
@@ -150,7 +153,12 @@
                     </td>
 
                     <td>
-                        <a>Copy direct link</a>
+                        <a href="renderTool.log">Render log</a>
+                    </td>
+
+                    <td>
+                        <!--<a>Copy direct link</a>-->
+                        <button type="button" name="copyDirectLinkButton">Copy to clipboard</button>
                     </td>
                 </tr>
             {% endfor %}

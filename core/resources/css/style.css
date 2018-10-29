@@ -295,3 +295,41 @@ a {
 .infoColumn {
   text-align: left;
 }
+
+#infoBox {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    margin: auto;
+    width: 80%;
+    height: 5%;
+    margin-top: 10px;
+    -webkit-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.5);
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    color: rgba(255, 255, 255, 1);
+    font-size: large;
+    text-align: center;
+    padding-top: 5px;
+}
+
+#infoBox p {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+button {
+    -webkit-box-shadow: 0px 0px 5px #666666;
+    -moz-box-shadow: 0px 0px 5px #666666;
+    box-shadow: 0px 0px 5px #666666;
+    border: 0.5px solid #6e8b94;
+}
+
+button:hover {
+    background-color: #fff;
+}
