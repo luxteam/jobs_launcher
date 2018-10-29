@@ -342,6 +342,9 @@ def build_local_reports(work_dir, summary_report, common_info):
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
 
+    if os.path.exists(os.path.join(work_dir, 'report_resources')):
+        shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
+
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
                         os.path.join(work_dir, 'report_resources'))
