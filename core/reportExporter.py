@@ -327,6 +327,7 @@ def build_local_reports(work_dir, summary_report, common_info):
                                 print(baseline_item['render_time'])
                                 render_item.update({'difference_time': get_change(render_item['render_time'], baseline_item['render_time'])})
                                 render_item.update({'difference_memory_gpu': get_change(render_item['gpu_memory_usage'], baseline_item['gpu_memory_usage'])})
+                                render_item.update({'baseline_render_device': baseline_item['render_device']})
                             except IndexError:
                                 main_logger.warning("Not found value in baseline")
 
