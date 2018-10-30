@@ -54,7 +54,7 @@ def main():
 
                     pix_difference = metrics.getDiffPixeles(tolerance=9)
                     img.update({'difference_color': pix_difference})
-                    if type(pix_difference) is not str and pix_difference > core.config.PIX_DIFF_MAX:
+                    if type(pix_difference) is str or pix_difference > core.config.PIX_DIFF_MAX:
                         img['test_status'] = 'error'
                     img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, baseline_json[img['file_name']]), args.work_dir)})
         else:
