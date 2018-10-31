@@ -153,7 +153,7 @@ window.copyTestCaseName = {
 function infoBox(message) {
     $("#infoBox").html("<p>" + message + "</p>");
     $("#infoBox").fadeIn('slow');
-    setTimeout(function(){$("#infoBox").fadeOut('slow');} , 1500);
+    setTimeout(function(){$("#infoBox").fadeOut('slow');} , 2000);
 }
 
 function getQueryVariable(variable) {

@@ -301,26 +301,28 @@ a {
     position: fixed;
     z-index: 100;
     margin: auto;
-    width: 80%;
-    height: 5%;
     margin-top: 10px;
-    -webkit-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
-    -moz-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
-    box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
-    background-color: rgba(0,0,0,0.5);
     top: 0;
     right: 0;
     left: 0;
     bottom: 0;
+
+    width: 80%;
+    height: 4vh;
     color: rgba(255, 255, 255, 1);
     font-size: large;
-    text-align: center;
-    padding-top: 5px;
+    -webkit-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.5);
 }
 
 #infoBox p {
-    display: inline-block;
-    vertical-align: middle;
+    position: absolute;
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .commonButton {
