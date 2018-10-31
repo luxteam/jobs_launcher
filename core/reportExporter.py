@@ -292,6 +292,7 @@ def build_compare_report(work_dir):
 
 
 def build_local_reports(work_dir, summary_report, common_info):
+    # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
 
     env = jinja2.Environment(

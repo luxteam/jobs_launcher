@@ -145,11 +145,11 @@ window.copyTestCaseName = {
             infoBox("Link copied to clipboard.")
         } catch(e) {
             infoBox("Can't copy to clipboard.")
-//            alert("Can't copy to clipboard.");
         }
     }
 }
 
+//TODO: add var for configure box color
 function infoBox(message) {
     $("#infoBox").html("<p>" + message + "</p>");
     $("#infoBox").fadeIn('slow');
