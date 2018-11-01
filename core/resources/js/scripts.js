@@ -178,3 +178,18 @@ $(document).ready(function init(){
     $( "h3:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
     $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
 });
+
+function performanceNormalizeFormatter(value, row, index, field) {
+    return (value * 100 / row[1]).toFixed(2) + " %";
+}
+
+function performanceNormalizeStyleFormatter(value, row, index, field) {
+//    TODO: normalize colors
+    diff = (value * 100 / row[1]) - 100;
+    greenState = 255 - diff;
+    redState = 0 + diff;
+    return {
+        classes: "",
+        css: {"background-color": "rgba(" + redState + ", " + greenState + ", 0, 0.4)"}
+    };
+}
