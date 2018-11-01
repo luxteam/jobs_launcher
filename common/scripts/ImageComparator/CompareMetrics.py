@@ -63,7 +63,7 @@ class CompareMetrics(object):
             img2B = self.img2[:, :, 2]
             # img2A = self.img2[:, :, 3]
 
-            if len(img1R) != len(img2R):
+            if img1R.shape != img2R.shape:
                 self.diff_pixeles = "Imgs resolution error"
                 return self.diff_pixeles
 
