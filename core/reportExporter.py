@@ -321,10 +321,10 @@ def build_local_reports(work_dir, summary_report, common_info):
                         baseline_report = json.loads(file.read())
                         for render_item in render_report:
                             try:
+                                # TODO: move to compare by json
                                 baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
                                 render_item.update({'baseline_render_time': baseline_item['render_time']})
                                 render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
-                                print(baseline_item['render_time'])
                                 render_item.update({'difference_time': get_change(render_item['render_time'], baseline_item['render_time'])})
                                 render_item.update({'difference_memory_gpu': get_change(render_item['gpu_memory_usage'], baseline_item['gpu_memory_usage'])})
                                 render_item.update({'baseline_render_device': baseline_item['render_device']})
