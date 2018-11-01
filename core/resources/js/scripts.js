@@ -184,12 +184,18 @@ function performanceNormalizeFormatter(value, row, index, field) {
 }
 
 function performanceNormalizeStyleFormatter(value, row, index, field) {
-//    TODO: normalize colors
-    diff = (value * 100 / row[1]) - 100;
-    greenState = 255 - diff;
-    redState = 0 + diff;
+
+    var diff = (value * 100 / row[1]) - 100;
+    var greenState = 255 - (2.55 * diff);
+    var redState = 0 + (2.55 * diff);
+    var opacityState = 0.8;
+    if (Math.round(diff) < 0) {
+        opacityState = 0.7 + (0.007 * diff);
+    }
     return {
         classes: "",
-        css: {"background-color": "rgba(" + redState + ", " + greenState + ", 0, 0.4)"}
+        css: {"background-color": "rgba(" + redState + ", " + greenState + ", 0, " + opacityState + ")"}
     };
 }
+
+//TODO: bootstrap extentions
