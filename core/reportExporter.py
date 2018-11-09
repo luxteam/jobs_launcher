@@ -161,7 +161,7 @@ def build_session_report(report, session_dir):
     report.update({'summary': total})
     report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
-    save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
+    save_json_report(report, session_dir, SESSION_REPORT)
 
     return report
 
@@ -353,7 +353,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
-        save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+        save_json_report(summary_report, work_dir, SUMMARY_REPORT)
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",
@@ -381,8 +381,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
     try:
         performance_template = env.get_template('performance_template.html')
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(work_dir)
-        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
-        save_json_report(performance_report_detail, work_dir, 'perf.json', replace_pathsep=True)
+        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
+        save_json_report(performance_report_detail, work_dir, 'perf.json')
         performance_html = performance_template.render(title=major_title + " Performance",
                                                        performance_report=performance_report,
                                                        hardware=hardware,
@@ -398,7 +398,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
     try:
         compare_template = env.get_template('compare_template.html')
         compare_report, hardware = build_compare_report(work_dir)
-        save_json_report(compare_report, work_dir, COMPARE_REPORT, True)
+        save_json_report(compare_report, work_dir, COMPARE_REPORT)
         compare_html = compare_template.render(title=major_title + " Compare",
                                                hardware=hardware,
                                                compare_report=compare_report,
