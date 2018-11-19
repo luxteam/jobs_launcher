@@ -13,10 +13,10 @@ from core.auto_dict import AutoDict
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         if replace_pathsep:
-            s = json.dumps(report, indent=" ", sort_keys=True)
+            s = json.dumps(report, indent=2, sort_keys=True)
             file.write(s.replace(os.path.sep, '/'))
         else:
-            json.dump(report, file, indent=" ", sort_keys=True)
+            json.dump(report, file, indent=2, sort_keys=True)
 
 
 def save_html_report(report, session_dir, file_name, replace_pathsep=False):
@@ -174,33 +174,45 @@ def build_summary_report(work_dir):
             # build summary report
             if file.endswith(SESSION_REPORT):
                 basepath = os.path.relpath(path, work_dir)
-                basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 with open(os.path.join(path, file), 'r') as report_file:
-                    summary_report[basename] = json.loads(report_file.read())
-                    summary_report[basename].update({'session_dir': basepath})
+                    temp_report = json.loads(report_file.read())
+                    basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
 
-                try:
-                    for test_package in summary_report[basename]['results']:
-                        for test_conf in summary_report[basename]['results'][test_package]:
-                            for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
+                    # update relative paths
+                    try:
+                        for test_package in temp_report['results']:
+                            for test_conf in temp_report['results'][test_package]:
+                                temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
 
-                                for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
-                                    if img in jtem.keys():
-                                        jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
+                                if common_info:
+                                    for key in common_info:
+                                        if not temp_report['machine_info'][key] in common_info[key]:
+                                            common_info[key].append(temp_report['machine_info'][key])
+                                else:
+                                    common_info.update(
+                                        {'reporting_date': [temp_report['machine_info']['reporting_date']],
+                                         'render_version': [temp_report['machine_info']['render_version']],
+                                         'core_version': [temp_report['machine_info']['core_version']]
+                                         })
 
-                            summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
+                                for jtem in temp_report['results'][test_package][test_conf]['render_results']:
+                                    for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
+                                        if img in jtem.keys():
+                                            jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
+                                temp_report['results'][test_package][test_conf].update(
+                                    {'result_path': os.path.relpath(os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']), work_dir)}
+                                )
+                    except Exception as err:
+                        main_logger.error(str(err))
 
-                    if common_info:
-                        for key in common_info:
-                            if not summary_report[basename]['machine_info'][key] in common_info[key]:
-                                common_info[key].append(summary_report[basename]['machine_info'][key])
+                    if basename in summary_report.keys():
+                        summary_report[basename]['results'].update(temp_report['results'])
+                        for key in temp_report['summary'].keys():
+                            summary_report[basename]['summary'][key] += temp_report['summary'][key]
                     else:
-                        common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
-                                            'render_version': [summary_report[basename]['machine_info']['render_version']],
-                                            'core_version': [summary_report[basename]['machine_info']['core_version']]
-                                            })
-                except Exception as e:
-                    main_logger.error(str(e))
+                        summary_report[basename] = {}
+                        summary_report[basename].update({'results': temp_report['results']})
+                        summary_report[basename].update({'summary': temp_report['summary']})
 
     for key in common_info:
         common_info[key] = ', '.join(common_info[key])
@@ -280,6 +292,7 @@ def build_compare_report(work_dir):
 
 
 def build_local_reports(work_dir, summary_report, common_info):
+    # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
 
     env = jinja2.Environment(
@@ -330,6 +343,9 @@ def build_local_reports(work_dir, summary_report, common_info):
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
 
+    if os.path.exists(os.path.join(work_dir, 'report_resources')):
+        shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
+
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
                         os.path.join(work_dir, 'report_resources'))
@@ -371,7 +387,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                                      i=execution)
 
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
-
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
         main_logger.error(summary_html)

@@ -32,8 +32,8 @@
         <div class="popupContent" id="imgsModalContent">
             <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
             <form style="display: block; margin: auto; width: 80%;">
-                <button type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
-                <button type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
+                <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
+                <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
                 <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
                 <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
             </form>
@@ -53,6 +53,8 @@
             </table>
         </div>
     </div>
+
+    <div id="infoBox"></div>
 
     <div id="header">
         <img src="{{ pre_path }}/report_resources/img/logo.png"/>
@@ -114,7 +116,8 @@
                     <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
-                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case link</th>
+                    <th data-filed="render_log">Render log</th>
+                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case direct link</th>
                 </tr>
             </thead>
             <tbody>
@@ -150,7 +153,11 @@
                     </td>
 
                     <td>
-                        <a>Copy direct link</a>
+                        <a href="renderTool.log">Render log</a>
+                    </td>
+
+                    <td>
+                        <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
                     </td>
                 </tr>
             {% endfor %}

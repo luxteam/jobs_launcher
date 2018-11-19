@@ -130,7 +130,7 @@ function setImgSize() {
 }
 
 window.copyTestCaseName = {
-    'click a': function(e, value, row, index) {
+    'click button': function(e, value, row, index) {
 
         try {
             var node = document.createElement('input');
@@ -141,10 +141,19 @@ window.copyTestCaseName = {
             node.select();
             document.execCommand('copy');
             node.remove();
+            // popup with status for user
+            infoBox("Link copied to clipboard.")
         } catch(e) {
-            alert("Can't copy to clipboard.");
+            infoBox("Can't copy to clipboard.")
         }
     }
+}
+
+//TODO: add var for configure box color
+function infoBox(message) {
+    $("#infoBox").html("<p>" + message + "</p>");
+    $("#infoBox").fadeIn('slow');
+    setTimeout(function(){$("#infoBox").fadeOut('slow');} , 2000);
 }
 
 function getQueryVariable(variable) {

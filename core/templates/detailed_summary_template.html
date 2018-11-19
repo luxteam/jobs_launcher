@@ -14,6 +14,8 @@
         <form style="display: block; margin: auto; width: 80%;">
             <button type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
             <button type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
+            <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
+            <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
             <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
             <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
         </form>
@@ -36,7 +38,7 @@
 
 <!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
 <div class="jsTableWrapper">
-    <table id="{{ i | lower }}"
+    <table id="{{ i | lower | replace(' ', '_') | replace('(', '') | replace(')', '') }}"
            class="baseTable detailedTable"
            data-toggle="table"
            data-search="true"
@@ -58,7 +60,7 @@
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
                 <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
-                <th data-field="copy_url_button" data-events="copyTestCaseName">Test case link</th>
+                <th data-field="copy_url_button" data-events="copyTestCaseName">Test case direct link</th>
             </tr>
         </thead>
         <tbody>
@@ -108,7 +110,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a>Copy direct link</a>
+                    <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
                 </td>
             </tr>
                 {% endfor %}
