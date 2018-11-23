@@ -101,8 +101,8 @@
                 <!--<td>{{ test_conf }}</td>-->
 
                 <td>
-                    <a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</a>
-
+                    <!--<a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</a>-->
+                    <button class="commonButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
                     <div class="popup" id="machineInfo{{ loop.index }}">
                         <div class="popupContent popupHalfWidth">
                             <span class="close" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
@@ -128,7 +128,7 @@
                 </td>
 
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
-                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Log</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
