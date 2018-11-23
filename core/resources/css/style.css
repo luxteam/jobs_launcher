@@ -252,11 +252,13 @@ a {
   height: 100%;
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
 }
 
 .popupContent {
   margin: auto;
-  margin-top: 6vh;
   padding: 10px;
 }
 
@@ -264,16 +266,20 @@ a {
   width: 50%;
 }
 
-.close {
+.closePopup {
   color: #aaa;
-  float: right;
   font-size: 4vh;
   font-weight: bold;
   opacity: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 3px 0px 0px 7px;
+  text-shadow: -1px 0px 12px #ff0101;
 }
 
-.close:hover,
-.close:focus {
+.closePopup:hover,
+.closePopup:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -338,4 +344,24 @@ a {
 #imgsDifferenceCanvas {
     display: block;
     margin: auto;
+}
+
+#renderedImgPopup {
+    width: 25vw;
+}
+
+#baselineImgPopup {
+    width: 25vw;
+}
+
+#imgsDifferenceCanvas {
+    width: 25vw;
+}
+
+#compareButtonsForm {
+    position: absolute;
+    display: block;
+    margin: 1vw 0px 0px 1vw;
+    left: 0;
+    top: 0;
 }

@@ -93,7 +93,7 @@ function metaAJAX(value, row, index, field) {
 
 function openModalWindow(id) {
     var modal = document.getElementById(id);
-    modal.style.display = "block";
+    modal.style.display = "flex";
 
     var diffCanvas = document.getElementById('imgsDifferenceCanvas');
     var imagesTable = document.getElementById("imgsCompareTable");
@@ -115,19 +115,31 @@ function closeModalWindow(id) {
 }
 
 function increaseImgSize() {
-    var renderImg = document.getElementById('renderedImgPopup');
-    var baselineImg = document.getElementById('baselineImgPopup');
+    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
+	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    });
 
-    renderImg.width += 50;
-    baselineImg.width +=50;
+    $("#renderedImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    });
+
+    $("#baselineImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    });
 }
 
 function reduceImgSize() {
-    var renderImg = document.getElementById('renderedImgPopup');
-    var baselineImg = document.getElementById('baselineImgPopup');
+    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
+	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    });
 
-    renderImg.width -= 50;
-    baselineImg.width -=50;
+    $("#renderedImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    });
+
+    $("#baselineImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    });
 }
 
 //TODO: finish custom img size

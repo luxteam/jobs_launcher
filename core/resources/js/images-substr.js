@@ -1,6 +1,7 @@
 function showImagesSubtraction(baselineId, renderId) {
 
     // TODO: catch case with empty images
+    // TODO: didn't repeat canvas creation if the same images compare
     var diffCanvas = document.getElementById('imgsDifferenceCanvas');
     var imagesTable = document.getElementById("imgsCompareTable");
 

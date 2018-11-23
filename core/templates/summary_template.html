@@ -105,7 +105,7 @@
                     <button class="commonButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
                     <div class="popup" id="machineInfo{{ loop.index }}">
                         <div class="popupContent popupHalfWidth">
-                            <span class="close" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
+                            <span class="closePopup" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
                             <table>
                                 <tr>
                                     <th>OS</th>

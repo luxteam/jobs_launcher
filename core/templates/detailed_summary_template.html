@@ -10,11 +10,11 @@
 
 <div class="popup" id="imgsModal">
     <div class="popupContent" id="imgsModalContent">
-        <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
-        <form style="display: block; margin: auto; width: 80%;">
-            <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
-            <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
-            <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch to difference</button>
+        <form id="compareButtonsForm">
+            <button class="commonButton" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;">&times;</button>
+            <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
+            <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
+            <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch view mode</button>
             <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
             <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
         </form>
@@ -27,8 +27,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="hatching"><img src="" id="baselineImgPopup" width="300"/></td>
-                    <td class="hatching"><img src="" id="renderedImgPopup" width="300"/></td>
+                    <td class="hatching"><img src="" id="baselineImgPopup"/></td>
+                    <td class="hatching"><img src="" id="renderedImgPopup"/></td>
                 </tr>
             </tbody>
         </table>
