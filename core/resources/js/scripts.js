@@ -78,19 +78,30 @@ window.openFullImgSize = {
     }
 }
 
+
 function timeFormatter(value, row, index, field) {
     var time = new Date(null);
     time.setSeconds(value);
     return time.toISOString().substr(11, 8);
 }
 
+
 function metaAJAX(value, row, index, field) {
     return value.replace('data-src', 'src');
 }
 
+
 function openModalWindow(id) {
     var modal = document.getElementById(id);
     modal.style.display = "block";
+
+    var diffCanvas = document.getElementById('imgsDifferenceCanvas');
+    var imagesTable = document.getElementById("imgsCompareTable");
+
+    if (diffCanvas && diffCanvas.style.display == "block") {
+        imagesTable.style.display = "";
+        diffCanvas.style.display = "none";
+    }
 
     window.onclick = function(event) {
         if (event.target == modal) {
