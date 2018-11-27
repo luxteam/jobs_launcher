@@ -95,7 +95,7 @@ function openModalWindow(id) {
     var modal = document.getElementById(id);
     modal.style.display = "flex";
 
-    var diffCanvas = document.getElementById('imgsDifferenceCanvas');
+    var diffCanvas = document.getElementById('imgsDiffTable');
     var imagesTable = document.getElementById("imgsCompareTable");
 
     if (diffCanvas && diffCanvas.style.display == "block") {

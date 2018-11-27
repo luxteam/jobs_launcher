@@ -4,15 +4,15 @@ function showImagesSubtraction(baselineId, renderId) {
     // TODO: didn't repeat canvas creation if the same images compare
     var diffCanvas = document.getElementById('imgsDifferenceCanvas');
     var imagesTable = document.getElementById("imgsCompareTable");
+    var diffTable = document.getElementById('imgsDiffTable');
 
-    if (diffCanvas && diffCanvas.style.display == "block") {
+    if (diffCanvas && diffTable.style.display == "block") {
         imagesTable.style.display = "";
-        diffCanvas.style.display = "none";
+        diffTable.style.display = "none";
         return;
-    } else if (diffCanvas && diffCanvas.style.display == "none") {
-        imagesTable.style.display = "none";
-        diffCanvas.style.display = "block";
-        return;
+    }
+    else if (diffCanvas && diffTable.style.display == "none") {
+        diffCanvas.parentNode.removeChild(diffCanvas);
     }
 
     var img1 = document.getElementById(baselineId);
@@ -21,7 +21,7 @@ function showImagesSubtraction(baselineId, renderId) {
     var width = img1.naturalWidth;
     var height = img1.naturalHeight;
 
-    var canvasParent = document.getElementById('imgsModalContent');
+    var canvasParent = document.getElementById('diffImageTd');
     var c = document.createElement('canvas');
     c.id = "imgsDifferenceCanvas";
     c.width = width;
@@ -39,6 +39,6 @@ function showImagesSubtraction(baselineId, renderId) {
     ctx.putImageData(diff, 0, 0);
 
     imagesTable.style.display = "none";
-    c.style.display = "block";
+    diffTable.style.display = "block";
     canvasParent.appendChild(c);
 }

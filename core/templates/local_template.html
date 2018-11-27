@@ -35,8 +35,8 @@
 
     <div class="popup" id="imgsModal">
         <div class="popupContent" id="imgsModalContent">
-            <form id="compareButtonsForm">
-                <button class="commonButton" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;">&times;</button>
+            <form class="popupForm">
+                <button class="commonButton closePopup" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;"><img src="report_resources/img/close-button.png"/></button>
                 <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
                 <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
                 <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch to difference</button>

@@ -262,11 +262,11 @@ a {
   padding: 10px;
 }
 
-.popupHalfWidth {
+.popupHalfWidth {|
   width: 50%;
 }
 
-.closePopup {
+/*.closePopup {
   color: #aaa;
   font-size: 4vh;
   font-weight: bold;
@@ -276,6 +276,10 @@ a {
   top: 0;
   margin: 3px 0px 0px 7px;
   text-shadow: -1px 0px 12px #ff0101;
+}*/
+
+.closePopup img{
+    width: 1vw;
 }
 
 .closePopup:hover,
@@ -285,11 +289,11 @@ a {
   cursor: pointer;
 }
 
-#imgsModalContent img{
+/*#imgsModalContent img{
   align: center;
   display: block;
   margin: auto;
-}
+}*/
 
 .localReportTable img{
   width: 300px;
@@ -358,7 +362,7 @@ a {
     width: 25vw;
 }
 
-#compareButtonsForm {
+.popupForm {
     position: absolute;
     display: block;
     margin: 1vw 0px 0px 1vw;
