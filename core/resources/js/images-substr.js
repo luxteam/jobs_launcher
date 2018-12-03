@@ -34,7 +34,7 @@ function showImagesSubtraction(baselineId, renderId) {
     var imgData2 = ctx.getImageData(0, 0, width, height);
     var diff = ctx.createImageData(width, height);
 
-    pixelmatch(imgData1.data, imgData2.data, diff.data, width, height, {threshold: 0.1});
+    pixelmatch(imgData1.data, imgData2.data, diff.data, width, height, {threshold: 0.03});
 
     ctx.putImageData(diff, 0, 0);
 
