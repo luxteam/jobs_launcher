@@ -331,7 +331,7 @@ def build_local_reports(work_dir, summary_report, common_info):
                                 pass
 
                 try:
-                    html = template.render(title=common_info['render_version'] + test + common_info['tool'],
+                    html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['render_version']),
                                            common_info=common_info,
                                            render_report=render_report,
                                            pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
