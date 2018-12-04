@@ -6,6 +6,24 @@ logging.basicConfig(filename='launcher.engine.log',
                     format=u'%(filename)-19s[LINE:%(lineno)-3d] #%(levelname)-8s [%(asctime)s] %(message)s')
 main_logger = logging.getLogger('main_logger')
 
+RENDER_REPORT_BASE = {
+    "file_name": "",
+    "date_time": "",
+    "script_info": [],
+    "render_color_path": "",
+    "test_case": "",
+    "render_version": "",
+    "test_status": "stub",
+    "tool": "",
+    "render_time": 0,
+    "render_mode": "",
+    "scene_name": "",
+    "test_group": "",
+    "difference_color": "not compared yet",
+    "core_version": "",
+    "render_device": ""
+}
+
 SIMPLE_RENDER_TIMEOUT = 10
 TIMEOUT = 6000
 TIMEOUT_PAR = 3
