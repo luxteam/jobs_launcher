@@ -73,6 +73,7 @@
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
                 <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+                <th data-filed="render_log">Render log</th>
                 <th data-field="copy_url_button" data-events="copyTestCaseName">Test case direct link</th>
             </tr>
         </thead>
@@ -121,6 +122,9 @@
                     {% else %}
                     <img data-src="{{ item.render_color_path }}"/>
                     {% endif %}
+                </td>
+                <td>
+                    <a hre="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a>
                 </td>
                 <td>
                     <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
