@@ -101,7 +101,7 @@
                 <td {% if item.difference_time > 5 %}
                         class="timeDiffFailedStatus"
                     {% endif %}>
-                    {{ item.difference_time }}</td>
+                    {{ item.difference_time | round (2) }}</td>
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}

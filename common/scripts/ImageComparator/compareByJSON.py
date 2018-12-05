@@ -48,8 +48,8 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json):
 
 def get_rendertime_difference(base_dir, img):
     render_time = img['render_time']
-    with open(os.path.join(base_dir, img['test_group'], str(img['test_case']+".json")), 'r') as file:
-        baseline_time = json.loads(file.read())['render_time']
+    with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
+        baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0]['render_time']
 
     def get_diff():
         if render_time == baseline_time:
