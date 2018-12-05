@@ -62,7 +62,7 @@ def get_rendertime_difference(base_dir, img):
         img.update({'difference_time': get_diff()})
     else:
         img.update({'difference_time': -0.0})
-        img.update({'baseline_difference_time': -0.0})
+        img.update({'baseline_render_time': -0.0})
 
     return img
 
