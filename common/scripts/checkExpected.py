@@ -26,7 +26,7 @@ def main():
     skipped_cases = expected_cases - rendered_cases
 
     if skipped_cases:
-        core.config.main_logger.warning("Some tests were not launched")
+        core.config.main_logger.error("Some tests were not launched")
         common_info = rendered[0].copy()
 
         for key in common_info:

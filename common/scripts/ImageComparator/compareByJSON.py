@@ -3,7 +3,6 @@ import argparse
 import json
 import CompareMetrics
 import sys
-import shutil
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
 
@@ -67,22 +66,34 @@ def get_rendertime_difference(base_dir, img):
 def main():
     args = createArgParser().parse_args()
 
-    if not os.path.exists(args.base_dir):
-        core.config.main_logger.warning("Baseline not found by path: {}".format(args.base_dir))
-        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
-            render_json = json.loads(file.read())
-            for img in render_json:
-                img['baseline_render_time'] = -0.0
-                img['difference_time'] = -0.0
+    render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
+    baseline_json_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
 
-        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
-            json.dump(render_json, file, indent=4)
+    if not os.path.exists(render_json_path):
+        core.config.error("Render report doesn't exists")
         return
 
-    with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
+    if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
+        core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
+
+        try:
+            with open(render_json_path, 'r') as file:
+                render_json = json.loads(file.read())
+                for img in render_json:
+                    img['baseline_render_time'] = -0.0
+                    img['difference_time'] = -0.0
+        except Exception as err:
+            core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
+        else:
+            with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+                json.dump(render_json, file, indent=4)
+        finally:
+            return
+
+    with open(render_json_path, 'r') as file:
         render_json = json.loads(file.read())
 
-    with open(os.path.join(args.base_dir, core.config.BASELINE_MANIFEST), 'r') as file:
+    with open(baseline_json_path, 'r') as file:
         baseline_json = json.loads(file.read())
 
     for img in render_json:
