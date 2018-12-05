@@ -6,8 +6,8 @@
     <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/bootstrap.css"/>
     <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/bootstrap-table.css"/>
     <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/test-statuses.css"/>
 
-    <!--<script src="{{ pre_path }}/report_resources/js/jquery.min.js" type="text/javascript"></script>-->
     <script src="{{ pre_path }}/report_resources/js/jquery-3.3.1.min.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/bootstrap.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/bootstrap-table.js" type="text/javascript"></script>
@@ -161,10 +161,11 @@
                        badResult
                     {% endif %}
                     ">
-                        <b>Pixel difference:</b> {{ item.difference_color }}<br/>
+                        <b>Pixel difference:</b> {{ item.difference_color }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
-                        <b>Render time:</b> {{ item.render_time }}<br/>
-                        <b>Baseline render time:</b> {{ item.baseline_render_time }}<br/>
+                        <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
+                        <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
+                        <b>Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
                         <b>Test info:</b><br/>
                         {% for param in item.script_info %}
                             {{ param }}<br/>
