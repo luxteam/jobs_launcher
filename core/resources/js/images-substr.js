@@ -1,6 +1,9 @@
 function showImagesSubtraction(baselineId, renderId) {
 
-    // TODO: catch case with empty images
+    if (!($("#baselineImgPopup").attr('src') && $("#renderedImgPopup").attr('src'))) {
+        infoBox("Can't read image", "#815e9b");
+        return;
+    }
     // TODO: didn't repeat canvas creation if the same images compare
     var diffCanvas = document.getElementById('imgsDifferenceCanvas');
     var imagesTable = document.getElementById("imgsCompareTable");
