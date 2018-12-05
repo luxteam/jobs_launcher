@@ -71,6 +71,8 @@
                 <th data-halign="center" data-sortable="true">Parameters</th>
                 <th data-halign="center" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="test_status" data-halign="center" data-sortable="true" data-sorter="statusSorter">Test status</th>
+                <th data-field="pix_diff" data-halign="center" data-sortable="true">Pixel diff, %</th>
+                <th data-field="time_diff" data-halign="center" data-sortable="true">Render time diff, %</th>
                 <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
                 <th data-filed="render_log">Render log</th>
@@ -91,19 +93,15 @@
                 </td>
                 <td>{{ item.render_time | round(3) }}</td>
 
-                <td
-                {% if item.test_status != "passed" %}
-                class="badResult">
-                    {{ item.test_status }}<br/>
-                    {{ item.error_title }}<br/>
-                    Diff: {{ item.difference_color }}, %
-                {% else %}
-                >
-                    {{ item.test_status }}<br/>
-                    <br/>
-                    Diff: {{ item.difference_color }}, %
-                {% endif %}
+                <td class="{{ item.test_status }}Status">
+                    {{ item.test_status }}
                 </td>
+
+                <td>{{ item.difference_color }}</td>
+                <td {% if item.difference_time > 5 %}
+                        class="timeDiffFailedStatus"
+                    {% endif %}>
+                    {{ item.difference_time | round (2) }}</td>
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}

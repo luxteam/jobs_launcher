@@ -1,0 +1,22 @@
+.badResult {
+  background: #e86755 !important;
+}
+
+.passedStatus {
+}
+
+.failedStatus {
+  background: #e86755 !important;
+}
+
+.errorStatus {
+  background: #e86755 !important;
+}
+
+.skippedStatus {
+  background: #e86755 !important;
+}
+
+.timeDiffFailedStatus {
+  background: #bc36e6 !important;
+}
