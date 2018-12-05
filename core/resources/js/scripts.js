@@ -184,18 +184,48 @@ function performanceNormalizeFormatter(value, row, index, field) {
 }
 
 function performanceNormalizeStyleFormatter(value, row, index, field) {
-
-    var diff = (value * 100 / row[1]) - 100;
-    var greenState = 255 - (2.55 * diff);
-    var redState = 0 + (2.55 * diff);
-    var opacityState = 0.8;
-    if (Math.round(diff) < 0) {
-        opacityState = 0.7 + (0.007 * diff);
+    var values = [];
+    for (key in row) {
+        if (key.indexOf('_') == -1 && key != 0) {
+            values.push(parseFloat(row[key]));
+        }
     }
+
+    var max = Math.max.apply(Math, values);
+
+    var redInit = 180;
+    var greenInit = 215;
+    var blueInit = 125;
+
+    var redWorst = 255;
+    var greenWorst = 113;
+    var blueWorst = 119;
+
+    var redBest = 110;
+    var greenBest = 190;
+    var blueBest = 120;
+
+    if (field == 1) {
+        var red = redInit;
+        var blue = blueInit;
+        var green = greenInit;
+    } else if (parseFloat(value) > values[0]) {
+        var red = Math.round(redInit + (redWorst - redInit)* value/max);
+        var green = Math.round(greenInit + (greenWorst - greenInit)* value/max);
+        var blue = Math.round(blueInit + (blueWorst - blueInit)* value/max);
+    } else {
+        var red = Math.round(redInit + (redBest - redInit)* value/max);
+        var green = Math.round(greenInit + (greenBest - greenInit)* value/max);
+        var blue = Math.round(blueInit + (blueBest - blueInit)* value/max);
+    }
+
+    var opacity = 1;
+    if (parseFloat(value) == 0.0) {
+        opacity = 0;
+    }
+
     return {
         classes: "",
-        css: {"background-color": "rgba(" + redState + ", " + greenState + ", 0, " + opacityState + ")"}
+        css: {"background-color": "rgba(" + red + ", " + green + ", " + blue + ", " + opacity + ")"}
     };
 }
-
-//TODO: bootstrap extentions
