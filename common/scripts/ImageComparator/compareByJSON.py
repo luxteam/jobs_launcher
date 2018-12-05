@@ -69,11 +69,13 @@ def main():
 
     if not os.path.exists(args.base_dir):
         core.config.main_logger.warning("Baseline not found by path: {}".format(args.base_dir))
-        shutil.copyfile(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED))
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
+            render_json = json.loads(file.read())
+            for img in render_json:
+                img['baseline_render_time'] = -0.0
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+            json.dump(render_json, file, indent=4)
         return
-
-    # render_json = []
-    # baseline_json = []
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
         render_json = json.loads(file.read())
@@ -90,6 +92,7 @@ def main():
         else:
             img['difference_color'] = -0.0
             img['difference_time'] = -0.0
+            img['baseline_render_time'] = -0.0
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
         json.dump(render_json, file, indent=4)
