@@ -41,11 +41,18 @@ def get_machine_info():
         else:
             return "not_implemented_for_" + os.name
 
+    def get_host():
+        if platform.system() == "Darwin" and platform.node().endswith('.local'):
+            return platform.node()[:-len('.local')]
+        else:
+            return platform.node()
+
+
     try:
         info = {}
         info['os'] = get_os()
         # info['driver'] = get_driver_ver()
-        info['host'] = platform.node()
+        info['host'] = get_host()
         info['cpu_count'] = str(psutil.cpu_count())
         # info['asic'] = get_gpu_name()
         # info['asic_count'] = "{}".format(len(info['asic'].split('+')))
