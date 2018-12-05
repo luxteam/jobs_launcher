@@ -29,6 +29,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json):
                 core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
                 continue
 
+            if not os.path.exists(baseline_img_path):
+                core.config.main_logger.error("BROKEN BASELINE MANIFEST")
+                continue
+
             metrics = None
             try:
                 metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
