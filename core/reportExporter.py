@@ -131,14 +131,13 @@ def build_session_report(report, session_dir):
                         else:
                             report['results'][result][item][jtem['test_status']] += 1
 
-                        # TODO: set machine_info once only
-                        try:
-                            report['machine_info'].update({'render_device': jtem['render_device']})
-                            report['machine_info'].update({'tool': jtem['tool']})
-                            report['machine_info'].update({'render_version': jtem['render_version']})
-                            report['machine_info'].update({'core_version': jtem['core_version']})
-                        except Exception as err:
-                            main_logger.warning(str(err))
+                    try:
+                        report['machine_info'].update({'render_device': jtem['render_device']})
+                        report['machine_info'].update({'tool': jtem['tool']})
+                        report['machine_info'].update({'render_version': jtem['render_version']})
+                        report['machine_info'].update({'core_version': jtem['core_version']})
+                    except Exception as err:
+                        main_logger.warning(str(err))
 
                     report['results'][result][item]['total'] += report['results'][result][item]['passed'] + \
                                                                report['results'][result][item]['failed'] + \
