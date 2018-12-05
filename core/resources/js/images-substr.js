@@ -4,7 +4,7 @@ function showImagesSubtraction(baselineId, renderId) {
         infoBox("Can't read image", "#815e9b");
         return;
     }
-    // TODO: didn't repeat canvas creation if the same images compare
+
     var diffCanvas = document.getElementById('imgsDifferenceCanvas');
     var imagesTable = document.getElementById("imgsCompareTable");
     var diffTable = document.getElementById('imgsDiffTable');

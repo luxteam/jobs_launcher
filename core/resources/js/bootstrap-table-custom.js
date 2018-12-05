@@ -1,5 +1,4 @@
 //TODO: add NOK status to sorting
-//TODO: fix sorting
 function statusSorter(a, b) {
     if (a == b) {
         return 0;

@@ -60,6 +60,7 @@ def get_rendertime_difference(base_dir, img):
                 return 0
 
         img.update({'difference_time': get_diff()})
+        img.update({'baseline_render_time': baseline_time})
     else:
         img.update({'difference_time': -0.0})
         img.update({'baseline_render_time': -0.0})
@@ -74,7 +75,7 @@ def main():
     baseline_json_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
 
     if not os.path.exists(render_json_path):
-        core.config.error("Render report doesn't exists")
+        core.config.main_logger.error("Render report doesn't exists")
         return
 
     if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
@@ -107,7 +108,6 @@ def main():
 
             img.update(get_rendertime_difference(args.base_dir, img))
         else:
-            img['difference_color'] = -0.0
             img['difference_time'] = -0.0
             img['baseline_render_time'] = -0.0
 
