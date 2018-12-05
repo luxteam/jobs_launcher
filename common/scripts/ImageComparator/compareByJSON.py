@@ -46,19 +46,22 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json):
 
 
 def get_rendertime_difference(base_dir, img):
-    render_time = img['render_time']
-    with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
-        baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0]['render_time']
+    if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
+        render_time = img['render_time']
+        with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
+            baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0]['render_time']
 
-    def get_diff():
-        if render_time == baseline_time:
-            return 0.0
-        try:
-            return (abs(render_time - baseline_time) / baseline_time) * 100.0
-        except ZeroDivisionError:
-            return 0
+        def get_diff():
+            if render_time == baseline_time:
+                return 0.0
+            try:
+                return (abs(render_time - baseline_time) / baseline_time) * 100.0
+            except ZeroDivisionError:
+                return 0
 
-    img.update({'difference_time': get_diff()})
+        img.update({'difference_time': get_diff()})
+    else:
+        img.update({'difference_time': -0.0})
 
     return img
 
