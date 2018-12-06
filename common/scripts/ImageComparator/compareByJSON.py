@@ -53,7 +53,10 @@ def get_rendertime_difference(base_dir, img):
     if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
         render_time = img['render_time']
         with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
-            baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0]['render_time']
+            try:
+                baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0]['render_time']
+            except IndexError:
+                baseline_time = -0.0
 
         def get_diff():
             if render_time == baseline_time:
