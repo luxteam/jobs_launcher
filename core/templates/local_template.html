@@ -161,10 +161,10 @@
                         <img data-src="{{ item.render_color_path }}"/>
                     </td>
 
-                    <td  class="infoColumn
-                    {% if item.test_status != "passed" %}
+                    <td nowrap class="infoColumn
+                    {%- if item.test_status != "passed" %}
                        badResult
-                    {% endif %}
+                    {% endif -%}
                     ">
                         <b>Pixel difference:</b> {{ item.difference_color }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
