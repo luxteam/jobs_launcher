@@ -285,18 +285,13 @@ a {
   cursor: pointer;
 }
 
-/*#imgsModalContent img{
-  align: center;
-  display: block;
-  margin: auto;
-}*/
-
 .localReportTable img{
   width: 300px;
 }
 
 .infoColumn {
   text-align: left;
+  white-space: nowrap;
 }
 
 #infoBox {
