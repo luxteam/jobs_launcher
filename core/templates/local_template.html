@@ -131,12 +131,17 @@
         >
             <thead>
                 <tr>
-                    <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
-                    <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
-                    <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
+                    <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
+                    <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
+                    <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
-                    <th data-filed="render_log">Render log</th>
-                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case direct link</th>
+                    <th data-filed="render_log" data-valign="middle">Render log</th>
+                    <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
+                    <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
+                    <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                    <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
+                    <th data-field="baseline_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
+                    <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                 </tr>
             </thead>
             <tbody>
@@ -179,6 +184,15 @@
                     <td>
                         <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
                     </td>
+
+                    <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+                    <td>{{ item.difference_color }}</td>
+                    <td {% if item.difference_time > 5 %}
+                        class="timeDiffFailedStatus"
+                        {% endif %}
+                        >{{ item.difference_time }}</td>
+                    <td>{{ item.render_time }}</td>
+                    <td>{{ item.baseline_render_time }}</td>
                 </tr>
             {% endfor %}
             </tbody>
