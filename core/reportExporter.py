@@ -304,12 +304,7 @@ def build_local_reports(work_dir, summary_report, common_info):
             for test in summary_report[execution]['results']:
                 for config in summary_report[execution]['results'][test]:
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
-
-                    # TODO: refactor it
-                    baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
-                    baseline_report = []
                     render_report = []
-
                     if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
                         with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
                             render_report = json.loads(file.read())
@@ -318,24 +313,14 @@ def build_local_reports(work_dir, summary_report, common_info):
                             common_info.update({'testing_start': render_report[0]['date_time']})
                             common_info.update({'test_group': render_report[0]['test_group']})
 
-                    if os.path.exists(baseline_report_path):
-                        with open(baseline_report_path, 'r') as file:
-                            baseline_report = json.loads(file.read())
-                            for render_item in render_report:
-                                try:
-                                    baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
-                                    render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                except IndexError:
-                                    pass
                     try:
-                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['render_version']),
+                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['core_version']),
                                                common_info=common_info,
                                                render_report=render_report,
                                                pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
                         save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
                     except Exception as err:
-                        print(str(err))
-                        main_logger.error(str(err))
+                        main_logger.error("Error during rendering local html report: {}".format(str(err)))
     except Exception as err:
         main_logger.error(str(err))
 
