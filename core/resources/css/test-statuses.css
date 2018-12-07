@@ -1,3 +1,7 @@
+.timeDiffFailedStatus {
+  background: #ffd3e6 !important;
+}
+
 .badResult {
   background: #e86755 !important;
 }
@@ -15,8 +19,4 @@
 
 .skippedStatus {
   background: #e86755 !important;
-}
-
-.timeDiffFailedStatus {
-  background: #ffd3e6 !important;
 }
