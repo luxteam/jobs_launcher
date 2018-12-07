@@ -160,9 +160,9 @@
                     </td>
 
                     <td class="infoColumn
-                    {%- if item.test_status != "passed" %}
+                    {%- if item.difference_time > 5 %}
                        badResult
-                    {% endif -%}">
+                    {% endif -%} {{ item.test_status }}Status">
                         <b>Pixel difference:</b> {{ item.difference_color }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
@@ -187,7 +187,7 @@
                     <td {% if item.difference_time > 5 %}
                         class="timeDiffFailedStatus"
                         {% endif %}
-                        >{{ item.difference_time }}</td>
+                        >{{ item.difference_time | round(2) }}</td>
                     <td>{{ item.render_time }}</td>
                     <td>{{ item.baseline_render_time }}</td>
                 </tr>
