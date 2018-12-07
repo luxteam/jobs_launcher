@@ -13,10 +13,10 @@ from core.auto_dict import AutoDict
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         if replace_pathsep:
-            s = json.dumps(report, indent=2, sort_keys=True)
+            s = json.dumps(report, indent=4, sort_keys=True)
             file.write(s.replace(os.path.sep, '/'))
         else:
-            json.dump(report, file, indent=2, sort_keys=True)
+            json.dump(report, file, indent=4, sort_keys=True)
 
 
 def save_html_report(report, session_dir, file_name, replace_pathsep=False):

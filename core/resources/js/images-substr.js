@@ -1,5 +1,6 @@
 function showImagesSubtraction(baselineId, renderId) {
 
+//    TODO: save images proportions while views switching
     if (!($("#baselineImgPopup").attr('src') && $("#renderedImgPopup").attr('src'))) {
         infoBox("Can't read image", "#815e9b");
         return;

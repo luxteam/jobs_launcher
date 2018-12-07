@@ -13,6 +13,7 @@ def main():
 
     rendered_cases = set()
     expected_cases = set()
+    common_info = {}
 
     try:
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_EXPECTED_NAME), 'r') as file:
@@ -23,6 +24,7 @@ def main():
 
         rendered_cases = {x['test_case'] for x in rendered}
         expected_cases = {x for x in expected}
+        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFULL_KEYS}
     except OSError as err:
         core.config.main_logger.error("Not found report: {}".format(str(err)))
         return
@@ -33,7 +35,6 @@ def main():
 
     if skipped_cases:
         core.config.main_logger.error("Some tests were not launched")
-        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFULL_KEYS}
 
         with open(os.path.join(args.work_dir, core.config.NOT_RENDERED_REPORT), 'w') as file:
             json.dump([x for x in skipped_cases], file, indent=4)
