@@ -1,3 +1,4 @@
+/*TODO: refactor all styles to vw vh*/
 body {
   margin:0px;
   background-image:none;
@@ -161,6 +162,7 @@ a {
   text-decoration: underline;
 }
 
+/*TODO: refactor go top button*/
 #goTop {
   margin: 0 !important;
   padding: 0 !important;
@@ -194,10 +196,6 @@ a {
 }
 #goTop:active {
   box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.25);
-}
-
-.badResult {
- background: #e86755 !important;
 }
 
 .hatching {
@@ -245,47 +243,46 @@ a {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 2;
+  z-index: 10;
   width: 100%;
   height: 100%;
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
 }
 
 .popupContent {
   margin: auto;
-  margin-top: 50px;
   padding: 10px;
-
-  /*position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 50%;
-  transform: translateX(-50%);*/
 }
 
-.popupHalfWidth {
+.popupHalfWidth {|
   width: 50%;
 }
 
-.close {
+/*.closePopup {
   color: #aaa;
-  float: right;
-  font-size: 28px;
+  font-size: 4vh;
   font-weight: bold;
+  opacity: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 3px 0px 0px 7px;
+  text-shadow: -1px 0px 12px #ff0101;
+}*/
+
+.closePopup img{
+    width: 1vw;
 }
 
-.close:hover,
-.close:focus {
+.closePopup:hover,
+.closePopup:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
-}
-
-#imgsModalContent img{
-  align: center;
-  display: block;
-  margin: auto;
 }
 
 .localReportTable img{
@@ -294,4 +291,72 @@ a {
 
 .infoColumn {
   text-align: left;
+  white-space: nowrap;
+}
+
+#infoBox {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    margin: auto;
+    margin-top: 10px;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+
+    width: 80%;
+    height: 4vh;
+    color: rgba(255, 255, 255, 1);
+    font-size: large;
+    -webkit-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    box-shadow: 1px 6px 15px 0px rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.5);
+}
+
+#infoBox p {
+    position: absolute;
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.commonButton {
+    padding: 4px;
+    border-radius: 9px;
+    border: 0.5px solid #bdbdbd;
+    background-color: #f1efefeb;
+}
+
+.commonButton:hover {
+    border-radius: 9px;
+    border: 0.5px solid #949393;
+    background-color: #dedede;
+}
+
+#imgsDifferenceCanvas {
+    display: block;
+    margin: auto;
+}
+
+#renderedImgPopup {
+    width: 25vw;
+}
+
+#baselineImgPopup {
+    width: 25vw;
+}
+
+#imgsDifferenceCanvas {
+    width: 25vw;
+}
+
+.popupForm {
+    position: absolute;
+    display: block;
+    margin: 1vw 0px 0px 1vw;
+    left: 0;
+    top: 0;
 }

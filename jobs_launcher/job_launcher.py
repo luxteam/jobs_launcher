@@ -29,7 +29,7 @@ def launch_job(cmd_line, job_timeout=None):
         report['passed'] = 1
         report['skipped'] = 0
     else:
-        core.config.main_logger.warning('Job was terminated by timeout')
+        core.config.main_logger.error('Job was terminated by timeout')
         report['failed'] = 1
         report['skipped'] = 0
 

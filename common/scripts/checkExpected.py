@@ -11,8 +11,8 @@ def main():
     argparser.add_argument('--work_dir')
     args = argparser.parse_args()
 
-    expected = set()
-    rendered = set()
+    rendered_cases = set()
+    expected_cases = set()
 
     try:
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_EXPECTED_NAME), 'r') as file:
@@ -20,23 +20,39 @@ def main():
 
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'r') as file:
             rendered = json.loads(file.read())
-    except Exception as err:
-        core.config.main_logger.error("Not found reports: {}".format(str(err)))
 
-    rendered = {x[img] for x in rendered for img in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS}
-    expected = {x['file_path'] for x in expected}
+        rendered_cases = {x['test_case'] for x in rendered}
+        expected_cases = {x for x in expected}
+    except OSError as err:
+        core.config.main_logger.error("Not found report: {}".format(str(err)))
+        return
+    except (KeyError, IndexError) as err:
+        core.config.main_logger.error("No one test was launched. Get empty report: {}".format(str(err)))
 
-    # TODO: check symmetry?
-    result = expected - rendered
+    skipped_cases = expected_cases - rendered_cases
 
-    if result:
-        result_json = [{"file_path": x} for x in result]
+    if skipped_cases:
+        core.config.main_logger.error("Some tests were not launched")
+        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFULL_KEYS}
 
         with open(os.path.join(args.work_dir, core.config.NOT_RENDERED_REPORT), 'w') as file:
-            json.dump(result_json, file, indent=" ")
+            json.dump([x for x in skipped_cases], file, indent=4)
+
+        for scase in skipped_cases:
+            report_base = core.config.RENDER_REPORT_BASE.copy()
+            report_base.update(
+                {"test_case": scase,
+                 "test_status": "error"}
+            )
+            report_base.update(common_info)
+            rendered.append(report_base)
+
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME), 'w') as file:
+            json.dump(rendered, file, indent=4)
     else:
-        pass
+        core.config.main_logger.info("No missed tests detected")
 
 
 if __name__ == '__main__':
-    main()
+    if not main():
+        exit(0)

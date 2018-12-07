@@ -6,12 +6,17 @@
     <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/bootstrap.css"/>
     <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/bootstrap-table.css"/>
     <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ pre_path }}/report_resources/css/test-statuses.css"/>
 
-    <script src="{{ pre_path }}/report_resources/js/jquery.min.js" type="text/javascript"></script>
+    <script src="{{ pre_path }}/report_resources/js/jquery-3.3.1.min.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/bootstrap.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/bootstrap-table.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/scripts.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/extensions/multiple-sort/bootstrap-table-multiple-sort.js"></script>
+
+    <script src="{{ pre_path }}/report_resources/js/pixelmatch.js"></script>
+    <script src="{{ pre_path }}/report_resources/js/images-substr.js"></script>
+    <script src="{{ pre_path }}/report_resources/js/bootstrap-table-custom.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function init(){
@@ -30,14 +35,15 @@
 
     <div class="popup" id="imgsModal">
         <div class="popupContent" id="imgsModalContent">
-            <span class="close" onclick="closeModalWindow('imgsModal');return false;">&times;</span>
-            <form style="display: block; margin: auto; width: 80%;">
-                <button type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +50</button>
-                <button type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -50</button>
+            <form class="popupForm">
+                <button class="commonButton closePopup" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;"><img src="{{ pre_path }}/report_resources/img/close-button.png"/></button>
+                <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
+                <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
+                <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch to difference</button>
                 <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
                 <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
             </form>
-            <table class="baseTable">
+            <table class="baseTable" id="imgsCompareTable">
                 <thead>
                     <tr>
                         <th>Baseline Image</th>
@@ -46,13 +52,28 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="hatching"><img src="" id="baselineImgPopup" width="300"/></td>
-                        <td class="hatching"><img src="" id="renderedImgPopup" width="300"/></td>
+                        <td class="hatching"><img src="" id="baselineImgPopup"/></td>
+                        <td class="hatching"><img src="" id="renderedImgPopup"/></td>
                     </tr>
                 </tbody>
             </table>
+
+            <table class="baseTable" id="imgsDiffTable" style="display: none">
+            <thead>
+                <tr>
+                    <th>Difference Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="hatching" id="diffImageTd"></td>
+                </tr>
+            </tbody>
+            </table>
         </div>
     </div>
+
+    <div id="infoBox"></div>
 
     <div id="header">
         <img src="{{ pre_path }}/report_resources/img/logo.png"/>
@@ -89,8 +110,6 @@
         </tr>
     </table>
 
-
-
     <hr/>
 
     <div class="jsTableWrapper">
@@ -104,19 +123,24 @@
                data-show-pagination-switch="true"
                data-pagination="true"
                data-page-size="5"
-               data-page-list="[5, 10, 20, 45, ALL]"
+               data-page-list="[1, 5, 10, 20, 45, ALL]"
                data-sort-order="desc"
-               data-show-multi-sort="true"
-        >
+               data-sort-name="test_case"
+               data-show-multi-sort="true">
             <thead>
                 <tr>
-                    <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
-                    <th data-field="parameters" data-halign="center">Parameters</th>
-                    <th data-field="baseline_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
-                    <th data-field="rendered_img" data-halign="center" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
+                    <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
+                    <th data-field="parameters" data-halign="center" data-valign="middle">Parameters</th>
+                    <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
+                    <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
-                    <th data-filed="log" data-halign="center">Render Log</th>
-                    <th data-field="copy_url_button" data-events="copyTestCaseName">Test case link</th>
+                    <th data-filed="render_log" data-valign="middle">Render log</th>
+                    <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
+                    <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
+                    <th data-field="pix_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                    <th data-field="time_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
+                    <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
+                    <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
                 </tr>
             </thead>
             <tbody>
@@ -124,7 +148,8 @@
                 <tr>
                     <td>{{ item.test_case }}</td>
 
-                    <td><b>Width:</b> {{ item.width }}<br/>
+                    <td>
+                        <b>Width:</b> {{ item.width }}<br/>
                         <b>Height:</b> {{ item.height }}<br/>
                         <b>Iterations:</b> {{ item.iterations }}
                     </td>
@@ -165,8 +190,21 @@
                     </td>
 
                     <td>
-                        <a>Copy direct link</a>
+                        <a href="renderTool.log">Render log</a>
                     </td>
+
+                    <td>
+                        <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
+                    </td>
+
+                    <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+                    <td>{{ item.difference_color }}</td>
+                    <td {%- if item.difference_time > 5 %}
+                        class="timeDiffFailedStatus"
+                        {% endif -%}>
+                        {{ item.difference_time | round(2) }}</td>
+                    <td>{{ item.render_time }}</td>
+                    <td>{{ item.baseline_render_time }}</td>
                 </tr>
             {% endfor %}
             </tbody>

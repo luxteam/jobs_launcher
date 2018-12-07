@@ -1,28 +1,3 @@
-//TODO: add NOK status to sorting
-//TODO: fix sorting
-function statusSorter(a, b) {
-    if (a == b) {
-        return 0;
-    }
-
-    if (a.includes('failed') || a.includes('skipped') && (!b.includes('failed') && !b.includes('skipped'))) {
-        return 1;
-    }
-
-    if (a.includes('failed') && b.includes('skipped')) {
-        return 1;
-    }
-
-    a = a.split('<br>');
-    b = b.split('<br>');
-
-    if (a[0] == b[0]) {
-        return a[2] > b[2] ? 1 : -1;
-    }
-
-    return -1;
-}
-
 function setActive(elem) {
     elem.classList.add('active_header');
 }
@@ -60,37 +35,23 @@ function resizeImg(img){
     }
 }
 
-window.openFullImgSize = {
-    'click img': function(e, value, row, index) {
-        var renderImg = document.getElementById('renderedImgPopup');
-        var baselineImg = document.getElementById('baselineImgPopup');
-
-        renderImg.src = "";
-        baselineImg.src = "";
-
-        renderImg.src = row.rendered_img.split('"')[1].replace("thumb64_", "");
-        try {
-            baselineImg.src = row.baseline_img.split('"')[1].replace("thumb64_", "");
-        } catch(e){
-        }
-
-        openModalWindow('imgsModal');
-    }
-}
-
 function timeFormatter(value, row, index, field) {
     var time = new Date(null);
     time.setMilliseconds(value * 1000);
     return time.toISOString().substr(11, 12);
 }
 
-function metaAJAX(value, row, index, field) {
-    return value.replace('data-src', 'src');
-}
-
 function openModalWindow(id) {
     var modal = document.getElementById(id);
-    modal.style.display = "block";
+    modal.style.display = "flex";
+
+    var diffCanvas = document.getElementById('imgsDiffTable');
+    var imagesTable = document.getElementById("imgsCompareTable");
+
+    if (diffCanvas && diffCanvas.style.display == "block") {
+        imagesTable.style.display = "";
+        diffCanvas.style.display = "none";
+    }
 
     window.onclick = function(event) {
         if (event.target == modal) {
@@ -104,19 +65,31 @@ function closeModalWindow(id) {
 }
 
 function increaseImgSize() {
-    var renderImg = document.getElementById('renderedImgPopup');
-    var baselineImg = document.getElementById('baselineImgPopup');
+    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
+	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    });
 
-    renderImg.width += 50;
-    baselineImg.width +=50;
+    $("#renderedImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    });
+
+    $("#baselineImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    });
 }
 
 function reduceImgSize() {
-    var renderImg = document.getElementById('renderedImgPopup');
-    var baselineImg = document.getElementById('baselineImgPopup');
+    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
+	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    });
 
-    renderImg.width -= 50;
-    baselineImg.width -=50;
+    $("#renderedImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    });
+
+    $("#baselineImgPopup").css("width", function( index, value ) {
+	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    });
 }
 
 //TODO: finish custom img size
@@ -129,22 +102,17 @@ function setImgSize() {
     baselineImg.width = widthValue;
 }
 
-window.copyTestCaseName = {
-    'click a': function(e, value, row, index) {
-
-        try {
-            var node = document.createElement('input');
-            //TODO: if previous link has vars - store it too
-            var normalized_link = window.location.hostname + window.location.pathname + "?searchText=";
-            node.setAttribute('value', normalized_link + row.test_case);
-            document.body.appendChild(node);
-            node.select();
-            document.execCommand('copy');
-            node.remove();
-        } catch(e) {
-            alert("Can't copy to clipboard.");
-        }
+function infoBox(message, bgcolor=false) {
+    $("#infoBox").html("<p>" + message + "</p>");
+    $("#infoBox").fadeIn('slow');
+    if (bgcolor) {
+        $("#infoBox").css({
+            "background-color": bgcolor,
+            "opacity": 0.4
+            });
     }
+
+    setTimeout(function(){$("#infoBox").fadeOut('slow');} , 2000);
 }
 
 function getQueryVariable(variable) {

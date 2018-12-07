@@ -11,7 +11,12 @@ import cpuinfo
 def get_machine_info():
 
     def get_os():
-        return '{} {}({})'.format(platform.system(), platform.release(), platform.architecture()[0])
+        if platform.system() == "Windows":
+            return '{} {}({})'.format(platform.system(), platform.release(), platform.architecture()[0])
+        elif platform.system() == "Darwin":
+            return '{} {}({})'.format(platform.system(), platform.mac_ver()[0], platform.architecture()[0])
+        else:
+            return '{} {}({})'.format(platform.linux_distribution()[0], platform.linux_distribution()[1], platform.architecture()[0])
 
     def get_driver_ver():
         if os.name == "nt":
@@ -36,11 +41,18 @@ def get_machine_info():
         else:
             return "not_implemented_for_" + os.name
 
+    def get_host():
+        if platform.system() == "Darwin" and platform.node().endswith('.local'):
+            return platform.node()[:-len('.local')]
+        else:
+            return platform.node()
+
+
     try:
         info = {}
         info['os'] = get_os()
         # info['driver'] = get_driver_ver()
-        info['host'] = platform.node()
+        info['host'] = get_host()
         info['cpu_count'] = str(psutil.cpu_count())
         # info['asic'] = get_gpu_name()
         # info['asic_count'] = "{}".format(len(info['asic'].split('+')))

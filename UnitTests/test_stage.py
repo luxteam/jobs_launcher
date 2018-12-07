@@ -52,6 +52,7 @@ def main():
                                         'render_time': random.choice([2.12903, 4.136912331, 5.62398]),
                                         'difference_color': random.randint(0, 50),
                                         'render_color_path': chosen_img,
+                                        'baseline_color_path': random.choice(['u211.jpg', 'u217.jpg']),
                                         'test_case': chosen_img.replace('.jpg', ''),
                                         'file_name': 'file',
                                         'core_version': random.choice(['1.23', '1.24', '1.25']),
