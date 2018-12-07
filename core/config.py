@@ -7,23 +7,28 @@ logging.basicConfig(filename='launcher.engine.log',
 main_logger = logging.getLogger('main_logger')
 
 RENDER_REPORT_BASE = {
-    "file_name": "",
-    "date_time": "",
-    "script_info": [],
-    "render_color_path": "",
-    "test_case": "",
-    "render_version": "",
-    "test_status": "stub",
-    "tool": "",
-    "render_time": -0.0,
-    "baseline_render_time": -0.0,
-    "render_mode": "",
-    "scene_name": "",
-    "test_group": "",
-    "difference_color": "not compared yet",
-    "core_version": "",
-    "render_device": ""
-}
+  "test_case": "",
+  "iterations": -0,
+  "render_device": "",
+  "width": -0,
+  "render_time": -0.0,
+  "scene_name": "",
+  "system_memory_usage": -0.0,
+  "gpu_memory_usage": -0.0,
+  "tool": "",
+  "render_mode": "",
+  "gpu_memory_total": -0.0,
+  "difference_memory_gpu": -0.0,
+  "minor_version": "",
+  "file_name": "",
+  "render_color_path": "",
+  "core_version": "",
+  "test_group": "",
+  "height": -0,
+  "date_time": "",
+  "test_status": "stub",
+  "gpu_memory_max": -0.0
+ }
 RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
