@@ -14,7 +14,18 @@ def createArgParser():
     argparser.add_argument('--pix_diff_tolerance', required=False, default=core.config.PIX_DIFF_TOLERANCE)
     argparser.add_argument('--pix_diff_max', required=False, default=core.config.PIX_DIFF_MAX)
     argparser.add_argument('--time_diff_max', required=False, default=core.config.TIME_DIFF_MAX)
+    argparser.add_argument('--vram_diff_max', required=False, default=core.config.VRAM_DIFF_MAX)
+
     return argparser
+
+
+def get_diff(current, base):
+    if current == base:
+        return 0.0
+    try:
+        return (abs(current - base) / base) * 100.0
+    except ZeroDivisionError:
+        return 0
 
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
@@ -60,19 +71,32 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             except IndexError:
                 baseline_time = -0.0
 
-        def get_diff():
-            if render_time == baseline_time:
-                return 0.0
-            try:
-                return (abs(render_time - baseline_time) / baseline_time) * 100.0
-            except ZeroDivisionError:
-                return 0
-
-        img.update({'difference_time': get_diff()})
+        img.update({'difference_time': get_diff(render_time, baseline_time)})
         img.update({'baseline_render_time': baseline_time})
     else:
         img.update({'difference_time': -0.0})
         img.update({'baseline_render_time': -0.0})
+
+    return img
+
+
+def get_vram_dfference(base_dir, img, vram_diff_max):
+    baseline_vram = -0.0
+    baseline_render_device = ""
+
+    if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
+        render_vram = img['gpu_memory_usage']
+        with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
+            try:
+                baseline_item = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']]
+                baseline_vram = baseline_item[0]['gpu_memory_usage']
+                baseline_render_device = baseline_item[0]['gpu_memory_usage']
+            except IndexError as err:
+                core.config.main_logger.error("Error during vram compare: {}".format(str(err)))
+
+    img.update({'baseline_gpu_memory_usage': baseline_vram})
+    img.update({'baseline_render_device': baseline_render_device})
+    img.update({'difference_vram': get_change(render_vram, baseline_vram)})
 
     return img
 
@@ -117,9 +141,7 @@ def main():
 
             img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
 
-            # TODO: render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
-            # render_item.update({'baseline_render_device': baseline_item['render_device']})
-            # render_item.update({'difference_memory_gpu': get_change(render_item['gpu_memory_usage'], baseline_item['gpu_memory_usage'])})
+            img.update(get_vram_difference(args.base_dir, img, args.vram_diff_max))
         else:
             img['difference_time'] = -0.0
             img['baseline_render_time'] = -0.0
