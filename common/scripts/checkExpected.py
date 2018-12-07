@@ -27,11 +27,7 @@ def main():
 
     if skipped_cases:
         core.config.main_logger.error("Some tests were not launched")
-        common_info = rendered[0].copy()
-
-        for key in common_info:
-            if key not in ['tool', 'render_version', 'test_group', 'core_version', 'render_device']:
-                del common_info[key]
+        common_info = {k: v for k, v in rendered[0].items() if k in ['tool', 'render_version', 'test_group', 'core_version', 'render_device']}
 
         with open(os.path.join(args.work_dir, core.config.NOT_RENDERED_REPORT), 'w') as file:
             json.dump([x for x in skipped_cases], file, indent=4)
