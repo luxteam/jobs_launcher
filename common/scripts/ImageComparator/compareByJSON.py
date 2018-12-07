@@ -17,7 +17,7 @@ def createArgParser():
     return argparser
 
 
-def get_pixel_difference(work_dir, base_dir, img, baseline_json):
+def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
 
     for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
         if key in img.keys():
@@ -36,12 +36,14 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json):
             metrics = None
             try:
                 metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
-            except FileNotFoundError as err:
+            except (FileNotFoundError, OSError) as err:
                 core.config.main_logger.error(str(err))
+                return img
 
-            pix_difference = metrics.getDiffPixeles(tolerance=9)
+            pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
             img.update({'difference_color': pix_difference})
-            if type(pix_difference) is str or pix_difference > core.config.PIX_DIFF_MAX:
+            if type(pix_difference) is str or pix_difference > pix_diff_max:
+                # TODO: swap status
                 img['test_status'] = 'error'
             img.update({'baseline_color_path': os.path.relpath(
                 os.path.join(base_dir, baseline_json[img['file_name']]), work_dir)})
@@ -49,7 +51,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json):
     return img
 
 
-def get_rendertime_difference(base_dir, img):
+def get_rendertime_difference(base_dir, img, time_diff_max):
     if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
         render_time = img['render_time']
         with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
@@ -111,9 +113,9 @@ def main():
     for img in render_json:
         # if failed it means tool crash - no sense to compare images
         if img['test_status'] != core.config.TEST_CRASH_STATUS:
-            img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json))
+            img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance, args.pix_diff_max))
 
-            img.update(get_rendertime_difference(args.base_dir, img))
+            img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
         else:
             img['difference_time'] = -0.0
             img['baseline_render_time'] = -0.0

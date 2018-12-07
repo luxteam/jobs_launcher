@@ -24,6 +24,7 @@ RENDER_REPORT_BASE = {
     "core_version": "",
     "render_device": ""
 }
+RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
 TIMEOUT = 6000

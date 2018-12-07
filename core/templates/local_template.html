@@ -161,8 +161,8 @@
 
                     <td class="infoColumn
                     {%- if item.difference_time > 5 %}
-                       badResult
-                    {% endif -%} {{ item.test_status }}Status">
+                       {{ ' ' }}timeDiffFailedStatus
+                    {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
                         <b>Pixel difference:</b> {{ item.difference_color }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
@@ -184,10 +184,10 @@
 
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
                     <td>{{ item.difference_color }}</td>
-                    <td {% if item.difference_time > 5 %}
+                    <td {%- if item.difference_time > 5 %}
                         class="timeDiffFailedStatus"
-                        {% endif %}
-                        >{{ item.difference_time | round(2) }}</td>
+                        {% endif -%}>
+                        {{ item.difference_time | round(2) }}</td>
                     <td>{{ item.render_time }}</td>
                     <td>{{ item.baseline_render_time }}</td>
                 </tr>
