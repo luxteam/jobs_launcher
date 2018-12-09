@@ -5,7 +5,8 @@ import CompareMetrics
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
-
+# TODO: refactor it
+# TODO: return difference value for better/worst time & vram diff
 
 def createArgParser():
     argparser = argparse.ArgumentParser()
@@ -80,7 +81,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
     return img
 
 
-def get_vram_dfference(base_dir, img, vram_diff_max):
+def get_vram_difference(base_dir, img, vram_diff_max):
     baseline_vram = -0.0
     baseline_render_device = ""
 
@@ -115,11 +116,8 @@ def main():
         core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
 
         try:
-            with open(render_json_path, 'r') as file:
-                render_json = json.loads(file.read())
-                for img in render_json:
-                    img['baseline_render_time'] = -0.0
-                    img['difference_time'] = -0.0
+            pass
+        # fill fileds for
         except Exception as err:
             core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
         else:
