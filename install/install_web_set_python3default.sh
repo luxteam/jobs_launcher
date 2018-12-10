@@ -11,7 +11,7 @@ python -m pip install mkl
 python -m pip install numpy
 python -m pip install scipy
 python -m pip install olefile
-python -m pip install Pillow
+python -m pip install -Iv Pillow==4.3.0
 
 python -m pip install MarkupSafe
 python -m pip install Jinja2
