@@ -91,7 +91,7 @@
                     {{ param }}<br>
                     {% endfor %}
                 </td>
-                <td>{{ item.render_time | round(3) }}</td>
+                <td>{{ item.render_time | round(2) }}</td>
 
                 <td class="{{ item.test_status }}Status">
                     {{ item.test_status | title }}
