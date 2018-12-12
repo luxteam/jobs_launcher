@@ -24,7 +24,7 @@ def get_diff(current, base):
     if current == base:
         return 0.0
     try:
-        return (abs(current - base) / base) * 100.0
+        return (current - base) / base * 100.0
     except ZeroDivisionError:
         return 0
 
@@ -63,86 +63,47 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
     return img
 
 
-def get_rendertime_difference(base_dir, img, time_diff_max):
-    if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
-        render_time = img['render_time']
-        with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
-            try:
-                baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0]['render_time']
-            except IndexError:
-                baseline_time = -0.0
-
-        img.update({'difference_time': get_diff(render_time, baseline_time)})
-        img.update({'baseline_render_time': baseline_time})
-    else:
-        img.update({'difference_time': -0.0})
-        img.update({'baseline_render_time': -0.0})
-
-    return img
-
-
-def get_vram_difference(base_dir, img, vram_diff_max):
-    baseline_vram = -0.0
-    baseline_render_device = ""
-
-    if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
-        render_vram = img['gpu_memory_usage']
-        with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
-            try:
-                baseline_item = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']]
-                baseline_vram = baseline_item[0]['gpu_memory_usage']
-                baseline_render_device = baseline_item[0]['gpu_memory_usage']
-            except IndexError as err:
-                core.config.main_logger.error("Error during vram compare: {}".format(str(err)))
-
-    img.update({'baseline_gpu_memory_usage': baseline_vram})
-    img.update({'baseline_render_device': baseline_render_device})
-    img.update({'difference_vram': get_change(render_vram, baseline_vram)})
-
-    return img
-
-
 def main():
     args = createArgParser().parse_args()
 
     render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
-    baseline_json_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
+    render_json = []
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
         return
 
-    if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
-        core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
-
-        try:
-            pass
-        # fill fileds for
-        except Exception as err:
-            core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
-        else:
-            with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
-                json.dump(render_json, file, indent=4)
-        finally:
-            return
-
     with open(render_json_path, 'r') as file:
         render_json = json.loads(file.read())
 
-    with open(baseline_json_path, 'r') as file:
-        baseline_json = json.loads(file.read())
+    if not os.path.exists(args.base_dir):
+        core.config.main_logger.warning("Baseline was not found: {}".format(args.base_dir))
 
-    for img in render_json:
-        # if failed it means tool crash - no sense to compare images
-        if img['test_status'] != core.config.TEST_CRASH_STATUS:
-            img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance, args.pix_diff_max))
-
-            img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
-
-            img.update(get_vram_difference(args.base_dir, img, args.vram_diff_max))
-        else:
-            img['difference_time'] = -0.0
-            img['baseline_render_time'] = -0.0
+        for img in render_json:
+            img.update({'difference_time': -0.0,
+                        'baseline_render_time': -0.0,
+                        'baseline_gpu_memory_usage': -0.0,
+                        'difference_vram': -0.0})
+    else:
+        for img in render_json:
+            # if failed it means tool crash - no sense to compare images
+            if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                if os.path.exists(os.path.join(args.base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
+                    with open(os.path.join(args.base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
+                        try:
+                            baseline_item = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']]
+                            baseline_vram = baseline_item[0]['gpu_memory_usage']
+                            baseline_time = baseline_item[0]['render_time']
+                            img.update({'difference_time': get_diff(img['render_time'], baseline_time)})
+                            img.update({'difference_vram': get_diff(img['render_time'], baseline_vram)})
+                        except IndexError:
+                            core.config.main_logger.error("{} wasn't found in baseline".format(img['test_case']))
+                        except KeyError:
+                            core.config.main_logger.error()
+                else:
+                    core.config.main_logger.warning("Baseline for: {} wasn't found".format(img['test_group']))
+            else:
+                pass
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
         json.dump(render_json, file, indent=4)

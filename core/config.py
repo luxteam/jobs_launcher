@@ -28,7 +28,7 @@ RENDER_REPORT_BASE = {
   "date_time": "",
   "test_status": "stub",
   "gpu_memory_max": -0.0
- }
+}
 RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'minor_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
@@ -40,8 +40,8 @@ PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
 VRAM_DIFF_MAX = 5
 
-TEST_CRASH_STATUS = 'failed'
-TEST_DIFF_STATUS = 'error'
+TEST_CRASH_STATUS = 'error'
+TEST_DIFF_STATUS = 'failed'
 
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
