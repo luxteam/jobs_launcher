@@ -1,13 +1,10 @@
 import os
 import jinja2
 import json
-import base64
 import shutil
 import datetime
-import operator
 from PIL import Image
 from core.config import *
-from core.auto_dict import AutoDict
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
@@ -25,34 +22,6 @@ def save_html_report(report, session_dir, file_name, replace_pathsep=False):
             file.write(report.replace(os.path.sep, '/'))
         else:
             file.write(report)
-
-
-def make_base64_img(session_dir, report):
-    os.mkdir(os.path.join(session_dir, 'tmp'))
-
-    for test_package in report['results']:
-        for test_conf in report['results'][test_package]:
-            for test_execution in report['results'][test_package][test_conf]['render_results']:
-
-                for img in POSSIBLE_JSON_IMG_KEYS:
-                    if img in test_execution:
-                        try:
-                            if not os.path.exists(os.path.abspath(test_execution[img])):
-                                test_execution[img] = os.path.join(session_dir, test_execution[img])
-
-                            cur_img = Image.open(os.path.abspath(test_execution[img]))
-                            tmp_img = cur_img.resize((64, 64), Image.ANTIALIAS)
-                            tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
-
-                            with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
-                                code = base64.b64encode(file.read())
-
-                            src = "data:image/jpeg;base64," + str(code)[2:-1]
-                            test_execution.update({img: src})
-                        except Exception as err:
-                            main_logger.error('Error in base64 encoding: {}'.format(str(err)))
-
-    return report
 
 
 def env_override(value, key):
@@ -220,77 +189,6 @@ def build_summary_report(work_dir):
     return summary_report, common_info
 
 
-def build_performance_report(work_dir):
-
-    performance_report = AutoDict()
-    performance_report_detail = AutoDict()
-    hardware = {}
-    summary_info_for_report = {}
-    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
-        for file in files:
-            if file.endswith(SESSION_REPORT):
-                with open(os.path.join(path, file), 'r') as report_file:
-                    temp_report = json.loads(report_file.read())
-
-                hw = temp_report['machine_info']['render_device']
-                if hw not in hardware:
-                    hardware[hw] = temp_report['summary']['render_duration']
-                tool = temp_report['machine_info']['tool']
-
-                results = temp_report.pop('results', None)
-                info = temp_report
-                for test_package in results:
-                    for test_config in results[test_package]:
-                        results[test_package][test_config].pop('render_results', None)
-
-                performance_report[tool].update({hw: info})
-
-                for test_package in results:
-                    for test_config in results[test_package]:
-                        performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
-
-                tmp = sorted(hardware.items(), key=operator.itemgetter(1))
-                summary_info_for_report[tool] = tmp
-    hardware = sorted(hardware.items(), key=operator.itemgetter(1))
-    return performance_report, hardware, performance_report_detail, summary_info_for_report
-
-
-def build_compare_report(work_dir):
-    compare_report = AutoDict()
-    hardware = []
-    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
-        for file in files:
-            if file == SESSION_REPORT:
-                with open(os.path.join(path, file), 'r') as report_file:
-                    temp_report = json.loads(report_file.read())
-
-                # force add gpu from baseline
-                hw = temp_report['machine_info']['render_device']
-                hw_bsln = temp_report['machine_info']['render_device'] + "[Baseline"
-                hardware.append(hw)
-                hardware.append(hw_bsln)
-
-                # collect images links
-                for test_package in temp_report['results']:
-                    for test_config in temp_report['results'][test_package]:
-                        for item in temp_report['results'][test_package][test_config]['render_results']:
-                            # if test is processing first time
-                            if not compare_report[item['test_case']]:
-                                compare_report[item['test_case']] = {}
-                            try:
-                                compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumb256_render_color_path']), work_dir)})
-                                compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['thumb256_baseline_color_path']), work_dir)})
-                            except KeyError as err:
-                                # TODO: fix
-                                try:
-                                    compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir)})
-                                    compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['baseline_color_path']), work_dir)})
-                                except:
-                                    pass
-
-    return compare_report, hardware
-
-
 def build_local_reports(work_dir, summary_report, common_info):
     # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
@@ -396,36 +294,5 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
 
-    try:
-        performance_template = env.get_template('performance_template.html')
-        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(work_dir)
-        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
-        save_json_report(performance_report_detail, work_dir, 'perf.json')
-        performance_html = performance_template.render(title=major_title + " Performance",
-                                                       performance_report=performance_report,
-                                                       hardware=hardware,
-                                                       performance_report_detail=performance_report_detail,
-                                                       pageID="performanceA",
-                                                       common_info=common_info, test_info=summary_info_for_report)
-        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-    except Exception as err:
-        performance_html = "Error while building performance report: {}".format(str(err))
-        main_logger.error(performance_html)
-        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-
-    try:
-        compare_template = env.get_template('compare_template.html')
-        compare_report, hardware = build_compare_report(work_dir)
-        save_json_report(compare_report, work_dir, COMPARE_REPORT)
-        compare_html = compare_template.render(title=major_title + " Compare",
-                                               hardware=hardware,
-                                               compare_report=compare_report,
-                                               pageID="compareA",
-                                               common_info=common_info)
-        save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
-    except Exception as err:
-        compare_html = "Error while building compare report: {}".format(str(err))
-        main_logger.error(compare_html)
-        save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info)
