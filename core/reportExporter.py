@@ -82,8 +82,9 @@ def generate_thumbnails(session_dir):
                                     continue
 
                                 cur_img = Image.open(cur_img_path)
-                                thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
-                                thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
+                                sides_proportion = int(cur_img.size[1] / cur_img.size[0])
+                                thumb64 = cur_img.resize((64, 64 * sides_proportion), Image.ANTIALIAS)
+                                thumb256 = cur_img.resize((256, 256 * sides_proportion), Image.ANTIALIAS)
 
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
