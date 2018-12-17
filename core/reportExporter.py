@@ -69,6 +69,7 @@ def generate_thumbnails(session_dir):
 
 def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
+    # total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0}
 
     generate_thumbnails(session_dir)
 
@@ -82,6 +83,7 @@ def build_session_report(report, session_dir):
             except Exception as err:
                 main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
+                # TODO: render_duration
                 report['results'][result][item].update({'render_duration': -0.0})
             else:
                 render_duration = 0.0
@@ -98,9 +100,11 @@ def build_session_report(report, session_dir):
                         if jtem['test_status'] == 'undefined':
                             report['results'][result][item]['total'] += 1
                         else:
+                            # TODO: validate 'works' status
                             report['results'][result][item][jtem['test_status']] += 1
 
                     try:
+                    # TODO: machine info
                         report['machine_info'].update({'render_device': jtem['render_device']})
                         report['machine_info'].update({'tool': jtem['tool']})
                         report['machine_info'].update({'render_version': jtem['render_version']})
@@ -293,6 +297,5 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
-
 
     build_local_reports(work_dir, summary_report, common_info)

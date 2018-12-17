@@ -54,11 +54,6 @@ def main():
         args.work_dir = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     work_path = os.path.join(work_path, args.work_dir)
 
-    try:
-        os.makedirs(work_path)
-    except OSError as e:
-        main_logger.error(str(e))
-
     # session_dir = os.path.join(work_path, machine_info.get("host"))
     session_dir = work_path
 
@@ -119,7 +114,6 @@ def main():
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
-            # print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
             print("  Executing job {}/{}".format(i+1, len(found_job[3])))
             report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
                 jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
@@ -129,8 +123,8 @@ def main():
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
 
-    # print("Saving session report")
-    # core.reportExporter.build_session_report(report, session_dir)
+    print("Saving session report")
+    core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report\n\n')
     shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
