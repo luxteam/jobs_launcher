@@ -68,13 +68,10 @@
         <thead>
             <tr>
                 <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
-                <th data-halign="center" data-valign="middle" data-sortable="true">Parameters</th>
-                <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
                 <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
-                <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
-                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
-                <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Redshift</th>
+                <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR</th>
                 <th data-filed="render_log" data-halign="center" data-valign="middle">Render log</th>
                 <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
             </tr>
@@ -87,27 +84,12 @@
                 {% for item in report[i].results[test_package][test_conf].render_results %}
             <tr>
                 <td>{{ item.test_case }}</td>
-                <td>{% for param in item.script_info %}
-                    {{ param }}<br>
-                    {% endfor %}
-                </td>
-                <td>{{ item.render_time | round(2) }}</td>
 
                 <td class="{{ item.test_status }}Status">
                     {{ item.test_status | title }}
                 </td>
 
                 <td>{{ item.difference_color }}</td>
-
-                <!--TODO: 5% to conf CONSTS-->
-                <td {%- if 5 < item.difference_time %}
-                        class="timeWorseStatus"
-                    {% elif item.difference_time < -5 %}
-                        class="timeBetterStatus"
-                    {% endif -%}
-                    >
-                    {{ item.difference_time | round (2) }}
-                </td>
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}
