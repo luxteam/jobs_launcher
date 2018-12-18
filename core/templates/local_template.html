@@ -80,8 +80,6 @@
 
         <ul>
             <li><a id="summaryA" href='{{ pre_path }}/summary_report.html'>summary</a></li>
-            <li><a id="performanceA" href='{{ pre_path }}/performance_report.html'>performance</a></li>
-            <li><a id="compareA" href='{{ pre_path }}/compare_report.html'>compare</a></li>
         </ul>
     </div>
 
@@ -133,14 +131,11 @@
                     <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
-                    <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
-                    <th data-filed="render_log" data-valign="middle">Render log</th>
+                    <th data-filed="render_log" data-valign="middle">Redshift Render log</th>
+                    <th data-filed="render_log" data-valign="middle">Conversion log</th>
+                    <th data-filed="render_log" data-valign="middle">RPR Render log</th>
                     <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
-                    <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
                     <th data-field="pix_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
-                    <th data-field="time_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
-                    <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
-                    <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
                 </tr>
             </thead>
             <tbody>
@@ -156,41 +151,15 @@
                     {% endif %}
                     </td>
 
-                    <td class="hatching">
-                        <img data-src="{{ item.render_color_path }}"/>
-                    </td>
+                    <td class="hatching"><img data-src="{{ item.render_color_path }}"/></td>
 
-                    <td class="infoColumn
-                    {%- if item.difference_time > 5 %}
-                       {{ ' ' }}timeDiffFailedStatus
-                    {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
-                        <b>Pixel difference:</b> {{ item.difference_color }} %<br/>
-                        <b>Scene:</b> {{ item.scene_name }}<br/>
-                        <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
-                        <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
-                        <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
-                        <b>Test info:</b><br/>
-                        {% for param in item.script_info %}
-                            {{ param }}<br/>
-                        {% endfor %}
-                    </td>
+                    <td><a href="renderTool.log">Render log</a></td>
+                    <td><a href="renderTool.log">Render log</a></td>
+                    <td><a href="renderTool.log">Render log</a></td>
 
-                    <td>
-                        <a href="renderTool.log">Render log</a>
-                    </td>
+                    <td><button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button></td>
 
-                    <td>
-                        <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
-                    </td>
-
-                    <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
                     <td>{{ item.difference_color }}</td>
-                    <td {%- if item.difference_time > 5 %}
-                        class="timeDiffFailedStatus"
-                        {% endif -%}>
-                        {{ item.difference_time | round(2) }}</td>
-                    <td>{{ item.render_time }}</td>
-                    <td>{{ item.baseline_render_time }}</td>
                 </tr>
             {% endfor %}
             </tbody>

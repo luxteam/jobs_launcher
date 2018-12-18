@@ -15,8 +15,6 @@
                 <th>Error</th>
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
-                <th data-formatter="timeFormatter">Setup time</th>
-                <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
         <tbody>
@@ -49,12 +47,6 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
-                <td
-                {% if report[i].summary.render_duration == -0.0 %}
-                class="badResult"
-                {% endif %}
-                >{{ report[i].summary.render_duration }}</td>
             </tr>
     {% endfor %}
         </tbody>
@@ -80,7 +72,6 @@
                 <!--<th>Config</th>-->
                 <th>Host</th>
                 <th>Local report</th>
-                <th>Tool's log</th>
                 <th>Engine log</th>
                 <th>Total</th>
                 <th>Passed</th>
@@ -88,8 +79,6 @@
                 <th>Error</th>
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
-                <th data-formatter="timeFormatter">Setup time</th>
-                <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
         <tbody>
@@ -130,7 +119,6 @@
                 </td>
 
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
-                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
@@ -155,13 +143,6 @@
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
 
-                <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
-
-                <td
-                {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
-                class="badResult"
-                {% endif %}
-                >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
             </tr>
             <tr>
             {% endfor %}
@@ -169,7 +150,7 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="5">Sum</td>
+                <td colspan="4">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -188,12 +169,6 @@
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
-                <td
-                {% if report[i].summary.render_duration == -0.0 %}
-                class="badResult"
-                {% endif %}
-                >{{ report[i].summary.render_duration | round(1) }}</td>
             </tr>
         </tbody>
     </table>
