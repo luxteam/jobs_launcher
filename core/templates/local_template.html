@@ -131,9 +131,9 @@
                     <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
-                    <th data-filed="render_log" data-valign="middle">Redshift Render log</th>
-                    <th data-filed="render_log" data-valign="middle">Conversion log</th>
-                    <th data-filed="render_log" data-valign="middle">RPR Render log</th>
+                    <th data-filed="redshift_log" data-valign="middle">Redshift Render log</th>
+                    <th data-filed="conversion_log" data-valign="middle">Conversion log</th>
+                    <th data-filed="rpr_log" data-valign="middle">RPR Render log</th>
                     <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
                     <th data-field="pix_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
                 </tr>
@@ -155,7 +155,7 @@
 
                     <td><a href="{{ item.scene_name }}.rs.log">Redshift log</a></td>
                     <td><a href="{{ item.scene_name }}.conversion.log">Conversion log</a></td>
-                    <td><a href="renderTool.log">Maya log</a></td>
+                    <td><a href="renderTool.log">RPR log</a></td>
 
                     <td><button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button></td>
 
