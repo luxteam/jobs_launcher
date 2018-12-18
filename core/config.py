@@ -6,7 +6,7 @@ logging.basicConfig(filename='launcher.engine.log',
                     format=u'%(filename)-19s[LINE:%(lineno)-3d] #%(levelname)-8s [%(asctime)s] %(message)s')
 main_logger = logging.getLogger('main_logger')
 
-TIMEOUT = 600
+TIMEOUT = 900
 TIMEOUT_PAR = 3
 
 PIX_DIFF_MAX = 15
