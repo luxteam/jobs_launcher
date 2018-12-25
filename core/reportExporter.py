@@ -1,10 +1,13 @@
 import os
 import jinja2
+import sys
 import json
 import shutil
 import datetime
 from PIL import Image
 from core.config import *
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
+from local_config import original_render
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
@@ -237,7 +240,8 @@ def build_local_reports(work_dir, summary_report, common_info):
                         html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['render_version']),
                                                common_info=common_info,
                                                render_report=render_report,
-                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
+                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
+                                               original_render=original_render)
                         save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
                     except Exception as err:
                         print(str(err))
@@ -289,7 +293,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                                      pageID="summaryA",
                                                                      PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                                      common_info=common_info,
-                                                                     i=execution)
+                                                                     i=execution,
+                                                                     original_render=original_render)
 
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:

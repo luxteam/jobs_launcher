@@ -69,9 +69,9 @@
             <tr>
                 <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
                 <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
-                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Redshift</th>
+                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR</th>
-            	<th data-filed="redshift_log" data-halign="center" data-valign="middle">Redshift Render log</th>
+            	<th data-filed="original_render_log" data-halign="center" data-valign="middle">{{ original_render | title }} Render log</th>
                 <th data-filed="conversion_log" data-halign="center" data-valign="middle">Conversion log</th>
                 <th data-filed="rpr_log" data-halign="center" data-valign="middle">RPR Render log</th>
                 <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
@@ -109,7 +109,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.rs.log">Redshift log</a></td>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.rs.log">{{ original_render | title }} log</a></td>
                 </td>
                 <td>
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.conversion.log">Conversion log</a></td>
