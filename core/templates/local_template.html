@@ -185,9 +185,12 @@
 
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
                     <td>{{ item.difference_color }}</td>
-                    <td {%- if item.difference_time > 5 %}
-                        class="timeDiffFailedStatus"
-                        {% endif -%}>
+
+                    <td {%- if 5 < item.difference_time %}
+                        class="timeWorseStatus"
+                    {% elif item.difference_time < -5 %}
+                        class="timeBetterStatus"
+                    {% endif -%}
                         {{ item.difference_time | round(2) }}</td>
                     <td>{{ item.render_time }}</td>
                     <td>{{ item.baseline_render_time }}</td>
