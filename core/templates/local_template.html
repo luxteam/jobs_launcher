@@ -134,13 +134,16 @@
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
+                    <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                    <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
+                    <th data-field="vram_diff" data-halign="center" data-valign="middle" data-sortable="true">GPU RAM diff, %</th>
                     <th data-filed="render_log" data-valign="middle">Render log</th>
                     <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
                     <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
-                    <th data-field="pix_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
-                    <th data-field="time_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                     <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                     <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
+                    <th data-field="render_vram" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render GPU RAM</th>
+                    <th data-field="baseline_vram" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline GPU RAM</th>
                 </tr>
             </thead>
             <tbody>
@@ -162,18 +165,14 @@
                     {% endif %}
                     </td>
 
-                    <td class="hatching">
-                        <img data-src="{{ item.render_color_path }}"/>
-                    </td>
+                    <td class="hatching"><img data-src="{{ item.render_color_path }}"/></td>
 
                     <td class="infoColumn
                     {%- if item.difference_time > 5 %}
-                       {{ ' ' }}timeDiffFailedStatus
+                       {{ ' ' }}timeWorseStatus
                     {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
+                        <b>Test status:</b> {{ item.test_status }}<br/>
                         <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
-                        <b>Pixel difference:</b> {{ item.difference_color }}<br/>
-                        <b>Render time difference:</b> {{ item.difference_time | round(3) }} %<br/>
-                        <b>GPU memory usage difference:</b> {{ item.difference_vram | round(3) }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                         <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
@@ -184,16 +183,7 @@
                         <b>System memory usage:</b> {{ item.system_memory_usage }}<br/>
                     </td>
 
-                    <td>
-                        <a href="{{ item.test_case }}.log">tahoe.log</a>
-                    </td>
-
-                    <td>
-                        <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
-                    </td>
-
-                    <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
-                    <td class="{{ item.test_status }}Status">{{ item.difference_color | round(2) }}</td>
+                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
 
                     <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"
@@ -201,8 +191,24 @@
                         class="timeBetterStatus"
                     {% endif -%}
                         >{{ item.difference_time | round(2) }}</td>
+
+                    <td {%- if 5 < item.difference_vram %}
+                        class="timeWorseStatus"
+                    {% elif item.difference_vram < -5 %}
+                        class="timeBetterStatus"
+                    {% endif -%}
+                        >{{ item.difference_vram | round(2) }}</td>
+
+                    <td><a href="{{ item.test_case }}.log">tahoe.log</a></td>
+
+                    <td><button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button></td>
+
+                    <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+
                     <td>{{ item.render_time }}</td>
                     <td>{{ item.baseline_render_time }}</td>
+                    <td>{{ item.gpu_memory_usage }}</td>
+                    <td>{{ item.baseline_gpu_memory_usage }}</td>
                 </tr>
             {% endfor %}
             </tbody>

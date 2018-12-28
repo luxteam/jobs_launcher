@@ -1,5 +1,9 @@
-.timeDiffFailedStatus {
+.timeWorseStatus {
   background: #ffd3e6 !important;
+}
+
+.timeBetterStatus {
+  background: #d3ffe4 !important;
 }
 
 .badResult {
