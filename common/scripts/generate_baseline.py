@@ -21,13 +21,6 @@ def main():
     args.results_root = os.path.abspath(args.results_root)
     args.baseline_root = os.path.abspath(args.baseline_root)
 
-    baseline_manifest_path = os.path.join(args.baseline_root, core.config.BASELINE_MANIFEST)
-
-    baseline_manifest = {}
-    report = []
-    if os.path.exists(baseline_manifest_path):              # if manifest already exists - update it
-        with open(baseline_manifest_path, 'r') as file:
-            baseline_manifest = json.loads(file.read())
     if os.path.exists(args.baseline_root):
         shutil.rmtree(args.baseline_root)
 
@@ -40,9 +33,6 @@ def main():
                 # copy json report with new names
                 shutil.copyfile(os.path.join(path, file),
                                 os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, core.config.BASELINE_REPORT_NAME), args.results_root)))
-                # copy html report
-                shutil.copyfile(os.path.join(path, core.config.TEST_REPORT_HTML_NAME),
-                                os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), core.config.TEST_REPORT_HTML_NAME))
 
                 with open(os.path.join(path, file), 'r') as json_report:
                     report = json.loads(json_report.read())
@@ -55,8 +45,6 @@ def main():
                             rendered_img_path = os.path.join(path, test[img])
                             baseline_img_path = os.path.relpath(rendered_img_path, args.results_root)
 
-                            # add img to baseline manifest
-                            baseline_manifest.update({os.path.split(test[img])[-1]: baseline_img_path})
                             # create folder in first step for current folder
                             if not os.path.exists(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0])):
                                 os.makedirs(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0]))
@@ -66,21 +54,6 @@ def main():
                                                 os.path.join(args.baseline_root, baseline_img_path))
                             except IOError as err:
                                 core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
-    try:
-        # save baseline manifest (using in compareByJSON.py)
-        with open(baseline_manifest_path, 'w') as file:
-            json.dump(baseline_manifest, file, indent=" ")
-
-        # TODO: check if session report exists and update it (is it need?)
-        # shutil.copyfile(os.path.join(args.results_root, core.config.SESSION_REPORT),
-        #                 os.path.join(os.path.abspath(args.baseline_root), core.config.BASELINE_SESSION_REPORT))
-        # TODO: copy html report
-        # shutil.copyfile(os.path.join(args.results_root, core.config.SESSION_REPORT_HTML),
-        #                 os.path.join(os.path.abspath(args.baseline_root), 'baseline_report.html'))
-        # shutil.copytree(os.path.join(args.results_root, 'report_resources'),
-        #                 os.path.join(os.path.abspath(args.baseline_root), 'report_resources'))
-    except Exception as err:
-        core.config.main_logger.error("Error while saving baseline manifest: {}".format(str(err)))
 
 
 if __name__ == '__main__':

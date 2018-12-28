@@ -211,10 +211,8 @@ a {
   width: 30%;
 }
 
-/*duck tape*/
 .detailedTable img {
   width: 64px;
-  height: 64px;
 }
 .jsTableWrapper {
   width: 80% !important;

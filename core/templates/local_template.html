@@ -171,9 +171,10 @@
                        badResult
                     {% endif %}
                     ">
+                        <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
                         <b>Pixel difference:</b> {{ item.difference_color }}<br/>
                         <b>Render time difference:</b> {{ item.difference_time | round(3) }} %<br/>
-                        <b>GPU memory usage difference:</b> {{ item.difference_memory_gpu | round(3) }} %<br/>
+                        <b>GPU memory usage difference:</b> {{ item.difference_vram | round(3) }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                         <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>

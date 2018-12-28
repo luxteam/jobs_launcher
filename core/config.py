@@ -8,27 +8,36 @@ main_logger = logging.getLogger('main_logger')
 
 RENDER_REPORT_BASE = {
   "test_case": "",
-  "iterations": -0,
-  "render_device": "",
-  "width": -0,
-  "render_time": -0.0,
+  "test_group": "",
   "scene_name": "",
+  "file_name": "",
+  "tool": "",
+  "test_status": "undefined",
+  "date_time": "",
+
+  "core_version": "",
+  "minor_version": "",
+
+  "render_mode": "",
+  "render_device": "",
+  "iterations": -0,
+  "width": -0,
+  "height": -0,
+
+  "render_color_path": "",
+  "render_time": -0.0,
   "system_memory_usage": -0.0,
   "gpu_memory_usage": -0.0,
-  "tool": "",
-  "render_mode": "",
   "gpu_memory_total": -0.0,
-  "difference_memory_gpu": -0.0,
-  "minor_version": "",
-  "file_name": "",
-  "render_color_path": "",
-  "core_version": "",
-  "test_group": "",
-  "height": -0,
-  "date_time": "",
-  "test_status": "stub",
-  "gpu_memory_max": -0.0
+  "gpu_memory_max": -0.0,
+
+  "baseline_gpu_memory_usage": -0.0,
+  "baseline_render_time": -0.0,
+  "difference_vram": -0.0,
+  "difference_time": -0.0,
+  "difference_color": "not compared"
 }
+
 RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'minor_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
@@ -41,7 +50,7 @@ TIME_DIFF_MAX = 5
 VRAM_DIFF_MAX = 5
 
 TEST_CRASH_STATUS = 'error'
-TEST_DIFF_STATUS = 'failed'
+TEST_BASELINE_DIFF_STATUS = 'failed'
 
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
