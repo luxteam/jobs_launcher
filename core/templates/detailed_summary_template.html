@@ -89,12 +89,15 @@
                 </td>
                 <td>{{ item.render_time }}</td>
                 <td>{{ item.baseline_render_time }}</td>
-                <td {% if item.difference_time > 5 %}
-                        class="timeDiffFailedStatus"
-                    {% endif %}>
-                    {{ item.difference_time | round (2) }}
-                </td>
-                <td>{{ item.difference_color }}</td>
+                <!--TODO: 5% to conf CONSTS-->
+                <td {%- if 5 < item.difference_time %}
+                        class="timeWorseStatus"
+                    {% elif item.difference_time < -5 %}
+                        class="timeBetterStatus"
+                    {% endif -%}
+                    >
+                    {{ item.difference_time | round (2) }}</td>
+                <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}

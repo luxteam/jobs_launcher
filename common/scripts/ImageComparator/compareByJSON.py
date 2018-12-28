@@ -108,6 +108,10 @@ def main():
             check_pixel_difference(args.work_dir, args.base_dir, img, baseline_item[0], args.pix_diff_tolerance, args.pix_diff_max)
             check_rendertime_difference(img, baseline_item[0], args.time_diff_max)
             check_vram_difference(img, baseline_item[0], args.vram_diff_max)
+            try:
+                img.update({"baseline_render_device": baseline_item[0]['render_device']})
+            except KeyError:
+                core.config.main_logger.error("Can't get baseline render device")
         else:
             core.config.main_logger.error("Found invalid count of test_cases in baseline json")
             continue

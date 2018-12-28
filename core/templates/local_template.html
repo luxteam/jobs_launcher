@@ -166,11 +166,10 @@
                         <img data-src="{{ item.render_color_path }}"/>
                     </td>
 
-                    <td  class="infoColumn
-                    {% if item.test_status != "passed" %}
-                       badResult
-                    {% endif %}
-                    ">
+                    <td class="infoColumn
+                    {%- if item.difference_time > 5 %}
+                       {{ ' ' }}timeDiffFailedStatus
+                    {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
                         <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
                         <b>Pixel difference:</b> {{ item.difference_color }}<br/>
                         <b>Render time difference:</b> {{ item.difference_time | round(3) }} %<br/>
@@ -194,11 +193,14 @@
                     </td>
 
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
-                    <td>{{ item.difference_color }}</td>
-                    <td {%- if item.difference_time > 5 %}
-                        class="timeDiffFailedStatus"
-                        {% endif -%}>
-                        {{ item.difference_time | round(2) }}</td>
+                    <td class="{{ item.test_status }}Status">{{ item.difference_color | round(2) }}</td>
+
+                    <td {%- if 5 < item.difference_time %}
+                        class="timeWorseStatus"
+                    {% elif item.difference_time < -5 %}
+                        class="timeBetterStatus"
+                    {% endif -%}
+                        >{{ item.difference_time | round(2) }}</td>
                     <td>{{ item.render_time }}</td>
                     <td>{{ item.baseline_render_time }}</td>
                 </tr>
