@@ -184,7 +184,7 @@
                     </td>
 
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
-                    <td>{{ item.difference_color }}</td>
+                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
 
                     <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"
