@@ -9,17 +9,14 @@
         <thead>
             <tr>
                 <th>Job-Name</th>
-                <th>Host</th>
-                <th>Major version</th>
-                <th>Minor version</th>
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed</th>
                 <th>Error</th>
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
+                <th data-formatter="timeFormatter">Setup time</th>
                 <th data-formatter="timeFormatter">Render time</th>
-                <th>Engine log</th>
             </tr>
         </thead>
         <tbody>
@@ -31,34 +28,6 @@
                     "Job name"
                     {% endif %}
                 </td>
-                <td>
-                    <a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].machine_info.host }}</a>
-
-                    <div class="popup" id="machineInfo{{ loop.index }}">
-                        <div class="popupContent popupHalfWidth">
-                            <span class="close" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;">&times;</span>
-                            <table>
-                                <tr>
-                                    <th>OS</th>
-                                    <th>RAM, Gb</th>
-                                    <th>CPU</th>
-                                    <th>CPU count</th>
-                                    <th>GPU</th>
-                                </tr>
-                                <tr>
-                                    <td>{{ report[i].machine_info.os }}</td>
-                                    <td>{{ report[i].machine_info.ram | round }}</td>
-                                    <td>{{ report[i].machine_info.cpu }}</td>
-                                    <td>{{ report[i].machine_info.cpu_count }}</td>
-                                    <td>{{ report[i].machine_info.render_device }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                </td>
-                <td>{{ report[i].machine_info.core_version }}</td>
-                <td>{{ report[i].machine_info.minor_version }}</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -80,18 +49,12 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-
+                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration }}</td>
-
-                <td><a href="
-                {% if i != "_cur_" -%}
-                    {{- report[i].session_dir -}}/
-                {%- endif -%}
-                launcher.engine.log">Engine log</a></td>
             </tr>
     {% endfor %}
         </tbody>
@@ -115,13 +78,17 @@
             <tr>
                 <th>Test package name</th>
                 <!--<th>Config</th>-->
+                <th>Host</th>
                 <th>Local report</th>
+                <th>Tool's log</th>
+                <th>Engine log</th>
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed</th>
                 <th>Error</th>
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
+                <th data-formatter="timeFormatter">Setup time</th>
                 <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
@@ -132,7 +99,39 @@
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 <!--<td>{{ test_conf }}</td>-->
+
+                <td>
+                    <!--<a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</a>-->
+                    <button class="commonButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
+                    <div class="popup" id="machineInfo{{ loop.index }}">
+                        <div class="popupContent popupHalfWidth">
+                            <form class="popupForm">
+                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                            </form>
+                            <table>
+                                <tr>
+                                    <th>OS</th>
+                                    <th>RAM, Gb</th>
+                                    <th>CPU</th>
+                                    <th>CPU count</th>
+                                    <th>GPU</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ report[i].results[test_package][test_conf].machine_info.os }}</td>
+                                    <td>{{ report[i].results[test_package][test_conf].machine_info.ram | round }}</td>
+                                    <td>{{ report[i].results[test_package][test_conf].machine_info.cpu }}</td>
+                                    <td>{{ report[i].results[test_package][test_conf].machine_info.cpu_count }}</td>
+                                    <td>{{ report[i].results[test_package][test_conf].machine_info.render_device }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                </td>
+
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/tahoe.log">Render Log</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
@@ -156,6 +155,8 @@
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
 
+                <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
+
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
                 class="badResult"
@@ -168,7 +169,7 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="2">Sum</td>
+                <td colspan="5">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -187,6 +188,7 @@
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
                 <td>{{ report[i].summary.duration }}</td>
+                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"

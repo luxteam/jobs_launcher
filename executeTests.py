@@ -19,12 +19,13 @@ SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 def parse_cmd_variables(tests_root, cmd_variables):
     config_devices = {}
     new_config = []
-    try:
-        with open(os.path.join(os.path.split(tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
-            config_devices = file.read()
-            config_devices = json.loads(config_devices)
-    except Exception as e:
-        main_logger.warning('Error while parse cmd {}'.format(str(e)))
+    if os.path.exists(os.path.join(os.path.split(tests_root)[0], 'scripts', 'Devices.config.json')):
+        try:
+            with open(os.path.join(os.path.split(tests_root)[0], 'scripts', 'Devices.config.json'), 'r') as file:
+                config_devices = file.read()
+                config_devices = json.loads(config_devices)
+        except Exception as e:
+            main_logger.error('Error while parse cmd {}'.format(str(e)))
 
     for item in cmd_variables['RenderDevice'].split(','):
         # if its int index of device

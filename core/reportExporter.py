@@ -13,10 +13,10 @@ from core.auto_dict import AutoDict
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         if replace_pathsep:
-            s = json.dumps(report, indent=" ", sort_keys=True)
+            s = json.dumps(report, indent=2, sort_keys=True)
             file.write(s.replace(os.path.sep, '/'))
         else:
-            json.dump(report, file, indent=" ", sort_keys=True)
+            json.dump(report, file, indent=2, sort_keys=True)
 
 
 def save_html_report(report, session_dir, file_name, replace_pathsep=False):
@@ -59,15 +59,6 @@ def env_override(value, key):
     return os.getenv(key, value)
 
 
-def get_change(current, previous):
-    if current == previous:
-        return 0.0
-    try:
-        return (abs(current - previous) / previous) * 100.0
-    except ZeroDivisionError:
-        return 0
-
-
 def generate_thumbnails(session_dir):
     current_test_report = []
     # TODO: don't generate thumbnails if test failed ?
@@ -82,16 +73,17 @@ def generate_thumbnails(session_dir):
                 for test in current_test_report:
                     for img_key in POSSIBLE_JSON_IMG_KEYS:
                         if img_key in test.keys():
-                            # create thumbnails
-                            # TODO: check if thumb already exists in baseline folder
                             try:
                                 cur_img_path = os.path.abspath(os.path.join(path, test[img_key]))
-                                cur_img = Image.open(cur_img_path)
-                                thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
-                                thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
-
                                 thumb64_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
                                 thumb256_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
+
+                                if os.path.exists(thumb64_path) and os.path.exists(thumb256_path):
+                                    continue
+
+                                cur_img = Image.open(cur_img_path)
+                                thumb64 = cur_img.resize((64, int(64 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
+                                thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
 
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
@@ -102,7 +94,7 @@ def generate_thumbnails(session_dir):
                                 test.update({'thumb256_' + img_key: os.path.relpath(thumb256_path, path)})
 
                 with open(os.path.join(path, TEST_REPORT_NAME_COMPARED), 'w') as file:
-                    json.dump(current_test_report, file, indent=" ")
+                    json.dump(current_test_report, file, indent=4)
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
@@ -139,14 +131,13 @@ def build_session_report(report, session_dir):
                         else:
                             report['results'][result][item][jtem['test_status']] += 1
 
-                        # TODO: set machine_info once only
-                        try:
-                            report['machine_info'].update({'render_device': jtem['render_device']})
-                            report['machine_info'].update({'tool': jtem['tool']})
-                            report['machine_info'].update({'minor_version': jtem['minor_version']})
-                            report['machine_info'].update({'core_version': jtem['core_version']})
-                        except Exception as err:
-                            main_logger.warning(str(err))
+                    try:
+                        report['machine_info'].update({'render_device': jtem['render_device']})
+                        report['machine_info'].update({'tool': jtem['tool']})
+                        report['machine_info'].update({'minor_version': jtem['minor_version']})
+                        report['machine_info'].update({'core_version': jtem['core_version']})
+                    except Exception as err:
+                        main_logger.warning(str(err))
 
                     report['results'][result][item]['total'] += report['results'][result][item]['passed'] + \
                                                                report['results'][result][item]['failed'] + \
@@ -170,7 +161,7 @@ def build_session_report(report, session_dir):
     report.update({'summary': total})
     report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
-    save_json_report(report, session_dir, SESSION_REPORT, replace_pathsep=True)
+    save_json_report(report, session_dir, SESSION_REPORT)
 
     return report
 
@@ -183,33 +174,42 @@ def build_summary_report(work_dir):
             # build summary report
             if file.endswith(SESSION_REPORT):
                 basepath = os.path.relpath(path, work_dir)
-                basename = os.path.relpath(path, work_dir).split(os.path.sep)[0]
                 with open(os.path.join(path, file), 'r') as report_file:
-                    summary_report[basename] = json.loads(report_file.read())
-                    summary_report[basename].update({'session_dir': basepath})
+                    temp_report = json.loads(report_file.read())
+                    basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
 
-                try:
-                    for test_package in summary_report[basename]['results']:
-                        for test_conf in summary_report[basename]['results'][test_package]:
-                            for jtem in summary_report[basename]['results'][test_package][test_conf]['render_results']:
+                    try:
+                        for test_package in temp_report['results']:
+                            for test_conf in temp_report['results'][test_package]:  # add machine info to each execution
+                                temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
+                                for jtem in temp_report['results'][test_package][test_conf]['render_results']:
+                                    for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
+                                        if img in jtem.keys():
+                                            jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
+                                temp_report['results'][test_package][test_conf].update(
+                                    {'result_path': os.path.relpath(os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']), work_dir)}
+                                )
+                        if common_info:
+                            for key in common_info:
+                                if not temp_report['machine_info'][key] in common_info[key]:
+                                    common_info[key].append(temp_report['machine_info'][key])
+                        else:
+                            common_info.update(
+                                {'reporting_date': [temp_report['machine_info']['reporting_date']],
+                                 'minor_version': [temp_report['machine_info']['minor_version']],
+                                 'core_version': [temp_report['machine_info']['core_version']]
+                                 })
+                    except Exception as err:
+                        main_logger.error(str(err))
 
-                                for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
-                                    if img in jtem.keys():
-                                        jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
-
-                            summary_report[basename]['results'][test_package][test_conf].update({'result_path': os.path.relpath(os.path.join(work_dir, basepath, summary_report[basename]['results'][test_package][test_conf]['result_path']), work_dir)})
-
-                    if common_info:
-                        for key in common_info:
-                            if not summary_report[basename]['machine_info'][key] in common_info[key]:
-                                common_info[key].append(summary_report[basename]['machine_info'][key])
+                    if basename in summary_report.keys():
+                        summary_report[basename]['results'].update(temp_report['results'])
+                        for key in temp_report['summary'].keys():
+                            summary_report[basename]['summary'][key] += temp_report['summary'][key]
                     else:
-                        common_info.update({'reporting_date': [summary_report[basename]['machine_info']['reporting_date']],
-                                            'minor_version': [summary_report[basename]['machine_info']['minor_version']],
-                                            'core_version': [summary_report[basename]['machine_info']['core_version']]
-                                            })
-                except Exception as e:
-                    main_logger.error(str(e))
+                        summary_report[basename] = {}
+                        summary_report[basename].update({'results': temp_report['results']})
+                        summary_report[basename].update({'summary': temp_report['summary']})
 
     for key in common_info:
         common_info[key] = ', '.join(common_info[key])
@@ -289,6 +289,7 @@ def build_compare_report(work_dir):
 
 
 def build_local_reports(work_dir, summary_report, common_info):
+    # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
 
     env = jinja2.Environment(
@@ -298,51 +299,36 @@ def build_local_reports(work_dir, summary_report, common_info):
     template = env.get_template('local_template.html')
     report_dir = ""
 
-    for execution in summary_report:
-        for test in summary_report[execution]['results']:
-            for config in summary_report[execution]['results'][test]:
-                report_dir = summary_report[execution]['results'][test][config]['result_path']
+    try:
+        for execution in summary_report:
+            for test in summary_report[execution]['results']:
+                for config in summary_report[execution]['results'][test]:
+                    report_dir = summary_report[execution]['results'][test][config]['result_path']
+                    render_report = []
+                    if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
+                        with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
+                            render_report = json.loads(file.read())
+                            common_info.update({'tool': render_report[0]['tool']})
+                            common_info.update({'render_device': render_report[0]['render_device']})
+                            common_info.update({'testing_start': render_report[0]['date_time']})
+                            common_info.update({'test_group': render_report[0]['test_group']})
 
-                # TODO: refactor it
-                baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
-                baseline_report = []
-                render_report = []
-
-                if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
-                    with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
-                        render_report = json.loads(file.read())
-                        common_info.update({'tool': render_report[0]['tool']})
-                        common_info.update({'render_device': render_report[0]['render_device']})
-                        common_info.update({'testing_start': render_report[0]['date_time']})
-                        common_info.update({'test_group': render_report[0]['test_group']})
-
-                if os.path.exists(baseline_report_path):
-                    with open(baseline_report_path, 'r') as file:
-                        baseline_report = json.loads(file.read())
-                        for render_item in render_report:
-                            try:
-                                # TODO: move to compare by json
-                                baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
-                                render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                render_item.update({'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
-                                render_item.update({'difference_time': get_change(render_item['render_time'], baseline_item['render_time'])})
-                                render_item.update({'difference_memory_gpu': get_change(render_item['gpu_memory_usage'], baseline_item['gpu_memory_usage'])})
-                                render_item.update({'baseline_render_device': baseline_item['render_device']})
-                            except IndexError:
-                                main_logger.warning("Not found value in baseline")
-
-                try:
-                    html = template.render(title=test,
-                                           common_info=common_info,
-                                           render_report=render_report,
-                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
-                    save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
-                except Exception as err:
-                    print(str(err))
-                    main_logger.error(str(err))
+                    try:
+                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['core_version']),
+                                               common_info=common_info,
+                                               render_report=render_report,
+                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
+                        save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
+                    except Exception as err:
+                        main_logger.error("Error during rendering local html report: {}".format(str(err)))
+    except Exception as err:
+        main_logger.error(str(err))
 
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
+
+    if os.path.exists(os.path.join(work_dir, 'report_resources')):
+        shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
 
     try:
         shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
@@ -367,7 +353,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
-        save_json_report(summary_report, work_dir, SUMMARY_REPORT, replace_pathsep=True)
+        save_json_report(summary_report, work_dir, SUMMARY_REPORT)
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",
@@ -385,7 +371,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                                      i=execution)
 
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
-
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
         main_logger.error(summary_html)
@@ -395,8 +380,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
     try:
         performance_template = env.get_template('performance_template.html')
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(work_dir)
-        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT, replace_pathsep=True)
-        save_json_report(performance_report_detail, work_dir, 'perf.json', replace_pathsep=True)
+        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
+        save_json_report(performance_report_detail, work_dir, 'perf.json')
         performance_html = performance_template.render(title=major_title + " Performance",
                                                        performance_report=performance_report,
                                                        hardware=hardware,
@@ -412,7 +397,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
     try:
         compare_template = env.get_template('compare_template.html')
         compare_report, hardware = build_compare_report(work_dir)
-        save_json_report(compare_report, work_dir, COMPARE_REPORT, True)
+        save_json_report(compare_report, work_dir, COMPARE_REPORT)
         compare_html = compare_template.render(title=major_title + " Compare",
                                                hardware=hardware,
                                                compare_report=compare_report,
