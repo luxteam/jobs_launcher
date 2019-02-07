@@ -15,8 +15,6 @@
             <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
             <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
             <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch view mode</button>
-            <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
-            <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
         </form>
         <table class="baseTable" id="imgsCompareTable">
             <thead>
@@ -48,7 +46,6 @@
     </div>
 </div>
 
-<!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
 <div class="jsTableWrapper">
     <table id="{{ i | lower | replace(' ', '_') | replace('(', '') | replace(')', '') }}"
            class="baseTable detailedTable"
@@ -69,7 +66,8 @@
             <tr>
                 <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
                 <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
-                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+                <th data-field="original_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR Baseline</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR</th>
             	<th data-filed="original_render_log" data-halign="center" data-valign="middle">{{ original_render | title }} Render log</th>
                 <th data-filed="conversion_log" data-halign="center" data-valign="middle">Conversion log</th>
@@ -91,6 +89,17 @@
                 </td>
 
                 <td class="hatching">
+                {% if item.original_color_path %}
+                    {% if 'thumb64_original_color_path' in item %}
+                    <img data-src="{{ item.thumb64_original_color_path }}"/>
+                    {% else %}
+                    <img data-src="{{ item.original_color_path }}"/>
+                    {% endif %}
+                {% else %}
+                    Not compared
+                {% endif %}
+                </td>
+                <td class="hatching">
                 {% if item.baseline_color_path %}
                     {% if 'thumb64_baseline_color_path' in item %}
                     <img data-src="{{ item.thumb64_baseline_color_path }}"/>
@@ -108,11 +117,12 @@
                     <img data-src="{{ item.render_color_path }}"/>
                     {% endif %}
                 </td>
+
                 <td>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.rs.log">{{ original_render | title }} log</a></td>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.rs.log">{{ original_render | title }} log</a>
                 </td>
                 <td>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.conversion.log">Conversion log</a></td>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.conversion.log">Conversion log</a>
                 </td>
                 <td>
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">RPR Log</a>
