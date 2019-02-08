@@ -155,7 +155,7 @@ def main():
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
-            if args.execute_stages and i+1 in args.execute_stages:
+            if (args.execute_stages and str(i + 1) in args.execute_stages) or not args.execute_stages:
                 print("  Executing job {}/{}".format(i+1, len(found_job[3])))
                 report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
                     jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
