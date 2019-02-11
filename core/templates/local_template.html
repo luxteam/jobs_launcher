@@ -129,7 +129,8 @@
             <thead>
                 <tr>
                     <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
-                    <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+                    <th data-field="original_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+                    <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR</th>
                     <th data-filed="original_render_log" data-valign="middle">{{ original_render | title }} Render log</th>
                     <th data-filed="conversion_log" data-valign="middle">Conversion log</th>
@@ -142,6 +143,14 @@
             {% for item in render_report %}
                 <tr>
                     <td>{{ item.test_case }}</td>
+
+                    <td class="hatching">
+                    {% if item.original_color_path %}
+                        <img data-src="{{ item.original_color_path }}"/>
+                    {% else %}
+                        Not compared
+                    {% endif %}
+                    </td>
 
                     <td class="hatching">
                     {% if item.baseline_color_path %}
