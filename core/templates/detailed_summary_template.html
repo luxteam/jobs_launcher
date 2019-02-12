@@ -115,13 +115,12 @@
 
                 <td>{{ item.baseline_render_time }}</td>
                 <td>{{ item.render_time }}</td>
-                <td>{{ item.difference_time }}</td>
-                <td {%- if item.difference_time > 0 %}
+                <td {%- if item.difference_time < 0 %}
                     class="timeBetterStatus"
                 {% else %}
                     class="timeWorseStatus"
                 {% endif -%}
-                >{{ item.difference_time }}</td>
+                >{{ item.difference_time | round(2) }}</td>
 
                 <td>
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.rs.log">{{ original_render | title }} log</a>
