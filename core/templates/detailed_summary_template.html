@@ -69,7 +69,10 @@
                 <th data-field="original_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR Baseline</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR</th>
-            	<th data-filed="original_render_log" data-halign="center" data-valign="middle">{{ original_render | title }} Render log</th>
+            	<th data-field="original_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">{{ original_render | title }} render time</th>
+                <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">RPR render time</th>
+                <th data-field="difference_time" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
+                <th data-filed="original_render_log" data-halign="center" data-valign="middle">{{ original_render | title }} Render log</th>
                 <th data-filed="conversion_log" data-halign="center" data-valign="middle">Conversion log</th>
                 <th data-filed="rpr_log" data-halign="center" data-valign="middle">RPR Render log</th>
                 <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
@@ -117,6 +120,16 @@
                     <img data-src="{{ item.render_color_path }}"/>
                     {% endif %}
                 </td>
+
+
+                <td>{{ item.baseline_render_time }}</td>
+                <td>{{ item.render_time }}</td>
+                <td {%- if item.difference_time < 0 %}
+                    class="timeBetterStatus"
+                {% else %}
+                    class="timeWorseStatus"
+                {% endif -%}
+                >{{ item.difference_time | round(2) }}</td>
 
                 <td>
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.original_render_log }}">{{ original_render | title }} log</a>
