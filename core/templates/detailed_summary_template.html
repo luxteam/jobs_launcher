@@ -122,14 +122,18 @@
                 </td>
 
 
-                <td>{{ item.baseline_render_time }}</td>
+                <td>{{ item.or_render_time }}</td>
                 <td>{{ item.render_time }}</td>
-                <td {%- if item.difference_time < 0 %}
-                    class="timeBetterStatus"
+                {%- if item.difference_time_or is str %}
+                <td>{{ item.difference_time_or }}</td>
                 {% else %}
-                    class="timeWorseStatus"
+                    <td {%- if item.difference_time_or < 0 %}
+                        class="timeBetterStatus"
+                    {% else %}
+                        class="timeWorseStatus"
+                    {% endif -%}
+                    >{{ item.difference_time_or | round(2) }}</td>
                 {% endif -%}
-                >{{ item.difference_time | round(2) }}</td>
 
                 <td>
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.original_render_log }}">{{ original_render | title }} log</a>
