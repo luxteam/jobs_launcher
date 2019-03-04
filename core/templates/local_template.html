@@ -168,7 +168,7 @@
                     <td>{{ item.or_render_time }}</td>
                     <td>{{ item.render_time }}</td>
 
-                    {%- if item.difference_time_or is str %}
+                    {%- if item.difference_time_or is string %}
                     <td>{{ item.difference_time_or }}</td>
                     {% else %}
                         <td {%- if item.difference_time_or < 0 %}
