@@ -23,7 +23,8 @@ RENDER_REPORT_BASE = {
     "difference_color": "not compared yet",
     "difference_time": "not compared yet",
     "core_version": "",
-    "render_device": ""
+    "render_device": "",
+    "difference_time_or": "not compared yet"
 }
 RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
