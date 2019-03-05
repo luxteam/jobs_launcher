@@ -109,9 +109,9 @@ def main():
                     img.update({'original_render_log': os.path.relpath(os.path.join(args.base_dir, original_log_path),
                                                                        args.work_dir)})
                 except IndexError:
-                    core.config.main_logger.error("{} case OR json is empty".format(img['test_name']))
+                    core.config.main_logger.error("{} case OR json is empty".format(img['test_case']))
                 except KeyError as err:
-                    core.config.main_logger.error("{} case OR json is incomplete".format(img['test_name']))
+                    core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
                     core.config.main_logger.error(str(err))
 
         baseline_json_path = os.path.join(args.base_dir, img['test_case'] + core.config.CASE_REPORT_SUFFIX)
