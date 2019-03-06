@@ -101,18 +101,24 @@ def main():
             else:
                 with open(or_baseline_json_path, 'r') as file:
                     original_json = json.loads(file.read())
-                try:
-                    original_img_path = original_json[0]['original_color_path']
-                    original_log_path = original_json[0]['original_render_log']
-                    img.update({'original_color_path': os.path.relpath(os.path.join(args.base_dir, original_img_path),
-                                                                   args.work_dir)})
-                    img.update({'original_render_log': os.path.relpath(os.path.join(args.base_dir, original_log_path),
-                                                                       args.work_dir)})
-                except IndexError:
+
+                if len(original_json) <= 0:
                     core.config.main_logger.error("{} case OR json is empty".format(img['test_case']))
-                except KeyError as err:
-                    core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
-                    core.config.main_logger.error(str(err))
+                else:
+                    try:
+                        original_img_path = original_json[0]['original_color_path']
+                        img.update({'original_color_path': os.path.relpath(os.path.join(args.base_dir, original_img_path),
+                                                                               args.work_dir)})
+                    except KeyError as err:
+                        core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
+                        core.config.main_logger.error(str(err))
+                    try:
+                        original_log_path = original_json[0]['original_render_log']
+                        img.update({'original_render_log': os.path.relpath(os.path.join(args.base_dir, original_log_path),
+                                                                           args.work_dir)})
+                    except KeyError as err:
+                        core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
+                        core.config.main_logger.error(str(err))
 
         baseline_json_path = os.path.join(args.base_dir, img['test_case'] + core.config.CASE_REPORT_SUFFIX)
         if not os.path.exists(baseline_json_path):
