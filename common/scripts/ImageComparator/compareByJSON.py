@@ -101,22 +101,23 @@ def main():
             else:
                 with open(or_baseline_json_path, 'r') as file:
                     original_json = json.loads(file.read())
-                try:
-                    # TODO: catch KeyError
-                    original_img_path = original_json[0]['original_color_path']
-                    original_log_path = original_json[0]['original_render_log']
-                    original_render_time = original_json[0]['render_time']
-                    img.update({'original_color_path': os.path.relpath(os.path.join(args.base_dir, original_img_path),
-                                                                   args.work_dir)})
-                    img.update({'original_render_log': os.path.relpath(os.path.join(args.base_dir, original_log_path),
-                                                                       args.work_dir)})
-                    img.update({'or_render_time': original_render_time})
-                    img.update({'difference_time_or': get_diff(img['render_time'], original_render_time)})
-                except IndexError:
+                if len(original_json) <= 0:
                     core.config.main_logger.error("{} case OR json is empty".format(img['test_case']))
-                except KeyError as err:
-                    core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
-                    core.config.main_logger.error(str(err))
+                else:
+                    for key in ['original_color_path', 'original_render_log']:
+                        try:
+                            original_path = original_json[0][key]
+                            img.update({key: os.path.relpath(os.path.join(args.base_dir, original_path),
+                                                             args.work_dir)})
+                        except KeyError:
+                            core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
+
+                        try:
+                            original_render_time = original_json[0]['render_time']
+                            img.update({'or_render_time': original_render_time})
+                            img.update({'difference_time_or': get_diff(img['render_time'], original_render_time)})
+                        except KeyError:
+                            core.config.main_logger.error("{} case OR json is incomplete".format(img['test_case']))
 
         baseline_json_path = os.path.join(args.base_dir, img['test_case'] + core.config.CASE_REPORT_SUFFIX)
         if not os.path.exists(baseline_json_path):
