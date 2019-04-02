@@ -187,9 +187,9 @@
                     <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
 
                     <td {%- if 5 < item.difference_time %}
-                        class="timeWorseStatus"
+                        class="timeWorseStatus">
                     {% elif item.difference_time < -5 %}
-                        class="timeBetterStatus"
+                        class="timeBetterStatus">
                     {% endif -%}
                         {{ item.difference_time | round(2) }}</td>
                     <td>{{ item.render_time }}</td>
