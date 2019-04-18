@@ -31,15 +31,29 @@
 <h2>render duration by test groups in seconds</h2>
 {% for tool in performance_report_detail %}
 <h3>{{ tool }}</h3>
-    <table class="baseTable">
-
+<div class="jsTableWrapper">
+    <table class="baseTable"
+           data-toggle="table"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-show-pagination-switch="true"
+           data-pagination="false"
+           data-page-list="[5, 10, 20, 45, ALL]"
+           data-sort-order="desc"
+           data-sort-name="test_status"
+           data-show-multi-sort="true"
+    >
+        <thead>
         <tr>
-            <th>Test</th>
+            <th data-halign="center" data-sortable="true">Test</th>
             {% for hw in hardware %}
-            <th>{{ hw[0] }}</th>
+            <th data-halign="center" data-sortable="true">{{ hw[0] }}</th>
             {% endfor %}
         </tr>
-
+        </thead>
+        <tbody>
     {% for test_package in performance_report_detail[tool] %}
         {% for test_config in performance_report_detail[tool][test_package] %}
         <tr>
@@ -50,8 +64,10 @@
         </tr>
         {% endfor %}
     {% endfor %}
+        </tbody>
     </table>
 {% endfor %}
+</div>
 
 <hr/>
 <h1>normalized</h1>
