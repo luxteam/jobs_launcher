@@ -1,22 +1,19 @@
-//TODO: add NOK status to sorting
+// error - means crash durin test execution
+// failed - pix /time/vram diff
+// skipped - commented case
 function statusSorter(a, b) {
-    if (a == b) {
-        return 0;
-    }
+    if (a == b) return 0;
 
-    if (a.includes('failed') || a.includes('skipped') && (!b.includes('failed') && !b.includes('skipped'))) {
+    if (a.includes('error')) {
         return 1;
     }
 
-    if (a.includes('failed') && b.includes('skipped')) {
+    if (a.includes('failed') && !b.includes('error')) {
         return 1;
     }
 
-    a = a.split('<br>');
-    b = b.split('<br>');
-
-    if (a[0] == b[0]) {
-        return a[2] > b[2] ? 1 : -1;
+    if (a.includes('skipped') && !b.includes('failed') && !b.includes('error')) {
+        return 1;
     }
 
     return -1;
