@@ -46,9 +46,15 @@ window.copyTestCaseName = {
 
         try {
             var node = document.createElement('input');
-            //TODO: if previous link has vars - store it too
-            var normalized_link = window.location.hostname + window.location.pathname + "?searchText=";
-            node.setAttribute('value', normalized_link + row.test_case);
+            var current_url = window.location.href;
+            var url_parser = new URL(current_url);
+            if (url_parser.searchParams.get("searchText")) {
+                url_parser.searchParams.delete("searchText");
+            }
+            url_parser.searchParams.set("searchText", row.test_case);
+
+            // duct tape for clipboard correct work
+            node.setAttribute('value', url_parser.toString());
             document.body.appendChild(node);
             node.select();
             document.execCommand('copy');
