@@ -8,7 +8,7 @@ import operator
 from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
-
+import copy
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
@@ -258,38 +258,37 @@ def build_performance_report(summary_report):
     return performance_report, hardware, performance_report_detail, summary_info_for_report
 
 
-def build_compare_report(work_dir):
+def build_compare_report(summary_report):
     compare_report = AutoDict()
     hardware = []
-    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
-        for file in files:
-            if file == SESSION_REPORT:
-                with open(os.path.join(path, file), 'r') as report_file:
-                    temp_report = json.loads(report_file.read())
+    for platform in summary_report.keys():
+        for test_package in summary_report[platform]['results']:
+            for test_config in summary_report[platform]['results'][test_package]:
+                temp_report = summary_report[platform]['results'][test_package][test_config]
 
                 # force add gpu from baseline
                 hw = temp_report['machine_info']['render_device']
-                hw_bsln = temp_report['machine_info']['render_device'] + "[Baseline"
-                hardware.append(hw)
-                hardware.append(hw_bsln)
+                hw_bsln = temp_report['machine_info']['render_device'] + "[Baseline]"
+
+                if hw not in hardware:
+                    hardware.append(hw)
+                    hardware.append(hw_bsln)
 
                 # collect images links
-                for test_package in temp_report['results']:
-                    for test_config in temp_report['results'][test_package]:
-                        for item in temp_report['results'][test_package][test_config]['render_results']:
-                            # if test is processing first time
-                            if not compare_report[item['test_case']]:
-                                compare_report[item['test_case']] = {}
-                            try:
-                                compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumb256_render_color_path']), work_dir)})
-                                compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['thumb256_baseline_color_path']), work_dir)})
-                            except KeyError as err:
-                                # TODO: fix
-                                try:
-                                    compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir)})
-                                    compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['baseline_color_path']), work_dir)})
-                                except:
-                                    pass
+                for item in temp_report['render_results']:
+                    # if test is processing first time
+                    if not compare_report[item['test_case']]:
+                        compare_report[item['test_case']] = {}
+
+                    try:
+                        for img_key in POSSIBLE_JSON_IMG_RENDERED_KEYS + POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL:
+                            if img_key in item.keys():
+                                compare_report[item['test_case']].update({hw: item[img_key]})
+                        for img_key in POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL:
+                            if img_key in item.keys():
+                                compare_report[item['test_case']].update({hw_bsln: item[img_key]})
+                    except KeyError as err:
+                        main_logger.error("Missed testcase detected {}".format(str(err)))
 
     return compare_report, hardware
 
@@ -398,37 +397,48 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
-    # try:
-    performance_template = env.get_template('performance_template.html')
-    # performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report11(work_dir)
-    performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(summary_report)
-    save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
-    save_json_report(performance_report_detail, work_dir, 'perf.json')
-    performance_html = performance_template.render(title=major_title + " Performance",
-                                                   performance_report=performance_report,
-                                                   hardware=hardware,
-                                                   performance_report_detail=performance_report_detail,
-                                                   pageID="performanceA",
-                                                   common_info=common_info, test_info=summary_info_for_report)
-    save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-    # except Exception as err:
-    #     performance_html = "Error while building performance report: {}".format(str(err))
-    #     main_logger.error(performance_html)
-    #     save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-
     try:
-        compare_template = env.get_template('compare_template.html')
-        compare_report, hardware = build_compare_report(work_dir)
-        save_json_report(compare_report, work_dir, COMPARE_REPORT)
-        compare_html = compare_template.render(title=major_title + " Compare",
-                                               hardware=hardware,
-                                               compare_report=compare_report,
-                                               pageID="compareA",
-                                               common_info=common_info)
-        save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
+        copy_summary_report = copy.deepcopy(summary_report)
+        performance_template = env.get_template('performance_template.html')
+        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report()
+        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
+        save_json_report(performance_report_detail, work_dir, 'perf.json')
+        performance_html = performance_template.render(title=major_title + " Performance",
+                                                       performance_report=performance_report,
+                                                       hardware=hardware,
+                                                       performance_report_detail=performance_report_detail,
+                                                       pageID="performanceA",
+                                                       common_info=common_info, test_info=summary_info_for_report)
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
-        compare_html = "Error while building compare report: {}".format(str(err))
-        main_logger.error(compare_html)
-        save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+        performance_html = "Error while building performance report: {}".format(str(err))
+        main_logger.error(performance_html)
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+
+    compare_template = env.get_template('compare_template.html')
+    copy_summary_report = copy.deepcopy(summary_report)
+    compare_report, hardware = build_compare_report(copy_summary_report)
+    save_json_report(compare_report, work_dir, COMPARE_REPORT)
+    compare_html = compare_template.render(title=major_title + " Compare",
+                                           hardware=hardware,
+                                           compare_report=compare_report,
+                                           pageID="compareA",
+                                           common_info=common_info)
+    save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
+
+    # try:
+    #     compare_template = env.get_template('compare_template.html')
+    #     compare_report, hardware = build_compare_report(work_dir)
+    #     save_json_report(compare_report, work_dir, COMPARE_REPORT)
+    #     compare_html = compare_template.render(title=major_title + " Compare",
+    #                                            hardware=hardware,
+    #                                            compare_report=compare_report,
+    #                                            pageID="compareA",
+    #                                            common_info=common_info)
+    #     save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
+    # except Exception as err:
+    #     compare_html = "Error while building compare report: {}".format(str(err))
+    #     main_logger.error(compare_html)
+    #     save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info)
