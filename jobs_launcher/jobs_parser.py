@@ -112,7 +112,6 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
     timeout = None
 
     for elem in root:
-        # TODO: check correct processing for serveral groups
         if elem.tag == 'variable':
             name = elem.attrib.get('name')
             value = elem.attrib.get('value')
