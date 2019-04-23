@@ -112,6 +112,13 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
     timeout = None
 
     for elem in root:
+        if elem.tag == 'variable':
+            name = elem.attrib.get('name')
+            value = elem.attrib.get('value')
+            value = value.format(**package_options['variables'])
+            #print(name + '=' + value)
+            package_options['variables'][name] = value
+
         if elem.tag == 'option':
             option_name = elem.attrib.get('name')
             package_options['options'][option_name] = collections.OrderedDict()
