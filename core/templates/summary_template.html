@@ -79,6 +79,8 @@
                 <th>Error</th>
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
+                <th data-formatter="timeFormatter">Setup time</th>
+                <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
         <tbody>
@@ -142,7 +144,12 @@
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-
+                <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
+                <td
+                {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
+                class="badResult"
+                {% endif %}
+                >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
             </tr>
             <tr>
             {% endfor %}
@@ -150,7 +157,7 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="4">Sum</td>
+                <td colspan="6">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
