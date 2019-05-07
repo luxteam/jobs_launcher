@@ -65,30 +65,24 @@ function closeModalWindow(id) {
 }
 
 function increaseImgSize() {
-    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
-	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
-    });
+    var step = 5;
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 2], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
-    $("#renderedImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
-    });
-
-    $("#baselineImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    imagesSelectorList.forEach(function(item) {
+        $(item[0]).css("width", function( index, value ) {
+	        return parseInt(value, 10) + document.documentElement.clientWidth / 100 * item[1];
+        });
     });
 }
 
 function reduceImgSize() {
-    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
-	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
-    });
+    var step = 5;
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step / 2], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
-    $("#renderedImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
-    });
-
-    $("#baselineImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    imagesSelectorList.forEach(function(item) {
+        $(item[0]).css("width", function( index, value ) {
+	        return parseInt(value, 10) - document.documentElement.clientWidth / 100 * item[1];
+        });
     });
 }
 
