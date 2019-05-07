@@ -4,9 +4,9 @@
 
 <h1>details</h1>
 
-    {% if i != "_cur_" %}
+{%- if i != "_cur_" %}
 <h3>{{ i }}</h3>
-    {% endif %}
+{% endif -%}
 
 <div class="popup" id="imgsModal">
     <div class="popupContent" id="imgsModalContent">
@@ -41,7 +41,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="hatching" id="diffImageTd"></td>
+                    <td class="hatching" id="diffImageTd"><canvas id="imgsDifferenceCanvas"></canvas></td>
                 </tr>
             </tbody>
         </table>
