@@ -61,7 +61,6 @@ def env_override(value, key):
 
 def generate_thumbnails(session_dir):
     current_test_report = []
-    # TODO: don't generate thumbnails if test failed ?
     main_logger.info("Start thumbnails creation")
 
     for path, dirs, files in os.walk(session_dir):

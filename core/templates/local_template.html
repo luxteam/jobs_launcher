@@ -134,11 +134,11 @@
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
+                    <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                    <th data-field="time_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                     <th data-filed="render_log" data-valign="middle">Render log</th>
                     <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
                     <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
-                    <th data-field="pix_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
-                    <th data-field="time_diff" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                     <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                     <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
                 </tr>
@@ -174,7 +174,13 @@
                             {{ param }}<br/>
                         {% endfor %}
                     </td>
-
+                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
+                    <td {%- if 5 < item.difference_time %}
+                        class="timeWorseStatus"
+                    {% elif item.difference_time < -5 %}
+                        class="timeBetterStatus"
+                    {% endif -%}
+                        >{{ item.difference_time | round(2) }}</td>
                     <td>
                         <a href="renderTool.log">Render log</a>
                     </td>
@@ -184,17 +190,7 @@
                     </td>
 
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
-                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
-
-                    <td {%- if 5 < item.difference_time %}
-                        class="timeWorseStatus"
-                    {% elif item.difference_time < -5 %}
-                        class="timeBetterStatus"
-                    {% endif -%}
-                        >{{ item.difference_time | round(2) }}</td>
-
                     <td>{{ item.render_time }}</td>
-
                     <td>{{ item.baseline_render_time }}</td>
                 </tr>
             {% endfor %}

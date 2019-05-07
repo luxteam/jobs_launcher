@@ -30,30 +30,31 @@
                 </td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
+                <!--TODO: redesign for failure statuses-->
                 <td
-                {% if report[i].summary.failed != 0 %}
+                {%- if report[i].summary.failed != 0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.failed }}</td>
 
                 <td
-                {% if report[i].summary.error != 0 %}
+                {%- if report[i].summary.error != 0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.error }}</td>
 
                 <td
-                {% if report[i].summary.skipped != 0 %}
+                {%- if report[i].summary.skipped != 0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
                 <td
-                {% if report[i].summary.render_duration == -0.0 %}
+                {%- if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
             </tr>
     {% endfor %}
@@ -68,7 +69,7 @@
     {% if i != "_cur_" %}
 <h3><a href="{{ i }}_detailed.html">{{ i }}</a></h3>
 
-<a name="{{ i }}"></a>
+<a class="hAnchor" name="{{ i }}"></a>
     {% endif %}
 
 <div class="jsTableWrapper">
@@ -135,6 +136,7 @@
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
+                <!--TODO: redesign for failure statuses-->
                 <td
                 {% if report[i].results[test_package][test_conf].failed != 0 %}
                 class="badResult"
@@ -172,6 +174,7 @@
                 <td colspan="6">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
+                <!--TODO: redesign for failure statuses-->
                 <td
                 {% if report[i].summary.failed != 0 %}
                 class="badResult"
