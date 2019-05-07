@@ -43,8 +43,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
             img.update({'difference_color': pix_difference})
             if type(pix_difference) is str or pix_difference > pix_diff_max:
-                # TODO: swap status
-                img['test_status'] = 'error'
+                img['test_status'] = core.config.TEST_DIFF_STATUS
             img.update({'baseline_color_path': os.path.relpath(
                 os.path.join(base_dir, baseline_json[img['file_name']]), work_dir)})
 
@@ -111,7 +110,7 @@ def main():
         baseline_json = json.loads(file.read())
 
     for img in render_json:
-        # if failed it means tool crash - no sense to compare images
+        # if tool crash - no sense to compare images
         if img['test_status'] != core.config.TEST_CRASH_STATUS:
             img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance, args.pix_diff_max))
 

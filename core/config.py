@@ -34,8 +34,8 @@ PIX_DIFF_MAX = 15
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
 
-TEST_CRASH_STATUS = 'failed'
-TEST_DIFF_STATUS = 'error'
+TEST_CRASH_STATUS = 'error'
+TEST_DIFF_STATUS = 'failed'
 
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'

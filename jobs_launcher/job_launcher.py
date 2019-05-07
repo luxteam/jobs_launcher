@@ -5,7 +5,7 @@ import core.config
 
 
 def launch_job(cmd_line, job_timeout=None):
-    report = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 1, 'duration': 0}
+    report = {'total': 0, 'passed': 0, 'failed': 0, 'error': 1, 'skipped': 0, 'duration': 0}
     core.config.main_logger.info('Started job: {}'.format(cmd_line))
     if not job_timeout:
         job_timeout = core.config.TIMEOUT
@@ -30,7 +30,5 @@ def launch_job(cmd_line, job_timeout=None):
         report['skipped'] = 0
     else:
         core.config.main_logger.error('Job was terminated by timeout')
-        report['failed'] = 1
-        report['skipped'] = 0
 
     return report

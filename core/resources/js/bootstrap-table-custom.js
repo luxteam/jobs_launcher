@@ -1,6 +1,10 @@
-// error - means crash durin test execution
-// failed - pix /time/vram diff
-// skipped - commented case
+/**
+ * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
+ * - error [high priority[ means crash during test execution
+ * - failed - pix /time/ram diff
+ * - skipped - commented case
+ * - passed - successfully passed test
+ */
 function statusSorter(a, b) {
     if (a == b) return 0;
 
