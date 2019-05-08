@@ -5,22 +5,25 @@
  * - skipped - commented case
  * - passed - successfully passed test
  */
-function statusSorter(a, b) {
-    if (a == b) return 0;
+function statusSorter(x, y) {
+    var a = x.toLowerCase();
+    var b = y.toLowerCase();
+
+    if (a === b) return 0;
 
     if (a.includes('error')) {
-        return 1;
+        return -1;
     }
 
     if (a.includes('failed') && !b.includes('error')) {
-        return 1;
+        return -1;
     }
 
     if (a.includes('skipped') && !b.includes('failed') && !b.includes('error')) {
-        return 1;
+        return -1;
     }
 
-    return -1;
+    return 1;
 }
 
 window.openFullImgSize = {
@@ -78,7 +81,7 @@ function performanceNormalizeFormatter(value, row, index, field) {
 function performanceNormalizeStyleFormatter(value, row, index, field) {
     var values = [];
     for (key in row) {
-        if (key.indexOf('_') == -1 && key != 0) {
+        if (key.indexOf('_') === -1 && key != 0) {
             values.push(parseFloat(row[key]));
         }
     }
@@ -112,7 +115,7 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
     }
 
     var opacity = 1;
-    if (parseFloat(value) == 0.0) {
+    if (parseFloat(value) === 0.0) {
         opacity = 0;
     }
 
@@ -120,4 +123,8 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
         classes: "",
         css: {"background-color": "rgba(" + red + ", " + green + ", " + blue + ", " + opacity + ")"}
     };
+}
+
+function searchTextInBootstrapTable(status) {
+    $('.jsTableWrapper [id]').bootstrapTable('resetSearch', status);
 }

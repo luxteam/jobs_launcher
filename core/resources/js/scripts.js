@@ -64,7 +64,7 @@ function increaseImgSize() {
 
 function reduceImgSize() {
     var step = 5;
-    var imagesSelectorList = [['#imgsDifferenceCanvas', step / 2], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 2], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
     imagesSelectorList.forEach(function(item) {
         $(item[0]).css("width", function( index, value ) {
@@ -83,7 +83,7 @@ function setImgSize() {
     baselineImg.width = widthValue;
 }
 
-function infoBox(message, bgcolor=false) {
+function infoBox(message, bgcolor = false) {
     $("#infoBox").html("<p>" + message + "</p>");
     $("#infoBox").fadeIn('slow');
     if (bgcolor) {
@@ -101,7 +101,7 @@ function getQueryVariable(variable) {
     var vars = query.split("&");
     for (var i=0; i < vars.length; i++) {
         var pair = vars[i].split("=");
-        if(pair[0] == variable) {
+        if(pair[0] === variable) {
             return pair[1];
         }
     }

@@ -50,18 +50,25 @@
 
 <!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
 <div class="jsTableWrapper">
+    <form>
+        <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed</button>
+        <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">Show failed</button>
+        <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">Show error</button>
+        <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped</button>
+        <button class="commonButton" type="button" name="showAll" onclick="searchTextInBootstrapTable('');">Reset</button>
+    </form>
     <table id="{{ i | lower | replace(' ', '_') | replace('(', '') | replace(')', '') }}"
            class="baseTable detailedTable"
            data-toggle="table"
            data-search="true"
            data-show-refresh="true"
-           data-show-toggle="true"
+           data-show-toggle="false"
            data-show-columns="true"
            data-show-pagination-switch="true"
            data-pagination="true"
            data-page-size="10"
            data-page-list="[1, 5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
+           data-sort-order="asc"
            data-sort-name="test_status"
            data-show-multi-sort="true"
     >
@@ -71,7 +78,7 @@
                 <th data-halign="center" data-valign="middle" data-sortable="true">Parameters</th>
                 <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
-                <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
+                <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true">Test status</th>
                 <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                 <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>

@@ -17,6 +17,10 @@ body {
   font-family: "Open Sans";
   src: url(../fonts/OpenSans-Regular.ttf) format("truetype");
 }
+@font-face {
+    font-family: "Open Sans Bold";
+    src: url(../fonts/OpenSans-Bold.ttf) format("truetype");
+}
 
 #header {
   text-align: center;
@@ -312,15 +316,16 @@ a {
 }
 
 .commonButton {
-    padding: 4px;
-    border-radius: 9px;
-    border: 0.5px solid #bdbdbd;
-    background-color: #f1efefeb;
+    padding: 5px 10px 5px 10px;
+    border-radius: 13px;
+    border: 1px solid #000000;
+    background-color: #fdfcfc;
+    font-family: "Open Sans Bold";
 }
 
 .commonButton:hover {
-    border-radius: 9px;
-    border: 0.5px solid #949393;
+    border-radius: 13px;
+    border: 1px solid #949393;
     background-color: #dedede;
 }
 

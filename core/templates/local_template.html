@@ -113,19 +113,26 @@
     <hr/>
 
     <div class="jsTableWrapper">
+        <form>
+            <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed</button>
+            <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">Show failed</button>
+            <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">Show error</button>
+            <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped</button>
+            <button class="commonButton" type="button" name="showAll" onclick="searchTextInBootstrapTable('');">Reset</button>
+        </form>
         <table class="baseTable localReportTable"
                id="local"
                data-toggle="table"
                data-search="true"
                data-show-refresh="true"
-               data-show-toggle="true"
+               data-show-toggle="false"
                data-show-columns="true"
                data-show-pagination-switch="true"
                data-pagination="true"
                data-page-size="5"
                data-page-list="[1, 5, 10, 20, 45, ALL]"
                data-sort-order="asc"
-               data-sort-name="test_case"
+               data-sort-name="test_status"
                data-show-multi-sort="true">
 
             <thead>
