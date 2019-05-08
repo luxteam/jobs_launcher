@@ -52,8 +52,8 @@ function closeModalWindow(id) {
 }
 
 function increaseImgSize() {
-    var step = 5;
-    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 2], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
+    var step = 3.5;
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 4], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
     imagesSelectorList.forEach(function(item) {
         $(item[0]).css("width", function( index, value ) {
@@ -63,24 +63,14 @@ function increaseImgSize() {
 }
 
 function reduceImgSize() {
-    var step = 5;
-    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 2], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
+    var step = 3.5;
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 4], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
     imagesSelectorList.forEach(function(item) {
         $(item[0]).css("width", function( index, value ) {
 	        return parseInt(value, 10) - document.documentElement.clientWidth / 100 * item[1];
         });
     });
-}
-
-//TODO: finish custom img size
-function setImgSize() {
-    var renderImg = document.getElementById('renderedImgPopup');
-    var baselineImg = document.getElementById('baselineImgPopup');
-    var widthValue = document.getElementsByName('inputImgSize')[0].value;
-
-    renderImg.width = widthValue;
-    baselineImg.width = widthValue;
 }
 
 function infoBox(message, bgcolor = false) {
@@ -127,3 +117,7 @@ $(document).ready(function init(){
     $( "h3:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
     $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
 });
+
+
+// TODO: upgrade Bootstrap
+//TODO: upgrade Bootstrap-table

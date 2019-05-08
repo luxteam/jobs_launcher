@@ -2,7 +2,8 @@
 
 {% block report_body %}
 
-    <h1>compare table</h1>
+<h1>compare table</h1>
+
 <div class="jsTableWrapper">
     <table id="compareTable"
            class="baseTable"
@@ -20,7 +21,11 @@
 
         <thead>
             <tr>
-                <th data-field="test_case" data-halign="center" data-sortable="true">Test case</th>
+                <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true" data-visible="false">Test case</th>
+                <th data-field="test_case_copy" data-halign="center" data-valign="middle" data-sortable="true" data-events="copyTestCaseName">
+                    Test case
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
+                </th>
                 {%- for hw in hardware %}
                     {%- if "Baseline" in hw %}
                 <th data-halign="center" data-formatter="metaAJAX" data-visible="false">{{ hw }}</th>
@@ -34,6 +39,7 @@
         {%- for file in compare_report %}
         <tr>
             <td>{{ file }}</td>
+            <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ file }}</button></td>
             {%- for hw in hardware %}
             <td class="hatching">
                 <img data-src="{{ compare_report[file][hw] }}"/><br/>

@@ -1,20 +1,29 @@
 function showImagesSubtraction(baselineId, renderId) {
 
     if (!($("#baselineImgPopup").attr('src') && $("#renderedImgPopup").attr('src'))) {
-        infoBox("[Error] Can't read source image.", "#815e9b");
+        infoBox("[Error] Can't read source image.", "#9b5e61");
         return;
     }
 
-    var diffCanvas = document.getElementById('imgsDifferenceCanvas');
     var imagesTable = document.getElementById("imgsCompareTable");
     var diffTable = document.getElementById('imgsDiffTable');
 
     // if diff image is show now
-    if (diffTable.style.display == "") {
+    if (diffTable.style.display === "") {
         imagesTable.style.display = "";
         diffTable.style.display = "none";
         return;
     }
+
+    renderCanvasData(baselineId, renderId, parseFloat(document.getElementById("thresholdRange").getAttribute('value')));
+
+    imagesTable.style.display = "none";
+    diffTable.style.display = "";
+}
+
+function renderCanvasData(baselineId, renderId, thresholdValue) {
+    document.getElementById('thresholdRange').setAttribute("value", thresholdValue);
+    var diffCanvas = document.getElementById('imgsDifferenceCanvas');
 
     var img1 = document.getElementById(baselineId);
     var img2 = document.getElementById(renderId);
@@ -31,9 +40,7 @@ function showImagesSubtraction(baselineId, renderId) {
     var imgData2 = ctx.getImageData(0, 0, diffCanvas.width, diffCanvas.height);
 
     var diff = ctx.createImageData(diffCanvas.width, diffCanvas.height);
-    pixelmatch(imgData1.data, imgData2.data, diff.data, diffCanvas.width, diffCanvas.height, {threshold: 0.03});
+    pixelmatch(imgData1.data, imgData2.data, diff.data, diffCanvas.width, diffCanvas.height, {threshold: thresholdValue});
     ctx.putImageData(diff, 0, 0);
-
-    imagesTable.style.display = "none";
-    diffTable.style.display = "";
 }
+

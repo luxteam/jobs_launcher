@@ -1,3 +1,5 @@
+@import "custom-range.css";
+
 body {
   margin:0px;
   background-image:none;
@@ -316,34 +318,49 @@ a {
 }
 
 .commonButton {
-    padding: 5px 10px 5px 10px;
     border-radius: 13px;
-    border: 1px solid #000000;
-    background-color: #fdfcfc;
+    border: 0.8px solid #828080;
+    background-color: #dedede;
     font-family: "Open Sans Bold";
 }
 
 .commonButton:hover {
     border-radius: 13px;
     border: 1px solid #949393;
-    background-color: #dedede;
+    background-color: #dededeeb;
+}
+
+.popupButton {
+    border-radius: 9px;
+    border: 0.8px solid #999999;
+    background-color: rgba(204, 204, 204, 1);
+    font-family: "Open Sans";
+}
+.popupForm .commonButton {
+    padding: 5px 10px 5px 10px;
 }
 
 #imgsDifferenceCanvas {
     display: block;
     margin: auto;
 }
-
 #renderedImgPopup {
-    width: 40vw;
+    max-width: 80vw;
+    max-height: 90vh;
+    width: 30vw;
+    height: auto;
 }
-
 #baselineImgPopup {
-    width: 40vw;
+    max-width: 80vw;
+    max-height: 90vh;
+    width: 30vw;
+    height: auto;
 }
-
 #imgsDifferenceCanvas {
-    width: 80vw;
+    max-width: 80vw;
+    max-height: 90vh;
+    width: 60vw;
+    height: auto;
 }
 
 .popupForm {
