@@ -1,12 +1,10 @@
 @import "custom-range.css";
 
 body {
-  margin:0px;
+  margin: 0px;
   background-image:none;
   position:static;
   left:auto;
-  margin-left:0;
-  margin-right:0;
   text-align:left;
   background-color: rgba(242, 242, 242, 1);
 }
@@ -52,7 +50,6 @@ body {
 #header a{
   font-family: AMDRTG, sans-serif;
   font-size: 22px;
-  font: normal;
   text-decoration: none;
   display: inline-block;
   padding: 8px;
@@ -166,7 +163,6 @@ a {
   text-decoration: underline;
 }
 
-/*TODO: refactor go top button*/
 #goTop {
   margin: 0 !important;
   padding: 0 !important;
@@ -174,9 +170,8 @@ a {
   border-radius: 50%;
   position: fixed;
   cursor: pointer;
-  display: block;
   border: none;
-  z-index: 1;
+  z-index: 2;
   color: #00ab6c;
   font-size: 25px;
   left: 25px;
@@ -191,8 +186,6 @@ a {
   justify-content: center;
 }
 #goTop:before {
-  content: "^";
-  font-family: "FontAwesome";
   font-weight: 1000;
   font-size: 50px;
   vertical-align: middle;
@@ -257,17 +250,6 @@ a {
   width: 50%;
 }
 
-/*.closePopup {
-  color: #aaa;
-  font-size: 4vh;
-  font-weight: bold;
-  opacity: 1;
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: 3px 0px 0px 7px;
-  text-shadow: -1px 0px 12px #ff0101;
-}*/
 .closePopup img{
     width: 1vw;
 }
