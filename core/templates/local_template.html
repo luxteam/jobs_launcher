@@ -115,18 +115,18 @@
 
     <div class="jsTableWrapper">
         <div id="toolbar">
-            <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed</button>
+            <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ render_report | selectattr("test_status", "equalto", "passed") | list | count }}]</button>
             <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">
-                Show failed
+                Show failed [{{ render_report | selectattr("test_status", "equalto", "failed") | list | count }}]
                 <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                       title="Failed status means that pixel difference with baseline image is too large."></span>
             </button>
             <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">
-                Show error
+                Show error [{{ render_report | selectattr("test_status", "equalto", "error") | list | count }}]
                 <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                       title="Error status means that fatal error has occur during testing."></span>
             </button>
-            <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped</button>
+            <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped [{{ render_report | selectattr("test_status", "equalto", "skipped") | list | count }}]</button>
             <button class="commonButton" type="button" name="showAll" onclick="searchTextInBootstrapTable('');">Reset</button>
         </div>
 
