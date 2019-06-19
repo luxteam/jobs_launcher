@@ -1,15 +1,15 @@
 import os
 import jinja2
 import sys
+import copy
 import json
 import base64
 import shutil
 import datetime
 import operator
 from PIL import Image
-import copy
-from core.auto_dict import AutoDict
 from core.config import *
+from core.auto_dict import AutoDict
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 from local_config import original_render
 
@@ -60,6 +60,10 @@ def make_base64_img(session_dir, report):
 
 def env_override(value, key):
     return os.getenv(key, value)
+
+
+def get_jobs_launcher_version():
+    return os.system("git describe --tags --abbrev=0")
 
 
 def generate_thumbnails(session_dir):
@@ -369,6 +373,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         autoescape=True
     )
     env.filters['env_override'] = env_override
+    env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
     common_info = {}
     summary_report = None
@@ -387,7 +392,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info)
-
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -398,7 +402,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                                      common_info=common_info,
                                                                      i=execution,
                                                                      original_render=original_render)
-
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
