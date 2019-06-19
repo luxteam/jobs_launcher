@@ -15,6 +15,8 @@
                 <th>Error</th>
                 <th>Skipped</th>
                 <th data-formatter="timeFormatter">Time taken</th>
+                <th data-formatter="timeFormatter">Setup time</th>
+                <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
         <tbody>
@@ -28,25 +30,32 @@
                 </td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
+                <!--TODO: redesign for failure statuses-->
                 <td
-                {% if report[i].summary.failed != 0 %}
+                {%- if report[i].summary.failed != 0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.failed }}</td>
 
                 <td
-                {% if report[i].summary.error != 0 %}
+                {%- if report[i].summary.error != 0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.error }}</td>
 
                 <td
-                {% if report[i].summary.skipped != 0 %}
+                {%- if report[i].summary.skipped != 0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
+                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
+                <td
+                {%- if report[i].summary.render_duration == -0.0 %}
+                class="badResult"
+                {% endif -%}
+                >{{ report[i].summary.render_duration }}</td>
             </tr>
     {% endfor %}
         </tbody>
@@ -60,7 +69,7 @@
     {% if i != "_cur_" %}
 <h3><a href="{{ i }}_detailed.html">{{ i }}</a></h3>
 
-<a name="{{ i }}"></a>
+<a class="hAnchor" name="{{ i }}"></a>
     {% endif %}
 
 <div class="jsTableWrapper">
@@ -72,6 +81,7 @@
                 <!--<th>Config</th>-->
                 <th>Host</th>
                 <th>Local report</th>
+                <th>Tool's log</th>
                 <th>Engine log</th>
                 <th>Total</th>
                 <th>Passed</th>
@@ -92,8 +102,7 @@
                 <!--<td>{{ test_conf }}</td>-->
 
                 <td>
-                    <!--<a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</a>-->
-                    <button class="commonButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
+                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
                     <div class="popup" id="machineInfo{{ loop.index }}">
                         <div class="popupContent popupHalfWidth">
                             <form class="popupForm">
@@ -121,10 +130,12 @@
                 </td>
 
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
+                <!--TODO: redesign for failure statuses-->
                 <td
                 {% if report[i].results[test_package][test_conf].failed != 0 %}
                 class="badResult"
@@ -144,7 +155,9 @@
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
+
                 <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
+
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
                 class="badResult"
@@ -157,9 +170,10 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="6">Sum</td>
+                <td colspan="4">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
+                <!--TODO: redesign for failure statuses-->
                 <td
                 {% if report[i].summary.failed != 0 %}
                 class="badResult"
@@ -176,6 +190,12 @@
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
                 <td>{{ report[i].summary.duration }}</td>
+                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
+                <td
+                {% if report[i].summary.render_duration == -0.0 %}
+                class="badResult"
+                {% endif %}
+                >{{ report[i].summary.render_duration | round(1) }}</td>
             </tr>
         </tbody>
     </table>

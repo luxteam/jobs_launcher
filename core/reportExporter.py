@@ -2,13 +2,16 @@ import os
 import jinja2
 import sys
 import json
+import base64
 import shutil
 import datetime
+import operator
 from PIL import Image
+import copy
+from core.auto_dict import AutoDict
 from core.config import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 from local_config import original_render
-
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
@@ -27,13 +30,40 @@ def save_html_report(report, session_dir, file_name, replace_pathsep=False):
             file.write(report)
 
 
+def make_base64_img(session_dir, report):
+    os.mkdir(os.path.join(session_dir, 'tmp'))
+
+    for test_package in report['results']:
+        for test_conf in report['results'][test_package]:
+            for test_execution in report['results'][test_package][test_conf]['render_results']:
+
+                for img in POSSIBLE_JSON_IMG_KEYS:
+                    if img in test_execution:
+                        try:
+                            if not os.path.exists(os.path.abspath(test_execution[img])):
+                                test_execution[img] = os.path.join(session_dir, test_execution[img])
+
+                            cur_img = Image.open(os.path.abspath(test_execution[img]))
+                            tmp_img = cur_img.resize((64, 64), Image.ANTIALIAS)
+                            tmp_img.save(os.path.join(session_dir, 'tmp', 'img.jpg'))
+
+                            with open(os.path.join(session_dir, 'tmp', 'img.jpg'), 'rb') as file:
+                                code = base64.b64encode(file.read())
+
+                            src = "data:image/jpeg;base64," + str(code)[2:-1]
+                            test_execution.update({img: src})
+                        except Exception as err:
+                            main_logger.error('Error in base64 encoding: {}'.format(str(err)))
+
+    return report
+
+
 def env_override(value, key):
     return os.getenv(key, value)
 
 
 def generate_thumbnails(session_dir):
     current_test_report = []
-    # TODO: don't generate thumbnails if test failed ?
     main_logger.info("Start thumbnails creation")
 
     for path, dirs, files in os.walk(session_dir):
@@ -54,8 +84,8 @@ def generate_thumbnails(session_dir):
                                     continue
 
                                 cur_img = Image.open(cur_img_path)
-                                thumb64 = cur_img.resize((64, 64), Image.ANTIALIAS)
-                                thumb256 = cur_img.resize((256, 256), Image.ANTIALIAS)
+                                thumb64 = cur_img.resize((64, int(64 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
+                                thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
 
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
@@ -72,7 +102,6 @@ def generate_thumbnails(session_dir):
 
 def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
-    # total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0}
 
     generate_thumbnails(session_dir)
 
@@ -103,11 +132,9 @@ def build_session_report(report, session_dir):
                         if jtem['test_status'] == 'undefined':
                             report['results'][result][item]['total'] += 1
                         else:
-                            # TODO: validate 'works' status
                             report['results'][result][item][jtem['test_status']] += 1
 
                     try:
-                    # TODO: machine info
                         report['machine_info'].update({'render_device': jtem['render_device']})
                         report['machine_info'].update({'tool': jtem['tool']})
                         report['machine_info'].update({'render_version': jtem['render_version']})
@@ -196,6 +223,79 @@ def build_summary_report(work_dir):
     return summary_report, common_info
 
 
+def build_performance_report(summary_report):
+
+    performance_report = AutoDict()
+    performance_report_detail = AutoDict()
+    hardware = {}
+    summary_info_for_report = {}
+
+    for key in summary_report:
+        platform = summary_report[key]
+        group = next(iter(platform['results']))
+        conf = list(platform['results'][group].keys())[0]
+
+        hw = platform['results'][group][conf]['machine_info']['render_device']
+        if hw not in hardware:
+            hardware[hw] = platform['summary']['render_duration']
+
+        temp_report = platform['results'][group][conf]
+        tool = temp_report['machine_info']['tool']
+
+        results = platform.pop('results', None)
+        info = temp_report
+        for test_package in results:
+            for test_config in results[test_package]:
+                results[test_package][test_config].pop('render_results', None)
+
+        performance_report[tool].update({hw: info})
+
+        for test_package in results:
+            for test_config in results[test_package]:
+                performance_report_detail[tool][test_package][test_config].update(
+                    {hw: results[test_package][test_config]})
+
+        tmp = sorted(hardware.items(), key=operator.itemgetter(1))
+        summary_info_for_report[tool] = tmp
+    hardware = sorted(hardware.items(), key=operator.itemgetter(1))
+    return performance_report, hardware, performance_report_detail, summary_info_for_report
+
+
+def build_compare_report(summary_report):
+    compare_report = AutoDict()
+    hardware = []
+    for platform in summary_report.keys():
+        for test_package in summary_report[platform]['results']:
+            for test_config in summary_report[platform]['results'][test_package]:
+                temp_report = summary_report[platform]['results'][test_package][test_config]
+
+                # force add gpu from baseline
+                hw = temp_report['machine_info']['render_device']
+                hw_bsln = temp_report['machine_info']['render_device'] + " [Baseline]"
+
+                if hw not in hardware:
+                    hardware.append(hw)
+                    hardware.append(hw_bsln)
+
+                # collect images links
+                for item in temp_report['render_results']:
+                    # if test is processing first time
+                    if not compare_report[item['test_case']]:
+                        compare_report[item['test_case']] = {}
+
+                    try:
+                        for img_key in POSSIBLE_JSON_IMG_RENDERED_KEYS + POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL:
+                            if img_key in item.keys():
+                                compare_report[item['test_case']].update({hw: item[img_key]})
+                        for img_key in POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL:
+                            if img_key in item.keys():
+                                compare_report[item['test_case']].update({hw_bsln: item[img_key]})
+                    except KeyError as err:
+                        main_logger.error("Missed testcase detected {}".format(str(err)))
+
+    return compare_report, hardware
+
+
 def build_local_reports(work_dir, summary_report, common_info):
     # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
@@ -224,7 +324,7 @@ def build_local_reports(work_dir, summary_report, common_info):
                             common_info.update({'tool': render_report[0]['tool']})
                             common_info.update({'render_device': render_report[0]['render_device']})
                             common_info.update({'testing_start': render_report[0]['date_time']})
-                            # common_info.update({'test_group': render_report[0]['test_group']})
+                            common_info.update({'test_group': render_report[0]['test_group']})
 
                     if os.path.exists(baseline_report_path):
                         with open(baseline_report_path, 'r') as file:
@@ -284,7 +384,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info)
-
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -302,5 +401,39 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
+    try:
+        copy_summary_report = copy.deepcopy(summary_report)
+        performance_template = env.get_template('performance_template.html')
+        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
+        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
+        save_json_report(performance_report_detail, work_dir, 'perf.json')
+        performance_html = performance_template.render(title=major_title + " Performance",
+                                                       performance_report=performance_report,
+                                                       hardware=hardware,
+                                                       performance_report_detail=performance_report_detail,
+                                                       pageID="performanceA",
+                                                       common_info=common_info,
+                                                       test_info=summary_info_for_report)
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+    except Exception as err:
+        performance_html = "Error while building performance report: {}".format(str(err))
+        main_logger.error(performance_html)
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+
+    try:
+        compare_template = env.get_template('compare_template.html')
+        copy_summary_report = copy.deepcopy(summary_report)
+        compare_report, hardware = build_compare_report(copy_summary_report)
+        save_json_report(compare_report, work_dir, COMPARE_REPORT)
+        compare_html = compare_template.render(title=major_title + " Compare",
+                                               hardware=hardware,
+                                               compare_report=compare_report,
+                                               pageID="compareA",
+                                               common_info=common_info)
+        save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
+    except Exception as err:
+        compare_html = "Error while building compare report: {}".format(str(err))
+        main_logger.error(compare_html)
+        save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info)

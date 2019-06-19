@@ -5,7 +5,7 @@ import core.config
 
 
 def launch_job(cmd_line, job_timeout=None):
-    report = {'total': 0, 'passed': 0, 'failed': 0, 'skipped': 1, 'duration': 0}
+    report = {'total': 0, 'passed': 0, 'failed': 0, 'error': 1, 'skipped': 0, 'duration': 0}
     core.config.main_logger.info('Started job: {}'.format(cmd_line))
     if not job_timeout:
         job_timeout = core.config.TIMEOUT
@@ -15,7 +15,7 @@ def launch_job(cmd_line, job_timeout=None):
     try:
         rc = p.wait(timeout=job_timeout)
     except psutil.TimeoutExpired as err:
-        rc = -1
+        rc = 1
         for child in reversed(p.children(recursive=True)):
             child.terminate()
         p.terminate()
@@ -28,13 +28,7 @@ def launch_job(cmd_line, job_timeout=None):
         core.config.main_logger.info('Job was completed normal')
         report['passed'] = 1
         report['skipped'] = 0
-    elif rc == -1:
-        core.config.main_logger.error('Job was terminated by timeout')
-        report['failed'] = 1
-        report['skipped'] = 0
     else:
-        core.config.main_logger.error('Job returned exit code: {}'.format(rc))
-        report['failed'] = 1
-        report['skipped'] = 0
+        core.config.main_logger.error('Job was terminated by timeout')
 
     return report

@@ -12,7 +12,7 @@
 
 .passedStatus {
 }
-
+/*TODO: customize colors for all statuses*/
 .failedStatus {
   background: #e86755 !important;
 }

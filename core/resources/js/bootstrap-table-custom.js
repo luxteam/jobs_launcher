@@ -1,25 +1,29 @@
-//TODO: add NOK status to sorting
-function statusSorter(a, b) {
-    if (a == b) {
-        return 0;
+/**
+ * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
+ * - error [high priority[ means crash during test execution
+ * - failed - pix /time/ram diff
+ * - skipped - commented case
+ * - passed - successfully passed test
+ */
+function statusSorter(x, y) {
+    var a = x.toLowerCase();
+    var b = y.toLowerCase();
+
+    if (a === b) return 0;
+
+    if (a.includes('error')) {
+        return -1;
     }
 
-    if (a.includes('failed') || a.includes('skipped') && (!b.includes('failed') && !b.includes('skipped'))) {
-        return 1;
+    if (a.includes('failed') && !b.includes('error')) {
+        return -1;
     }
 
-    if (a.includes('failed') && b.includes('skipped')) {
-        return 1;
+    if (a.includes('skipped') && !b.includes('failed') && !b.includes('error')) {
+        return -1;
     }
 
-    a = a.split('<br>');
-    b = b.split('<br>');
-
-    if (a[0] == b[0]) {
-        return a[2] > b[2] ? 1 : -1;
-    }
-
-    return -1;
+    return 1;
 }
 
 window.openFullImgSize = {
@@ -49,9 +53,15 @@ window.copyTestCaseName = {
 
         try {
             var node = document.createElement('input');
-            //TODO: if previous link has vars - store it too
-            var normalized_link = window.location.hostname + window.location.pathname + "?searchText=";
-            node.setAttribute('value', normalized_link + row.test_case);
+            var current_url = window.location.href;
+            var url_parser = new URL(current_url);
+            if (url_parser.searchParams.get("searchText")) {
+                url_parser.searchParams.delete("searchText");
+            }
+            url_parser.searchParams.set("searchText", row.test_case);
+
+            // duct tape for clipboard correct work
+            node.setAttribute('value', url_parser.toString());
             document.body.appendChild(node);
             node.select();
             document.execCommand('copy');
@@ -71,7 +81,7 @@ function performanceNormalizeFormatter(value, row, index, field) {
 function performanceNormalizeStyleFormatter(value, row, index, field) {
     var values = [];
     for (key in row) {
-        if (key.indexOf('_') == -1 && key != 0) {
+        if (key.indexOf('_') === -1 && key != 0) {
             values.push(parseFloat(row[key]));
         }
     }
@@ -105,7 +115,7 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
     }
 
     var opacity = 1;
-    if (parseFloat(value) == 0.0) {
+    if (parseFloat(value) === 0.0) {
         opacity = 0;
     }
 
@@ -113,4 +123,8 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
         classes: "",
         css: {"background-color": "rgba(" + red + ", " + green + ", " + blue + ", " + opacity + ")"}
     };
+}
+
+function searchTextInBootstrapTable(status) {
+    $('.jsTableWrapper [id]').bootstrapTable('resetSearch', status);
 }
