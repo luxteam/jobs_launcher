@@ -40,6 +40,9 @@ window.openFullImgSize = {
         } catch(e){
         }
 
+        document.getElementById("imgsCompareTable").style.display = "";
+        document.getElementById("imgsDiffTable").style.display = "none";
+
         openModalWindow('imgsModal');
     }
 }
