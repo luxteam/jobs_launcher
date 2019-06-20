@@ -34,12 +34,18 @@ window.openFullImgSize = {
         renderImg.src = "";
         baselineImg.src = "";
 
-        renderImg.src = row.rendered_img.split('"')[1].replace("thumb64_", "");
-        try {
-            baselineImg.src = row.baseline_img.split('"')[1].replace("thumb64_", "");
-        } catch(e){
-        }
+        var src_prefixes = ["thumb64_", "thumb256_"];
+        renderImg.src = row.rendered_img.split('"')[1];
 
+        if (row.baseline_img.includes("img")) {
+            baselineImg.src = row.baseline_img.split('"')[1];
+        }
+        for (var i in src_prefixes) {
+            renderImg.src = renderImg.src.replace(src_prefixes[i], "");
+            if (row.baseline_img.includes("img")) {
+                baselineImg.src = baselineImg.src.replace(src_prefixes[i], "");
+            }
+        }
         openModalWindow('imgsModal');
     }
 }
