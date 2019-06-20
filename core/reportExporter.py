@@ -1,4 +1,6 @@
 import os
+import subprocess
+
 import jinja2
 import sys
 import copy
@@ -62,8 +64,10 @@ def env_override(value, key):
     return os.getenv(key, value)
 
 
-def get_jobs_launcher_version():
-    return os.system("git describe --tags --abbrev=0")
+def get_jobs_launcher_version(value):
+    # os.chdir(os.path.dirname(__file__))
+    return subprocess.check_output("git describe --tags --abbrev=0", shell=True).decode("utf-8")
+    # return os.system("git describe --tags --abbrev=0")
 
 
 def generate_thumbnails(session_dir):
@@ -311,6 +315,9 @@ def build_local_reports(work_dir, summary_report, common_info):
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+    env.filters['env_override'] = env_override
+    env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
+
     template = env.get_template('local_template.html')
     report_dir = ""
 

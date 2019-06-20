@@ -19,14 +19,6 @@
     <script src="{{ pre_path }}/report_resources/js/images-substr.js"></script>
     <script src="{{ pre_path }}/report_resources/js/bootstrap-table-custom.js"></script>
 
-    <script type="text/javascript">
-        $(document).ready(function init(){
-        {% if pageID is defined %}
-            setActive({{ pageID }});
-        {% endif %}
-        });
-    </script>
-
     <title>{{ title }}</title>
 </head>
 
@@ -225,6 +217,8 @@
         Luxoft RPR CIS
         <br>
         2017-2019
+        <br>
+        jobs_launcher v{{ "v" | get_jobs_launcher_version() }}
     </div>
 
 </body>
