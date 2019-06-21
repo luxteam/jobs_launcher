@@ -12,9 +12,16 @@
 
 .passedStatus {
 }
-/*TODO: customize colors for all statuses*/
+
 .failedStatus {
-  background: #e86755 !important;
+  background:
+       repeating-linear-gradient(
+       45deg,
+       rgba(232, 103, 85, 1.0),
+       rgba(232, 103, 85, 0.8) 20px,
+       rgba(232, 120, 90, 0.8) 20px,
+       rgba(232, 120, 90, 1.0) 40px
+     ) !important;
 }
 
 .errorStatus {
@@ -22,5 +29,5 @@
 }
 
 .skippedStatus {
-  background: #e5e855 !important;
+  background: #e8d250 !important;
 }

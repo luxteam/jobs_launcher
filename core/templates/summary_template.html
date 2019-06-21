@@ -30,22 +30,21 @@
                 </td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
-                <!--TODO: redesign for failure statuses-->
                 <td
                 {%- if report[i].summary.failed != 0 %}
-                class="badResult"
+                class="failedStatus"
                 {% endif -%}
                 >{{ report[i].summary.failed }}</td>
 
                 <td
                 {%- if report[i].summary.error != 0 %}
-                class="badResult"
+                class="errorStatus"
                 {% endif -%}
                 >{{ report[i].summary.error }}</td>
 
                 <td
                 {%- if report[i].summary.skipped != 0 %}
-                class="badResult"
+                class="skippedStatus"
                 {% endif -%}
                 >{{ report[i].summary.skipped }}</td>
 
@@ -133,22 +132,21 @@
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
-                <!--TODO: redesign for failure statuses-->
                 <td
                 {% if report[i].results[test_package][test_conf].failed != 0 %}
-                class="badResult"
+                class="failedStatus"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].failed }}</td>
 
                 <td
                 {% if report[i].results[test_package][test_conf].error != 0 %}
-                class="badResult"
+                class="errorStatus"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].error }}</td>
 
                 <td
                 {% if report[i].results[test_package][test_conf].skipped != 0 %}
-                class="badResult"
+                class="skippedStatus"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
@@ -171,20 +169,19 @@
                 <td colspan="4">Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
-                <!--TODO: redesign for failure statuses-->
                 <td
                 {% if report[i].summary.failed != 0 %}
-                class="badResult"
+                class="failedStatus"
                 {% endif %}
                 >{{ report[i].summary.failed }}</td>
                 <td
                 {% if report[i].summary.error != 0 %}
-                class="badResult"
+                class="errorStatus"
                 {% endif %}
                 >{{ report[i].summary.error }}</td>
                 <td
                 {% if report[i].summary.skipped != 0 %}
-                class="badResult"
+                class="skippedStatus"
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
                 <td>{{ report[i].summary.duration }}</td>
