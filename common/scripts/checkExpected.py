@@ -43,7 +43,7 @@ def main():
             report_base = core.config.RENDER_REPORT_BASE.copy()
             report_base.update(
                 {"test_case": scase,
-                 "test_status": core.config.TEST_CRASH_STATUS}
+                 "test_status": "error"}
             )
             report_base.update(common_info)
             rendered.append(report_base)

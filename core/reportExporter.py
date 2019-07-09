@@ -384,6 +384,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info)
+
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
