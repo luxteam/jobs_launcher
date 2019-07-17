@@ -179,7 +179,10 @@ def build_summary_report(work_dir):
                 basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     temp_report = json.loads(report_file.read())
-                    basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                    try:
+                        basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                    except KeyError:
+                        continue
 
                     # update relative paths
                     try:
@@ -407,7 +410,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         performance_template = env.get_template('performance_template.html')
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
-        save_json_report(performance_report_detail, work_dir, 'perf.json')
+        save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
         performance_html = performance_template.render(title=major_title + " Performance",
                                                        performance_report=performance_report,
                                                        hardware=hardware,
