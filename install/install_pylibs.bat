@@ -16,5 +16,4 @@ python -m pip install Jinja2
 python -m pip install pytest
 python -m pip install pyscreenshot
 
-
 python -m pip install py-cpuinfo

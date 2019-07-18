@@ -18,7 +18,6 @@ SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
 def parse_cmd_variables(tests_root, cmd_variables):
     # if TestsFilter doesn't exist or is empty - set it 'full'
-    # TODO: mb keep empty
     if 'TestsFilter' not in cmd_variables.keys() or not cmd_variables['TestsFilter']:
         cmd_variables.update({'TestsFilter': 'full'})
 
@@ -38,6 +37,7 @@ def main():
     parser.add_argument('--test_filter', required=False, nargs="*", default=[])
     parser.add_argument('--package_filter', required=False, nargs="*", default=[])
     parser.add_argument('--file_filter', required=False)
+    parser.add_argument('--execute_stages', required=False, nargs="*", default=[])
 
     args = parser.parse_args()
 
@@ -116,8 +116,7 @@ def main():
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
                                            test_filter=args.test_filter, package_filter=args.package_filter)
-
-    core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
+    # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
@@ -129,11 +128,10 @@ def main():
         temp_path = os.path.abspath(found_job[4][0].format(SessionDir=session_dir))
 
         for i in range(len(found_job[3])):
-            # print("  Executing job: ", found_job[3][i].format(SessionDir=session_dir))
-            print("  Executing job {}/{}".format(i+1, len(found_job[3])))
-            report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
-                jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
-
+            if (args.execute_stages and str(i + 1) in args.execute_stages) or not args.execute_stages:
+                print("  Executing job {}/{}".format(i+1, len(found_job[3])))
+                report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
+                    jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
     # json_report = json.dumps(report, indent = 4)

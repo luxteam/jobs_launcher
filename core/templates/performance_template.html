@@ -59,7 +59,11 @@
         <tr>
             <td>{{ test_package }} {{ test_config }}</td>
             {% for hw in test_info[tool] %}
-            <td>{{ performance_report_detail[tool][test_package][test_config][hw[0]].render_duration | round(3) }}</td>
+                {% if performance_report_detail[tool][test_package][test_config][hw[0]].render_duration is number %}
+                    <td>{{ performance_report_detail[tool][test_package][test_config][hw[0]].render_duration | round(3) }}</td>
+                {% else %}
+                    <td class="errorStatus">NaN</td>
+                {% endif %}
             {% endfor %}
         </tr>
         {% endfor %}
@@ -103,7 +107,7 @@
         <tr>
             <td>{{ test_package }} {{ test_config }}</td>
             {% for hw in test_info[tool] %}
-            <td>{{ performance_report_detail[tool][test_package][test_config][hw[0]].render_duration | round(3) }}</td>
+            <td>{{ performance_report_detail[tool][test_package][test_config][hw[0]].render_duration }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
