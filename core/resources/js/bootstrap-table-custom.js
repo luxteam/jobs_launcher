@@ -46,6 +46,10 @@ window.openFullImgSize = {
                 baselineImg.src = baselineImg.src.replace(src_prefixes[i], "");
             }
         }
+
+        document.getElementById("imgsCompareTable").style.display = "";
+        document.getElementById("imgsDiffTable").style.display = "none";
+
         openModalWindow('imgsModal');
     }
 }
