@@ -32,7 +32,7 @@ function renderCanvasData(baselineId, renderId, thresholdValue) {
     diffCanvas.height = img1.naturalHeight;
 
     var ctx = diffCanvas.getContext("2d");
-    ctx.clearRect(0, 0, diffCanvas.width, diffCanvas.height)
+    ctx.clearRect(0, 0, diffCanvas.width, diffCanvas.height);
 
     ctx.drawImage(img1, 0, 0);
     var imgData1 = ctx.getImageData(0, 0, diffCanvas.width, diffCanvas.height);
