@@ -10,3 +10,4 @@ pytest
 pyscreenshot
 py-cpuinfo
 requests
+imageio

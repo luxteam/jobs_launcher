@@ -1,6 +1,11 @@
 import numpy as np
 
-from scipy.misc import imread
+import scipy
+if scipy.__version__ > '1.1.0':
+    from imageio import imread
+else:
+    from scipy.misc import imread
+
 from scipy import sum
 
 from scipy.spatial.distance import hamming
