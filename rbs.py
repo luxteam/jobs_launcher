@@ -5,10 +5,10 @@ import subprocess
 from core.system_info import get_machine_info
 
 
-# RBS_DEV = "https://rbsdbdev.cis.luxoft.com"
-# RBS = "https://rbsdb.cis.luxoft.com"
-TEST = "http://localhost:5000"
-links = [TEST]
+RBS_DEV = "https://rbsdbdev.cis.luxoft.com"
+RBS = "https://rbsdb.cis.luxoft.com"
+
+links = [RBS_DEV, RBS]
 
 
 def get_gpu():
@@ -21,8 +21,8 @@ def get_gpu():
 		pass
 
 
-def get_headers(link):
-	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth('root', 'root'))
+def get_headers():
+	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth('admin', 'dev'))
 	print(r)
 	return {"Authorization": "Bearer " + json.loads(r.content)['token']}
 
