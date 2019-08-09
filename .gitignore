@@ -3,4 +3,3 @@ UnitTests/Results/*
 .idea/
 *.pyc
 *.log
-machine_info.json
