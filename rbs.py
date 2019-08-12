@@ -11,7 +11,7 @@ RBS = "https://rbsdb.cis.luxoft.com"
 links = [RBS_DEV, RBS]
 
 gpu_map = {
-	"AMD_WX9100": "AMD Radeon (TM) Pro WX 7100 Graphics",
+	"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 	"AMD_WX9100": "Radeon (TM) Pro WX 9100",
 	"AMD_RXVEGA": "Radeon RX Vega",
 	"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
@@ -39,16 +39,28 @@ def main():
 	parser.add_argument('--tool', required=True)
 	parser.add_argument('--branch',  required=True)
 	parser.add_argument('--build', required=True)
-	parser.add_argument('--test_groups', nargs='+', required=True)
+	parser.add_argument('--tests', nargs='+', required=False, default=[])
+	parser.add_argument('--tests_package', required=False)
 	parser.add_argument('--login', required=True)
 	parser.add_argument('--password', required=True)
 	args = parser.parse_args()
+
+	if args.tests:
+		test_groups = args.tests
+	elif args.tests_package:
+		try:
+			with open('../jobs/{0}'.format(args.tests_package)) as file:
+				test_groups = [group.strip() for group in file.read().split('\n') if group]
+		except Exception as err:
+			return False
+	else:
+		return False
 
 	data = {
 		"build_name": args.build,
 		"branch": args.branch,
 		"tool": args.tool,
-		"groups": args.test_groups,
+		"groups": test_groups,
 		"tester_info": {**get_machine_info(), **get_gpu()}
 	}
 
