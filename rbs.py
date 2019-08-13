@@ -1,6 +1,7 @@
 import json
 import argparse
 import requests
+from platform import system
 import subprocess
 from core.system_info import get_machine_info
 
@@ -20,14 +21,18 @@ gpu_map = {
 
 
 def get_gpu():
-	try:
-		s = subprocess.Popen("wmic path win32_VideoController get name", stdout=subprocess.PIPE)
-		stdout = s.communicate()
-		render_device = stdout[0].decode("utf-8").split('\n')[1].replace('\r', '').strip(' ')
-		return {"render_device": render_device}
-	except:
-		return gpu_map[os.environ["GPU"].split(":")[1]]
-
+	os = system()
+	if os == "Windows":
+		try:
+			s = subprocess.Popen("wmic path win32_VideoController get name", stdout=subprocess.PIPE)
+			stdout = s.communicate()
+			render_device = stdout[0].decode("utf-8").split('\n')[1].replace('\r', '').strip(' ')
+			return {"render_device": render_device}
+		except Exception as err:
+			print("Render device not found - set from map.")
+			return {"render_device": gpu_map[os.environ["GPU"].split(":")[1]]}
+	else:
+		return {"render_device": gpu_map[os.environ["GPU"].split(":")[1]]}
 
 def get_headers(link, login, password):
 	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth(login, password))
@@ -63,6 +68,8 @@ def main():
 		"groups": test_groups,
 		"tester_info": {**get_machine_info(), **get_gpu()}
 	}
+
+	print(data)
 
 	for link in links:
 		headers = get_headers(link, args.login, args.password)
