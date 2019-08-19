@@ -36,7 +36,7 @@ def get_gpu():
 
 def get_headers(link, login, password):
 	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth(login, password))
-	return {"Authorization": "Bearer " + json.loads(r.content)['token']}
+	return {"Authorization": "Bearer " + json.loads(r.content.decode('utf-8'))['token']}
 
 
 def main():
