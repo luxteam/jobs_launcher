@@ -41,8 +41,9 @@ def main():
                 shutil.copyfile(os.path.join(path, file),
                                 os.path.join(args.baseline_root, os.path.relpath(os.path.join(path, core.config.BASELINE_REPORT_NAME), args.results_root)))
                 # copy html report
-                shutil.copyfile(os.path.join(path, core.config.TEST_REPORT_HTML_NAME),
-                                os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), core.config.TEST_REPORT_HTML_NAME))
+                if os.path.exists(os.path.join(path, core.config.TEST_REPORT_HTML_NAME)):
+                    shutil.copyfile(os.path.join(path, core.config.TEST_REPORT_HTML_NAME),
+                                    os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), core.config.TEST_REPORT_HTML_NAME))
 
                 with open(os.path.join(path, file), 'r') as json_report:
                     report = json.loads(json_report.read())
