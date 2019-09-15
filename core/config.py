@@ -36,6 +36,8 @@ PIX_DIFF_MAX = 15
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
 
+TEST_SUCCESS_STATUS = 'passed'
+TEST_IGNORE_STATUS = 'skipped'
 TEST_CRASH_STATUS = 'error'
 TEST_DIFF_STATUS = 'failed'
 
@@ -49,6 +51,8 @@ SESSION_REPORT = 'session_report.json'
 SESSION_REPORT_HTML = 'session_report.html'
 
 NOT_RENDERED_REPORT = "not_rendered.json"
+
+THUMBNAIL_PREFIXES = ['thumb64_', 'thumb256_']
 
 POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'render_color_path', 'original_color_path']
 POSSIBLE_JSON_IMG_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_KEYS]
