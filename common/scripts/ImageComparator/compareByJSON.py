@@ -57,6 +57,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
                 img['test_status'] = core.config.TEST_DIFF_STATUS
             img.update({'baseline_color_path': os.path.relpath(
                 os.path.join(base_dir, baseline_json[key]), work_dir)})
+            for thumb in core.config.THUMBNAIL_PREFIXES:
+                if os.path.exists(os.path.join(base_dir, thumb + baseline_json[key])):
+                    img.update({thumb + 'baseline_color_path': os.path.relpath(
+                        os.path.join(base_dir, thumb + baseline_json[key]), work_dir)})
 
     return img
 
