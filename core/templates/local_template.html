@@ -140,8 +140,11 @@
 
             <thead>
                 <tr>
-                    <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
-                    <th data-field="parameters" data-halign="center" data-valign="middle">Parameters</th>
+                    <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true" data-visible="false">Test case</th>
+                    <th data-field="test_case_copy" data-halign="center" data-valign="middle" data-sortable="true" data-events="copyTestCaseName">
+                        Test case
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
+                    </th>
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
                     <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
@@ -149,7 +152,6 @@
                     <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                     <th data-field="vram_diff" data-halign="center" data-valign="middle" data-sortable="true">GPU RAM diff, %</th>
                     <th data-filed="render_log" data-valign="middle">Render log</th>
-                    <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
                     <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
                     <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                     <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
@@ -161,26 +163,31 @@
             {% for item in render_report %}
                 <tr>
                     <td>{{ item.test_case }}</td>
-
-                    <td>
-                        <b>Width:</b> {{ item.width }}<br/>
-                        <b>Height:</b> {{ item.height }}<br/>
-                        <b>Iterations:</b> {{ item.iterations }}
-                    </td>
+                    <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
 
                     <td class="hatching">
                     {% if item.baseline_color_path %}
+                        {% if 'thumb256_baseline_color_path' in item %}
+                        <img data-src="{{ item.thumb256_baseline_color_path }}"/>
+                        {% else %}
                         <img data-src="{{ item.baseline_color_path }}"/>
+                        {% endif %}
                     {% else %}
                         Not compared
                     {% endif %}
                     </td>
 
-                    <td class="hatching"><img data-src="{{ item.render_color_path }}"/></td>
+                    <td class="hatching">
+                        {% if 'thumb256_render_color_path' in item %}
+                        <img data-src="{{ item.thumb256_render_color_path }}"/>
+                        {% else %}
+                        <img data-src="{{ item.render_color_path }}"/>
+                        {% endif %}
+                    </td>
 
                     <td class="infoColumn
                     {%- if item.difference_time > 5 %}
-                       {{ ' ' }}timeWorseStatus
+                       {{ ' ' }}timeDiffFailedStatus
                     {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
                         <b>Test status:</b> {{ item.test_status }}<br/>
                         <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
@@ -192,10 +199,11 @@
                         <b>GPU memory total:</b> {{ item.gpu_memory_total }}<br/>
                         <b>GPU memory max:</b> {{ item.gpu_memory_max }}<br/>
                         <b>System memory usage:</b> {{ item.system_memory_usage }}<br/>
+                        <b>Width:</b> {{ item.width }}<br/>
+                        <b>Height:</b> {{ item.height }}<br/>
+                        <b>Iterations:</b> {{ item.iterations }}
                     </td>
-
                     <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
-
                     <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"
                     {% elif item.difference_time < -5 %}
@@ -211,11 +219,7 @@
                         >{{ item.difference_vram | round(2) }}</td>
 
                     <td><a href="{{ item.test_case }}.log">tahoe.log</a></td>
-
-                    <td><button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button></td>
-
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
-
                     <td>{{ item.render_time }}</td>
                     <td>{{ item.baseline_render_time }}</td>
                     <td>{{ item.gpu_memory_usage }}</td>
