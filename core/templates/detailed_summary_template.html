@@ -83,32 +83,38 @@
     >
         <thead>
             <tr>
-                <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
-                <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status</th>
-                <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
-                <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
+                <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true" data-visible="false">Test case</th>
+                <th data-field="test_case_copy" data-halign="center" data-valign="middle" data-sortable="true" data-events="copyTestCaseName">
+                    Test case
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
+                </th>
+
+                <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
+                <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
+                <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true">Test status</th>
                 <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
-                <th data-field="render_vram" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Render GPU RAM, Mb</th>
-                <th data-field="baseline_vram" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Baseline GPU RAM, Mb</th>
+                <th data-field="render_vram" data-halign="center" data-valign="middle" data-sortable="true">Render GPU RAM, Mb</th>
+                <th data-field="baseline_vram" data-halign="center" data-valign="middle" data-sortable="true">Baseline GPU RAM, Mb</th>
                 <th data-field="vram_diff" data-halign="center" data-valign="middle" data-sortable="true">GPU RAM diff, %</th>
                 <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
-                <th data-field="copy_url_button" data-valign="middle" data-events="copyTestCaseName">Test case direct link</th>
+                <th data-filed="render_log" data-halign="center" data-valign="middle">Render log</th>
             </tr>
         </thead>
         <tbody>
         {% for test_package, value in report[i].results | dictsort %}
             {% for test_conf, value in report[i].results[test_package] | dictsort%}
                 {% if report[i].results[test_package][test_conf].render_results | length > 0 %}
-                    {% for item in report[i].results[test_package][test_conf].render_results %}
+
+                {% for item in report[i].results[test_package][test_conf].render_results %}
             <tr>
                 <td>{{ item.test_case }}</td>
-                <td class="{{ item.test_status }}Status">
-                    {{ item.test_status | title }}
-                </td>
-                <td>{{ item.render_time }}</td>
-                <td>{{ item.baseline_render_time }}</td>
+                <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
+                <td>{{ item.render_time | round(2) }}</td>
+                <td>{{ item.baseline_render_time | round(2) }}</td>
+                <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+
                 <!--TODO: 5% to conf CONSTS-->
                 <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"
@@ -150,7 +156,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <button class="commonButton" type="button" name="copyDirectLinkButton">Copy to clipboard</button>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/tahoe.log">tahoe Log</a>
                 </td>
             </tr>
                 {% endfor %}

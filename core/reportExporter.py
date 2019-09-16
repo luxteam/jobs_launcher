@@ -1,4 +1,6 @@
 import os
+import subprocess
+
 import jinja2
 import json
 import base64
@@ -10,7 +12,6 @@ from core.config import *
 from core.auto_dict import AutoDict
 import copy
 import sys
-import subprocess
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
@@ -184,12 +185,17 @@ def build_summary_report(work_dir):
                 basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     temp_report = json.loads(report_file.read())
-                    basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                    try:
+                        basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                    except KeyError:
+                        continue
 
+                    # update relative paths
                     try:
                         for test_package in temp_report['results']:
-                            for test_conf in temp_report['results'][test_package]:  # add machine info to each execution
+                            for test_conf in temp_report['results'][test_package]:
                                 temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
+
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
                                     for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
                                         if img in jtem.keys():

@@ -51,7 +51,7 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
             pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
             img.update({'difference_color': pix_difference})
             if type(pix_difference) is str or pix_difference > pix_diff_max:
-                img['test_status'] = core.config.TEST_BASELINE_DIFF_STATUS
+                img['test_status'] = core.config.TEST_DIFF_STATUS
             img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_item[key]), work_dir)})
 
     return img

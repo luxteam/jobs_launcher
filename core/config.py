@@ -7,35 +7,36 @@ logging.basicConfig(filename='launcher.engine.log',
 main_logger = logging.getLogger('main_logger')
 
 RENDER_REPORT_BASE = {
-  "test_case": "",
-  "test_group": "",
-  "scene_name": "",
-  "file_name": "",
-  "tool": "",
-  "test_status": "undefined",
-  "date_time": "",
+    "file_name": "",
+    "date_time": "",
+    "script_info": [],
+    "render_color_path": "",
+    "test_case": "",
+    "render_version": "",
+    "test_status": "undefined",
+    "tool": "",
+    "render_time": -0.0,
+    "baseline_render_time": -0.0,
+    "render_mode": "",
+    "scene_name": "",
+    "test_group": "",
+    "difference_color": "not compared yet",
+    "difference_time": "not compared yet",
+    "core_version": "",
+    "render_device": "",
+    "difference_time_or": "not compared yet",
 
-  "core_version": "",
+  # core block
   "minor_version": "",
-
-  "render_mode": "",
-  "render_device": "",
   "iterations": -0,
   "width": -0,
   "height": -0,
-
-  "render_color_path": "",
-  "render_time": -0.0,
   "system_memory_usage": -0.0,
   "gpu_memory_usage": -0.0,
   "gpu_memory_total": -0.0,
   "gpu_memory_max": -0.0,
-
   "baseline_gpu_memory_usage": -0.0,
-  "baseline_render_time": -0.0,
-  "difference_vram": -0.0,
-  "difference_time": -0.0,
-  "difference_color": "not compared"
+  "difference_vram": -0.0
 }
 
 RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'minor_version', 'test_group', 'core_version', 'render_device']
@@ -52,7 +53,6 @@ VRAM_DIFF_MAX = 5
 TEST_SUCCESS_STATUS = 'passed'
 TEST_IGNORE_STATUS = 'skipped'
 TEST_CRASH_STATUS = 'error'
-TEST_BASELINE_DIFF_STATUS = 'failed'  # TODO: remove
 TEST_DIFF_STATUS = 'failed'
 
 CASE_REPORT_SUFFIX = '_RPR.json'
