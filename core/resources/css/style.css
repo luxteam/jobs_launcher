@@ -1,11 +1,10 @@
-/*TODO: refactor all styles to vw vh*/
+@import "custom-range.css";
+
 body {
-  margin:0px;
+  margin: 0px;
   background-image:none;
   position:static;
   left:auto;
-  margin-left:0;
-  margin-right:0;
   text-align:left;
   background-color: rgba(242, 242, 242, 1);
 }
@@ -17,6 +16,10 @@ body {
 @font-face {
   font-family: "Open Sans";
   src: url(../fonts/OpenSans-Regular.ttf) format("truetype");
+}
+@font-face {
+    font-family: "Open Sans Bold";
+    src: url(../fonts/OpenSans-Bold.ttf) format("truetype");
 }
 
 #header {
@@ -47,7 +50,6 @@ body {
 #header a{
   font-family: AMDRTG, sans-serif;
   font-size: 22px;
-  font: normal;
   text-decoration: none;
   display: inline-block;
   padding: 8px;
@@ -68,19 +70,19 @@ body {
   width: 100%;
   position: relative;
   float: left;
-  padding-bottom: 5px;
-  padding-top: 5px;
-  font-family: "Open Sans"
+  padding-bottom: 1vh;
+  padding-top: 2vh;
+  font-family: "Open Sans";
+  font-weight: bold;
 }
 
 table.baseTable {
   border-collapse: collapse;
   font-family: 'Open Sans';
-  font-weight: 400px;
   font-size: 14px;
   font-style: normal;
   text-align: center;
-  width: 80%;
+  width: 90%;
   margin-right: auto;
   margin-left: auto;
 }
@@ -102,14 +104,13 @@ table.baseTable {
 }
 
 hr {
-  height: 7px;
-  width: 90%;
+  height: 5px;
+  width: 95%;
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
   color: rgba(222, 222, 222, 1);
-  background-color: rgba(212, 212, 212, 1);
+  background-color: rgba(222, 222, 222, 1);
   border: none;
 }
 
@@ -162,7 +163,6 @@ a {
   text-decoration: underline;
 }
 
-/*TODO: refactor go top button*/
 #goTop {
   margin: 0 !important;
   padding: 0 !important;
@@ -170,9 +170,8 @@ a {
   border-radius: 50%;
   position: fixed;
   cursor: pointer;
-  display: block;
   border: none;
-  z-index: 1;
+  z-index: 2;
   color: #00ab6c;
   font-size: 25px;
   left: 25px;
@@ -187,8 +186,6 @@ a {
   justify-content: center;
 }
 #goTop:before {
-  content: "^";
-  font-family: "FontAwesome";
   font-weight: 1000;
   font-size: 50px;
   vertical-align: middle;
@@ -200,31 +197,26 @@ a {
 
 .hatching {
   background:
-          linear-gradient(45deg, rgba(0, 0, 0, 0) 49.9%, black 49.9%, black 60%, rgba(0, 0, 0, 0) 60%)
-          fixed,
-          linear-gradient(45deg, black 10%, rgba(0, 0, 0, 0) 10%)
-          fixed;
-  background-size: 0.3em 0.3em;
-}
-
-.resizedImg img{
-  width: 30%;
+     repeating-linear-gradient(
+       45deg,
+       rgba(0, 0, 0, 0.0),
+       rgba(0, 0, 0, 0.0) 5px,
+       rgba(150, 150, 150, 0.3) 5px,
+       rgba(150, 150, 150, 0.3) 10px
+     );
 }
 
 .detailedTable img {
   width: 64px;
 }
 .jsTableWrapper {
-  width: 80% !important;
+  width: 90% !important;
   margin: auto;
 }
 .jsTableWrapper table {
   width: 100%;
 }
 
-#compareTable {
-  width: 100%;
-}
 #compareTable img {
   max-width: 300px;
 }
@@ -250,32 +242,17 @@ a {
   justify-content: center;
   overflow: auto;
 }
-
 .popupContent {
   margin: auto;
   padding: 10px;
 }
-
 .popupHalfWidth {|
   width: 50%;
 }
 
-/*.closePopup {
-  color: #aaa;
-  font-size: 4vh;
-  font-weight: bold;
-  opacity: 1;
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: 3px 0px 0px 7px;
-  text-shadow: -1px 0px 12px #ff0101;
-}*/
-
 .closePopup img{
     width: 1vw;
 }
-
 .closePopup:hover,
 .closePopup:focus {
   color: black;
@@ -290,6 +267,7 @@ a {
 .infoColumn {
   text-align: left;
   white-space: nowrap;
+  width: 15vw;
 }
 
 #infoBox {
@@ -322,33 +300,49 @@ a {
 }
 
 .commonButton {
-    padding: 4px;
-    border-radius: 9px;
-    border: 0.5px solid #bdbdbd;
-    background-color: #f1efefeb;
+    border-radius: 13px;
+    border: 0.8px solid #828080;
+    background-color: #dedede;
+    font-family: "Open Sans Bold";
 }
 
 .commonButton:hover {
+    border-radius: 13px;
+    border: 1px solid #949393;
+    background-color: #dededeeb;
+}
+
+.popupButton {
     border-radius: 9px;
-    border: 0.5px solid #949393;
-    background-color: #dedede;
+    border: 0.8px solid #999999;
+    background-color: rgba(204, 204, 204, 1);
+    font-family: "Open Sans";
+}
+.popupForm .commonButton {
+    padding: 5px 10px 5px 10px;
 }
 
 #imgsDifferenceCanvas {
     display: block;
     margin: auto;
 }
-
 #renderedImgPopup {
-    width: 25vw;
+    max-width: 80vw;
+    max-height: 90vh;
+    width: 30vw;
+    height: auto;
 }
-
 #baselineImgPopup {
-    width: 25vw;
+    max-width: 80vw;
+    max-height: 90vh;
+    width: 30vw;
+    height: auto;
 }
-
 #imgsDifferenceCanvas {
-    width: 25vw;
+    max-width: 80vw;
+    max-height: 90vh;
+    width: 60vw;
+    height: auto;
 }
 
 .popupForm {
@@ -357,4 +351,10 @@ a {
     margin: 1vw 0px 0px 1vw;
     left: 0;
     top: 0;
+}
+
+.hAnchor {
+  display: block;
+  position: relative;
+  top: -10vh;
 }

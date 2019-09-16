@@ -2,19 +2,6 @@ function setActive(elem) {
     elem.classList.add('active_header');
 }
 
-function resizeAllImg(){
-  imgs = document.getElementsByClassName('resizedImg');
-  if (imgs[0].style.width == 'auto' || imgs[0].style.width == '') {
-    for (var i = 0; i < imgs.length; i++) {
-        imgs[i].style.width = "30%";
-    }
-  } else {
-    for (var i = 0; i < imgs.length; i++) {
-        imgs[i].style.width = "auto";
-    }
-  }
-}
-
 $.extend($.expr[':'], {
   'containsCI': function(elem, i, match, array)
   {
@@ -65,44 +52,28 @@ function closeModalWindow(id) {
 }
 
 function increaseImgSize() {
-    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
-	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
-    });
+    var step = 3.5;
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 4], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
-    $("#renderedImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
-    });
-
-    $("#baselineImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) + document.documentElement.clientWidth / 100 * 5;
+    imagesSelectorList.forEach(function(item) {
+        $(item[0]).css("width", function( index, value ) {
+	        return parseInt(value, 10) + document.documentElement.clientWidth / 100 * item[1];
+        });
     });
 }
 
 function reduceImgSize() {
-    $("#imgsDifferenceCanvas").css("width", function( index, value ) {
-	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
-    });
+    var step = 3.5;
+    var imagesSelectorList = [['#imgsDifferenceCanvas', step * 4], ['#renderedImgPopup', step], ['#baselineImgPopup', step]];
 
-    $("#renderedImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
-    });
-
-    $("#baselineImgPopup").css("width", function( index, value ) {
-	    return parseInt(value, 10) - document.documentElement.clientWidth / 100 * 5;
+    imagesSelectorList.forEach(function(item) {
+        $(item[0]).css("width", function( index, value ) {
+	        return parseInt(value, 10) - document.documentElement.clientWidth / 100 * item[1];
+        });
     });
 }
 
-//TODO: finish custom img size
-function setImgSize() {
-    var renderImg = document.getElementById('renderedImgPopup');
-    var baselineImg = document.getElementById('baselineImgPopup');
-    var widthValue = document.getElementsByName('inputImgSize')[0].value;
-
-    renderImg.width = widthValue;
-    baselineImg.width = widthValue;
-}
-
-function infoBox(message, bgcolor=false) {
+function infoBox(message, bgcolor = false) {
     $("#infoBox").html("<p>" + message + "</p>");
     $("#infoBox").fadeIn('slow');
     if (bgcolor) {
@@ -120,7 +91,7 @@ function getQueryVariable(variable) {
     var vars = query.split("&");
     for (var i=0; i < vars.length; i++) {
         var pair = vars[i].split("=");
-        if(pair[0] == variable) {
+        if(pair[0] === variable) {
             return pair[1];
         }
     }
@@ -146,3 +117,7 @@ $(document).ready(function init(){
     $( "h3:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
     $( "table.baseTable th:containsCI('AMD')" ).css( "color", "rgba(92, 136, 200, 1)" );
 });
+
+
+// TODO: upgrade Bootstrap
+//TODO: upgrade Bootstrap-table
