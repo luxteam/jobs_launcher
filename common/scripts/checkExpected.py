@@ -24,7 +24,7 @@ def main():
 
         rendered_cases = {x['test_case'] for x in rendered}
         expected_cases = {x for x in expected}
-        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFULL_KEYS}
+        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFUL_KEYS}
     except OSError as err:
         core.config.main_logger.error("Not found report: {}".format(str(err)))
         return

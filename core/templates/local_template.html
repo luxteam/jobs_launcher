@@ -204,7 +204,11 @@
                     {% endif -%}
                         >{{ item.difference_time | round(2) }}</td>
                     <td>
+                        {%- if 'render_log' in item %}
+                        <a href="{{ item.render_log }}">Render log</a>
+                        {% else %}
                         <a href="renderTool.log">Render log</a>
+                        {% endif -%}
                     </td>
                     <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
                     <td>{{ item.render_time }}</td>

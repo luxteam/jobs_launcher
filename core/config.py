@@ -26,7 +26,7 @@ RENDER_REPORT_BASE = {
     "render_device": "",
     "difference_time_or": "not compared yet"
 }
-RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
+RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
 TIMEOUT = 900
@@ -61,7 +61,7 @@ POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'original_color_path']
 POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_RENDERED_KEYS]
 POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_RENDERED_KEYS]
 
-POSSIBLE_JSON_LOG_KEYS = ['original_render_log', 'rpr_render_log', 'conversion_log']
+POSSIBLE_JSON_LOG_KEYS = ['original_render_log', 'rpr_render_log', 'conversion_log', 'render_log']
 REPORT_FILES = POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL + POSSIBLE_JSON_LOG_KEYS
 
 IMG_KEYS_FOR_COMPARE = ['render_color_path']
