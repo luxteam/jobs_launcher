@@ -8,15 +8,17 @@ import operator
 from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
+import copy
+import sys
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
         if replace_pathsep:
-            s = json.dumps(report, indent=2, sort_keys=True)
+            s = json.dumps(report, indent=4, sort_keys=True)
             file.write(s.replace(os.path.sep, '/'))
         else:
-            json.dump(report, file, indent=2, sort_keys=True)
+            json.dump(report, file, indent=4, sort_keys=True)
 
 
 def save_html_report(report, session_dir, file_name, replace_pathsep=False):
@@ -59,9 +61,14 @@ def env_override(value, key):
     return os.getenv(key, value)
 
 
+def get_jobs_launcher_version(value):
+    # os.chdir(os.path.dirname(__file__))
+    return subprocess.check_output("git describe --tags --abbrev=0", shell=True).decode("utf-8")
+    # return os.system("git describe --tags --abbrev=0")
+
+
 def generate_thumbnails(session_dir):
     current_test_report = []
-    # TODO: don't generate thumbnails if test failed ?
     main_logger.info("Start thumbnails creation")
 
     for path, dirs, files in os.walk(session_dir):
@@ -296,6 +303,9 @@ def build_local_reports(work_dir, summary_report, common_info):
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+    env.filters['env_override'] = env_override
+    env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
+
     template = env.get_template('local_template.html')
     report_dir = ""
 
@@ -305,13 +315,14 @@ def build_local_reports(work_dir, summary_report, common_info):
                 for config in summary_report[execution]['results'][test]:
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
                     render_report = []
+
                     if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
                         with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
                             render_report = json.loads(file.read())
-                            common_info.update({'tool': render_report[0]['tool']})
-                            common_info.update({'render_device': render_report[0]['render_device']})
-                            common_info.update({'testing_start': render_report[0]['date_time']})
-                            common_info.update({'test_group': render_report[0]['test_group']})
+                            keys_for_upd = ['tool', 'render_device', 'testing_start', 'test_group']
+                            for key_upd in keys_for_upd:
+                                if key_upd in render_report[0].keys():
+                                    common_info.update({key_upd: render_report[0][key_upd]})
 
                     try:
                         html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['core_version']),
@@ -341,6 +352,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         autoescape=True
     )
     env.filters['env_override'] = env_override
+    env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
     common_info = {}
     summary_report = None
@@ -359,7 +371,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info)
-
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -369,25 +380,25 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
                                                                      PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                                      common_info=common_info,
                                                                      i=execution)
-
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
         main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
-
     try:
+        copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(work_dir)
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
-        save_json_report(performance_report_detail, work_dir, 'perf.json')
+        save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
         performance_html = performance_template.render(title=major_title + " Performance",
                                                        performance_report=performance_report,
                                                        hardware=hardware,
                                                        performance_report_detail=performance_report_detail,
                                                        pageID="performanceA",
-                                                       common_info=common_info, test_info=summary_info_for_report)
+                                                       common_info=common_info,
+                                                       test_info=summary_info_for_report)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))
@@ -396,6 +407,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
 
     try:
         compare_template = env.get_template('compare_template.html')
+        copy_summary_report = copy.deepcopy(summary_report)
         compare_report, hardware = build_compare_report(work_dir)
         save_json_report(compare_report, work_dir, COMPARE_REPORT)
         compare_html = compare_template.render(title=major_title + " Compare",
