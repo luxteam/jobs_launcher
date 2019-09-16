@@ -13,35 +13,28 @@
     <script src="{{ pre_path }}/report_resources/js/bootstrap-table.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/scripts.js" type="text/javascript"></script>
     <script src="{{ pre_path }}/report_resources/js/extensions/multiple-sort/bootstrap-table-multiple-sort.js"></script>
+    <script src="{{ pre_path }}/report_resources/js/extensions/toolbar/bootstrap-table-toolbar.js"></script>
 
     <script src="{{ pre_path }}/report_resources/js/pixelmatch.js"></script>
     <script src="{{ pre_path }}/report_resources/js/images-substr.js"></script>
     <script src="{{ pre_path }}/report_resources/js/bootstrap-table-custom.js"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function init(){
-        {% if pageID is defined %}
-            setActive({{ pageID }});
-        {% endif %}
-        });
-    </script>
 
     <title>{{ title }}</title>
 </head>
 
 <body>
     <a name="#top"/>
-    <a id="goTop" href="#top" title="Go top"></a>
+    <a id="goTop" href="#top" title="Go top"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true" aria-label="Go top"></span></a>
 
     <div class="popup" id="imgsModal">
         <div class="popupContent" id="imgsModalContent">
-            <form class="popupForm">
+            <form class="popupForm" oninput="currentThresholdView.value=parseFloat(thresholdRange.value)">
                 <button class="commonButton closePopup" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;"><img src="{{ pre_path }}/report_resources/img/close-button.png"/></button>
                 <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
                 <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
                 <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch to difference</button>
-                <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
-                <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
+                <input  autocomplete="true" id="thresholdRange" type="range"  name="thresholdSelector" min="0.0" max="1" step="0.01" value="0.03" oninput="renderCanvasData('baselineImgPopup', 'renderedImgPopup', this.value);"/>
+                <output for="thresholdSelector">0.03</output>
             </form>
             <table class="baseTable" id="imgsCompareTable">
                 <thead>
@@ -66,7 +59,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="hatching" id="diffImageTd"></td>
+                    <td class="hatching" id="diffImageTd"><canvas id="imgsDifferenceCanvas"></canvas></td>
                 </tr>
             </tbody>
             </table>
@@ -113,20 +106,38 @@
     <hr/>
 
     <div class="jsTableWrapper">
+        <div id="toolbar">
+            <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ render_report | selectattr("test_status", "equalto", "passed") | list | count }}]</button>
+            <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">
+                Show failed [{{ render_report | selectattr("test_status", "equalto", "failed") | list | count }}]
+                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                      title="Failed status means that pixel difference with baseline image is too large."></span>
+            </button>
+            <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">
+                Show error [{{ render_report | selectattr("test_status", "equalto", "error") | list | count }}]
+                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                      title="Error status means that fatal error has occur during testing."></span>
+            </button>
+            <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped [{{ render_report | selectattr("test_status", "equalto", "skipped") | list | count }}]</button>
+            <button class="commonButton" type="button" name="showAll" onclick="searchTextInBootstrapTable('');">Reset</button>
+        </div>
+
         <table class="baseTable localReportTable"
                id="local"
+               data-toolbar="#toolbar"
                data-toggle="table"
                data-search="true"
                data-show-refresh="true"
-               data-show-toggle="true"
+               data-show-toggle="false"
                data-show-columns="true"
                data-show-pagination-switch="true"
                data-pagination="true"
                data-page-size="5"
                data-page-list="[1, 5, 10, 20, 45, ALL]"
-               data-sort-order="desc"
-               data-sort-name="test_case"
+               data-sort-order="asc"
+               data-sort-name="test_status"
                data-show-multi-sort="true">
+
             <thead>
                 <tr>
                     <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
@@ -221,6 +232,8 @@
         Luxoft RPR CIS
         <br>
         2017-2019
+        <br>
+        jobs_launcher v{{ "v" | get_jobs_launcher_version() }}
     </div>
 
 </body>

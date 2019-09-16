@@ -10,6 +10,7 @@ from core.config import *
 from core.auto_dict import AutoDict
 import copy
 import sys
+import subprocess
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):

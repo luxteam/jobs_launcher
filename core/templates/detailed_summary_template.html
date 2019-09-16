@@ -4,19 +4,19 @@
 
 <h1>details</h1>
 
-    {% if i != "_cur_" %}
+{%- if i != "_cur_" %}
 <h3>{{ i }}</h3>
-    {% endif %}
+{% endif -%}
 
 <div class="popup" id="imgsModal">
     <div class="popupContent" id="imgsModalContent">
-        <form class="popupForm">
+        <form class="popupForm" oninput="currentThresholdView.value=parseFloat(thresholdRange.value)">
             <button class="commonButton closePopup" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;"><img src="report_resources/img/close-button.png"/></button>
             <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
             <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
             <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch view mode</button>
-            <!--<input type="text" value="300" size="4" min="64" max="8000" name="inputImgSize"/>-->
-            <!--<button type="button" name="setImgSize" onclick="setImgSize();">Set img size</button>-->
+            <input  autocomplete="true" id="thresholdRange" type="range"  name="thresholdSelector" min="0.0" max="1" step="0.01" value="0.03" oninput="renderCanvasData('baselineImgPopup', 'renderedImgPopup', this.value);"/>
+            <output for="thresholdSelector" name="currentThresholdView">0.03</output>
         </form>
         <table class="baseTable" id="imgsCompareTable">
             <thead>
@@ -41,29 +41,46 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="hatching" id="diffImageTd"></td>
+                    <td class="hatching" id="diffImageTd"><canvas id="imgsDifferenceCanvas"></canvas></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
 
-<!--data-sort-priority='[{"sortName": "test_status", "sortOrder":"desc"},{"sortName": "pix_difference", "sortOrder":"desc"}]'-->
 <div class="jsTableWrapper">
+    <div id="toolbar">
+        <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ report[i].summary.passed }}]</button>
+        <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">
+            Show failed [{{ report[i].summary.failed }}]
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                  title="Failed status means that pixel difference with baseline image is too large."></span>
+        </button>
+        <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">
+            Show error [{{ report[i].summary.error }}]
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                  title="Error status means that fatal error has occur during testing."></span>
+        </button>
+        <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped [{{ report[i].summary.skipped }}]</button>
+        <button class="commonButton" type="button" name="showAll" onclick="searchTextInBootstrapTable('');">Reset</button>
+    </div>
+
     <table id="{{ i | lower | replace(' ', '_') | replace('(', '') | replace(')', '') }}"
+           data-toolbar="#toolbar"
            class="baseTable detailedTable"
            data-toggle="table"
            data-search="true"
            data-show-refresh="true"
-           data-show-toggle="true"
+           data-show-toggle="false"
            data-show-columns="true"
            data-show-pagination-switch="true"
            data-pagination="true"
            data-page-size="10"
            data-page-list="[1, 5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
+           data-sort-order="asc"
            data-sort-name="test_status"
-           data-show-multi-sort="true">
+           data-show-multi-sort="true"
+    >
         <thead>
             <tr>
                 <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true">Test case</th>
@@ -125,7 +142,6 @@
                     Not compared
                 {% endif %}
                 </td>
-
                 <td class="hatching">
                     {% if 'thumb64_render_color_path' in item %}
                     <img data-src="{{ item.thumb64_render_color_path }}"/>

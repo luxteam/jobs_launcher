@@ -8,7 +8,7 @@
             data-toggle="table">
         <thead>
             <tr>
-                <th>Job-Name</th>
+                <th>Job Name</th>
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed</th>
@@ -31,29 +31,29 @@
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
-                {% if report[i].summary.failed != 0 %}
-                class="badResult"
-                {% endif %}
+                {%- if report[i].summary.failed != 0 %}
+                class="failedStatus"
+                {% endif -%}
                 >{{ report[i].summary.failed }}</td>
 
                 <td
-                {% if report[i].summary.error != 0 %}
-                class="badResult"
-                {% endif %}
+                {%- if report[i].summary.error != 0 %}
+                class="errorStatus"
+                {% endif -%}
                 >{{ report[i].summary.error }}</td>
 
                 <td
-                {% if report[i].summary.skipped != 0 %}
-                class="badResult"
-                {% endif %}
+                {%- if report[i].summary.skipped != 0 %}
+                class="skippedStatus"
+                {% endif -%}
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
                 <td
-                {% if report[i].summary.render_duration == -0.0 %}
+                {%- if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
-                {% endif %}
+                {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
             </tr>
     {% endfor %}
@@ -68,7 +68,7 @@
     {% if i != "_cur_" %}
 <h3><a href="{{ i }}_detailed.html">{{ i }}</a></h3>
 
-<a name="{{ i }}"></a>
+<a class="hAnchor" name="{{ i }}"></a>
     {% endif %}
 
 <div class="jsTableWrapper">
@@ -77,7 +77,7 @@
         <thead>
             <tr>
                 <th>Test package name</th>
-                <!--<th>Config</th>-->
+<!--                <th>Config</th>-->
                 <th>Host</th>
                 <th>Local report</th>
                 <th>Tool's log</th>
@@ -98,11 +98,10 @@
             <tr>
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
-                <!--<td>{{ test_conf }}</td>-->
+<!--                <td>{{ test_conf }}</td>-->
 
                 <td>
-                    <!--<a href="#" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</a>-->
-                    <button class="commonButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
+                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
                     <div class="popup" id="machineInfo{{ loop.index }}">
                         <div class="popupContent popupHalfWidth">
                             <form class="popupForm">
@@ -137,19 +136,19 @@
 
                 <td
                 {% if report[i].results[test_package][test_conf].failed != 0 %}
-                class="badResult"
+                class="failedStatus"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].failed }}</td>
 
                 <td
                 {% if report[i].results[test_package][test_conf].error != 0 %}
-                class="badResult"
+                class="errorStatus"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].error }}</td>
 
                 <td
                 {% if report[i].results[test_package][test_conf].skipped != 0 %}
-                class="badResult"
+                class="skippedStatus"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
@@ -161,7 +160,7 @@
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
-                >{{ report[i].results[test_package][test_conf].render_duration }}</td>
+                >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
             </tr>
             <tr>
             {% endfor %}
@@ -174,17 +173,17 @@
                 <td>{{ report[i].summary.passed }}</td>
                 <td
                 {% if report[i].summary.failed != 0 %}
-                class="badResult"
+                class="failedStatus"
                 {% endif %}
                 >{{ report[i].summary.failed }}</td>
                 <td
                 {% if report[i].summary.error != 0 %}
-                class="badResult"
+                class="errorStatus"
                 {% endif %}
                 >{{ report[i].summary.error }}</td>
                 <td
                 {% if report[i].summary.skipped != 0 %}
-                class="badResult"
+                class="skippedStatus"
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
                 <td>{{ report[i].summary.duration }}</td>
@@ -193,7 +192,7 @@
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
-                >{{ report[i].summary.render_duration }}</td>
+                >{{ report[i].summary.render_duration | round(1) }}</td>
             </tr>
         </tbody>
     </table>

@@ -1,25 +1,29 @@
-//TODO: add NOK status to sorting
-function statusSorter(a, b) {
-    if (a == b) {
-        return 0;
+/**
+ * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
+ * - error [high priority[ means crash during test execution
+ * - failed - pix /time/ram diff
+ * - skipped - commented case
+ * - passed - successfully passed test
+ */
+function statusSorter(x, y) {
+    var a = x.toLowerCase();
+    var b = y.toLowerCase();
+
+    if (a === b) return 0;
+
+    if (a.includes('error')) {
+        return -1;
     }
 
-    if (a.includes('failed') || a.includes('skipped') && (!b.includes('failed') && !b.includes('skipped'))) {
-        return 1;
+    if (a.includes('failed') && !b.includes('error')) {
+        return -1;
     }
 
-    if (a.includes('failed') && b.includes('skipped')) {
-        return 1;
+    if (a.includes('skipped') && !b.includes('failed') && !b.includes('error')) {
+        return -1;
     }
 
-    a = a.split('<br>');
-    b = b.split('<br>');
-
-    if (a[0] == b[0]) {
-        return a[2] > b[2] ? 1 : -1;
-    }
-
-    return -1;
+    return 1;
 }
 
 window.openFullImgSize = {
