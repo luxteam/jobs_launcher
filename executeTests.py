@@ -79,7 +79,7 @@ def main():
         args.package_filter = []
 
     # extend test_filter by values in file_filter
-    if args.file_filter:
+    if args.file_filter and args.file_filter is not "none":
         try:
             with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
                 if args.file_filter.endswith('json'):
