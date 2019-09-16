@@ -13,12 +13,15 @@ RBS = "https://rbsdb.cis.luxoft.com"
 links = [RBS_DEV, RBS]
 
 gpu_map = {
-	"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
-	"AMD_WX9100": "Radeon (TM) Pro WX 9100",
-	"AMD_RXVEGA": "Radeon RX Vega",
-	"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
 	"RadeonPro560": "AMD Radeon Pro 560",
-	"AMD_RadeonVII": "AMD Radeon Pro VII"
+	"AMD_WX7100": "AMD Radeon Pro WX 7100",
+	"AMD_WX9100": "AMD Radeon Pro WX 9100",
+	"AMD_RXVEGA": "AMD Radeon RX Vega",
+	"AMD_RadeonVII": "AMD Radeon VII",
+	"NVIDIA_GTX980": "NVIDIA GeForce GTX 980",
+	"NVIDIA_GF1080TI": "NVIDIA GeForce GTX 1080 Ti",
+	"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080",
+	"NVIDIA_RTX2080TI": "NVIDIA GeForce RTX 2080 Ti"
 }
 
 
@@ -29,7 +32,7 @@ def get_gpu_from_label():
 			if label.startswith("gpu"):
 				GPU_TAG = label[3:]
 				break
-		return gpu_map[GPU_TAG]
+		return gpu_map.get(GPU_TAG, "undefined")
 	except Exception as e:
 		print(e)
 		return None
