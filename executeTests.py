@@ -64,10 +64,11 @@ def main():
         args.work_dir = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     work_path = os.path.join(work_path, args.work_dir)
 
-    try:
-        os.makedirs(work_path)
-    except OSError as e:
-        main_logger.error(str(e))
+    if not os.path.exists(work_path):
+        try:
+            os.makedirs(work_path)
+        except OSError as e:
+            main_logger.error(str(e))
 
     # session_dir = os.path.join(work_path, machine_info.get("host"))
     session_dir = work_path
@@ -79,7 +80,7 @@ def main():
         args.package_filter = []
 
     # extend test_filter by values in file_filter
-    if args.file_filter:
+    if args.file_filter and args.file_filter != 'none':
         try:
             with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
                 if args.file_filter.endswith('json'):
@@ -116,7 +117,7 @@ def main():
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
                                            test_filter=args.test_filter, package_filter=args.package_filter)
-    # core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
+    core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
