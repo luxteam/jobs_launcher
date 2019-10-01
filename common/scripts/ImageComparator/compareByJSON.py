@@ -45,7 +45,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
             pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
             img.update({'difference_color': pix_difference})
-            if type(pix_difference) is str or pix_difference > pix_diff_max:
+            if type(pix_difference) is str or pix_difference > float(pix_diff_max):
                 img['test_status'] = core.config.TEST_DIFF_STATUS
 
             # add baseline images paths to json
