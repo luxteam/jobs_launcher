@@ -7,11 +7,6 @@ import subprocess
 from core.system_info import get_machine_info
 
 
-RBS_DEV = "https://rbsdbdev.cis.luxoft.com"
-RBS = "https://rbsdb.cis.luxoft.com"
-
-links = [RBS_DEV, RBS]
-
 gpu_map = {
 	"RadeonPro560": "AMD Radeon Pro 560",
 	"AMD_WX7100": "AMD Radeon Pro WX 7100",
@@ -53,9 +48,9 @@ def get_gpu():
 		return {"render_device": get_gpu_from_label()}
 
 
-def get_headers(link, login, password):
-	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth(login, password))
-	return {"Authorization": "Bearer " + json.loads(r.content.decode('utf-8'))['token']}
+# def get_headers(link, login, password):
+# 	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth(login, password))
+# 	return {"Authorization": "Bearer " + json.loads(r.content.decode('utf-8'))['token']}
 
 
 def main():
@@ -65,8 +60,8 @@ def main():
 	parser.add_argument('--build', required=True)
 	parser.add_argument('--tests', nargs='+', required=False, default=[])
 	parser.add_argument('--tests_package', required=False)
-	parser.add_argument('--login', required=True)
-	parser.add_argument('--password', required=True)
+	parser.add_argument('--token', required=True)
+	parser.add_argument('--link', required=True)
 	args = parser.parse_args()
 
 	if args.tests:
@@ -90,15 +85,12 @@ def main():
 
 	print(data)
 
-	for link in links:
-		headers = get_headers(link, args.login, args.password)
-		requests.post(
-			link + "/report/setTester",
-			params={'data': str(json.dumps(data))},
-			headers=headers
-		)
+	requests.post(
+		args.link + "/report/setTester",
+		params={'data': str(json.dumps(data))},
+		headers={"Authorization": "Bearer " + args.token}
+	)
 
 
-# >>> python rbs.py --tool Maya --branch weekly --build 1024 --test_groups <Group1> <Group2> <Group3> --password <password> --login <login>
 if __name__ == "__main__":
 	main()
