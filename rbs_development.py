@@ -36,8 +36,8 @@ def get_gpu_from_label():
 def get_render_device():
 	render_device = get_gpu()
 	if not render_device:
-		print("Will be used value from map: {}".format(render_device))
 		render_device = get_gpu_from_label()
+		print("Will be used value from map: {}".format(render_device))
 
 	return {"render_device": render_device}
 
