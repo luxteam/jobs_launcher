@@ -4,7 +4,7 @@ import argparse
 import requests
 from platform import system
 import subprocess
-from core.system_info import get_machine_info
+from core.system_info import get_machine_info, get_gpu
 
 
 gpu_map = {
@@ -33,20 +33,13 @@ def get_gpu_from_label():
 		return None
 
 
-def get_gpu():
-	operation_sys = system()
-	if operation_sys == "Windows":
-		try:
-			s = subprocess.Popen("wmic path win32_VideoController get name", stdout=subprocess.PIPE)
-			stdout = s.communicate()
-			render_device = stdout[0].decode("utf-8").split('\n')[1].replace('\r', '').strip(' ')
-			return {"render_device": render_device}
-		except Exception as err:
-			print("Render device not found - set from map. Error {0}".format(err))
-			return {"render_device": get_gpu_from_label()}
-	else:
-		return {"render_device": get_gpu_from_label()}
+def get_render_device():
+	render_device = get_gpu()
+	if not render_device:
+		print("Will be used value from map: {}".format(render_device))
+		render_device = get_gpu_from_label()
 
+	return {"render_device": render_device}
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -76,7 +69,7 @@ def main():
 		"branch": args.branch,
 		"tool": args.tool,
 		"groups": test_groups,
-		"tester_info": {**get_machine_info(), **get_gpu()}
+		"tester_info": {**get_machine_info(), **get_render_device()}
 	}
 
 	print(data)
