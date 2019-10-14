@@ -122,10 +122,14 @@ def main():
 
     for img in render_json:
         # if tool crash has been occur, we shouldn't change test case status
-        if img['test_status'] != core.config.TEST_CRASH_STATUS:
-            img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
-                                        args.pix_diff_max))
-            img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
+        test_case_save_crash = None
+        if img['test_status'] == core.config.TEST_CRASH_STATUS:
+            test_case_save_crash = core.config.TEST_CRASH_STATUS
+        img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
+                                    args.pix_diff_max))
+        img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
+
+        if test_case_save_crash:
             img.update({'test_status': core.config.TEST_CRASH_STATUS})
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:

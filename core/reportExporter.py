@@ -213,7 +213,7 @@ def build_summary_report(work_dir):
                                          })
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
-                                    for group_report_file in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
+                                    for group_report_file in REPORT_FILES:
                                         if group_report_file in jtem.keys():
                                             jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
                                 temp_report['results'][test_package][test_conf].update(
