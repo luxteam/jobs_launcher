@@ -1,6 +1,5 @@
 import os
 import subprocess
-
 import jinja2
 import json
 import base64
@@ -11,7 +10,6 @@ from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
 import copy
-import sys
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
@@ -84,15 +82,21 @@ def generate_thumbnails(session_dir):
                         if img_key in test.keys():
                             try:
                                 cur_img_path = os.path.abspath(os.path.join(path, test[img_key]))
-                                thumb64_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
-                                thumb256_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
+                                thumb64_path = os.path.abspath(
+                                    os.path.join(path, test[img_key].replace(test['test_case'],
+                                                                             'thumb64_' + test['test_case'])))
+                                thumb256_path = os.path.abspath(
+                                    os.path.join(path, test[img_key].replace(test['test_case'],
+                                                                             'thumb256_' + test['test_case'])))
 
                                 if os.path.exists(thumb64_path) and os.path.exists(thumb256_path):
                                     continue
 
                                 cur_img = Image.open(cur_img_path)
-                                thumb64 = cur_img.resize((64, int(64 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
-                                thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
+                                thumb64 = cur_img.resize((64, int(64 * cur_img.size[1] / cur_img.size[0])),
+                                                         Image.ANTIALIAS)
+                                thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])),
+                                                          Image.ANTIALIAS)
 
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
@@ -127,12 +131,12 @@ def build_session_report(report, session_dir):
                 render_duration = 0.0
                 try:
                     for jtem in current_test_report:
-                        for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
-                            if img in jtem.keys():
+                        for group_report_file in REPORT_FILES:
+                            if group_report_file in jtem.keys():
                                 # update paths
-                                cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]))
+                                cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[group_report_file]))
 
-                                jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
+                                jtem.update({group_report_file: os.path.relpath(cur_img_path, session_dir)})
 
                         render_duration += jtem['render_time']
                         if jtem['test_status'] == 'undefined':
@@ -194,7 +198,8 @@ def build_summary_report(work_dir):
                     try:
                         for test_package in temp_report['results']:
                             for test_conf in temp_report['results'][test_package]:
-                                temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
+                                temp_report['results'][test_package][test_conf].update(
+                                    {'machine_info': temp_report['machine_info']})
 
                                 if common_info:
                                     for key in common_info:
@@ -208,11 +213,13 @@ def build_summary_report(work_dir):
                                          })
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
-                                    for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
-                                        if img in jtem.keys():
-                                            jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
+                                    for group_report_file in REPORT_FILES:
+                                        if group_report_file in jtem.keys():
+                                            jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
                                 temp_report['results'][test_package][test_conf].update(
-                                    {'result_path': os.path.relpath(os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']), work_dir)}
+                                    {'result_path': os.path.relpath(
+                                        os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
+                                        work_dir)}
                                 )
                     except Exception as err:
                         main_logger.error(str(err))
@@ -361,7 +368,7 @@ def build_local_reports(work_dir, summary_report, common_info):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
@@ -415,6 +422,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_
         copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
+
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
         performance_html = performance_template.render(title=major_title + " Performance",
