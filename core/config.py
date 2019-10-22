@@ -20,11 +20,11 @@ RENDER_REPORT_BASE = {
     "render_mode": "",
     "scene_name": "",
     "test_group": "",
-    "difference_color": "not compared yet",
-    "difference_time": "not compared yet",
+    "difference_color": -0.0,
+    "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_time_or": "not compared yet"
+    "difference_time_or": -0.0
 }
 RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
