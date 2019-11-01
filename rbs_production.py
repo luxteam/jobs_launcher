@@ -4,13 +4,8 @@ import argparse
 import requests
 from platform import system
 import subprocess
-from core.system_info import get_machine_info
+from core.system_info import get_machine_info, get_gpu
 
-
-RBS_DEV = "https://rbsdbdev.cis.luxoft.com"
-RBS = "https://rbsdb.cis.luxoft.com"
-
-links = [RBS_DEV, RBS]
 
 gpu_map = {
 	"RadeonPro560": "AMD Radeon Pro 560",
@@ -38,25 +33,13 @@ def get_gpu_from_label():
 		return None
 
 
-def get_gpu():
-	operation_sys = system()
-	if operation_sys == "Windows":
-		try:
-			s = subprocess.Popen("wmic path win32_VideoController get name", stdout=subprocess.PIPE)
-			stdout = s.communicate()
-			render_device = stdout[0].decode("utf-8").split('\n')[1].replace('\r', '').strip(' ')
-			return {"render_device": render_device}
-		except Exception as err:
-			print("Render device not found - set from map.")
-			return {"render_device": get_gpu_from_label()}
-	else:
-		return {"render_device": get_gpu_from_label()}
+def get_render_device():
+	render_device = get_gpu()
+	if not render_device:
+		render_device = get_gpu_from_label()
+		print("Will be used value from map: {}".format(render_device))
 
-
-def get_headers(link, login, password):
-	r = requests.post(link + "/api/login", auth=requests.auth.HTTPBasicAuth(login, password))
-	return {"Authorization": "Bearer " + json.loads(r.content.decode('utf-8'))['token']}
-
+	return {"render_device": render_device}
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -65,8 +48,8 @@ def main():
 	parser.add_argument('--build', required=True)
 	parser.add_argument('--tests', nargs='+', required=False, default=[])
 	parser.add_argument('--tests_package', required=False)
-	parser.add_argument('--login', required=True)
-	parser.add_argument('--password', required=True)
+	parser.add_argument('--token', required=True)
+	parser.add_argument('--link', required=True)
 	args = parser.parse_args()
 
 	if args.tests:
@@ -76,6 +59,7 @@ def main():
 			with open('../jobs/{0}'.format(args.tests_package)) as file:
 				test_groups = [group.strip() for group in file.read().split('\n') if group]
 		except Exception as err:
+			print(err)
 			return False
 	else:
 		return False
@@ -85,20 +69,17 @@ def main():
 		"branch": args.branch,
 		"tool": args.tool,
 		"groups": test_groups,
-		"tester_info": {**get_machine_info(), **get_gpu()}
+		"tester_info": {**get_machine_info(), **get_render_device()}
 	}
 
 	print(data)
 
-	for link in links:
-		headers = get_headers(link, args.login, args.password)
-		requests.post(
-			link + "/report/setTester",
-			params={'data': str(json.dumps(data))},
-			headers=headers
-		)
+	requests.post(
+		args.link + "/report/setTester",
+		params={'data': str(json.dumps(data))},
+		headers={"Authorization": "Bearer " + args.token}
+	)
 
 
-# >>> python rbs.py --tool Maya --branch weekly --build 1024 --test_groups <Group1> <Group2> <Group3> --password <password> --login <login>
 if __name__ == "__main__":
 	main()
