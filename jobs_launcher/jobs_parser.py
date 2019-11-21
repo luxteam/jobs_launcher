@@ -213,24 +213,28 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
         execute_command1 = execute_command
         execute_command = []
 
-        try:
-            for command in execute_command1:
-                execute_command.append(command.format(**config_map, **package_options['variables'], OutputDir=config_output_dir))
-        except KeyError as err:
-            core.config.main_logger.error("XML variable error: {}".format(str(err)))
-        else:
-            # outdir = [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)]
-            found_jobs.append(
-                (
-                    job_name,
-                    config_dirs,
-                    config_map,
-                    execute_command,
-                    [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)],
-                    stages,
-                    job_timeout
+        for engine_value in package_options['variables']['engine_list'].split(' '):
+            package_options['variables'].update({"engine": engine_value})
+            execute_command = []
+            engine_config_output_dir = config_output_dir + "_" + engine_value
+            try:
+                for command in execute_command1:
+                    execute_command.append(command.format(**config_map, **package_options['variables'], OutputDir=engine_config_output_dir))
+            except KeyError as err:
+                core.config.main_logger.error("XML variable error: {}".format(str(err)))
+            else:
+                # outdir = [outdir[0].format(**config_map, **package_options['variables'], OutputDir=config_output_dir)]
+                found_jobs.append(
+                    (
+                        job_name + "_" + engine_value,
+                        config_dirs,
+                        config_map,
+                        execute_command,
+                        [outdir[0].format(**config_map, **package_options['variables'], OutputDir=engine_config_output_dir)],
+                        stages,
+                        job_timeout
+                    )
                 )
-            )
         #print(delim + execute_command)
         #execute_job(level, execute_command, report['results'][job_name][job_config_name])
 
