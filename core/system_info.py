@@ -22,7 +22,8 @@ def get_gpu():
         elif operation_sys == "Darwin":
             s = subprocess.Popen("""system_profiler SPDisplaysDataType | grep Chipset\ Model | awk '{for(i=3;i<=NF;++i) printf "%s ", $i; print ""}' """, stdout=subprocess.PIPE, shell=True)
             stdout = s.communicate()
-            render_device = stdout[0].decode("utf-8").split('\n')[0].replace('\r', '').strip(' ')
+            # FIXME: hot fix for eGPU
+            render_device = [x for x in stdout[0].decode("utf-8").split('\n') if "Intel" not in x and x][0].replace('\r', '').strip(' ')
     except Exception as err:
         print("ERROR during GPU detecting: {}".format(str(err)))
         return False
