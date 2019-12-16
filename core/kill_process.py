@@ -7,13 +7,6 @@ def kill_process(process_list):
     for p in psutil.process_iter():
         try:
             p_info = p.as_dict(attrs=['pid', 'name', 'cpu_percent', 'username'])
-            main_logger.info(
-                "{name} \t (PID: {pid}) \t| Username: {username} | CPU Percent: {cpu_percent}".format(
-                    name=p_info['name'],
-                    pid=p_info['pid'],
-                    username=p_info['username'],
-                    cpu_percent=p_info['cpu_percent']
-                ))
 
             if p_info['name'] in process_list:
                 try:
