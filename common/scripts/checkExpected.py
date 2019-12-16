@@ -2,6 +2,7 @@ import os
 import argparse
 import json
 import sys
+from shutil import copyfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
 
@@ -43,8 +44,16 @@ def main():
             report_base = core.config.RENDER_REPORT_BASE.copy()
             report_base.update(
                 {"test_case": scase,
-                 "test_status": core.config.TEST_CRASH_STATUS}
+                 "test_status": core.config.TEST_CRASH_STATUS,
+                 "file_name": 'Color/' + scase + ".jpg" }
             )
+            if not os.path.exists(os.path.join(args.work_dir, 'Color', scase + '.jpg')):
+                try:
+                    copyfile(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'img', core.config.TEST_CRASH_STATUS + '.jpg')),
+                             os.path.join(args.work_dir, 'Color', scase + '.jpg'))
+                except:
+                    core.config.main_logger.error("Error copy error img for case")
+
             report_base.update(common_info)
             rendered.append(report_base)
 
