@@ -20,42 +20,35 @@ def createArgParser():
 
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
-    # TODO: add support of several pix-diff values for one case
-    # for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
-    for key in ['render_color_path']:
-        if key in img.keys():
-            render_img_path = os.path.join(work_dir, img[key])
+    if 'render_color_path' in img.keys():
+        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('file_name', ''), ''))
+        # if baseline image not found - return
+        if not os.path.exists(baseline_img_path):
+            core.config.main_logger.error("Baseline image not found by path: {}".format(baseline_img_path))
+            return img
 
-            try:
-                baseline_img_path = os.path.join(base_dir, baseline_json[img['file_name']])
-            except KeyError as err:
-                core.config.main_logger.warning("No such file in baseline: {}".format(str(err)))
-                continue
+        # else add baseline images paths to json
+        img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[img['file_name']]), work_dir)})
+        for thumb in core.config.THUMBNAIL_PREFIXES:
+            if thumb + img['file_name'] in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + img['file_name']])):
+                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + img['file_name']]), work_dir)})
 
-            if not os.path.exists(baseline_img_path):
-                core.config.main_logger.error("BROKEN BASELINE MANIFEST")
-                continue
+        render_img_path = os.path.join(work_dir, img['render_color_path'])
+        if not os.path.exists(render_img_path):
+            core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
+            return img
 
-            metrics = None
-            try:
-                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
-            except (FileNotFoundError, OSError) as err:
-                core.config.main_logger.error(str(err))
-                return img
+        metrics = None
+        try:
+            metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+        except (FileNotFoundError, OSError) as err:
+            core.config.main_logger.error("Error during metrics calculation: {}".format(str(err)))
+            return img
 
-            pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
-            img.update({'difference_color': pix_difference})
-            if type(pix_difference) is str or pix_difference > float(pix_diff_max):
-                img['test_status'] = core.config.TEST_DIFF_STATUS
-
-            # add baseline images paths to json
-            img.update({'baseline_color_path': os.path.relpath(
-                os.path.join(base_dir, baseline_json[img['file_name']]), work_dir)})
-            for thumb in core.config.THUMBNAIL_PREFIXES:
-                if thumb + img['file_name'] in baseline_json.keys() and os.path.exists(
-                        os.path.join(base_dir, baseline_json[thumb + img['file_name']])):
-                    img.update({thumb + 'baseline_color_path': os.path.relpath(
-                        os.path.join(base_dir, baseline_json[thumb + img['file_name']]), work_dir)})
+        pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
+        img.update({'difference_color': pix_difference})
+        if type(pix_difference) is str or pix_difference > float(pix_diff_max):
+            img['test_status'] = core.config.TEST_DIFF_STATUS
 
     return img
 
@@ -97,28 +90,33 @@ def main():
         core.config.main_logger.error("Render report doesn't exists")
         return
 
+    # create report_compared.json before calculation to provide stability
+    try:
+        with open(render_json_path, 'r') as file:
+            render_json = json.loads(file.read())
+            for img in render_json:
+                img.update({'baseline_render_time' : -0.0})
+                img.update({'difference_time': -0.0})
+    except (FileNotFoundError, OSError) as err:
+        core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
+    except json.JSONDecodeError as e:
+        core.config.main_logger.error("Broken report: {}".format(str(e)))
+    else:
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+            json.dump(render_json, file, indent=4)
+
     if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
         core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
 
-        try:
-            with open(render_json_path, 'r') as file:
-                render_json = json.loads(file.read())
-                for img in render_json:
-                    img['baseline_render_time'] = -0.0
-                    img['difference_time'] = -0.0
-        except Exception as err:
-            core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
-        else:
-            with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
-                json.dump(render_json, file, indent=4)
-        finally:
-            return
+    try:
+        with open(render_json_path, 'r') as file:
+            render_json = json.loads(file.read())
 
-    with open(render_json_path, 'r') as file:
-        render_json = json.loads(file.read())
+        with open(baseline_json_path, 'r') as file:
+            baseline_json = json.loads(file.read())
 
-    with open(baseline_json_path, 'r') as file:
-        baseline_json = json.loads(file.read())
+    except (FileNotFoundError, OSError, json.JSONDecodeError) as err:
+        core.config.main_logger.error("Can't get input data: {}".format(str(err)))
 
     for img in render_json:
         if img['test_status'] != core.config.TEST_IGNORE_STATUS:
