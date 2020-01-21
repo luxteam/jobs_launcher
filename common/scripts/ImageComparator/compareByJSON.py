@@ -124,7 +124,8 @@ def main():
             test_case_save_crash = None
             if img['test_status'] == core.config.TEST_CRASH_STATUS:
                 test_case_save_crash = core.config.TEST_CRASH_STATUS
-            img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
+            else:
+                img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
                                         args.pix_diff_max))
             img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
 
