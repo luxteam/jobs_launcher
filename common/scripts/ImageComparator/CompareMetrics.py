@@ -1,20 +1,20 @@
 import numpy as np
 import cv2
 
+
 class CompareMetrics(object):
 
     def __init__ (self, file1, file2):
         
         self.file1 = file1
         self.file2 = file2
+        self.diff_pixels = 0
 
         self.readImages()
-        
 
     def readImages(self):
         self.img1 = cv2.imread(self.file1).astype(np.float32)
         self.img2 = cv2.imread(self.file2).astype(np.float32)
-       
 
     def getDiffPixeles(self, tolerance=3):
 
@@ -29,24 +29,23 @@ class CompareMetrics(object):
         # img2A = self.img2[:, :, 3]
 
         if img1R.shape != img2R.shape:
-            self.diff_pixeles = -1
-            return self.diff_pixeles
+            self.diff_pixels = -1
+            return self.diff_pixels
 
         diffR = abs(img1R - img2R)
         diffG = abs(img1G - img2G)
         diffB = abs(img1B - img2B)
         # diffA = abs(img1A - img2A)
 
-        self.diff_pixeles = len(list(filter(
+        self.diff_pixels = len(list(filter(
             lambda x: x[0] <= tolerance and x[1] <= tolerance and x[2] <= tolerance, zip(diffR.ravel(), diffG.ravel(), diffB.ravel())
         )))
 
         # get percent
-        self.diff_pixeles = len(diffR.ravel()) - self.diff_pixeles
-        self.diff_pixeles = float (self.diff_pixeles / len(diffR.ravel())) * 100
+        self.diff_pixels = len(diffR.ravel()) - self.diff_pixels
+        self.diff_pixels = float(self.diff_pixels / len(diffR.ravel())) * 100
 
-        return round(self.diff_pixeles, 2)
-
+        return round(self.diff_pixels, 2)
 
     def getPrediction(self, max_size=1000, div_image_path=False):
 
@@ -83,10 +82,3 @@ class CompareMetrics(object):
 
         # 1 - there is a difference. 0 - there isn't a difference
         return 1 if max(new_list) >= max_size else 0
-
-
-
-
-
-
-

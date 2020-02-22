@@ -33,6 +33,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             if thumb + img['file_name'] in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + img['file_name']])):
                 img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + img['file_name']]), work_dir)})
 
+        # for crushed and non-executed cases only set baseline img src
+        if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
+            return img
+
         render_img_path = os.path.join(work_dir, img['render_color_path'])
         if not os.path.exists(render_img_path):
             core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
@@ -47,6 +51,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
         pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
         img.update({'difference_color': pix_difference})
+        img.update({'difference_color_2': metrics.getPrediction()})
         if type(pix_difference) is str or pix_difference > float(pix_diff_max):
             img['test_status'] = core.config.TEST_DIFF_STATUS
 
@@ -95,7 +100,7 @@ def main():
         with open(render_json_path, 'r') as file:
             render_json = json.loads(file.read())
             for img in render_json:
-                img.update({'baseline_render_time' : -0.0})
+                img.update({'baseline_render_time': -0.0})
                 img.update({'difference_time': -0.0})
     except (FileNotFoundError, OSError) as err:
         core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
@@ -107,6 +112,7 @@ def main():
 
     if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
         core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
+        exit(1)
 
     try:
         with open(render_json_path, 'r') as file:
@@ -119,18 +125,9 @@ def main():
         core.config.main_logger.error("Can't get input data: {}".format(str(err)))
 
     for img in render_json:
-        if img['test_status'] != core.config.TEST_IGNORE_STATUS:
-            # if tool crash has been occur, we shouldn't change test case status
-            test_case_save_crash = None
-            if img['test_status'] == core.config.TEST_CRASH_STATUS:
-                test_case_save_crash = core.config.TEST_CRASH_STATUS
-            else:
-                img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
+        img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
                                         args.pix_diff_max))
-            img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
-
-            if test_case_save_crash:
-                img.update({'test_status': core.config.TEST_CRASH_STATUS})
+        img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
         json.dump(render_json, file, indent=4)

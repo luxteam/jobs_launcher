@@ -24,7 +24,8 @@ RENDER_REPORT_BASE = {
     "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_time_or": -0.0
+    "difference_time_or": -0.0,
+    "difference_color_2": -0
 }
 RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
