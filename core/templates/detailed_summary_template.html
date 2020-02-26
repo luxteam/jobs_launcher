@@ -54,12 +54,12 @@
         <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">
             Show failed [{{ report[i].summary.failed }}]
             <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
-                  title="Failed status means that pixel difference with baseline image is too large."></span>
+                  title="[Failed] status means that pixel difference with baseline image is too large."></span>
         </button>
         <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">
             Show error [{{ report[i].summary.error }}]
             <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
-                  title="Error status means that fatal error has occur during testing."></span>
+                  title="[Error] status means fatal error during render, terminating by timeout, or case wasn't launched at all."></span>
         </button>
         <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped [{{ report[i].summary.skipped }}]</button>
         <button class="commonButton" type="button" name="showAll" onclick="searchTextInBootstrapTable('');">Reset</button>
@@ -96,7 +96,9 @@
                 <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
                 <th data-field="pix_diff_2" data-halign="center" data-valign="middle" data-sortable="true">
                     Diff new
-                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="1 - diff images. 0 - equals images. -1 - diff resolution couldn't be compared"></span>
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+[0] - equals images.
+[-1] - images has diff resolution, so couldn't be compared."></span>
                 </th>
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
