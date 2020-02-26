@@ -91,7 +91,11 @@
                 <th data-halign="center" data-valign="middle" data-sortable="true">Parameters</th>
                 <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
                 <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
-                <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true">Test status</th>
+                <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true">Test status
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[Failed] status means that pixel difference with baseline image is too large.
+[Error] status means fatal error during render, terminating by timeout, or case wasn't launched at all.
+[Skipped] status means case wasn't launched by QA team decision."></span>
+                </th>
                 <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                 <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
                 <th data-field="pix_diff_2" data-halign="center" data-valign="middle" data-sortable="true">
