@@ -94,7 +94,10 @@
                 <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true">Test status</th>
                 <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                 <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
-                <th data-field="pix_diff_2" data-halign="center" data-valign="middle" data-sortable="true">Diff new</th>
+                <th data-field="pix_diff_2" data-halign="center" data-valign="middle" data-sortable="true">
+                    Diff new
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="1 - diff images. 0 - equals images. -1 - diff resolution couldn't be compared"></span>
+                </th>
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
                 <th data-filed="render_log" data-halign="center" data-valign="middle">Render log</th>
@@ -124,8 +127,8 @@
                     {% endif -%}
                     >
                     {{ item.difference_time | round (2) }}</td>
-                <td>{{ item.difference_color_2 }}</td>
                 <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
+                <td>{{ item.difference_color_2 }}</td>
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}
