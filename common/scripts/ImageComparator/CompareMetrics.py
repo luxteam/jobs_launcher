@@ -8,6 +8,7 @@ class CompareMetrics(object):
 
         self.file1 = file1
         self.file2 = file2
+        self.diff_pixels = 0
 
         self.readImages()
 
@@ -28,40 +29,38 @@ class CompareMetrics(object):
         # img2A = self.img2[:, :, 3]
 
         if img1R.shape != img2R.shape:
-            self.diff_pixeles = -1
-            return self.diff_pixeles
+            self.diff_pixels = -1
+            return self.diff_pixels
 
         diffR = abs(img1R - img2R)
         diffG = abs(img1G - img2G)
         diffB = abs(img1B - img2B)
         # diffA = abs(img1A - img2A)
 
-        self.diff_pixeles = len(list(filter(
+        self.diff_pixels = len(list(filter(
             lambda x: x[0] <= tolerance and x[1] <= tolerance and x[2] <= tolerance,
             zip(diffR.ravel(), diffG.ravel(), diffB.ravel())
         )))
 
         # get percent
-        self.diff_pixeles = len(diffR.ravel()) - self.diff_pixeles
-        self.diff_pixeles = float(self.diff_pixeles / len(diffR.ravel())) * 100
+        self.diff_pixels = len(diffR.ravel()) - self.diff_pixels
+        self.diff_pixels = float(self.diff_pixels / len(diffR.ravel())) * 100
 
-        return round(self.diff_pixeles, 2)
+        return round(self.diff_pixels, 2)
 
     def getPrediction(self, max_size=1000, div_image_path=False):
 
         if self.img1.shape != self.img2.shape:
             return -1
 
-        kernel_size = (5, 5)
-
-        img_1 = cv2.GaussianBlur(self.img1, kernel_size, 0)
-        img_2 = cv2.GaussianBlur(self.img2, kernel_size, 0)
+        img_1 = cv2.GaussianBlur(self.img1, (5, 5), 0)
+        img_2 = cv2.GaussianBlur(self.img2, (5, 5), 0)
 
         sub = np.abs(img_1 - img_2).astype(np.uint8)
 
         median = cv2.medianBlur(sub, 9)
 
-        kernel = np.ones(kernel_size, np.uint8)
+        kernel = np.ones((5, 5), np.uint8)
         median = cv2.morphologyEx(median, cv2.MORPH_CLOSE, kernel)
 
         median = cv2.cvtColor(median, cv2.COLOR_BGR2GRAY)
@@ -76,11 +75,21 @@ class CompareMetrics(object):
         # number of objects
         # print("Count:", max(stat[0]))
 
-        new_list = sorted(stat[1], reverse=True)
-        new_list[0] = 0
+        a = np.delete(stat[1], np.where(stat[1] == max(stat[1])))
 
-        # maximum object size
-        # print("Max:", max(new_list))
+        try:
 
-        # 1 - there is a difference. 0 - there isn't a difference
-        return 1 if max(new_list) >= max_size else 0
+            # maximum object size
+            # print("Max:", max(a))
+
+            # 1 - there is a difference. 0 - there isn't a difference
+            return 0 if max(a) <= 1000 and median[0][0] != 255 else 1
+
+        except ValueError:
+
+            # maximum object = 0. No blobs
+            # print("Max: 0")
+
+            # 1 - there is a difference. 0 - there isn't a difference
+            return 0 if median[0][0] != 255 else 1
+
