@@ -91,4 +91,3 @@ class CompareMetrics(object):
 
             # 1 - there is a difference. 0 - there isn't a difference
             return 0 if median[0][0] != 255 else 1
-
