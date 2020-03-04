@@ -92,30 +92,15 @@ def main():
     args = createArgParser().parse_args()
 
     render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
-    baseline_json_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
+    baseline_json_manifest_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
         return
 
-    # create report_compared.json before calculation to provide stability
-    try:
-        with open(render_json_path, 'r') as file:
-            render_json = json.loads(file.read())
-            for img in render_json:
-                img.update({'baseline_render_time': -0.0})
-                img.update({'difference_time': -0.0})
-    except (FileNotFoundError, OSError) as err:
-        core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
-    except json.JSONDecodeError as e:
-        core.config.main_logger.error("Broken report: {}".format(str(e)))
-    else:
-        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
-            json.dump(render_json, file, indent=4)
-
-    if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
-        core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
-        exit(1)
+    if not os.path.exists(args.base_dir):
+        core.config.main_logger.error("Baseline folder doesn't exist. It will be created with baseline stub img.")
+        os.makedirs(args.base_dir)
 
     try:
         if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
@@ -124,11 +109,35 @@ def main():
     except (OSError, FileNotFoundError) as err:
         core.config.main_logger.error("Couldn't copy baseline stub: {}".format(str(err)))
 
+    # create report_compared.json before calculation to provide stability
+    try:
+        with open(render_json_path, 'r') as file:
+            render_json = json.loads(file.read())
+            for img in render_json:
+                img.update({'baseline_render_time': -0.0,
+                            'difference_time': -0.0,
+                            'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, 'baseline.png'), args.work_dir)})
+    except (FileNotFoundError, OSError) as err:
+        core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
+    except json.JSONDecodeError as e:
+        core.config.main_logger.error("Broken report: {}".format(str(e)))
+    else:
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+            json.dump(render_json, file, indent=4)
+
+    if not os.path.exists(baseline_json_manifest_path):
+        core.config.main_logger.warning("Baseline manifest not found by path: {}".format(args.base_dir))
+        for img in render_json:
+            img.update({'test_status': core.config.TEST_DIFF_STATUS})
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+            json.dump(render_json, file, indent=4)
+        exit(1)
+
     try:
         with open(render_json_path, 'r') as file:
             render_json = json.loads(file.read())
 
-        with open(baseline_json_path, 'r') as file:
+        with open(baseline_json_manifest_path, 'r') as file:
             baseline_json = json.loads(file.read())
 
     except (FileNotFoundError, OSError, json.JSONDecodeError) as err:
