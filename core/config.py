@@ -37,6 +37,13 @@ PIX_DIFF_MAX = 15
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
 
+"""
+# Possible test case statuses
+  passed - status means case was executed without errors and difference with baseline is permissible.
+  skipped - status means case wasn't launched by QA team decision. 
+  error - status means fatal error during render, terminating by timeout, or case wasn't launched at all.
+  failed - status means that pixel difference with baseline image is too large.
+"""
 TEST_SUCCESS_STATUS = 'passed'
 TEST_IGNORE_STATUS = 'skipped'
 TEST_CRASH_STATUS = 'error'

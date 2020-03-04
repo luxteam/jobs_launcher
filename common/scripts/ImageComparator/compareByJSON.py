@@ -3,6 +3,7 @@ import argparse
 import json
 import CompareMetrics
 import sys
+from shutil import copyfile
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
@@ -25,8 +26,8 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.error("Baseline image not found by path: {}".format(baseline_img_path))
-            # TODO: set default image common/img
-            img['test_status'] = core.config.TEST_DIFF_STATUS
+            img.update({'test_status': core.config.TEST_DIFF_STATUS,
+                        'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
             return img
 
         # else add baseline images paths to json
@@ -115,6 +116,13 @@ def main():
     if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
         core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
         exit(1)
+
+    try:
+        if not os.path.exists(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png')):
+            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png'),
+                     os.path.join(args.base_dir, 'baseline.png'))
+    except (OSError, FileNotFoundError) as err:
+        core.config.main_logger.error("Couldn't copy baseline stub: {}".format(str(err)))
 
     try:
         with open(render_json_path, 'r') as file:
