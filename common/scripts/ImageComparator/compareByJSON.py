@@ -65,9 +65,9 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
     if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
         render_time = img['render_time']
         with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
+            baseline_report_json = json.loads(file.read())
             try:
-                baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0][
-                    'render_time']
+                baseline_time = [x for x in baseline_report_json if x['test_case'] == img['test_case']][0]['render_time']
             except IndexError:
                 baseline_time = -0.0
 
@@ -118,7 +118,7 @@ def main():
         exit(1)
 
     try:
-        if not os.path.exists(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png')):
+        if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
             copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png'),
                      os.path.join(args.base_dir, 'baseline.png'))
     except (OSError, FileNotFoundError) as err:
