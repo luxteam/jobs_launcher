@@ -119,11 +119,11 @@
 <!--                <td>{{ test_conf }}</td>-->
 
                 <td>
-                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
-                    <div class="popup" id="machineInfo{{ loop.index }}">
+                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
+                    <div class="popup" id="machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}">
                         <div class="popupContent popupHalfWidth">
                             <form class="popupForm">
-                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;"><img src="report_resources/img/close-button.png"/></button>
                             </form>
                             <table>
                                 <tr>
