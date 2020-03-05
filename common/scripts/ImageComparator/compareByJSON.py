@@ -3,6 +3,7 @@ import argparse
 import json
 import CompareMetrics
 import sys
+from shutil import copyfile
 
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
@@ -25,6 +26,8 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.error("Baseline image not found by path: {}".format(baseline_img_path))
+            img.update({'test_status': core.config.TEST_DIFF_STATUS,
+                        'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
             return img
 
         # else add baseline images paths to json
@@ -62,9 +65,9 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
     if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
         render_time = img['render_time']
         with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
+            baseline_report_json = json.loads(file.read())
             try:
-                baseline_time = [x for x in json.loads(file.read()) if x['test_case'] == img['test_case']][0][
-                    'render_time']
+                baseline_time = [x for x in baseline_report_json if x['test_case'] == img['test_case']][0]['render_time']
             except IndexError:
                 baseline_time = -0.0
 
@@ -89,19 +92,31 @@ def main():
     args = createArgParser().parse_args()
 
     render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
-    baseline_json_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
+    baseline_json_manifest_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
         return
+
+    if not os.path.exists(args.base_dir):
+        core.config.main_logger.error("Baseline folder doesn't exist. It will be created with baseline stub img.")
+        os.makedirs(args.base_dir)
+
+    try:
+        if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
+            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png'),
+                     os.path.join(args.base_dir, 'baseline.png'))
+    except (OSError, FileNotFoundError) as err:
+        core.config.main_logger.error("Couldn't copy baseline stub: {}".format(str(err)))
 
     # create report_compared.json before calculation to provide stability
     try:
         with open(render_json_path, 'r') as file:
             render_json = json.loads(file.read())
             for img in render_json:
-                img.update({'baseline_render_time': -0.0})
-                img.update({'difference_time': -0.0})
+                img.update({'baseline_render_time': -0.0,
+                            'difference_time': -0.0,
+                            'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, 'baseline.png'), args.work_dir)})
     except (FileNotFoundError, OSError) as err:
         core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
     except json.JSONDecodeError as e:
@@ -110,15 +125,19 @@ def main():
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
 
-    if not os.path.exists(args.base_dir) or not os.path.exists(baseline_json_path):
-        core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
+    if not os.path.exists(baseline_json_manifest_path):
+        core.config.main_logger.warning("Baseline manifest not found by path: {}".format(args.base_dir))
+        for img in render_json:
+            img.update({'test_status': core.config.TEST_DIFF_STATUS})
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+            json.dump(render_json, file, indent=4)
         exit(1)
 
     try:
         with open(render_json_path, 'r') as file:
             render_json = json.loads(file.read())
 
-        with open(baseline_json_path, 'r') as file:
+        with open(baseline_json_manifest_path, 'r') as file:
             baseline_json = json.loads(file.read())
 
     except (FileNotFoundError, OSError, json.JSONDecodeError) as err:

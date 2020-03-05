@@ -4,8 +4,8 @@ import cv2
 
 class CompareMetrics(object):
 
-    def __init__ (self, file1, file2):
-        
+    def __init__(self, file1, file2):
+
         self.file1 = file1
         self.file2 = file2
         self.diff_pixels = 0
@@ -52,18 +52,18 @@ class CompareMetrics(object):
         if self.img1.shape != self.img2.shape:
             return -1
 
-        img_1 = cv2.GaussianBlur(self.img1,(5,5),0)
-        img_2 = cv2.GaussianBlur(self.img2,(5,5),0)
+        img_1 = cv2.GaussianBlur(self.img1, (5, 5), 0)
+        img_2 = cv2.GaussianBlur(self.img2, (5, 5), 0)
 
         sub = np.abs(img_1 - img_2).astype(np.uint8)
 
-        median = cv2.medianBlur(sub,9)
+        median = cv2.medianBlur(sub, 9)
 
-        kernel = np.ones((5,5),np.uint8)
+        kernel = np.ones((5, 5), np.uint8)
         median = cv2.morphologyEx(median, cv2.MORPH_CLOSE, kernel)
 
         median = cv2.cvtColor(median, cv2.COLOR_BGR2GRAY)
-        ret,median = cv2.threshold(median,10,255,cv2.THRESH_BINARY)
+        ret, median = cv2.threshold(median, 10, 255, cv2.THRESH_BINARY)
 
         if div_image_path:
             cv2.imwrite(div_image_path, median)
@@ -74,11 +74,20 @@ class CompareMetrics(object):
         # number of objects
         # print("Count:", max(stat[0]))
 
-        new_list = sorted(stat[1], reverse=True)
-        new_list[0] = 0
+        a = np.delete(stat[1], np.where(stat[1] == max(stat[1])))
 
-        # maximum object size
-        # print("Max:", max(new_list))
+        try:
 
-        # 1 - there is a difference. 0 - there isn't a difference
-        return 1 if max(new_list) >= max_size else 0
+            # maximum object size
+            # print("Max:", max(a))
+
+            # 1 - there is a difference. 0 - there isn't a difference
+            return 0 if max(a) <= 1000 and median[0][0] != 255 else 1
+
+        except ValueError:
+
+            # maximum object = 0. No blobs
+            # print("Max: 0")
+
+            # 1 - there is a difference. 0 - there isn't a difference
+            return 0 if median[0][0] != 255 else 1
