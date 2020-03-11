@@ -24,7 +24,9 @@ def get_gpu():
     .. todo:: Implement mGPU support
     """
     try:
-        render_device = ""
+        render_device = os.getenv('CIS_RENDER_DEVICE')
+        if render_device:
+            return render_device
         operation_sys = platform.system()
         if operation_sys == "Windows":
             s = subprocess.Popen("wmic path win32_VideoController get name", stdout=subprocess.PIPE)

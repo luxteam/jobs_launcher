@@ -97,7 +97,7 @@
 [Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
                 <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
-                <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+<!--                <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>-->
                 <th data-field="pix_diff_2" data-halign="center" data-valign="middle" data-sortable="true">
                     Diff new
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
@@ -133,8 +133,8 @@
                     {% endif -%}
                     >
                     {{ item.difference_time | round (2) }}</td>
-                <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
-                <td>{{ item.difference_color_2 }}</td>
+<!--                <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>-->
+                <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
 
                 <td class="hatching">
                 {% if item.baseline_color_path %}
