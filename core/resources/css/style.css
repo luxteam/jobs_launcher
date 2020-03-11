@@ -266,7 +266,7 @@ a {
 
 .infoColumn {
   text-align: left;
-  white-space: nowrap;
+// white-space: nowrap;
   width: 15vw;
 }
 
