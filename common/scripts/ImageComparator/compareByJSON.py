@@ -22,10 +22,10 @@ def createArgParser():
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('file_name', ''), ''))
+        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('file_name', ''), 'not.exist'))
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
-            core.config.main_logger.error("Baseline image not found by path: {}".format(baseline_img_path))
+            core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
             img.update({'test_status': core.config.TEST_DIFF_STATUS,
                         'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
             return img
@@ -52,10 +52,12 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             core.config.main_logger.error("Error during metrics calculation: {}".format(str(err)))
             return img
 
-        pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
-        img.update({'difference_color': pix_difference})
-        img.update({'difference_color_2': metrics.getPrediction()})
-        if type(pix_difference) is str or pix_difference > float(pix_diff_max):
+        # pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
+        # img.update({'difference_color': pix_difference})
+        pix_difference_2 = metrics.getPrediction()
+        img.update({'difference_color_2': pix_difference_2})
+        # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
+        if pix_difference_2 != 0:
             img['test_status'] = core.config.TEST_DIFF_STATUS
 
     return img
@@ -143,6 +145,7 @@ def main():
     except (FileNotFoundError, OSError, json.JSONDecodeError) as err:
         core.config.main_logger.error("Can't get input data: {}".format(str(err)))
 
+    core.config.main_logger.info("Began metrics calculation")
     for img in render_json:
         img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
                                         args.pix_diff_max))

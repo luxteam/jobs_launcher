@@ -147,8 +147,8 @@
                     </th>
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
-                    <th data-filed="info" data-halign="center" data-sortable="true">Info</th>
-                    <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                    <th data-filed="info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
+<!--                    <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>-->
                     <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
                         Diff new
                         <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
@@ -206,8 +206,8 @@
                             {{ param }}<br/>
                         {% endfor %}
                     </td>
-                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
-                    <td>{{ item.difference_color_2 }}</td>
+<!--                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>-->
+                    <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
                     <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"
                     {% elif item.difference_time < -5 %}
