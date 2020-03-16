@@ -26,8 +26,9 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
-            img.update({'test_status': core.config.TEST_DIFF_STATUS,
-                        'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
+            img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
+            if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                img.update({'test_status': core.config.TEST_DIFF_STATUS})
             return img
 
         # else add baseline images paths to json

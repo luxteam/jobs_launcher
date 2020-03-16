@@ -234,7 +234,7 @@ def build_summary_report(work_dir):
                         summary_report[basename].update({'summary': temp_report['summary']})
 
     for key in common_info:
-        common_info[key] = ', '.join(common_info[key])
+        common_info[key] = ' '.join(common_info[key])
 
     return summary_report, common_info
 

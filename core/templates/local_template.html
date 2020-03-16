@@ -196,7 +196,6 @@
                     {%- if item.difference_time > 5 %}
                        {{ ' ' }}timeDiffFailedStatus
                     {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
-                        <b>Pixel difference:</b> {{ item.difference_color }} %<br/>
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
                         <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
