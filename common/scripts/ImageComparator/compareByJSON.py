@@ -46,20 +46,21 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
             return img
 
-        metrics = None
-        try:
-            metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
-        except (FileNotFoundError, OSError) as err:
-            core.config.main_logger.error("Error during metrics calculation: {}".format(str(err)))
-            return img
+        if "Don't compare" not in img['script_info']:
+            metrics = None
+            try:
+                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+            except (FileNotFoundError, OSError) as err:
+                core.config.main_logger.error("Error during metrics calculation: {}".format(str(err)))
+                return img
 
-        # pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
-        # img.update({'difference_color': pix_difference})
-        pix_difference_2 = metrics.getPrediction()
-        img.update({'difference_color_2': pix_difference_2})
-        # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
-        if pix_difference_2 != 0:
-            img['test_status'] = core.config.TEST_DIFF_STATUS
+            # pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
+            # img.update({'difference_color': pix_difference})
+            pix_difference_2 = metrics.getPrediction()
+            img.update({'difference_color_2': pix_difference_2})
+            # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
+            if pix_difference_2 != 0:
+                img['test_status'] = core.config.TEST_DIFF_STATUS
 
     return img
 
