@@ -14,8 +14,8 @@ def launch_job(cmd_line, job_timeout=None):
     p = psutil.Popen(cmd_line, stdout=subprocess.PIPE, shell=True)
     try:
         rc = p.wait(timeout=job_timeout)
-    except psutil.TimeoutExpired as err:
-        rc = -1
+    except (psutil.TimeoutExpired, subprocess.TimeoutExpired):
+        rc = -10
         for child in reversed(p.children(recursive=True)):
             child.terminate()
         p.terminate()
@@ -28,9 +28,9 @@ def launch_job(cmd_line, job_timeout=None):
         core.config.main_logger.info('Job was completed normal')
         report['passed'] = 1
         report['skipped'] = 0
-    elif rc == -1:
+    elif rc == -10:
         core.config.main_logger.error('Job was terminated by timeout')
     else:
-        core.config.main_logger.error('Job has returned exit code: {}'.format(rc))
+        core.config.main_logger.warning('Job has returned exit code: {}'.format(rc))
 
     return report

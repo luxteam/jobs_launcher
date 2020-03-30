@@ -3,7 +3,8 @@ import subprocess
 import jinja2
 import json
 import base64
-import shutil
+from shutil import rmtree, copytree
+from codecs import open
 import datetime
 import operator
 from PIL import Image
@@ -13,7 +14,7 @@ import copy
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
-    with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
+    with open(os.path.abspath(os.path.join(session_dir, file_name)), "w", encoding='utf8') as file:
         if replace_pathsep:
             s = json.dumps(report, indent=4, sort_keys=True)
             file.write(s.replace(os.path.sep, '/'))
@@ -22,7 +23,7 @@ def save_json_report(report, session_dir, file_name, replace_pathsep=False):
 
 
 def save_html_report(report, session_dir, file_name, replace_pathsep=False):
-    with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
+    with open(os.path.abspath(os.path.join(session_dir, file_name)), "w", encoding='utf8') as file:
         if replace_pathsep:
             file.write(report.replace(os.path.sep, '/'))
         else:
@@ -62,9 +63,7 @@ def env_override(value, key):
 
 
 def get_jobs_launcher_version(value):
-    # os.chdir(os.path.dirname(__file__))
-    return subprocess.check_output("git describe --tags --abbrev=0", shell=True).decode("utf-8")
-    # return os.system("git describe --tags --abbrev=0")
+    return subprocess.check_output("git describe --tags --always", shell=True).decode("utf-8")
 
 
 def generate_thumbnails(session_dir):
@@ -222,7 +221,7 @@ def build_summary_report(work_dir):
                                         work_dir)}
                                 )
                     except Exception as err:
-                        main_logger.error(str(err))
+                        main_logger.error("Processing of {} has produced error: {}".format(basepath.split(os.path.sep)[-1], str(err)))
 
                     if basename in summary_report.keys():
                         summary_report[basename]['results'].update(temp_report['results'])
@@ -371,11 +370,11 @@ def build_local_reports(work_dir, summary_report, common_info):
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
-        shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
+        rmtree(os.path.join(work_dir, 'report_resources'), True)
 
     try:
-        shutil.copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
-                        os.path.join(work_dir, 'report_resources'))
+        copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
+                 os.path.join(work_dir, 'report_resources'))
     except Exception as err:
         main_logger.error("Failed to copy report resources: {}".format(str(err)))
 
@@ -389,11 +388,13 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
+    main_logger.info("Saving summary report...")
     try:
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template.html')
 
         summary_report, common_info = build_summary_report(work_dir)
+
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
@@ -418,9 +419,12 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
+
+    main_logger.info("Saving performance report...")
     try:
         copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
+
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
@@ -438,10 +442,13 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(performance_html)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
 
+    main_logger.info("Saving compare report...")
     try:
         compare_template = env.get_template('compare_template.html')
         copy_summary_report = copy.deepcopy(summary_report)
+
         compare_report, hardware = build_compare_report(copy_summary_report)
+
         save_json_report(compare_report, work_dir, COMPARE_REPORT)
         compare_html = compare_template.render(title=major_title + " Compare",
                                                hardware=hardware,
