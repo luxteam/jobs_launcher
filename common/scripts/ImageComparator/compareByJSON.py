@@ -46,7 +46,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
             return img
 
-        if "Don't compare" not in img['script_info']:
+        if core.config.DONT_COMPARE not in img.get('script_info', ''):
             metrics = None
             try:
                 metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
