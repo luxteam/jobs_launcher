@@ -3,3 +3,4 @@ UnitTests/Results/*
 .idea/
 *.pyc
 *.log
+/debug_folder/
