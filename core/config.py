@@ -24,9 +24,30 @@ RENDER_REPORT_BASE = {
     "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_time_or": -0.0,
     "difference_color_2": -0
 }
+
+RENDER_REPORT_EC_PACK = {
+    "minor_version": "",
+    "iterations": -0,
+    "width": -0,
+    "height": -0,
+    "system_memory_usage": -0.0,
+    "gpu_memory_usage": -0.0,
+    "gpu_memory_total": -0.0,
+    "gpu_memory_max": -0.0,
+    "baseline_gpu_memory_usage": -0.0,
+    "baseline_system_memory_usage": -0.0,
+    "difference_vram": -0.0,
+    "difference_ram": -0.0
+}
+
+RENDER_REPORT_CT_PACK = {
+    "difference_time_or": -0.0,
+    "or_render_time": -0.0,
+    "original_render_log": ""
+}
+
 RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
