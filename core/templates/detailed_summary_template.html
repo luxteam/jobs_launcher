@@ -88,24 +88,26 @@
                     Test case
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
                 </th>
-                <th data-halign="center" data-valign="middle" data-sortable="true">Parameters</th>
-                <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
-                <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
+                <th data-field="parameters" data-halign="center" data-valign="middle" data-sortable="true">Parameters</th>
+                <th data-field="original_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
+                <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+
                 <th data-field="test_status" data-halign="center" data-valign="middle" data-sortable="true">Test status
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[Failed] status means that pixel difference with baseline image is too large.
 [Error] status means fatal error during render, terminating by timeout, or case wasn't launched at all.
 [Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
-<!--                <th data-field="pix_diff" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>-->
                 <th data-field="pix_diff_2" data-halign="center" data-valign="middle" data-sortable="true">
                     Diff new
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
 [-1] - images has diff resolution, so couldn't be compared."></span>
                 </th>
-                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
-                <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+                <th data-field="original_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">{{ original_render | title }} render time</th>
+                <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
+                <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
+                <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                 <th data-filed="render_log" data-halign="center" data-valign="middle">Render log</th>
             </tr>
         </thead>
@@ -160,6 +162,10 @@
                     {% else %}
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a>
                     {% endif -%}
+                    <!--TODO: get render path from json-->
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.conversion.log">Conversion log</a><br/>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">RPR Log</a>
                 </td>
             </tr>
                 {% endfor %}
