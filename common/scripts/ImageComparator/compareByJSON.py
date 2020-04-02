@@ -130,8 +130,10 @@ def main():
 
     if not os.path.exists(baseline_json_manifest_path):
         core.config.main_logger.warning("Baseline manifest not found by path: {}".format(args.base_dir))
-        for img in render_json:
-            img.update({'test_status': core.config.TEST_DIFF_STATUS})
+        # "true" is define by Jenkins manual job. if updaterefs - not fail cases without baseline
+        if "true" not in os.getenv("UpdateRefs", "false"):
+            for img in render_json:
+                img.update({'test_status': core.config.TEST_DIFF_STATUS})
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
         exit(1)
