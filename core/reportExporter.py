@@ -368,7 +368,7 @@ def build_local_reports(work_dir, summary_report, common_info):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', original_render=''):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
@@ -383,6 +383,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+    env.globals.update({'original_render': original_render,
+                        'or_boolean_formatted': str(bool(original_render)).lower()})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
