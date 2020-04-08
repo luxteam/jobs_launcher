@@ -23,15 +23,15 @@ OS_NAMES_CONVERTATIONS = {
 	"OSX": "Darwin"
 }
 
-def main(lost_tests_results, tests_dir, output_dir, regression = ''):
+def main(lost_tests_results, tests_dir, output_dir, is_regression):
 	lost_tests_data = {}
 	lost_tests_results = ast.literal_eval(lost_tests_results)
 
 	if len(lost_tests_results) == 0:
 		return 0
 
-	if regression:
-		with open(regression, "r") as file:
+	if is_regression == 'true':
+		with open(os.path.join(tests_dir, "jobs", "regression.json"), "r") as file:
 			test_packages = json.load(file)
 		for test_package_name in test_packages:
 			lost_tests_count = len(test_packages[test_package_name].split(','))
