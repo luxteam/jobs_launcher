@@ -39,7 +39,8 @@ def main(work_dir=''):
     # get summary results
     for execution in summary_report:
         for key in total:
-            total[key] += summary_report[execution]['summary'][key]
+            if summary_report[execution]['summary'][key]:
+                total[key] += summary_report[execution]['summary'][key]
 
     with open(os.path.join(args.work_dir, 'summary_status.json'), 'w') as file:
         json.dump(total, file, indent=' ')
