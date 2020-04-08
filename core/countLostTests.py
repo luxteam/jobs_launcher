@@ -57,5 +57,6 @@ def main(lost_tests_results, tests_dir, output_dir, regression = ''):
 			if joined_gpu_os_names not in lost_tests_data:
 				lost_tests_data[joined_gpu_os_names] = {}
 			lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
+	os.makedirs(output_dir, exist_ok=True)
 	with open(os.path.join(output_dir, LOST_TESTS_JSON_NAME), "w") as file:
 		json.dump(lost_tests_data, file, indent=4, sort_keys=True)
