@@ -42,8 +42,6 @@
         </div>
     </div>
 
-    <hr/>
-
     <div class="jsTableWrapper">
         <div id="toolbar">
             <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ render_report | selectattr("test_status", "equalto", "passed") | list | count }}]</button>
@@ -84,16 +82,19 @@
                         Test case
                         <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
                     </th>
+
+                    <th data-field="original_img" data-visible="{{ or_boolean_formatted }}" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
                     <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
                     <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
+
                     <th data-filed="info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
-<!--                    <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>-->
                     <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
                         Diff new
                         <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
 [-1] - images has diff resolution, so couldn't be compared."></span>
                     </th>
+
                     <th data-field="time_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
                     <th data-filed="render_log" data-valign="middle">Render log</th>
                     <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status
@@ -109,7 +110,21 @@
             {% for item in render_report %}
                 <tr>
                     <td>{{ item.test_case }}</td>
-                    <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
+                    <td>
+                        <button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button>
+                    </td>
+
+                    <td class="hatching">
+                    {% if item.original_color_path %}
+                        {% if 'thumb64_original_color_path' in item %}
+                        <img data-src="{{ item.thumb256_original_color_path }}"/>
+                        {% else %}
+                        <img data-src="{{ item.original_color_path }}"/>
+                        {% endif %}
+                    {% else %}
+                        Not compared
+                    {% endif %}
+                    </td>
 
                     <td class="hatching">
                     {% if item.baseline_color_path %}
@@ -137,6 +152,7 @@
                     {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
                         <b>Scene:</b> {{ item.scene_name }}<br/>
                         <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
+                        {% if "true" in or_boolean_formatted %}<b>OR render time:</b> {{ item.or_render_time | round(2) }} <br/>{% endif %}
                         <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
                         <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
                         <b>Test info:</b><br/>
@@ -144,7 +160,7 @@
                             {{ param }}<br/>
                         {% endfor %}
                     </td>
-<!--                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>-->
+
                     <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
                     <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"

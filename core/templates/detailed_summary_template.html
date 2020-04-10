@@ -88,7 +88,7 @@
                     Test case
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
                 </th>
-                <th data-field="script_info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
+                <th data-field="script_info" data-visible="{{ or_boolean_formatted_invert }}" data-halign="center" data-valign="middle" data-sortable="true">Params</th>
 
                 <th data-field="original_img" data-visible="{{ or_boolean_formatted }}" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
@@ -121,10 +121,13 @@
                 {% for item in report[i].results[test_package][test_conf].render_results %}
             <tr>
                 <td>{{ item.test_case }}</td>
-                <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
-                <td>{%- for param in item.script_info %}
-                    {{ param }}<br>
-                    {% endfor -%}
+                <td>
+                    <button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button>
+                </td>
+                <td>
+                    {% for param in item.script_info %}
+                        {{ param }}<br/>
+                    {% endfor %}
                 </td>
 
                 <td class="hatching">

@@ -311,18 +311,10 @@ def build_compare_report(summary_report):
     return compare_report, hardware
 
 
-def build_local_reports(work_dir, summary_report, common_info):
-    # TODO: inherit local_template from base_template
+def build_local_reports(work_dir, summary_report, common_info, jinja_env):
     work_dir = os.path.abspath(work_dir)
 
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-        autoescape=True
-    )
-    env.filters['env_override'] = env_override
-    env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
-
-    template = env.get_template('local_template.html')
+    template = jinja_env.get_template('local_template.html')
     report_dir = ""
 
     try:
@@ -384,6 +376,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     )
     env.globals.update({'original_render': original_render,
                         'or_boolean_formatted': str(bool(original_render)).lower(),
+                        'or_boolean_formatted_invert': str(bool(not original_render)).lower(),
                         'pre_path': '.'})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
@@ -464,4 +457,4 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
-    build_local_reports(work_dir, summary_report, common_info)
+    build_local_reports(work_dir, summary_report, common_info, env)
