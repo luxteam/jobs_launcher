@@ -5,6 +5,7 @@ import argparse
 import os
 import json
 import sys
+from codecs import open
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
 
@@ -36,7 +37,7 @@ def main():
     template = env.get_template('report.html')
     text = template.render(title="Render Results", compared=compared, rendered=rendered_json, not_rendered=notRenderedJson)
 
-    with open(os.path.join(args.work_dir, 'result.html'), 'w') as f:
+    with open(os.path.join(args.work_dir, 'result.html'), 'w', encoding='utf8') as f:
         f.write(text)
 
 
