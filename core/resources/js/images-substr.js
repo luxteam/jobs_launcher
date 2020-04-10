@@ -1,5 +1,4 @@
 function showImagesSubtraction(baselineId, renderId) {
-
     if (!($("#baselineImgPopup").attr('src') && $("#renderedImgPopup").attr('src'))) {
         infoBox("[Error] Can't read source image.", "#9b5e61");
         return;
@@ -7,6 +6,7 @@ function showImagesSubtraction(baselineId, renderId) {
 
     var imagesTable = document.getElementById("imgsCompareTable");
     var diffTable = document.getElementById('imgsDiffTable');
+    document.getElementById("imagesCarousel").style.display = "none";
 
     // if diff image is show now
     if (diffTable.style.display === "") {

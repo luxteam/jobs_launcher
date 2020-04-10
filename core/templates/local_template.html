@@ -2,57 +2,19 @@
 
 {% block report_body %}
 
-    <div class="popup" id="imgsModal">
-        <div class="popupContent" id="imgsModalContent">
-            <form class="popupForm" oninput="currentThresholdView.value=parseFloat(thresholdRange.value)">
-                <button class="commonButton closePopup" type="button" name="closePopupButton" onclick="closeModalWindow('imgsModal');return false;"><img src="{{ pre_path }}/report_resources/img/close-button.png"/></button>
-                <button class="commonButton" type="button" name="increaseImgSizeButton" onclick="increaseImgSize();">Image Size +</button>
-                <button class="commonButton" type="button" name="reduceImgSizeButton" onclick="reduceImgSize();">Image Size -</button>
-                <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup');">Switch to difference</button>
-                <input  autocomplete="true" id="thresholdRange" type="range"  name="thresholdSelector" min="0.0" max="1" step="0.01" value="0.03" oninput="renderCanvasData('baselineImgPopup', 'renderedImgPopup', this.value);"/>
-                <output for="thresholdSelector">0.03</output>
-            </form>
-            <table class="baseTable" id="imgsCompareTable">
-                <thead>
-                    <tr>
-                        <th>Baseline Image</th>
-                        <th>Rendered Image</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="hatching"><img src="" id="baselineImgPopup"/></td>
-                        <td class="hatching"><img src="" id="renderedImgPopup"/></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <table class="baseTable" id="imgsDiffTable" style="display: none">
-            <thead>
-                <tr>
-                    <th>Difference Image</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="hatching" id="diffImageTd"><canvas id="imgsDifferenceCanvas"></canvas></td>
-                </tr>
-            </tbody>
-            </table>
-        </div>
-    </div>
+    {% include "images_compare_block.html" %}
 
     <div class="jsTableWrapper">
         <div id="toolbar">
             <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ render_report | selectattr("test_status", "equalto", "passed") | list | count }}]</button>
             <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">
                 Show failed [{{ render_report | selectattr("test_status", "equalto", "failed") | list | count }}]
-                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true" data-toggle="tooltip" data-placement="top"
                       title="Failed status means that pixel difference with baseline image is too large."></span>
             </button>
             <button class="commonButton" type="button" name="showOnlyErrorCases" onclick="searchTextInBootstrapTable('error');">
                 Show error [{{ render_report | selectattr("test_status", "equalto", "error") | list | count }}]
-                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true" data-toggle="tooltip" data-placement="top"
                       title="Error status means that fatal error has occur during testing."></span>
             </button>
             <button class="commonButton" type="button" name="showOnlySkippedCases" onclick="searchTextInBootstrapTable('skipped');">Show skipped [{{ render_report | selectattr("test_status", "equalto", "skipped") | list | count }}]</button>

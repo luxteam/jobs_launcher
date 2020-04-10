@@ -1,3 +1,5 @@
+var carouselTask;
+
 function setActive(elem) {
     elem.classList.add('active_header');
 }
@@ -43,12 +45,16 @@ function openModalWindow(id) {
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
+            document.getElementById("imagesCarousel").style.display = "none";
+            clearInterval(carouselTask);
         }
     }
 }
 
 function closeModalWindow(id) {
     document.getElementById(id).style.display = "none";
+    document.getElementById("imagesCarousel").style.display = "none";
+    clearInterval(carouselTask);
 }
 
 function increaseImgSize() {
@@ -121,3 +127,32 @@ $(document).ready(function init(){
 
 // TODO: upgrade Bootstrap
 //TODO: upgrade Bootstrap-table
+
+function showCarousel(baselineId, renderId) {
+
+    if (!($("#baselineImgPopup").attr('src') && $("#renderedImgPopup").attr('src'))) {
+        infoBox("[Error] Can't read source image.", "#9b5e61");
+        return;
+    }
+
+    var carousel = document.getElementById('imagesCarousel');
+    if (carousel.style.display === "none") {
+        carousel.style.display = "block";
+    }
+    else {
+        carousel.style.display = "none";
+        clearInterval(carouselTask);
+        return;
+    }
+
+    var renderImg = document.getElementById(renderId);
+    var baselineImg = document.getElementById(baselineId);
+    var showImg = document.getElementById('imagesCarouselImg');
+
+    showImg.src = baselineImg.src;
+
+    carouselTask = setInterval(function(){
+        setTimeout(function(){showImg.src = renderImg.src;}, 300);
+        setTimeout(function(){showImg.src = baselineImg.src;}, 600);
+    }, 1200);
+}
