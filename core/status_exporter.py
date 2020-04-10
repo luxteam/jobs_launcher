@@ -21,6 +21,9 @@ def main(work_dir=''):
         with open(os.path.join(args.work_dir, SUMMARY_REPORT), 'r') as file:
             summary_report = json.load(file)
 
+            if len(summary_report) == 0:
+                return 0
+
             max_name = max([len(x) for x in summary_report.keys()])
             max_name = max(max_name, 12)
 
