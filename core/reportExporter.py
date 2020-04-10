@@ -383,7 +383,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         autoescape=True
     )
     env.globals.update({'original_render': original_render,
-                        'or_boolean_formatted': str(bool(original_render)).lower()})
+                        'or_boolean_formatted': str(bool(original_render)).lower(),
+                        'pre_path': '.'})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
