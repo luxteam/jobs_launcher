@@ -16,7 +16,17 @@ function draw_reshalla_diff_canvas() {
     cv.GaussianBlur(renderImgData, renderImgDataProc, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT);
     cv.GaussianBlur(baselineImgData, baselineImgDataProc, new cv.Size(5, 5), 0, 0, cv.BORDER_DEFAULT);
 
-    var imgDataDiff = Math.abs(renderImgDataProc.data - baselineImgDataProc.data);
+    var imgDataDiffProc = new cv.Mat();
+    cv.absdiff(baselineImgDataProc, renderImgDataProc, imgDataDiffProc);
 
-//    cv.imshow(diffCanvas, diffImgData);
+    var median = new cv.Mat();
+    cv.medianBlur(imgDataDiffProc, median, 9);
+
+    var kernel = cv.getStructuringElement(1, new cv.Size(5, 5), new cv.Point(2, 2));
+    cv.morphologyEx(median, median, cv.MORPH_CLOSE, kernel);
+
+    cv.cvtColor(median, median, cv.COLOR_BGR2GRAY);
+    cv.threshold(median, median, 10, 255, cv.THRESH_BINARY);
+
+    cv.imshow(diffCanvas, median);
 };
