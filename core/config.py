@@ -95,4 +95,4 @@ COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'
 
-DONT_COMPARE = "Don't compare"
+DONT_COMPARE = "Do not compare"
