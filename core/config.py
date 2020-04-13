@@ -97,3 +97,5 @@ REPORT_RESOURCES_PATH = 'resources'
 
 TEST_CASES_JSON_NAME = 'test_cases.json'
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
+
+DONT_COMPARE = "Do not compare"
