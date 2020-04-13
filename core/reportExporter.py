@@ -265,10 +265,10 @@ def build_summary_report(work_dir):
             lost_tests_count = json.load(file)
         for lost_test_result in lost_tests_count:
             test_case_found = False
-            gpu_name = lost_test_result.split('-')[0].lower()
-            os_name = lost_test_result.split('-')[1].lower()
+            gpu_name = lost_test_result.split('-')[0]
+            os_name = lost_test_result.split('-')[1]
             for gpu_os_case in summary_report:
-                if gpu_name in gpu_os_case.lower() and os_name in gpu_os_case.lower():
+                if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                     for lost_test_package in lost_tests_count[lost_test_result]:
                         generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
                     test_case_found = True

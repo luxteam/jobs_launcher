@@ -202,13 +202,13 @@
                 {% if report[i].results[test_package][test_conf].duration %}
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
                 {% else %}
-                <td>Unknown</td>
+                <td>0</td>
                 {% endif %}
 
                 {% if report[i].results[test_package][test_conf].duration and report[i].results[test_package][test_conf].render_duration %}
                 <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
                 {% else %}
-                <td>Unknown</td>
+                <td>0</td>
                 {% endif %}
 
                 {% if report[i].results[test_package][test_conf].render_duration %}
@@ -218,7 +218,7 @@
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
                 {% else %}
-                <td>Unknown</td>
+                <td>0</td>
                 {% endif %}
             </tr>
             <tr>
@@ -249,8 +249,8 @@
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
                 {% else %}
-                <td>Unknown</td>
-                <td>Unknown</td>
+                <td>0</td>
+                <td>0</td>
                 {% endif %}
 
                 {% if report[i].summary.render_duration %}
@@ -260,7 +260,7 @@
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
                 {% else %}
-                <td>Unknown</td>
+                <td>0</td>
                 {% endif %}
             </tr>
         </tbody>
