@@ -1,11 +1,11 @@
-import common.scripts.ImageComparator.compareByJSON_default as compareByJSON_default
-import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON_ct
-import common.scripts.ImageComparator.compareByJSON_ec as compareByJSON_ec
 import sys
 import argparse
 import os
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+import common.scripts.ImageComparator.compareByJSON_default as compareByJSON_default
+import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON_ct
+import common.scripts.ImageComparator.compareByJSON_ec as compareByJSON_ec
 import core.config
 from local_config import *
 
