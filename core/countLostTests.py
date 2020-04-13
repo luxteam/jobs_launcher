@@ -4,23 +4,33 @@ import json
 from core.config import *
 
 
-# match gpu label in Jenkins and part of gpu name which session_report.json contains
-GPU_NAMES_CONVERTATIONS = {
-	"AMD_RXVEGA": "RX Vega",
-	"AMD_RX5700XT": "RX 5700 XT",
-	"AMD_RadeonVII": "Radeon VII",
-	"NVIDIA_GF1080TI": "GTX 1080 Ti",
-	"AMD_WX7100": "WX 7100",
-	"AMD_WX9100": "WX 9100",
-	"NVIDIA_GTX980": "GTX 980",
-	"NVIDIA_RTX2080TI": "RTX 2080 Ti"
-}
-
-# match OS label in Jenkins and part of OS name which session_report.json contains
-OS_NAMES_CONVERTATIONS = {
-	"Windows": "Windows",
-	"Ubuntu": "Ubuntu",
-	"OSX": "Darwin"
+# match gpu and OS labels in Jenkins and platform name which session_report.json contains
+PLATFORM_CONVERTATIONS = {
+	"Windows": {
+		"os_name": "Windows",
+		"cards": {
+			"AMD_RXVEGA": "Radeon RX Vega",
+			"AMD_RX5700XT": "AMD Radeon RX 5700 XT",
+			"AMD_RadeonVII": "AMD Radeon VII",
+			"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
+			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
+			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
+			"NVIDIA_RTX2080TI": "GeForce RTX 2080 Ti"
+		}
+	},
+	"Ubuntu": {
+		"os_name": "Ubuntu",
+		"cards": {
+			"AMD_RadeonVII": "AMD Radeon VII",
+			"NVIDIA_GTX980": "GeForce GTX 980"
+		}
+	},
+	"OSX": {
+		"os_name": "Darwin",
+		"cards": {
+			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)"
+		}
+	}
 }
 
 def main(lost_tests_results, tests_dir, output_dir, is_regression):
@@ -49,7 +59,7 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 				gpu_name = lost_test_result.split('-')[0]
 				os_name = lost_test_result.split('-')[1]
 				# join converted gpu name and os name
-				joined_gpu_os_names = GPU_NAMES_CONVERTATIONS[gpu_name] + "-" + OS_NAMES_CONVERTATIONS[os_name]
+				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 				if joined_gpu_os_names not in lost_tests_data:
 					lost_tests_data[joined_gpu_os_names] = {}
 				lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
@@ -63,7 +73,7 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 			# number of lost tests = number of tests in test package
 			lost_tests_count = len(data)
 			# join converted gpu name and os name
-			joined_gpu_os_names = GPU_NAMES_CONVERTATIONS[gpu_name] + "-" + OS_NAMES_CONVERTATIONS[os_name]
+			joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 			if joined_gpu_os_names not in lost_tests_data:
 				lost_tests_data[joined_gpu_os_names] = {}
 			lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
