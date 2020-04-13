@@ -199,27 +199,15 @@
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
-                {% if report[i].results[test_package][test_conf].duration %}
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-                {% else %}
-                <td>0</td>
-                {% endif %}
 
-                {% if report[i].results[test_package][test_conf].duration and report[i].results[test_package][test_conf].render_duration %}
                 <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
-                {% else %}
-                <td>0</td>
-                {% endif %}
 
-                {% if report[i].results[test_package][test_conf].render_duration %}
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
-                {% else %}
-                <td>0</td>
-                {% endif %}
             </tr>
             <tr>
             {% endfor %}
@@ -245,23 +233,15 @@
                 class="skippedStatus"
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
-                {% if report[i].summary.duration and report[i].summary.render_duration %}
+
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
-                {% else %}
-                <td>0</td>
-                <td>0</td>
-                {% endif %}
 
-                {% if report[i].summary.render_duration %}
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
-                {% else %}
-                <td>0</td>
-                {% endif %}
             </tr>
         </tbody>
     </table>

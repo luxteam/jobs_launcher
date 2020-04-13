@@ -184,12 +184,12 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     # add empty conf
     summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
     # specify data
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = ""
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = 0.0
     summary_report[gpu_os_case]['results'][lost_test_package][""]['error'] = lost_tests_count
     summary_report[gpu_os_case]['results'][lost_test_package][""]['failed'] = 0
     summary_report[gpu_os_case]['results'][lost_test_package][""]['machine_info'] = ""
     summary_report[gpu_os_case]['results'][lost_test_package][""]['passed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = ""
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = -0.0
     summary_report[gpu_os_case]['results'][lost_test_package][""]['render_results'] = []
     summary_report[gpu_os_case]['results'][lost_test_package][""]['result_path'] = ""
     summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
@@ -279,11 +279,11 @@ def build_summary_report(work_dir):
                 summary_report[gpu_os_case] = {}
                 summary_report[gpu_os_case]['results'] = {}
                 summary_report[gpu_os_case]['summary'] = {}
-                summary_report[gpu_os_case]['summary']['duration'] = ""
+                summary_report[gpu_os_case]['summary']['duration'] = 0.0
                 summary_report[gpu_os_case]['summary']['error'] = 0
                 summary_report[gpu_os_case]['summary']['failed'] = 0
                 summary_report[gpu_os_case]['summary']['passed'] = 0
-                summary_report[gpu_os_case]['summary']['render_duration'] = ""
+                summary_report[gpu_os_case]['summary']['render_duration'] = -0.0
                 summary_report[gpu_os_case]['summary']['skipped'] = 0
                 summary_report[gpu_os_case]['summary']['total'] = 0
                 for lost_test_package in lost_tests_count[lost_test_result]:
