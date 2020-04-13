@@ -1,8 +1,7 @@
 import sys
 import argparse
 import os
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import common.scripts.generate_baseline_default as generate_baseline_default
 import common.scripts.generate_baseline_ct as generate_baseline_ct
 import common.scripts.generate_baseline_ec as generate_baseline_ec

@@ -113,7 +113,7 @@ def generate_thumbnails(session_dir):
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
-def build_session_report(report, session_dir, report_type):
+def build_session_report(report, session_dir):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
@@ -319,7 +319,7 @@ def build_compare_report(summary_report):
     return compare_report, hardware
 
 
-def build_local_reports(work_dir, summary_report, common_info, report_type):
+def build_local_reports(work_dir, summary_report, common_info):
     # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
 
@@ -479,4 +479,4 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
-    build_local_reports(work_dir, summary_report, common_info, report_type)
+    build_local_reports(work_dir, summary_report, common_info)
