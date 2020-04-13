@@ -10,7 +10,9 @@ from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
 import copy
-
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
+from local_config import *
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w") as file:
@@ -111,7 +113,7 @@ def generate_thumbnails(session_dir):
                     main_logger.info("Thumbnails created for: {}".format(os.path.join(path, TEST_REPORT_NAME_COMPARED)))
 
 
-def build_session_report(report, session_dir):
+def build_session_report(report, session_dir, report_type):
     total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
 
     generate_thumbnails(session_dir)
@@ -147,7 +149,10 @@ def build_session_report(report, session_dir):
                     try:
                         report['machine_info'].update({'render_device': jtem['render_device']})
                         report['machine_info'].update({'tool': jtem['tool']})
-                        report['machine_info'].update({'render_version': jtem['render_version']})
+                        if report_type != 'ec':
+                            report['machine_info'].update({'render_version': jtem['render_version']})
+                        else:
+                            report['machine_info'].update({'minor_version': jtem['minor_version']})
                         report['machine_info'].update({'core_version': jtem['core_version']})
                     except Exception as err:
                         main_logger.warning(str(err))
@@ -206,11 +211,13 @@ def build_summary_report(work_dir):
                                         if not temp_report['machine_info'][key] in common_info[key]:
                                             common_info[key].append(temp_report['machine_info'][key])
                                 else:
-                                    common_info.update(
-                                        {'reporting_date': [temp_report['machine_info']['reporting_date']],
-                                         'render_version': [temp_report['machine_info']['render_version']],
-                                         'core_version': [temp_report['machine_info']['core_version']]
-                                         })
+                                    report['machine_info'].update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
+                                    
+                                    if report_type != 'ec':
+                                        report['machine_info'].update({'render_version': [temp_report['machine_info']['render_version']]})
+                                    else:
+                                        report['machine_info'].update({'minor_version': [temp_report['machine_info']['minor_version']]})
+                                    report['machine_info'].update({'core_version': [temp_report['machine_info']['core_version']]})
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
                                     for group_report_file in REPORT_FILES:
@@ -312,7 +319,7 @@ def build_compare_report(summary_report):
     return compare_report, hardware
 
 
-def build_local_reports(work_dir, summary_report, common_info):
+def build_local_reports(work_dir, summary_report, common_info, report_type):
     # TODO: inherit local_template from base_template
     work_dir = os.path.abspath(work_dir)
 
@@ -332,9 +339,6 @@ def build_local_reports(work_dir, summary_report, common_info):
                 for config in summary_report[execution]['results'][test]:
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
 
-                    # TODO: refactor it
-                    baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
-                    baseline_report = []
                     render_report = []
 
                     if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
@@ -345,21 +349,34 @@ def build_local_reports(work_dir, summary_report, common_info):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
 
-                    if os.path.exists(baseline_report_path):
-                        with open(baseline_report_path, 'r') as file:
-                            baseline_report = json.loads(file.read())
-                            for render_item in render_report:
-                                try:
-                                    baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
-                                    render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                except IndexError:
-                                    pass
+                    # for core baseline_render_time initialize via compareByJson script
+                    if report_type != 'ec':
+                        baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
+                        baseline_report = []
+
+                        if os.path.exists(baseline_report_path):
+                            with open(baseline_report_path, 'r') as file:
+                                baseline_report = json.loads(file.read())
+                                for render_item in render_report:
+                                    try:
+                                        baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
+                                        render_item.update({'baseline_render_time': baseline_item['render_time']})
+                                    except IndexError:
+                                        pass
 
                     try:
-                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['render_version']),
+                        # if tests job isn't converter its tests repository doesn't contains original_render attribute
+                        if report_type != 'ec':
+                            original_render = ''
+                            version_in_title = common_info['render_version']
+                        else:
+                            version_in_title = common_info['core_version']
+                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
                                                common_info=common_info,
                                                render_report=render_report,
-                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
+                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
+                                               report_type=report_type,
+                                               original_render=original_render)
                         save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
                     except Exception as err:
                         print(str(err))
@@ -402,16 +419,22 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                report=summary_report,
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
-                                               common_info=common_info)
+                                               common_info=common_info,
+                                               report_type=report_type)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
+            # if tests job isn't converter and its tests repository doesn't contains original_render attribute
+            if not hasattr(core.config, 'original_render'):
+                original_render = ''
             detailed_summary_html = detailed_summary_template.render(title=major_title + " " + execution,
                                                                      report=summary_report,
                                                                      pageID="summaryA",
                                                                      PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                                      common_info=common_info,
-                                                                     i=execution)
+                                                                     i=execution,
+                                                                     report_type=report_type,
+                                                                     original_render=original_render)
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
@@ -431,7 +454,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        performance_report_detail=performance_report_detail,
                                                        pageID="performanceA",
                                                        common_info=common_info,
-                                                       test_info=summary_info_for_report)
+                                                       test_info=summary_info_for_report,
+                                                       report_type=report_type)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))
@@ -447,11 +471,12 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                hardware=hardware,
                                                compare_report=compare_report,
                                                pageID="compareA",
-                                               common_info=common_info)
+                                               common_info=common_info,
+                                               report_type=report_type)
         save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         compare_html = "Error while building compare report: {}".format(str(err))
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
-    build_local_reports(work_dir, summary_report, common_info)
+    build_local_reports(work_dir, summary_report, common_info, report_type)

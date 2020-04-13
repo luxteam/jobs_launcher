@@ -80,23 +80,35 @@
 
     <table class="baseTable">
         <tr>
-            <th>Tool</th>
-            <th>Render device</th>
-            <th>Tests Package</th>
+            <th>Testing start</th>
+
+            {% if report_type == 'ec' %}
+            <!-- Core -->
+            <th>Major version</th>
+            <th>Minor version</th>
+            {% else %}
+            <!-- Default and converters -->
             <th>Plugin version</th>
             <th>Core version</th>
-            <th>Testing start</th>
+            {% endif %}
+            
             <th>Branch name</th>
             <th>Commit SHA</th>
             <th>Commit message</th>
         </tr>
         <tr>
-            <td>{{ common_info.tool }}</td>
-            <td>{{ common_info.render_device }}</td>
-            <td>{{ common_info.test_group }}</td>
+            <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
+
+            {% if 'minor_version' in common_info %}
+            <!-- Core -->
+            <td>{{ common_info.core_version }}</td>
+            <td>{{ common_info.minor_version }}</td>
+            {% else %}
+            <!-- Default and converters -->
             <td>{{ common_info.render_version }}</td>
             <td>{{ common_info.core_version }}</td>
-            <td>{{ common_info.testing_start }}</td>
+            {% endif %}
+
             <td>{{ common_info.branch_name }}</td>
             <td>{{ common_info.commit_sha }}</td>
             <td>{{ common_info.commit_message }}</td>
@@ -139,91 +151,238 @@
                data-show-multi-sort="true">
 
             <thead>
-                <tr>
-                    <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true" data-visible="false">Test case</th>
-                    <th data-field="test_case_copy" data-halign="center" data-valign="middle" data-sortable="true" data-events="copyTestCaseName">
-                        Test case
-                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
-                    </th>
-                    <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline</th>
-                    <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered</th>
-                    <th data-filed="info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
-<!--                    <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>-->
-                    <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
-                        Diff new
-                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+            <tr>
+                <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true" data-visible="false">Test case</th>
+                <th data-field="test_case_copy" data-halign="center" data-valign="middle" data-sortable="true" data-events="copyTestCaseName">
+                    Test case
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
+                </th>
+
+                <!-- Baselines and results -->
+                {% if report_type == 'default' or report_type == 'ec' %}
+                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
+                <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+                {% elif report_type == 'ct' %}
+                <th data-field="original_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+                <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR Baseline</th>
+                <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">RPR</th>
+                {% endif %}
+
+                {% if report_type == 'default' or report_type == 'ec' %}
+                <th data-filed="info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
+                {% endif %}
+
+                <th data-field="time_diff" 
+                {% if report_type == 'default' %}
+                    data-visible="true"
+                {% elif report_type == 'ec' %}
+                    data-visible="true"
+                {% elif report_type == 'ct' %}
+                    data-visible="true"
+                {% endif %}
+                data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
+
+                <!-- Other info -->
+                {% if report_type == 'default' %}
+                <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
+                    Diff new
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
 [-1] - images has diff resolution, so couldn't be compared."></span>
-                    </th>
-                    <th data-field="time_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
-                    <th data-filed="render_log" data-valign="middle">Render log</th>
-                    <th data-field="test_status" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-sorter="statusSorter">Test status
-                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[Failed] status means that pixel difference with baseline image is too large.
+                </th>
+                {% elif report_type == 'ec' %}
+                <th data-field="render_vram" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Render GPU RAM, Mb</th>
+                <th data-field="baseline_vram" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Baseline GPU RAM, Mb</th>
+                <th data-field="vram_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">GPU RAM diff, %</th>
+                <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                {% elif report_type == 'ct' %}
+                <th data-field="pix_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Pixel diff, %</th>
+                {% endif %}
+
+                <th data-field="test_status"
+                {% if report_type == 'default' %}
+                    data-visible="false"
+                {% elif report_type == 'ec' %}
+                    data-visible="false"
+                {% elif report_type == 'ct' %}
+                    data-visible="true"
+                {% endif %}
+                data-halign="center" data-valign="middle" data-sortable="true">Test status
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[Failed] status means that pixel difference with baseline image is too large.
 [Error] status means fatal error during render, terminating by timeout, or case wasn't launched at all.
 [Skipped] status means case wasn't launched by QA team decision."></span>
-                    </th>
-                    <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
-                    <th data-field="baseline_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline time</th>
-                </tr>
+                </th>
+
+                <!-- Render time -->
+                {% if report_type == 'default' or report_type == 'ec' %}
+                <th data-field="render_time" 
+                {% if report_type == 'default' %}
+                    data-visible="false"
+                {% elif report_type == 'ec' %}
+                    data-visible="false"
+                {% endif %}
+                data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
+                <th data-field="baseline_render_time"
+                {% if report_type == 'default' %}
+                    data-visible="false"
+                {% elif report_type == 'ec' %}
+                    data-visible="false"
+                {% endif %}
+                data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
+                {% elif report_type == 'ct' %}
+                <th data-field="original_time" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">{{ original_render | title }} render time</th>
+                <th data-field="baseline_render_time" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
+                <th data-field="render_time" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">RPR render time</th>
+                {% endif %}
+
+                <th data-filed="render_log"
+                {% if report_type == 'default' %}
+                    data-visible="true"
+                {% elif report_type == 'ec' %}
+                    data-visible="true"
+                {% elif report_type == 'ct' %}
+                    data-visible="true"
+                {% endif %}
+                data-halign="center" data-valign="middle">Log files</th>
+            </tr>
             </thead>
             <tbody>
             {% for item in render_report %}
-                <tr>
-                    <td>{{ item.test_case }}</td>
-                    <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
+            <tr>
+                <td>{{ item.test_case }}</td>
+                <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
 
-                    <td class="hatching">
-                    {% if item.baseline_color_path %}
-                        {% if 'thumb256_baseline_color_path' in item %}
-                        <img data-src="{{ item.thumb256_baseline_color_path }}"/>
-                        {% else %}
-                        <img data-src="{{ item.baseline_color_path }}"/>
-                        {% endif %}
+                <!-- Baselines and results -->
+                {% if report_type == 'default' or report_type == 'ec' %}
+                <td class="hatching">
+                {% if item.baseline_color_path %}
+                    {% if 'thumb64_baseline_color_path' in item %}
+                    <img data-src="{{ item.thumb64_baseline_color_path }}"/>
                     {% else %}
-                        Not compared
+                    <img data-src="{{ item.baseline_color_path }}"/>
                     {% endif %}
-                    </td>
+                {% else %}
+                    Not compared
+                {% endif %}
+                </td>
+                <td class="hatching">
+                    {% if 'thumb64_render_color_path' in item %}
+                    <img data-src="{{ item.thumb64_render_color_path }}"/>
+                    {% else %}
+                    <img data-src="{{ item.render_color_path }}"/>
+                    {% endif %}
+                </td>
+                {% elif report_type == 'ct' %}
+                <td class="hatching">
+                {% if item.original_color_path %}
+                    {% if 'thumb64_original_color_path' in item %}
+                    <img data-src="{{ item.thumb64_original_color_path }}"/>
+                    {% else %}
+                    <img data-src="{{ item.original_color_path }}"/>
+                    {% endif %}
+                {% else %}
+                    Not compared
+                {% endif %}
+                </td>
+                <td class="hatching">
+                {% if item.baseline_color_path %}
+                    {% if 'thumb64_baseline_color_path' in item %}
+                    <img data-src="{{ item.thumb64_baseline_color_path }}"/>
+                    {% else %}
+                    <img data-src="{{ item.baseline_color_path }}"/>
+                    {% endif %}
+                {% else %}
+                    Not compared
+                {% endif %}
+                </td>
+                <td class="hatching">
+                    {% if 'thumb64_render_color_path' in item %}
+                    <img data-src="{{ item.thumb64_render_color_path }}"/>
+                    {% else %}
+                    <img data-src="{{ item.render_color_path }}"/>
+                    {% endif %}
+                </td>
+                {% endif %}
 
-                    <td class="hatching">
-                        {% if 'thumb256_render_color_path' in item %}
-                        <img data-src="{{ item.thumb256_render_color_path }}"/>
-                        {% else %}
-                        <img data-src="{{ item.render_color_path }}"/>
-                        {% endif %}
-                    </td>
+                {% if report_type == 'default' or report_type == 'ec' %}
+                <td class="infoColumn
+                {%- if item.difference_time > 5 %}
+                   {{ ' ' }}timeDiffFailedStatus
+                {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
+                    <b>Scene:</b> {{ item.scene_name }}<br/>
+                    <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
+                    <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
+                    <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
+                    <b>Test info:</b><br/>
+                    {% for param in item.script_info %}
+                        {{ param }}<br/>
+                    {% endfor %}
+                </td>
+                {% endif %}
 
-                    <td class="infoColumn
-                    {%- if item.difference_time > 5 %}
-                       {{ ' ' }}timeDiffFailedStatus
-                    {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
-                        <b>Scene:</b> {{ item.scene_name }}<br/>
-                        <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
-                        <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
-                        <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
-                        <b>Test info:</b><br/>
-                        {% for param in item.script_info %}
-                            {{ param }}<br/>
-                        {% endfor %}
-                    </td>
-<!--                    <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>-->
-                    <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
-                    <td {%- if 5 < item.difference_time %}
+                <!--TODO: 5% to conf CONSTS-->
+                <td {%- if 5 < item.difference_time %}
                         class="timeWorseStatus"
                     {% elif item.difference_time < -5 %}
                         class="timeBetterStatus"
                     {% endif -%}
-                        >{{ item.difference_time | round(2) }}</td>
-                    <td>
-                        {%- if 'render_log' in item %}
-                        <a href="{{ item.render_log }}">Render log</a>
-                        {% else %}
-                        <a href="renderTool.log">Render log</a>
-                        {% endif -%}
-                    </td>
-                    <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
-                    <td>{{ item.render_time }}</td>
-                    <td>{{ item.baseline_render_time }}</td>
-                </tr>
+                    >
+                    {{ item.difference_time | round (2) }}</td>
+
+                <!-- Other info -->
+                {% if report_type == 'default' %}
+                <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
+                {% elif report_type == 'ec' %}
+                <td>{{ item.gpu_memory_usage }}</td>
+                <td>{{ item.baseline_gpu_memory_usage }}</td>
+                <!--TODO: 5% to conf CONSTS-->
+                <td {%- if 5 < item.difference_vram %}
+                        class="timeWorseStatus"
+                    {% elif item.difference_vram < -5 %}
+                        class="timeBetterStatus"
+                    {% endif -%}
+                    >
+                    {{ item.difference_vram }}</td>
+                <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
+                {% elif report_type == 'ct' %}
+                <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
+                {% endif %}
+
+                <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+
+                <!-- Render time -->
+                {% if report_type == 'default' or report_type == 'ec' %}
+                <td>{{ item.render_time | round(2) }}</td>
+                <td>{{ item.baseline_render_time | round(2) }}</td>
+                {% elif report_type == 'ct' %}
+                <td>{{ item.or_render_time }}</td>
+                <td>{{ item.baseline_render_time }}</td>
+                <td>{{ item.render_time }}</td>
+                {% endif %}
+
+                <!-- Log files -->
+                {% if report_type == 'default' %}
+                <td>
+                    {%- if 'render_log' in item %}
+                    <a href="{{ item.render_log }}">Render log</a>
+                    {% else %}
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a>
+                    {% endif -%}
+                </td>
+                {% elif report_type == 'ec' %}
+                <td>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/tahoe.log">tahoe Log</a>
+                </td>
+                {% elif report_type == 'ct' %}
+                <td>
+                    <!--TODO: get render path from json-->
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.conversion.log">Conversion log</a><br/>
+                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">RPR Log</a>
+                </td>
+                {% endif %}
+
+            </tr>
             {% endfor %}
             </tbody>
         </table>
