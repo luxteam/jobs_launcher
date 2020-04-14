@@ -1,6 +1,6 @@
 import os
 import json
-import CompareMetrics
+import CompareMetrics_ct
 import shutil
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
@@ -34,7 +34,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
             metrics = None
             try:
-                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                metrics = CompareMetrics_ct.CompareMetrics(render_img_path, baseline_img_path)
             except (FileNotFoundError, OSError) as err:
                 core.config.main_logger.error(str(err))
                 return img
