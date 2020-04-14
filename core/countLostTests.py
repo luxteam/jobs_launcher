@@ -2,6 +2,11 @@ import ast
 import os
 import json
 from core.config import *
+import sys
+import argparse
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
+from local_config import *
 
 
 # match gpu and OS labels in Jenkins and platform name which session_report.json contains
@@ -73,10 +78,15 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 			gpu_name = lost_test_result.split('-')[0]
 			os_name = lost_test_result.split('-')[1]
 			test_package_name = lost_test_result.split('-')[2]
-			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME), "r") as file:
+			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 				data = json.load(file)
 			# number of lost tests = number of tests in test package
-			lost_tests_count = len(data)
+			if tool_name == 'blender' or tool_name == 'maya':
+				lost_tests_count = len(data)
+			elif tool_name == 'max':
+				lost_tests_count = len(data['cases'])
+			else:
+				raise Exception('Unexpected tool name: ' + tool_name)
 			# join converted gpu name and os name
 			joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 			if joined_gpu_os_names not in lost_tests_data:

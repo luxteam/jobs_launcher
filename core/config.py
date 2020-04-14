@@ -95,7 +95,11 @@ COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'
 
-TEST_CASES_JSON_NAME = 'test_cases.json'
+TEST_CASES_JSON_NAME = {
+        'blender': 'test_cases.json',
+        'maya': 'test_cases.json',
+        'max': 'case_list.json'
+    }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 
 DONT_COMPARE = "Do not compare"
