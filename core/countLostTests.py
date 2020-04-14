@@ -38,19 +38,22 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 	lost_tests_results = ast.literal_eval(lost_tests_results)
 
 	# check that session_reports is in each results directory
-	results_directories = next(os.walk(os.path.abspath(output_dir)))[1]
-	for results_directory in results_directories:
-		session_report_exist = False
-		for path, dirs, files in os.walk(os.path.abspath(os.path.join(output_dir, results_directory))):
-			for file in files:
-				if file.endswith(SESSION_REPORT):
-					session_report_exist = True
+	try:
+		results_directories = next(os.walk(os.path.abspath(output_dir)))[1]
+		for results_directory in results_directories:
+			session_report_exist = False
+			for path, dirs, files in os.walk(os.path.abspath(os.path.join(output_dir, results_directory))):
+				for file in files:
+					if file.endswith(SESSION_REPORT):
+						session_report_exist = True
+						break
+				if session_report_exist:
 					break
-			if session_report_exist:
-				break
-		if not session_report_exist:
-			lost_tests_results.append(results_directory)
-
+			if not session_report_exist:
+				lost_tests_results.append(results_directory)
+	except:
+		# all results were lost
+		pass
 
 	if is_regression == 'true':
 		with open(os.path.join(tests_dir, "jobs", "regression.json"), "r") as file:
