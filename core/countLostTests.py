@@ -59,7 +59,7 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 		with open(os.path.join(tests_dir, "jobs", "regression.json"), "r") as file:
 			test_packages = json.load(file)
 		for test_package_name in test_packages:
-			lost_tests_count = len(test_packages[test_package_name].split(','))
+			lost_tests_count = len(set(test_packages[test_package_name].split(',')))
 			for lost_test_result in lost_tests_results:
 				gpu_name = lost_test_result.split('-')[0]
 				os_name = lost_test_result.split('-')[1]
