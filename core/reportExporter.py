@@ -211,13 +211,13 @@ def build_summary_report(work_dir):
                                         if not temp_report['machine_info'][key] in common_info[key]:
                                             common_info[key].append(temp_report['machine_info'][key])
                                 else:
-                                    report['machine_info'].update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
+                                    common_info.update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
                                     
                                     if report_type != 'ec':
-                                        report['machine_info'].update({'render_version': [temp_report['machine_info']['render_version']]})
+                                        common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
                                     else:
-                                        report['machine_info'].update({'minor_version': [temp_report['machine_info']['minor_version']]})
-                                    report['machine_info'].update({'core_version': [temp_report['machine_info']['core_version']]})
+                                        common_info.update({'minor_version': [temp_report['machine_info']['minor_version']]})
+                                    common_info.update({'core_version': [temp_report['machine_info']['core_version']]})
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
                                     for group_report_file in REPORT_FILES:
@@ -382,6 +382,7 @@ def build_local_reports(work_dir, summary_report, common_info):
                         print(str(err))
                         main_logger.error(str(err))
     except Exception as err:
+        print(str(err))
         main_logger.error(str(err))
 
 
