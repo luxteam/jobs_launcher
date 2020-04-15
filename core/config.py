@@ -1,7 +1,7 @@
-import core.engine_logger
+from . import engine_logger
 
 
-main_logger = core.engine_logger.create_main_logger()
+main_logger = engine_logger.create_main_logger()
 
 RENDER_REPORT_BASE = {
     "file_name": "",
