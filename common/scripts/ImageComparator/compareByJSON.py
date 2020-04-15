@@ -2,6 +2,7 @@ import sys
 import argparse
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir, os.path.pardir)))
 import common.scripts.ImageComparator.compareByJSON_default as compareByJSON_default
 import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON_ct
 import common.scripts.ImageComparator.compareByJSON_ec as compareByJSON_ec
@@ -22,6 +23,7 @@ def createArgParser():
         argparser.add_argument('--vram_diff_max', required=False, default=core.config.VRAM_DIFF_MAX)
     return argparser
 
+
 if __name__ == '__main__':
     args = createArgParser().parse_args()
     if report_type == 'default':
@@ -30,4 +32,4 @@ if __name__ == '__main__':
         compareByJSON_ct.main(args)
     elif report_type == 'ec':
         compareByJSON_ec.main(args)
-    
+
