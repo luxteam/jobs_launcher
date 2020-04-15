@@ -366,7 +366,7 @@ def build_local_reports(work_dir, summary_report, common_info):
 
                     try:
                         # if tests job isn't converter its tests repository doesn't contains original_render attribute
-                        if report_type != 'ec':
+                        if report_type != 'ct':
                             original_render = ''
                             version_in_title = common_info['render_version']
                         else:
@@ -424,8 +424,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
-            # if tests job isn't converter and its tests repository doesn't contains original_render attribute
-            if not hasattr(core.config, 'original_render'):
+            if report_type != 'ct':
                 original_render = ''
             detailed_summary_html = detailed_summary_template.render(title=major_title + " " + execution,
                                                                      report=summary_report,
