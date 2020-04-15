@@ -3,9 +3,6 @@ import argparse
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir, os.path.pardir)))
-import common.scripts.ImageComparator.compareByJSON_default as compareByJSON_default
-import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON_ct
-import common.scripts.ImageComparator.compareByJSON_ec as compareByJSON_ec
 import core.config
 from local_config import *
 
@@ -27,9 +24,9 @@ def createArgParser():
 if __name__ == '__main__':
     args = createArgParser().parse_args()
     if report_type == 'default':
-        compareByJSON_default.main(args)
+        import common.scripts.ImageComparator.compareByJSON_default as compareByJSON
     elif report_type == 'ct':
-        compareByJSON_ct.main(args)
+        import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON
     elif report_type == 'ec':
-        compareByJSON_ec.main(args)
-
+        import common.scripts.ImageComparator.compareByJSON_ec as compareByJSON
+    compareByJSON.main(args)
