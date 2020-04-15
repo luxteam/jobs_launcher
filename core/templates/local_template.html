@@ -83,11 +83,11 @@
             <th>Testing start</th>
 
             {% if report_type == 'ec' %}
-            <!-- Core -->
+            {# Core #}
             <th>Major version</th>
             <th>Minor version</th>
             {% else %}
-            <!-- Default and converters -->
+            {# Default and converters #}
             <th>Plugin version</th>
             <th>Core version</th>
             {% endif %}
@@ -100,11 +100,11 @@
             <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
 
             {% if 'minor_version' in common_info %}
-            <!-- Core -->
+            {# Core #}
             <td>{{ common_info.core_version }}</td>
             <td>{{ common_info.minor_version }}</td>
             {% else %}
-            <!-- Default and converters -->
+            {# Default and converters #}
             <td>{{ common_info.render_version }}</td>
             <td>{{ common_info.core_version }}</td>
             {% endif %}
@@ -158,7 +158,7 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
                 </th>
 
-                <!-- Baselines and results -->
+                {# Baselines and results #}
                 {% if report_type == 'default' or report_type == 'ec' %}
                 <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
                 <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
@@ -182,7 +182,7 @@
                 {% endif %}
                 data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
 
-                <!-- Other info -->
+                {# Other info #}
                 {% if report_type == 'default' %}
                 <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
                     Diff new
@@ -213,7 +213,7 @@
 [Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
 
-                <!-- Render time -->
+                {# Render time #}
                 {% if report_type == 'default' or report_type == 'ec' %}
                 <th data-field="render_time" 
                 {% if report_type == 'default' %}
@@ -252,7 +252,7 @@
                 <td>{{ item.test_case }}</td>
                 <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
 
-                <!-- Baselines and results -->
+                {# Baselines and results #}
                 {% if report_type == 'default' or report_type == 'ec' %}
                 <td class="hatching">
                 {% if item.baseline_color_path %}
@@ -329,7 +329,7 @@
                     >
                     {{ item.difference_time | round (2) }}</td>
 
-                <!-- Other info -->
+                {# Other info #}
                 {% if report_type == 'default' %}
                 <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
                 {% elif report_type == 'ec' %}
@@ -350,7 +350,7 @@
 
                 <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
 
-                <!-- Render time -->
+                {# Render time #}
                 {% if report_type == 'default' or report_type == 'ec' %}
                 <td>{{ item.render_time | round(2) }}</td>
                 <td>{{ item.baseline_render_time | round(2) }}</td>
@@ -360,7 +360,7 @@
                 <td>{{ item.render_time }}</td>
                 {% endif %}
 
-                <!-- Log files -->
+                {# Log files #}
                 {% if report_type == 'default' %}
                 <td>
                     {%- if 'render_log' in item %}

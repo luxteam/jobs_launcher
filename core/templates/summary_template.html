@@ -86,7 +86,6 @@
         <thead>
             <tr>
                 <th>Test package name</th>
-<!--                <th>Config</th>-->
                 <th>Host</th>
                 <th>Local report</th>
                 <th>Tool's log</th>
@@ -116,8 +115,6 @@
             <tr>
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
-<!--                <td>{{ test_conf }}</td>-->
-
                 <td>
                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
                     <div class="popup" id="machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}">
