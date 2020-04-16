@@ -370,15 +370,12 @@
                     {% endif -%}
                 </td>
                 {% elif report_type == 'ec' %}
-                <td>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/tahoe.log">tahoe Log</a>
-                </td>
+                <td><a href="{{ item.test_case }}.log">tahoe.log</a></td>
                 {% elif report_type == 'ct' %}
                 <td>
-                    <!--TODO: get render path from json-->
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.conversion.log">Conversion log</a><br/>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">RPR Log</a>
+                    <a href="{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
+                    <a href="{{ item.scene_name }}.conversion.log">Conversion log</a><br/>
+                    <a href="renderTool.log">RPR log</a>
                 </td>
                 {% endif %}
 
