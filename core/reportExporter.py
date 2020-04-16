@@ -365,12 +365,14 @@ def build_local_reports(work_dir, summary_report, common_info):
                                         pass
 
                     try:
-                        # if tests job isn't converter its tests repository doesn't contains original_render attribute
-                        if report_type != 'ct':
-                            original_render = ''
+                        # choose right plugin version based on building report type
+                        if report_type != 'ec':
                             version_in_title = common_info['render_version']
                         else:
                             version_in_title = common_info['core_version']
+                        # if tests job isn't converter its tests repository doesn't contains original_render attribute
+                        if report_type != 'ct':
+                            original_render = ''
                         html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
                                                common_info=common_info,
                                                render_report=render_report,
