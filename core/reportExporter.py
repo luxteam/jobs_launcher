@@ -335,6 +335,12 @@ def build_local_reports(work_dir, summary_report, common_info):
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+    # check that original_render variable exists
+    if not 'original_render' in globals():
+        original_render = ''
+    env.globals.update({'original_render': original_render,
+                        'report_type': report_type,
+                        'pre_path': '.'})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
@@ -377,15 +383,10 @@ def build_local_reports(work_dir, summary_report, common_info):
                         version_in_title = common_info['render_version']
                     else:
                         version_in_title = common_info['core_version']
-                    # if tests job isn't converter its tests repository doesn't contains original_render attribute
-                    if report_type != 'ct':
-                        original_render = ''
                     html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
                                            common_info=common_info,
                                            render_report=render_report,
-                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
-                                           report_type=report_type,
-                                           original_render=original_render)
+                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
                     save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
@@ -407,6 +408,12 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+    # check that original_render variable exists
+    if not 'original_render' in globals():
+        original_render = ''
+    env.globals.update({'original_render': original_render,
+                        'report_type': report_type,
+                        'pre_path': '.'})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
@@ -426,21 +433,16 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                report=summary_report,
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
-                                               common_info=common_info,
-                                               report_type=report_type)
+                                               common_info=common_info)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
-            if report_type != 'ct':
-                original_render = ''
             detailed_summary_html = detailed_summary_template.render(title=major_title + " " + execution,
                                                                      report=summary_report,
                                                                      pageID="summaryA",
                                                                      PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                                      common_info=common_info,
-                                                                     i=execution,
-                                                                     report_type=report_type,
-                                                                     original_render=original_render)
+                                                                     i=execution)
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         summary_html = "Error while building summary report: {}".format(str(err))
@@ -460,8 +462,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        performance_report_detail=performance_report_detail,
                                                        pageID="performanceA",
                                                        common_info=common_info,
-                                                       test_info=summary_info_for_report,
-                                                       report_type=report_type)
+                                                       test_info=summary_info_for_report)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         performance_html = "Error while building performance report: {}".format(str(err))
@@ -477,8 +478,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                hardware=hardware,
                                                compare_report=compare_report,
                                                pageID="compareA",
-                                               common_info=common_info,
-                                               report_type=report_type)
+                                               common_info=common_info)
         save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         compare_html = "Error while building compare report: {}".format(str(err))
