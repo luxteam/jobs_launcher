@@ -11,6 +11,7 @@ from core.config import *
 from core.auto_dict import AutoDict
 import copy
 import sys
+import traceback
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 from local_config import *
 
@@ -54,6 +55,7 @@ def make_base64_img(session_dir, report):
                             src = "data:image/jpeg;base64," + str(code)[2:-1]
                             test_execution.update({img: src})
                         except Exception as err:
+                            traceback.print_exc()
                             main_logger.error('Error in base64 encoding: {}'.format(str(err)))
 
     return report
@@ -103,6 +105,7 @@ def generate_thumbnails(session_dir):
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
                             except Exception as err:
+                                print("Thumbnail didn't created: json_report - {}, test - {}, img_key - {}".format(json_report, test, img_key))
                                 main_logger.error("Thumbnail didn't created: {}".format(str(err)))
                             else:
                                 test.update({'thumb64_' + img_key: os.path.relpath(thumb64_path, path)})
@@ -126,6 +129,7 @@ def build_session_report(report, session_dir):
                 with open(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED), 'r') as file:
                     current_test_report = json.loads(file.read())
             except Exception as err:
+                print("Excepted 'report_compare.json' not found for {} {}".format(result, item))
                 main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
                 report['results'][result][item].update({'render_duration': -0.0})
@@ -155,6 +159,7 @@ def build_session_report(report, session_dir):
                             report['machine_info'].update({'minor_version': jtem['minor_version']})
                         report['machine_info'].update({'core_version': jtem['core_version']})
                     except Exception as err:
+                        print("Exception while updating machine_info in session_report")
                         main_logger.warning(str(err))
 
                     report['results'][result][item]['total'] += report['results'][result][item]['passed'] + \
@@ -163,6 +168,7 @@ def build_session_report(report, session_dir):
                                                                report['results'][result][item]['error']
                     # unite launcher report and render report
                 except Exception as err:
+                    traceback.print_exc()
                     main_logger.error('Exception while update render report {}'.format(str(err)))
                     render_duration = -0.0
 
@@ -229,6 +235,7 @@ def build_summary_report(work_dir):
                                         work_dir)}
                                 )
                     except Exception as err:
+                        traceback.print_exc()
                         main_logger.error(str(err))
 
                     if basename in summary_report.keys():
@@ -314,6 +321,7 @@ def build_compare_report(summary_report):
                             if img_key in item.keys():
                                 compare_report[item['test_case']].update({hw_bsln: item[img_key]})
                     except KeyError as err:
+                        print("Missed testcase detected: platform - {}, test_package - {}, test_config - {}, item - {}".format(platform, test_package, test_config, item))
                         main_logger.error("Missed testcase detected {}".format(str(err)))
 
     return compare_report, hardware
@@ -364,27 +372,23 @@ def build_local_reports(work_dir, summary_report, common_info):
                                     except IndexError:
                                         pass
 
-                    try:
-                        # choose right plugin version based on building report type
-                        if report_type != 'ec':
-                            version_in_title = common_info['render_version']
-                        else:
-                            version_in_title = common_info['core_version']
-                        # if tests job isn't converter its tests repository doesn't contains original_render attribute
-                        if report_type != 'ct':
-                            original_render = ''
-                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
-                                               common_info=common_info,
-                                               render_report=render_report,
-                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
-                                               report_type=report_type,
-                                               original_render=original_render)
-                        save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
-                    except Exception as err:
-                        print(str(err))
-                        main_logger.error(str(err))
+                    # choose right plugin version based on building report type
+                    if report_type != 'ec':
+                        version_in_title = common_info['render_version']
+                    else:
+                        version_in_title = common_info['core_version']
+                    # if tests job isn't converter its tests repository doesn't contains original_render attribute
+                    if report_type != 'ct':
+                        original_render = ''
+                    html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
+                                           common_info=common_info,
+                                           render_report=render_report,
+                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
+                                           report_type=report_type,
+                                           original_render=original_render)
+                    save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
     except Exception as err:
-        print(str(err))
+        traceback.print_exc()
         main_logger.error(str(err))
 
 
