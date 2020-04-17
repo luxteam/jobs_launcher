@@ -59,10 +59,9 @@
         <td>{{ item.render_time | round(2) }}</td>
         <td>{{ item.baseline_render_time | round(2) }}</td>
 
-        <!--TODO: 5% to conf CONSTS-->
-        <td {%- if 5 < item.difference_time %}
+        <td {%- if config.TIME_DIFF_MAX < item.difference_time %}
                 class="timeWorseStatus"
-            {% elif item.difference_time < -5 %}
+            {% elif item.difference_time < -config.TIME_DIFF_MAX %}
                 class="timeBetterStatus"
             {% endif -%}
             >
@@ -96,7 +95,7 @@
             {%- if 'render_log' in item %}
             <a href="{{ item.render_log }}">Render log</a>
             {% else %}
-            <a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a>
+            <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">Render Log</a>
             {% endif -%}
         </td>
 

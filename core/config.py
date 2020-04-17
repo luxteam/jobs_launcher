@@ -117,3 +117,6 @@ COMPARE_REPORT = 'compare_report.json'
 COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'
+REPORT_CONVERSION_LOG = 'conversion.log'
+REPORT_RPR_LOG = 'renderTool.log'
+

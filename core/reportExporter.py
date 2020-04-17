@@ -8,6 +8,7 @@ from codecs import open
 import datetime
 import operator
 from PIL import Image
+import core.config as config
 from core.config import *
 from core.auto_dict import AutoDict
 import copy
@@ -398,7 +399,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         original_render = ''
     env.globals.update({'original_render': original_render,
                         'report_type': report_type,
-                        'pre_path': '.'})
+                        'pre_path': '.',
+                        'config': config})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
