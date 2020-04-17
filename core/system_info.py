@@ -1,6 +1,5 @@
 #!usr/bin/env python3
 import os
-import sys
 import re
 import platform
 import subprocess
@@ -9,30 +8,55 @@ import cpuinfo
 
 
 def get_gpu():
+    """Get installed GPU by system tools.
+
+    Windows
+      Use **wmci** ignore 'Microsoft Remote Adapter' in case of RDP connection.
+      Remove **Nvidia** prefix from GPU name.
+    Linux
+      Use **clinfo**
+    Darwin
+      Use **system profiler** ignore integrated graphics by Intel.
+
+    :returns: GPU name defined by system tool | False
+    :rtype: str | bool
+
+    .. todo:: Implement mGPU support
+    """
     try:
+        render_device = os.getenv('CIS_RENDER_DEVICE')
+        if render_device:
+            return render_device
         operation_sys = platform.system()
         if operation_sys == "Windows":
             s = subprocess.Popen("wmic path win32_VideoController get name", stdout=subprocess.PIPE)
             stdout = s.communicate()
-            render_device = stdout[0].decode("utf-8").split('\n')[1].replace('\r', '').strip(' ')
+            render_device = [x.replace('\r', '').strip(' ') for x in stdout[0].decode("utf-8").split('\n')[1:] if x.replace('\r', '').strip(' ') and 'Microsoft' not in x][0]
+            render_device = render_device.replace('Nvidia ', '').replace('NVIDIA ', '')
         elif operation_sys == "Linux":
-            s = subprocess.Popen("""clinfo --raw | grep CL_DEVICE_BOARD_NAME | awk '{for(i=3;i<=NF;++i) printf "%s ", $i; print ""}'""", stdout=subprocess.PIPE, shell=True)
+            cli_command = """clinfo --raw | grep CL_DEVICE_BOARD_NAME | awk '{for(i=3;i<=NF;++i) printf "%s ", $i; print ""}'"""
+            s = subprocess.Popen(cli_command, stdout=subprocess.PIPE, shell=True)
             stdout = s.communicate()
             render_device = stdout[0].decode("utf-8").split('\n')[0].replace('\r', '').strip(' ')
         elif operation_sys == "Darwin":
-            s = subprocess.Popen("""system_profiler SPDisplaysDataType | grep Chipset\ Model | awk '{for(i=3;i<=NF;++i) printf "%s ", $i; print ""}' """, stdout=subprocess.PIPE, shell=True)
+            cli_command = """system_profiler SPDisplaysDataType | grep Chipset\ Model | awk '{for(i=3;i<=NF;++i) printf "%s ", $i; print ""}' """
+            s = subprocess.Popen(cli_command, stdout=subprocess.PIPE, shell=True)
             stdout = s.communicate()
-            render_device = stdout[0].decode("utf-8").split('\n')[0].replace('\r', '').strip(' ')
+            # FIXME: hot fix for eGPU
+            render_device = [x for x in stdout[0].decode("utf-8").split('\n') if "Intel" not in x and x][0].replace('\r', '').strip(' ')
     except Exception as err:
         print("ERROR during GPU detecting: {}".format(str(err)))
         return False
 
     return render_device
-    
+
 
 def get_machine_info():
 
     def get_os():
+        custom_os_name = os.getenv('CIS_OS')
+        if custom_os_name:
+            return custom_os_name
         if platform.system() == "Windows":
             return '{} {}({})'.format(platform.system(), platform.release(), platform.architecture()[0])
         elif platform.system() == "Darwin":
@@ -53,22 +77,11 @@ def get_machine_info():
         else:
             return "not_implemented_for_" + os.name
 
-    def get_gpu_name():
-        if os.name == "nt":
-            tool = os.path.join(os.path.dirname(os.path.realpath(__file__)), "gpu_name.py")
-            proc = subprocess.Popen([sys.executable, tool], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-            stdout, stderr = proc.communicate(10)
-            return stdout.decode().replace("\n", "").replace("\r", "")
-        else:
-            return "not_implemented_for_" + os.name
-
     def get_host():
         if platform.system() == "Darwin" and platform.node().endswith('.local'):
             return platform.node()[:-len('.local')]
         else:
             return platform.node()
-
 
     try:
         info = {}
@@ -89,4 +102,3 @@ def get_machine_info():
 
 def print_machine_info():
     info = get_machine_info();
-
