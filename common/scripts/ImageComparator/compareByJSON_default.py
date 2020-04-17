@@ -86,16 +86,12 @@ def main(args):
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
-        return
-
-    if not os.path.exists(args.base_dir):
-        core.config.main_logger.error("Baseline folder doesn't exist. It will be created with baseline stub img.")
-        os.makedirs(args.base_dir)
+        return 1
 
     try:
-        if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
+        if not os.path.exists(os.path.join(args.work_dir, 'baseline.png')):
             copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png'),
-                     os.path.join(args.base_dir, 'baseline.png'))
+                     os.path.join(args.work_dir, 'baseline.png'))
     except (OSError, FileNotFoundError) as err:
         core.config.main_logger.error("Couldn't copy baseline stub: {}".format(str(err)))
 
@@ -106,7 +102,7 @@ def main(args):
             for img in render_json:
                 img.update({'baseline_render_time': -0.0,
                             'difference_time': -0.0,
-                            'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, 'baseline.png'), args.work_dir)})
+                            'baseline_color_path': 'baseline.png'})
     except (FileNotFoundError, OSError) as err:
         core.config.main_logger.error("Can't read report.json: {}".format(str(err)))
     except json.JSONDecodeError as e:
@@ -117,8 +113,10 @@ def main(args):
 
     if not os.path.exists(baseline_json_manifest_path):
         core.config.main_logger.warning("Baseline manifest not found by path: {}".format(args.base_dir))
-        for img in render_json:
-            img.update({'test_status': core.config.TEST_DIFF_STATUS})
+        # "true" is define by Jenkins manual job. if updaterefs - not fail cases without baseline
+        if "true" not in os.getenv("UpdateRefs", "false"):
+            for img in render_json:
+                img.update({'test_status': core.config.TEST_DIFF_STATUS})
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
         exit(1)

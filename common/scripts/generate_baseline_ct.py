@@ -44,3 +44,7 @@ def main(args):
                                                 os.path.join(args.baseline_root, baseline_img_path))
                             except IOError as err:
                                 core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
+
+
+if __name__ == '__main__':
+    main()

@@ -124,6 +124,7 @@ def main():
         main_logger.info('Started job: {}'.format(found_job[0]))
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
+        main_logger.info("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
         report['results'][found_job[0]][' '.join(found_job[1])] = {
             'result_path': '', 'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0
         }
@@ -132,9 +133,11 @@ def main():
         for i in range(len(found_job[3])):
             if (args.execute_stages and str(i + 1) in args.execute_stages) or not args.execute_stages:
                 print("  Executing job {}/{}".format(i+1, len(found_job[3])))
+                main_logger.info("  Executing job {}/{}".format(i+1, len(found_job[3])))
                 report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
                     jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
+        main_logger.newline()
 
     # json_report = json.dumps(report, indent = 4)
     # print(json_report)
