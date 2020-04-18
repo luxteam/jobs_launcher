@@ -50,6 +50,9 @@ window.openFullImgSize = {
 
         document.getElementById("imgsCompareTable").style.display = "";
         document.getElementById("imgsDiffTable").style.display = "none";
+        document.getElementById('imgsDiffTable').is_reshalla = undefined;
+        document.getElementById('thresholdRange').style.display = "none";
+        document.getElementById('thresholdView').style.display = "none";
 
         openModalWindow('imgsModal');
     }
