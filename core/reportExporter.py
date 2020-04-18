@@ -379,7 +379,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', original_render=''):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
@@ -396,6 +396,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     )
     # check that original_render variable exists
     if not 'original_render' in globals():
+        global original_render
         original_render = ''
     env.globals.update({'original_render': original_render,
                         'report_type': report_type,

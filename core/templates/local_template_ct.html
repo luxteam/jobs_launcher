@@ -43,32 +43,22 @@
         {# Baselines and results #}
         <td class="hatching">
         {% if item.original_color_path %}
-            {% if 'thumb64_original_color_path' in item %}
-            <img data-src="{{ item.thumb64_original_color_path }}"/>
-            {% else %}
             <img data-src="{{ item.original_color_path }}"/>
-            {% endif %}
         {% else %}
             Not compared
         {% endif %}
         </td>
+
         <td class="hatching">
         {% if item.baseline_color_path %}
-            {% if 'thumb64_baseline_color_path' in item %}
-            <img data-src="{{ item.thumb64_baseline_color_path }}"/>
-            {% else %}
             <img data-src="{{ item.baseline_color_path }}"/>
-            {% endif %}
         {% else %}
             Not compared
         {% endif %}
         </td>
+
         <td class="hatching">
-            {% if 'thumb64_render_color_path' in item %}
-            <img data-src="{{ item.thumb64_render_color_path }}"/>
-            {% else %}
             <img data-src="{{ item.render_color_path }}"/>
-            {% endif %}
         </td>
 
         <td {%- if config.TIME_DIFF_MAX < item.difference_time %}
