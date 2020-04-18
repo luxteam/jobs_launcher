@@ -96,7 +96,7 @@
         {# Log files #}
         <td>
             <!--TODO: get render path from json-->
-            <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
+            <a href="{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
             <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.{{ config.REPORT_CONVERSION_LOG }}">Conversion log</a><br/>
             <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">RPR Log</a>
         </td>
