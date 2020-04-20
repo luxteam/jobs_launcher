@@ -48,8 +48,8 @@
         {# Baselines and results #}
         <td class="hatching">
         {% if item.baseline_color_path %}
-            {% if 'thumb64_baseline_color_path' in item %}
-            <img data-src="{{ item.thumb64_baseline_color_path }}"/>
+            {% if 'thumb256_baseline_color_path' in item %}
+            <img data-src="{{ item.thumb256_baseline_color_path }}"/>
             {% else %}
             <img data-src="{{ item.baseline_color_path }}"/>
             {% endif %}
@@ -58,8 +58,8 @@
         {% endif %}
         </td>
         <td class="hatching">
-            {% if 'thumb64_render_color_path' in item %}
-            <img data-src="{{ item.thumb64_render_color_path }}"/>
+            {% if 'thum256_render_color_path' in item %}
+            <img data-src="{{ item.thumb256_render_color_path }}"/>
             {% else %}
             <img data-src="{{ item.render_color_path }}"/>
             {% endif %}
