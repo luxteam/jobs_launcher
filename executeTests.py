@@ -13,7 +13,23 @@ from core.config import *
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
+from rbs_client import RBS_Client
+from rbs_client import logger as rbs_logger
+
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
+
+# create rbs client
+rbs_client = None
+try:
+    rbs_client = RBS_Client(
+        self.job_id = os.getenv("RBS_JOB_ID")
+        self.url = os.getenv("RBS_URL")
+        self.build_id = os.getenv("RBS_BUILD_ID")
+        self.env_label = os.getenv("RBS_ENV_LABEL")
+        self.suite_id = None)
+    rbs_logger.info("Client created")
+except Exception as e:
+    rbs_logger.error(f"Client creation error: {e}")
 
 
 def parse_cmd_variables(tests_root, cmd_variables):
@@ -100,6 +116,14 @@ def main():
     machine_info = core.system_info.get_machine_info()
     for mi in machine_info.keys():
         print('{0: <16}: {1}'.format(mi, machine_info[mi]))
+
+
+    # send machine info to rbs
+    if rbs_client:
+        rbs_client.define_environment({
+            "gpu": core.system_info.get_gpu(),
+            **machine_info
+            })
 
     found_jobs = []
     report = AutoDict()
