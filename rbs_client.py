@@ -22,6 +22,8 @@ class RBS_Client:
         self.build_id = build_id
         self.env_label = env_label
         self.suite_id = suite_id
+        self.headers = None
+        self.token = None
 
         # auth
         self.get_token()
