@@ -23,17 +23,33 @@ class Client:
         self.get_token()
 
     def get_token(self):
-        request = post(
+        response = post(
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth('dm1tryG', 'root'),
         )
 
-        token = json.loads(request.content)["token"]
+        token = json.loads(response.content)["token"]
         self.token = token
         self.headers = {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json"
         }
+
+    def get_suite_id_by_name(suite_name):
+        response = get(url="{url}/api/build?id={build_id}&jobId={job_id}".format(
+                url=self.url,
+                build_id=self.build_id,
+                job_id=self.job_id
+            )
+        )
+
+        try:
+            suites = [el['suite'] for el in json.loads(response.content)['suites'] if el['suite']['name'] == suite_name]
+            self.suite_id =  suites[0]['_id']
+        except Exception:
+            self.suite_id = None
+
+
 
     def send_test_suite(self, res, env):
         data = {
@@ -41,7 +57,7 @@ class Client:
             "environment": env,
             "env_label": self.env_label
         }
-        request = post(
+        response = post(
             headers=self.headers,
             data=json.dumps(data),
             url="{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(
@@ -51,16 +67,16 @@ class Client:
                 job_id=self.job_id
             )
         )
-        print(request.content)
+        print(response.content)
 
-        return request
+        return response
 
     def define_environment(self, env):
         data = {
             "env_label": self.env_label,
             "environment": env
         }
-        request = put(
+        response = put(
             headers=self.headers,
             data=json.dumps(data),
             url="{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(
@@ -70,4 +86,4 @@ class Client:
                 job_id=self.job_id
             )
         )
-        return request
+        return response
