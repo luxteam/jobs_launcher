@@ -22,10 +22,10 @@ SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 rbs_client = None
 try:
     rbs_client = RBS_Client(
-        job_id = os.getenv("RBS_JOB_ID")
-        url = os.getenv("RBS_URL")
-        build_id = os.getenv("RBS_BUILD_ID")
-        env_label = os.getenv("RBS_ENV_LABEL")
+        job_id = os.getenv("RBS_JOB_ID"),
+        url = os.getenv("RBS_URL"),
+        build_id = os.getenv("RBS_BUILD_ID"),
+        env_label = os.getenv("RBS_ENV_LABEL"),
         suite_id = None)
     rbs_logger.info("Client created")
 except Exception as e:
