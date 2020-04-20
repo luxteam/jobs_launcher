@@ -26,7 +26,10 @@ class RBS_Client:
         self.token = None
 
         # auth
-        self.get_token()
+        try:
+            self.get_token()
+        except Exception as e:
+            logger.error(str(e))
 
     def get_token(self):
         try:

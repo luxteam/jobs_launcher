@@ -14,8 +14,9 @@ import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
 from rbs_client import RBS_Client
-from rbs_client import logger as rbs_logger
+import logging
 
+rbs_logger = logging.getLogger("rbs")
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
 # create rbs client
