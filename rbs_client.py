@@ -39,6 +39,8 @@ class RBS_Client:
                 "Authorization": "Bearer " + token,
                 "Content-Type": "application/json"
             }
+
+            logger.info("Auth token")
         except Exception as e:
             logger.error(str(e))
 
@@ -54,6 +56,8 @@ class RBS_Client:
 
             suites = [el['suite'] for el in json.loads(response.content)['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
+            logger.info(f"Get suite id by name {suite_name}")
+
         except Exception as e:
             self.suite_id = None
             logger.error(str(e))
@@ -78,8 +82,10 @@ class RBS_Client:
                 )
             )
             logger.info(response.content)
+            logger.info('Test suite result sent.')
 
             return response
+
         except Exception as e:
             logger.error(str(e))
 
@@ -99,6 +105,8 @@ class RBS_Client:
                     job_id=self.job_id
                 )
             )
+            logger.info("Environment defined")
             return response
+
         except Exception as e:
             logger.error(str(e))
