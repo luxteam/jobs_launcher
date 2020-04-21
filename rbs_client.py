@@ -47,9 +47,9 @@ class RBS_Client:
                     url=self.url,
                     build_id=self.build_id,
                     job_id=self.job_id
-                )
+                ),
+                headers=self.headers
             )
-
             suites = [el['suite'] for el in json.loads(response.content)['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
             print("Get suite id by name {}".format(suite_name))
