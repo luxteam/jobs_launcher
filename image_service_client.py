@@ -22,12 +22,16 @@ class ISClient:
         }
 
     def send_image(self, path2img):
-        with open(path2img, 'rb') as img:
-            request = post(
-                url="{url}/api/".format(url=self.url),
-                files={
-                    'image': img
-                },
-                headers=self.headers
-            )
-        return json.loads(request.content)["image_id"]
+        try:
+            with open(path2img, 'rb') as img:
+                request = post(
+                    url="{url}/api/".format(url=self.url),
+                    files={
+                        'image': img
+                    },
+                    headers=self.headers
+                )
+            return json.loads(request.content)["image_id"]
+        except Exception as e:
+            print("Image sending error: {}".format(str(e)))
+            return None
