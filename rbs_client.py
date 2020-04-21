@@ -50,7 +50,7 @@ class RBS_Client:
             logger.error(str(e))
 
 
-    def get_suite_id_by_name(suite_name):
+    def get_suite_id_by_name(self, suite_name):
         try:
             response = get(url="{url}/api/build?id={build_id}&jobId={job_id}".format(
                     url=self.url,
