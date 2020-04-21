@@ -26,28 +26,19 @@ class RBS_Client:
         self.token = None
 
         # auth
-        try:
-            self.get_token()
-        except Exception as e:
-            logger.error(str(e))
+        self.get_token()
 
     def get_token(self):
-        try:
-            response = post(
-                url="{url}/user/login".format(url=self.url),
-                auth=HTTPBasicAuth('dm1tryG', 'root'),
-            )
+        response = post(
+            url="{url}/user/login".format(url=self.url),
+            auth=HTTPBasicAuth('dm1tryG', 'root'),
+        )
 
-            token = json.loads(response.content)["token"]
-            self.token = token
-            self.headers = {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
+        token = json.loads(response.content)["token"]
+        self.token = token
+        self.headers = {"Authorization": "Bearer " + token}
 
-            logger.info("Auth token")
-        except Exception as e:
-            logger.error(str(e))
+        print("Got auth token")
 
 
     def get_suite_id_by_name(self, suite_name):
@@ -61,11 +52,12 @@ class RBS_Client:
 
             suites = [el['suite'] for el in json.loads(response.content)['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
-            logger.info(f"Get suite id by name {suite_name}")
+            print("Get suite id by name {}".format(suite_name))
 
         except Exception as e:
             self.suite_id = None
-            logger.error(str(e))
+            print("Suite id getting error")
+            print(str(e))
 
 
 
@@ -86,13 +78,12 @@ class RBS_Client:
                     job_id=self.job_id
                 )
             )
-            logger.info(response.content)
-            logger.info('Test suite result sent.')
+            print('Test suite result sent with code {}'.format(response.status_code))
 
             return response
 
         except Exception as e:
-            logger.error(str(e))
+            print(f'Test suite result send error: {str(e)}')
 
     def define_environment(self, env):
         try:
@@ -102,7 +93,7 @@ class RBS_Client:
             }
             response = put(
                 headers=self.headers,
-                data=json.dumps(data),
+                json=data,
                 url="{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(
                     url=self.url,
                     build_id=self.build_id,
@@ -110,8 +101,8 @@ class RBS_Client:
                     job_id=self.job_id
                 )
             )
-            logger.info("Environment defined")
+            print(f"Environment defined with code {response.status_code}")
             return response
 
         except Exception as e:
-            logger.error(str(e))
+            print("Environment definition error: {}".format(str(e)))
