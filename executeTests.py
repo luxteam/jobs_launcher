@@ -18,19 +18,6 @@ from rbs_client import logger as rbs_logger
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
-# create rbs client
-rbs_client = None
-try:
-    rbs_client = RBS_Client(
-        job_id = os.getenv("RBS_JOB_ID"),
-        url = os.getenv("RBS_URL"),
-        build_id = os.getenv("RBS_BUILD_ID"),
-        env_label = os.getenv("RBS_ENV_LABEL"),
-        suite_id = None)
-    rbs_logger.info("Client created")
-except Exception as e:
-    rbs_logger.error(f"Client creation error: {e}")
-
 
 def parse_cmd_variables(tests_root, cmd_variables):
     # if TestsFilter doesn't exist or is empty - set it 'full'
@@ -41,6 +28,20 @@ def parse_cmd_variables(tests_root, cmd_variables):
 
 
 def main():
+
+    # create RBS client
+    rbs_client = None
+
+    try:
+        rbs_client = RBS_Client(
+            job_id = os.getenv("RBS_JOB_ID"),
+            url = os.getenv("RBS_URL"),
+            build_id = os.getenv("RBS_BUILD_ID"),
+            env_label = os.getenv("RBS_ENV_LABEL"),
+            suite_id = None)
+        print("RBS Client created")
+    except Exception as e:
+        print("Client creation error: {}".format(e))
 
     level = 0
     delim = ' '*level
@@ -120,10 +121,13 @@ def main():
 
     # send machine info to rbs
     if rbs_client:
-        rbs_client.define_environment({
-            "gpu": core.system_info.get_gpu(),
-            **machine_info
-            })
+        for group in args.test_filter:
+            rbs_client.get_suite_id_by_name(group)
+            # send machine info to rbs
+            env = {"gpu": core.system_info.get_gpu(), **machine_info}
+            env.pop('os')
+            env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
+            rbs_client.define_environment(env)
 
     found_jobs = []
     report = AutoDict()
