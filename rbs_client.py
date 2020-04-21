@@ -70,7 +70,7 @@ class RBS_Client:
             }
             response = post(
                 headers=self.headers,
-                data=json.dumps(data),
+                json=data,
                 url="{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(
                     url=self.url,
                     build_id=self.build_id,
