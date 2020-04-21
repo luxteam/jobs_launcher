@@ -51,9 +51,7 @@ def get_gpu():
     return render_device
 
 
-def get_machine_info():
-
-    def get_os():
+def get_os():
         custom_os_name = os.getenv('CIS_OS')
         if custom_os_name:
             return custom_os_name
@@ -63,6 +61,9 @@ def get_machine_info():
             return '{} {}({})'.format(platform.system(), platform.mac_ver()[0], platform.architecture()[0])
         else:
             return '{} {}({})'.format(platform.linux_distribution()[0], platform.linux_distribution()[1], platform.architecture()[0])
+
+
+def get_machine_info():
 
     def get_driver_ver():
         if os.name == "nt":
