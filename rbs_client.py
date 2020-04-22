@@ -83,7 +83,7 @@ class RBS_Client:
             return response
 
         except Exception as e:
-            print(f'Test suite result send error: {str(e)}')
+            print("Test suite result send error: {}".format(str(e)))
 
     def define_environment(self, env):
         try:
