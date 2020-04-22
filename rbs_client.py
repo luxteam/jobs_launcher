@@ -101,7 +101,7 @@ class RBS_Client:
                     job_id=self.job_id
                 )
             )
-            print(f"Environment defined with code {response.status_code}")
+            print("Environment defined with code {}".format(response.status_code))
             return response
 
         except Exception as e:
