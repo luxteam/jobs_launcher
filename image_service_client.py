@@ -14,8 +14,9 @@ class ISClient:
             auth=HTTPBasicAuth('admin', '&t)m(KniA%KF0tQ;'),
         )
 
-        print(json.loads(request.content))
-        token = json.loads(request.content)["token"]
+        if 'error' in response.content.decode("utf-8"):
+            print('Check login and password')
+        token = json.loads(request.content.decode("utf-8"))["token"]
         self.token = token
         self.headers = {
             "Authorization": "Bearer " + token,
@@ -31,7 +32,7 @@ class ISClient:
                     },
                     headers=self.headers
                 )
-            return json.loads(request.content)["image_id"]
+            return json.loads(request.content.decode("utf-8"))["image_id"]
         except Exception as e:
             print("Image sending error: {}".format(str(e)))
             return None

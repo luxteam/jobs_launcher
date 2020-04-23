@@ -34,8 +34,8 @@ class RBS_Client:
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth('dm1tryG', 'root'),
         )
-        print(str(response.content))
-
+        if 'error' in response.content.decode("utf-8"):
+            print('Check login and password')
         token = json.loads(response.content.decode("utf-8"))["token"]
         self.token = token
         self.headers = {"Authorization": "Bearer " + token}
@@ -52,7 +52,7 @@ class RBS_Client:
                 ),
                 headers=self.headers
             )
-            suites = [el['suite'] for el in json.loads(response.content)['suites'] if el['suite']['name'] == suite_name]
+            suites = [el['suite'] for el in json.loads(response.content.decode("utf-8"))['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
             print("Get suite id by name {}".format(suite_name))
 
