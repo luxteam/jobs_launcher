@@ -9,14 +9,13 @@ class ISClient:
         self.get_token()
 
     def get_token(self):
-        request = post(
+        response = post(
             url="{url}/api/login".format(url=self.url),
             auth=HTTPBasicAuth('admin', '&t)m(KniA%KF0tQ;'),
         )
-
         if 'error' in response.content.decode("utf-8"):
             print('Check login and password')
-        token = json.loads(request.content.decode("utf-8"))["token"]
+        token = json.loads(response.content.decode("utf-8"))["token"]
         self.token = token
         self.headers = {
             "Authorization": "Bearer " + token,
@@ -25,14 +24,14 @@ class ISClient:
     def send_image(self, path2img):
         try:
             with open(path2img, 'rb') as img:
-                request = post(
+                response = post(
                     url="{url}/api/".format(url=self.url),
                     files={
                         'image': img
                     },
                     headers=self.headers
                 )
-            return json.loads(request.content.decode("utf-8"))["image_id"]
+            return json.loads(response.content.decode("utf-8"))["image_id"]
         except Exception as e:
             print("Image sending error: {}".format(str(e)))
             return None
