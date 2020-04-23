@@ -11,7 +11,7 @@ class ISClient:
     def get_token(self):
         request = post(
             url="{url}/api/login".format(url=self.url),
-            auth=HTTPBasicAuth('admin', ')m$`mMcd)!u(!X"/'),
+            auth=HTTPBasicAuth('admin', '&t)m(KniA%KF0tQ;'),
         )
 
         print(json.loads(request.content))
