@@ -31,6 +31,7 @@ class ISClient:
                     },
                     headers=self.headers
                 )
+                img.close()
             return json.loads(response.content.decode("utf-8"))["image_id"]
         except Exception as e:
             print("Image sending error: {}".format(str(e)))
