@@ -35,7 +35,7 @@ class RBS_Client:
             auth=HTTPBasicAuth('dm1tryG', 'root'),
         )
 
-        token = json.loads(response.content)["token"]
+        token = json.loads(str(response.content))["token"]
         self.token = token
         self.headers = {"Authorization": "Bearer " + token}
 
