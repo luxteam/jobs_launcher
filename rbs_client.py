@@ -29,6 +29,7 @@ class RBS_Client:
         self.get_token()
 
     def get_token(self):
+        print('Try to get auth token')
         response = post(
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth('dm1tryG', 'root'),

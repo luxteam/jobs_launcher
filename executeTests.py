@@ -41,7 +41,7 @@ def main():
             suite_id = None)
         print("RBS Client created")
     except Exception as e:
-        print("Client creation error: {}".format(e))
+        print("RBS Client creation error: {}".format(e))
 
     level = 0
     delim = ' '*level
