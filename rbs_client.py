@@ -34,6 +34,7 @@ class RBS_Client:
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth('dm1tryG', 'root'),
         )
+        print(str(response.content))
 
         token = json.loads(str(response.content))["token"]
         self.token = token
