@@ -36,7 +36,7 @@ class RBS_Client:
         )
         print(str(response.content))
 
-        token = json.loads(str(response.content))["token"]
+        token = json.loads(response.content.decode("utf-8"))["token"]
         self.token = token
         self.headers = {"Authorization": "Bearer " + token}
 
