@@ -13,7 +13,7 @@ from core.config import *
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
-from rbs_client import RBS_Client
+from rbs_client import RBS_Client, str2bool
 from rbs_client import logger as rbs_logger
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
@@ -31,17 +31,18 @@ def main():
 
     # create RBS client
     rbs_client = None
-
-    try:
-        rbs_client = RBS_Client(
-            job_id = os.getenv("RBS_JOB_ID"),
-            url = os.getenv("RBS_URL"),
-            build_id = os.getenv("RBS_BUILD_ID"),
-            env_label = os.getenv("RBS_ENV_LABEL"),
-            suite_id = None)
-        print("RBS Client created")
-    except Exception as e:
-        print("RBS Client creation error: {}".format(e))
+    use_rbs = str2bool(os.getenv('RBS_USE'))
+    if use_rbs:
+        try:
+            rbs_client = RBS_Client(
+                job_id = os.getenv("RBS_JOB_ID"),
+                url = os.getenv("RBS_URL"),
+                build_id = os.getenv("RBS_BUILD_ID"),
+                env_label = os.getenv("RBS_ENV_LABEL"),
+                suite_id = None)
+            print("RBS Client created")
+        except Exception as e:
+            print("RBS Client creation error: {}".format(e))
 
     level = 0
     delim = ' '*level
