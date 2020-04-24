@@ -2,6 +2,7 @@ import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
 import logging
+import argparse
 
 logging.basicConfig(filename='rbs.log',level=logging.DEBUG)
 logger = logging.getLogger("rbs")
