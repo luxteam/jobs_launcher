@@ -1,6 +1,7 @@
 import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
+from requests.exeptions import RequestException
 
 
 class ISClient:
@@ -13,9 +14,12 @@ class ISClient:
             url="{url}/api/login".format(url=self.url),
             auth=HTTPBasicAuth('admin', '&t)m(KniA%KF0tQ;'),
         )
-        if 'error' in response.content.decode("utf-8"):
-            print('Check login and password')
-        token = json.loads(response.content.decode("utf-8"))["token"]
+        if response.status_code == 404:
+            raise RequestException("Cant connect image service. Check url")
+        content = response.content.decode("utf-8")
+        if 'error' in content:
+            raise RequestException('Check login and password')
+        token = json.loads(content)["token"]
         self.token = token
         self.headers = {
             "Authorization": "Bearer " + token,
