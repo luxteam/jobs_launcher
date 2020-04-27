@@ -24,8 +24,8 @@ function resizeImg(img){
 
 function timeFormatter(value, row, index, field) {
     var time = new Date(null);
-    time.setMilliseconds(value * 1000);
-    return time.toISOString().substr(11, 12);
+    time.setSeconds(value);
+    return time.toISOString().substr(11, 8);
 }
 
 function openModalWindow(id) {

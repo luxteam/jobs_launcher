@@ -52,15 +52,15 @@ def get_gpu():
 
 
 def get_os():
-        custom_os_name = os.getenv('CIS_OS')
-        if custom_os_name:
-            return custom_os_name
-        if platform.system() == "Windows":
-            return '{} {}({})'.format(platform.system(), platform.release(), platform.architecture()[0])
-        elif platform.system() == "Darwin":
-            return '{} {}({})'.format(platform.system(), platform.mac_ver()[0], platform.architecture()[0])
-        else:
-            return '{} {}({})'.format(platform.linux_distribution()[0], platform.linux_distribution()[1], platform.architecture()[0])
+    custom_os_name = os.getenv('CIS_OS')
+    if custom_os_name:
+        return custom_os_name
+    if platform.system() == "Windows":
+        return '{} {}({})'.format(platform.system(), platform.release(), platform.architecture()[0])
+    elif platform.system() == "Darwin":
+        return '{} {}({})'.format(platform.system(), platform.mac_ver()[0], platform.architecture()[0])
+    else:
+        return '{} {}({})'.format(platform.linux_distribution()[0], platform.linux_distribution()[1], platform.architecture()[0])
 
 
 def get_machine_info():
