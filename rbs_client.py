@@ -63,9 +63,9 @@ class RBS_Client:
                 ),
                 headers=self.headers
             )
+            print("Get suite id by name {}".format(suite_name))
             suites = [el['suite'] for el in json.loads(response.content.decode("utf-8"))['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
-            print("Get suite id by name {}".format(suite_name))
 
         except Exception as e:
             self.suite_id = None
