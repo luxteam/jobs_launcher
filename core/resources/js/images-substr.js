@@ -6,24 +6,34 @@ function showImagesSubtraction(baselineId, renderId, reshalla) {
 
     var imagesTable = document.getElementById("imgsCompareTable");
     var diffTable = document.getElementById('imgsDiffTable');
+    var thresholdRange = document.getElementById('thresholdRange');
+    var thresholdView = document.getElementById('thresholdView');
     document.getElementById("imagesCarousel").style.display = "none";
 
-    // if diff image is show now
-    if (diffTable.style.display === "") {
+    // if diff image is shown now and its type is same as type of clicked button
+    if (diffTable.is_reshalla != undefined && diffTable.is_reshalla == reshalla) {
         imagesTable.style.display = "";
         diffTable.style.display = "none";
+        thresholdRange.style.display = "none";
+        thresholdView.style.display = "none";
+        diffTable.is_reshalla = undefined
         return;
     }
 
     if(reshalla) {
+        thresholdRange.style.display = "none";
+        thresholdView.style.display = "none";
         renderCanvasReshalla(baselineId, renderId);
     }
     else {
+        thresholdRange.style.display = "";
+        thresholdView.style.display = "";
         renderCanvasData(baselineId, renderId, parseFloat(document.getElementById("thresholdRange").getAttribute('value')));
     }
 
     imagesTable.style.display = "none";
     diffTable.style.display = "";
+    diffTable.is_reshalla = reshalla;
 }
 
 function renderCanvasData(baselineId, renderId, thresholdValue) {

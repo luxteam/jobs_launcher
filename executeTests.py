@@ -9,6 +9,7 @@ import core.reportExporter
 import core.system_info
 from core.auto_dict import AutoDict
 from core.config import *
+from local_config import *
 
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher

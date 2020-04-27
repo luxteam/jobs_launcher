@@ -2,16 +2,30 @@
     <table class="baseTable">
         <tr>
             <th>Testing start</th>
-            <th>Plugin version</th>
-            <th>Core version</th>
+            {% if report_type == 'ec' %}
+                {# Core #}
+                <th>Major version</th>
+                <th>Minor version</th>
+            {% else %}
+                {# Default and converters #}
+                <th>Plugin version</th>
+                <th>Core version</th>
+            {% endif %}
             <th>Branch name</th>
             <th>Commit SHA</th>
             <th>Commit message</th>
         </tr>
         <tr>
             <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
-            <td>{{ common_info.render_version }}</td>
-            <td>{{ common_info.core_version }}</td>
+            {% if report_type == 'ec' %}
+                {# Core #}
+                <td>{{ common_info.core_version }}</td>
+                <td>{{ common_info.minor_version }}</td>
+            {% else %}
+                {# Default and converters #}
+                <td>{{ common_info.render_version }}</td>
+                <td>{{ common_info.core_version }}</td>
+            {% endif %}
             <td>{{ common_info.branch_name }}</td>
             <td>{{ common_info.commit_sha }}</td>
             <td>{{ common_info.commit_message }}</td>
@@ -23,8 +37,15 @@
             <th>Tool</th>
             <th>Render device</th>
             <th>Tests Package</th>
-            <th>Plugin version</th>
-            <th>Core version</th>
+            {% if report_type == 'ec' %}
+                {# Core #}
+                <th>Major version</th>
+                <th>Minor version</th>
+            {% else %}
+                {# Default and converters #}
+                <th>Plugin version</th>
+                <th>Core version</th>
+            {% endif %}
             <th>Testing start</th>
             <th>Branch name</th>
             <th>Commit SHA</th>
@@ -34,8 +55,15 @@
             <td>{{ common_info.tool }}</td>
             <td>{{ common_info.render_device }}</td>
             <td>{{ common_info.test_group }}</td>
-            <td>{{ common_info.render_version }}</td>
-            <td>{{ common_info.core_version }}</td>
+            {% if report_type == 'ec' %}
+                {# Core #}
+                <td>{{ common_info.core_version }}</td>
+                <td>{{ common_info.minor_version }}</td>
+            {% else %}
+                {# Default and converters #}
+                <td>{{ common_info.render_version }}</td>
+                <td>{{ common_info.core_version }}</td>
+            {% endif %}
             <td>{{ common_info.testing_start }}</td>
             <td>{{ common_info.branch_name }}</td>
             <td>{{ common_info.commit_sha }}</td>

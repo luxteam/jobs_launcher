@@ -24,6 +24,10 @@ RENDER_REPORT_BASE = {
     "difference_color_2": -0
 }
 
+RENDER_REPORT_DEFAULT_PACK = {
+
+}
+
 RENDER_REPORT_EC_PACK = {
     "minor_version": "",
     "iterations": -0,
@@ -54,6 +58,7 @@ TIMEOUT_PAR = 3
 PIX_DIFF_MAX = 15
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
+VRAM_DIFF_MAX = 5
 
 """
 # Possible test case statuses
@@ -112,3 +117,6 @@ COMPARE_REPORT = 'compare_report.json'
 COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'
+REPORT_CONVERSION_LOG = 'conversion.log'
+REPORT_RPR_LOG = 'renderTool.log'
+

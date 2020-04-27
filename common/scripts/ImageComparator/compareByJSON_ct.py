@@ -1,22 +1,10 @@
 import os
-import argparse
 import json
-import CompareMetrics
+from CompareMetrics_ct import CompareMetrics
 import shutil
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
-
-
-def createArgParser():
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('--work_dir')
-    argparser.add_argument('--base_dir')
-    argparser.add_argument('--case_suffix')
-    argparser.add_argument('--pix_diff_tolerance', required=False, default=core.config.PIX_DIFF_TOLERANCE)
-    argparser.add_argument('--pix_diff_max', required=False, default=core.config.PIX_DIFF_MAX)
-    argparser.add_argument('--time_diff_max', required=False, default=core.config.TIME_DIFF_MAX)
-    return argparser
 
 
 def get_diff(current, previous):
@@ -46,7 +34,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
             metrics = None
             try:
-                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                metrics = CompareMetrics(render_img_path, baseline_img_path)
             except (FileNotFoundError, OSError) as err:
                 core.config.main_logger.error(str(err))
                 return img
@@ -78,9 +66,7 @@ def get_rendertime_difference(img, baseline_item, time_diff_max):
     return img
 
 
-def main():
-    args = createArgParser().parse_args()
-
+def main(args):
     render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
 
     if not os.path.exists(render_json_path):
@@ -142,7 +128,3 @@ def main():
         json.dump(render_json, file, indent=4)
 
     return 0
-
-
-if __name__ == '__main__':
-    exit(main())

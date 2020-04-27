@@ -8,10 +8,14 @@ from codecs import open
 import datetime
 import operator
 from PIL import Image
+import core.config as config
 from core.config import *
 from core.auto_dict import AutoDict
 import copy
-
+import sys
+import traceback
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
+from local_config import *
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w", encoding='utf8') as file:
@@ -53,6 +57,7 @@ def make_base64_img(session_dir, report):
                             src = "data:image/jpeg;base64," + str(code)[2:-1]
                             test_execution.update({img: src})
                         except Exception as err:
+                            traceback.print_exc()
                             main_logger.error('Error in base64 encoding: {}'.format(str(err)))
 
     return report
@@ -100,6 +105,7 @@ def generate_thumbnails(session_dir):
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
                             except Exception as err:
+                                print("Thumbnail didn't created: json_report - {}, test - {}, img_key - {}".format(json_report, test, img_key))
                                 main_logger.error("Thumbnail didn't created: {}".format(str(err)))
                             else:
                                 test.update({'thumb64_' + img_key: os.path.relpath(thumb64_path, path)})
@@ -123,6 +129,7 @@ def build_session_report(report, session_dir):
                 with open(os.path.join(session_dir, report['results'][result][item]['result_path'], TEST_REPORT_NAME_COMPARED), 'r') as file:
                     current_test_report = json.loads(file.read())
             except Exception as err:
+                print("Excepted 'report_compare.json' not found for {} {}".format(result, item))
                 main_logger.error("Expected 'report_compare.json' not found: {}".format(str(err)))
                 report['results'][result][item].update({'render_results': {}})
                 report['results'][result][item].update({'render_duration': -0.0})
@@ -146,9 +153,13 @@ def build_session_report(report, session_dir):
                     try:
                         report['machine_info'].update({'render_device': jtem['render_device']})
                         report['machine_info'].update({'tool': jtem['tool']})
-                        report['machine_info'].update({'render_version': jtem['render_version']})
+                        if report_type != 'ec':
+                            report['machine_info'].update({'render_version': jtem['render_version']})
+                        else:
+                            report['machine_info'].update({'minor_version': jtem['minor_version']})
                         report['machine_info'].update({'core_version': jtem['core_version']})
                     except Exception as err:
+                        print("Exception while updating machine_info in session_report")
                         main_logger.warning(str(err))
 
                     report['results'][result][item]['total'] += report['results'][result][item]['passed'] + \
@@ -157,6 +168,7 @@ def build_session_report(report, session_dir):
                                                                report['results'][result][item]['error']
                     # unite launcher report and render report
                 except Exception as err:
+                    traceback.print_exc()
                     main_logger.error('Exception while update render report {}'.format(str(err)))
                     render_duration = -0.0
 
@@ -205,11 +217,13 @@ def build_summary_report(work_dir):
                                         if not temp_report['machine_info'][key] in common_info[key]:
                                             common_info[key].append(temp_report['machine_info'][key])
                                 else:
-                                    common_info.update(
-                                        {'reporting_date': [temp_report['machine_info']['reporting_date']],
-                                         'render_version': [temp_report['machine_info']['render_version']],
-                                         'core_version': [temp_report['machine_info']['core_version']]
-                                         })
+                                    common_info.update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
+                                    
+                                    if report_type != 'ec':
+                                        common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
+                                    else:
+                                        common_info.update({'minor_version': [temp_report['machine_info']['minor_version']]})
+                                    common_info.update({'core_version': [temp_report['machine_info']['core_version']]})
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
                                     for group_report_file in REPORT_FILES:
@@ -221,6 +235,7 @@ def build_summary_report(work_dir):
                                         work_dir)}
                                 )
                     except Exception as err:
+                        traceback.print_exc()
                         main_logger.error("Processing of {} has produced error: {}".format(basepath.split(os.path.sep)[-1], str(err)))
 
                     if basename in summary_report.keys():
@@ -306,6 +321,7 @@ def build_compare_report(summary_report):
                             if img_key in item.keys():
                                 compare_report[item['test_case']].update({hw_bsln: item[img_key]})
                     except KeyError as err:
+                        print("Missed testcase detected: platform - {}, test_package - {}, test_config - {}, item - {}".format(platform, test_package, test_config, item))
                         main_logger.error("Missed testcase detected {}".format(str(err)))
 
     return compare_report, hardware
@@ -314,7 +330,7 @@ def build_compare_report(summary_report):
 def build_local_reports(work_dir, summary_report, common_info, jinja_env):
     work_dir = os.path.abspath(work_dir)
 
-    template = jinja_env.get_template('local_template.html')
+    template = jinja_env.get_template('local_template_{}.html'.format(report_type))
     report_dir = ""
 
     try:
@@ -323,9 +339,6 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                 for config in summary_report[execution]['results'][test]:
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
 
-                    # TODO: refactor it
-                    baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
-                    baseline_report = []
                     render_report = []
 
                     if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
@@ -336,30 +349,37 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
 
-                    if os.path.exists(baseline_report_path):
-                        with open(baseline_report_path, 'r') as file:
-                            baseline_report = json.loads(file.read())
-                            for render_item in render_report:
-                                try:
-                                    baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
-                                    render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                except IndexError:
-                                    pass
+                    # for core baseline_render_time initialize via compareByJson script
+                    if report_type != 'ec':
+                        baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
+                        baseline_report = []
 
-                    try:
-                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['render_version']),
-                                               common_info=common_info,
-                                               render_report=render_report,
-                                               pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
-                        save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
-                    except Exception as err:
-                        print(str(err))
-                        main_logger.error(str(err))
+                        if os.path.exists(baseline_report_path):
+                            with open(baseline_report_path, 'r') as file:
+                                baseline_report = json.loads(file.read())
+                                for render_item in render_report:
+                                    try:
+                                        baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
+                                        render_item.update({'baseline_render_time': baseline_item['render_time']})
+                                    except IndexError:
+                                        pass
+
+                    # choose right plugin version based on building report type
+                    if report_type != 'ec':
+                        version_in_title = common_info['render_version']
+                    else:
+                        version_in_title = common_info['core_version']
+                    html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
+                                           common_info=common_info,
+                                           render_report=render_report,
+                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
+                    save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
     except Exception as err:
+        traceback.print_exc()
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', original_render=''):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
@@ -374,10 +394,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
         autoescape=True
     )
+    # check that original_render variable exists
+    if not 'original_render' in globals():
+        global original_render
+        original_render = ''
     env.globals.update({'original_render': original_render,
-                        'or_boolean_formatted': str(bool(original_render)).lower(),
-                        'or_boolean_formatted_invert': str(bool(not original_render)).lower(),
-                        'pre_path': '.'})
+                        'report_type': report_type,
+                        'pre_path': '.',
+                        'config': config})
     env.filters['env_override'] = env_override
     env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
 
@@ -387,7 +411,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     main_logger.info("Saving summary report...")
     try:
         summary_template = env.get_template('summary_template.html')
-        detailed_summary_template = env.get_template('detailed_summary_template.html')
+        detailed_summary_template = env.get_template('detailed_summary_template_{}.html'.format(report_type))
 
         summary_report, common_info = build_summary_report(work_dir)
 
@@ -411,7 +435,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                                      i=execution)
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
-        summary_html = "Error while building summary report: {}".format(str(err))
+        traceback.print_exc()
         main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
@@ -434,7 +458,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        test_info=summary_info_for_report)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
-        performance_html = "Error while building performance report: {}".format(str(err))
+        traceback.print_exc()
         main_logger.error(performance_html)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
 
@@ -453,7 +477,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                common_info=common_info)
         save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
-        compare_html = "Error while building compare report: {}".format(str(err))
+        traceback.print_exc()
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 

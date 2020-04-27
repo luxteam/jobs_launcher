@@ -60,7 +60,7 @@
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
                 <td
-                {%- if report[i].summary.render_duration == -0.0 %}
+                {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
@@ -86,10 +86,11 @@
         <thead>
             <tr>
                 <th>Test package name</th>
-<!--                <th>Config</th>-->
                 <th>Host</th>
                 <th>Local report</th>
-                <th>Tool's log</th>
+                {% if report_type != 'ct' %}
+                    <th>Tool's log</th>
+                {% endif %}
                 <th>Engine log</th>
                 <th>Total</th>
                 <th>Passed</th>
@@ -116,8 +117,6 @@
             <tr>
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
-<!--                <td>{{ test_conf }}</td>-->
-
                 <td>
                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
                     <div class="popup" id="machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}">
@@ -147,7 +146,13 @@
                 </td>
 
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
-                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
+
+                {% if report_type == 'default' %}
+                    <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
+                {% elif report_type == 'ec' %}
+                    <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/render_log.txt">Render Log</a></td>                
+                {% endif %}
+
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
@@ -186,7 +191,13 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td colspan="5">Sum</td>
+                <td 
+                {% if report_type == 'ct' %}
+                    colspan="4"
+                {% else %}
+                    colspan="5"
+                {% endif %}
+                >Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td

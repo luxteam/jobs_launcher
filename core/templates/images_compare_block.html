@@ -8,7 +8,7 @@
             <button class="commonButton" type="button" name="showImgsSubstr" onclick="showImagesSubtraction('baselineImgPopup', 'renderedImgPopup', true);">Switch to Reshalla difference</button>
             <button class="commonButton" type="button" name="showCarouselButton" onclick="showCarousel('baselineImgPopup', 'renderedImgPopup');">"Gif" mode</button>
             <input  autocomplete="true" id="thresholdRange" type="range" name="thresholdSelector" min="0.0" max="1" step="0.01" value="0.03" oninput="renderCanvasData('baselineImgPopup', 'renderedImgPopup', this.value);"/>
-            <output name="thresholdView" for="thresholdSelector">0.03</output>
+            <output name="thresholdView" id="thresholdView" for="thresholdSelector">0.03</output>
         </form>
 
         <table class="baseTable" id="imgsCompareTable">
