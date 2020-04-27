@@ -1,9 +1,10 @@
 /**
  * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
- * - error [high priority[ means crash during test execution
- * - failed - pix /time/ram diff
- * - skipped - commented case
- * - passed - successfully passed test
+ * Case statuses (from highest to lowest sort priority):
+ * - error - crash during test execution
+ * - failed - pixel/time/ram diff too large
+ * - passed - case executed without crushes; acceptable diff
+ * - skipped - case wasn't launched
  */
 function statusSorter(x, y) {
     var a = x.toLowerCase();
@@ -19,7 +20,7 @@ function statusSorter(x, y) {
         return -1;
     }
 
-    if (a.includes('skipped') && !b.includes('failed') && !b.includes('error')) {
+    if (a.includes('passed') && !b.includes('failed') && !b.includes('error')) {
         return -1;
     }
 
