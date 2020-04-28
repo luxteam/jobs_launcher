@@ -38,7 +38,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         if core.config.DONT_COMPARE not in img.get('script_info', ''):
             metrics = None
             try:
-                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                metrics = CompareMetrics(render_img_path, baseline_img_path)
             except (FileNotFoundError, OSError) as err:
                 core.config.main_logger.error("Error during metrics calculation: {}".format(str(err)))
                 return img
