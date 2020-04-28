@@ -21,6 +21,9 @@ def main(work_dir=''):
         with open(os.path.join(args.work_dir, SUMMARY_REPORT), 'r') as file:
             summary_report = json.load(file)
 
+            if len(summary_report) == 0:
+                return 0
+
             max_name = max([len(x) for x in summary_report.keys()])
             max_name = max(max_name, 12)
 
@@ -39,7 +42,8 @@ def main(work_dir=''):
     # get summary results
     for execution in summary_report:
         for key in total:
-            total[key] += summary_report[execution]['summary'][key]
+            if summary_report[execution]['summary'][key]:
+                total[key] += summary_report[execution]['summary'][key]
 
     with open(os.path.join(args.work_dir, 'summary_status.json'), 'w') as file:
         json.dump(total, file, indent=' ')
