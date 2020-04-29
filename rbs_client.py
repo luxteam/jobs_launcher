@@ -15,7 +15,7 @@ def str2bool(v):
     elif v.lower() in ('no', 'false', 'f', 'n', '0', 'None'):
         return False
     else:
-        raise ValueError('Boolean value expected.')
+        raise ValueError('Boolean value expected. Got <{}>'.format(v))
 
 
 class RBS_Client:
