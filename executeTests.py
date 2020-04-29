@@ -31,7 +31,11 @@ def main():
 
     # create RBS client
     rbs_client = None
-    use_rbs = str2bool(os.getenv('RBS_USE'))
+    use_rbs = None
+    try:
+        use_rbs = str2bool(os.getenv('RBS_USE'))
+    except Exception as e:
+        print('Exception when getenv RBS USE: {}'.format(str(e)))
     if use_rbs:
         try:
             rbs_client = RBS_Client(
