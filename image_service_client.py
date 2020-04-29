@@ -1,7 +1,7 @@
 import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
-from requests.exeptions import RequestException
+from requests.exceptions import RequestException
 
 
 class ISClient:
