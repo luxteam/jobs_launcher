@@ -12,7 +12,7 @@ class ISClient:
     def get_token(self):
         response = post(
             url="{url}/api/login".format(url=self.url),
-            auth=HTTPBasicAuth('admin', '&t)m(KniA%KF0tQ;'),
+            auth=HTTPBasicAuth('admin', 'OCXybZvozF8QTI&c'),
         )
         if response.status_code == 404:
             raise RequestException("Cant connect image service. Check url")
