@@ -126,7 +126,7 @@ def main():
 
     # send machine info to rbs
     if rbs_client:
-        print('Tests filter: ' + args.test_filter)
+        print('Tests filter: ' + str(args.test_filter))
         for group in args.test_filter:
             group = group.replace(' ', '').replace(",", '').replace('"', '').replace('[', '').replace(']', '')
             rbs_client.get_suite_id_by_name(group)
