@@ -126,7 +126,8 @@ def main():
 
     # send machine info to rbs
     if rbs_client:
-        for group in list(args.test_filter):
+        for group in list(args.test_filter.replace('"', '')):
+
             rbs_client.get_suite_id_by_name(group)
             # send machine info to rbs
             env = {"gpu": core.system_info.get_gpu(), **machine_info}
