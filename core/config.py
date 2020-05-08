@@ -24,26 +24,34 @@ RENDER_REPORT_BASE = {
     "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_time_or": -0.0,
-    "difference_color_2": -0
+    "difference_time_or": "not compared yet",
+
+    # core block
+    "minor_version": "",
+    "iterations": -0,
+    "width": -0,
+    "height": -0,
+    "system_memory_usage": -0.0,
+    "gpu_memory_usage": -0.0,
+    "gpu_memory_total": -0.0,
+    "gpu_memory_max": -0.0,
+    "baseline_gpu_memory_usage": -0.0,
+    "baseline_system_memory_usage": -0.0,
+    "difference_vram": -0.0,
+    "difference_ram": -0.0
 }
-RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
+
+RENDER_REPORT_BASE_USEFULL_KEYS = ['tool', 'minor_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
-TIMEOUT = 2400
+TIMEOUT = 900
 TIMEOUT_PAR = 3
 
-PIX_DIFF_MAX = 15
+PIX_DIFF_MAX = 0  # TODO: move to separate file
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
+VRAM_DIFF_MAX = 5
 
-"""
-# Possible test case statuses
-  passed - status means case was executed without errors and difference with baseline is permissible.
-  skipped - status means case wasn't launched by QA team decision. 
-  error - status means fatal error during render, terminating by timeout, or case wasn't launched at all.
-  failed - status means that pixel difference with baseline image is too large.
-"""
 TEST_SUCCESS_STATUS = 'passed'
 TEST_IGNORE_STATUS = 'skipped'
 TEST_CRASH_STATUS = 'error'
@@ -69,7 +77,7 @@ POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'original_color_path']
 POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_RENDERED_KEYS]
 POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_RENDERED_KEYS]
 
-POSSIBLE_JSON_LOG_KEYS = ['original_render_log', 'rpr_render_log', 'conversion_log', 'render_log']
+POSSIBLE_JSON_LOG_KEYS = ['original_render_log', 'rpr_render_log', 'conversion_log']
 REPORT_FILES = POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL + POSSIBLE_JSON_LOG_KEYS
 
 IMG_KEYS_FOR_COMPARE = ['render_color_path']
@@ -94,12 +102,3 @@ COMPARE_REPORT = 'compare_report.json'
 COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'
-
-TEST_CASES_JSON_NAME = {
-        'blender': 'test_cases.json',
-        'maya': 'test_cases.json',
-        'max': 'case_list.json'
-    }
-LOST_TESTS_JSON_NAME = 'lost_tests.json'
-
-DONT_COMPARE = "Do not compare"

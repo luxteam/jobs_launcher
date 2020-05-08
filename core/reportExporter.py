@@ -1,5 +1,6 @@
 import os
 import subprocess
+
 import jinja2
 import json
 import base64
@@ -10,6 +11,7 @@ from PIL import Image
 from core.config import *
 from core.auto_dict import AutoDict
 import copy
+import sys
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
@@ -82,21 +84,15 @@ def generate_thumbnails(session_dir):
                         if img_key in test.keys():
                             try:
                                 cur_img_path = os.path.abspath(os.path.join(path, test[img_key]))
-                                thumb64_path = os.path.abspath(
-                                    os.path.join(path, test[img_key].replace(test['test_case'],
-                                                                             'thumb64_' + test['test_case'])))
-                                thumb256_path = os.path.abspath(
-                                    os.path.join(path, test[img_key].replace(test['test_case'],
-                                                                             'thumb256_' + test['test_case'])))
+                                thumb64_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb64_' + test['test_case'])))
+                                thumb256_path = os.path.abspath(os.path.join(path, test[img_key].replace(test['test_case'], 'thumb256_' + test['test_case'])))
 
                                 if os.path.exists(thumb64_path) and os.path.exists(thumb256_path):
                                     continue
 
                                 cur_img = Image.open(cur_img_path)
-                                thumb64 = cur_img.resize((64, int(64 * cur_img.size[1] / cur_img.size[0])),
-                                                         Image.ANTIALIAS)
-                                thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])),
-                                                          Image.ANTIALIAS)
+                                thumb64 = cur_img.resize((64, int(64 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
+                                thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])), Image.ANTIALIAS)
 
                                 thumb64.save(thumb64_path)
                                 thumb256.save(thumb256_path)
@@ -131,12 +127,12 @@ def build_session_report(report, session_dir):
                 render_duration = 0.0
                 try:
                     for jtem in current_test_report:
-                        for group_report_file in REPORT_FILES:
-                            if group_report_file in jtem.keys():
+                        for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
+                            if img in jtem.keys():
                                 # update paths
-                                cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[group_report_file]))
+                                cur_img_path = os.path.abspath(os.path.join(session_dir, report['results'][result][item]['result_path'], jtem[img]))
 
-                                jtem.update({group_report_file: os.path.relpath(cur_img_path, session_dir)})
+                                jtem.update({img: os.path.relpath(cur_img_path, session_dir)})
 
                         render_duration += jtem['render_time']
                         if jtem['test_status'] == 'undefined':
@@ -147,7 +143,7 @@ def build_session_report(report, session_dir):
                     try:
                         report['machine_info'].update({'render_device': jtem['render_device']})
                         report['machine_info'].update({'tool': jtem['tool']})
-                        report['machine_info'].update({'render_version': jtem['render_version']})
+                        report['machine_info'].update({'minor_version': jtem['minor_version']})
                         report['machine_info'].update({'core_version': jtem['core_version']})
                     except Exception as err:
                         main_logger.warning(str(err))
@@ -179,30 +175,6 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count):
-    summary_report[gpu_os_case]['results'][lost_test_package] = {}
-    # add empty conf
-    summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
-    # specify data
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = 0.0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['error'] = lost_tests_count
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['failed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['machine_info'] = ""
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['passed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = -0.0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_results'] = []
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['result_path'] = ""
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
-
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
-
-    summary_report[gpu_os_case]['summary']['error'] += lost_tests_count
-    summary_report[gpu_os_case]['summary']['total'] += lost_tests_count
-
-
 def build_summary_report(work_dir):
     summary_report = {}
     common_info = {}
@@ -222,29 +194,25 @@ def build_summary_report(work_dir):
                     try:
                         for test_package in temp_report['results']:
                             for test_conf in temp_report['results'][test_package]:
-                                temp_report['results'][test_package][test_conf].update(
-                                    {'machine_info': temp_report['machine_info']})
-
-                                if common_info:
-                                    for key in common_info:
-                                        if not temp_report['machine_info'][key] in common_info[key]:
-                                            common_info[key].append(temp_report['machine_info'][key])
-                                else:
-                                    common_info.update(
-                                        {'reporting_date': [temp_report['machine_info']['reporting_date']],
-                                         'render_version': [temp_report['machine_info']['render_version']],
-                                         'core_version': [temp_report['machine_info']['core_version']]
-                                         })
+                                temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
-                                    for group_report_file in REPORT_FILES:
-                                        if group_report_file in jtem.keys():
-                                            jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
+                                    for img in POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL:
+                                        if img in jtem.keys():
+                                            jtem.update({img: os.path.relpath(os.path.join(work_dir, basepath, jtem[img]), work_dir)})
                                 temp_report['results'][test_package][test_conf].update(
-                                    {'result_path': os.path.relpath(
-                                        os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
-                                        work_dir)}
+                                    {'result_path': os.path.relpath(os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']), work_dir)}
                                 )
+                        if common_info:
+                            for key in common_info:
+                                if not temp_report['machine_info'][key] in common_info[key]:
+                                    common_info[key].append(temp_report['machine_info'][key])
+                        else:
+                            common_info.update(
+                                {'reporting_date': [temp_report['machine_info']['reporting_date']],
+                                 'minor_version': [temp_report['machine_info']['minor_version']],
+                                 'core_version': [temp_report['machine_info']['core_version']]
+                                 })
                     except Exception as err:
                         main_logger.error(str(err))
 
@@ -258,109 +226,78 @@ def build_summary_report(work_dir):
                         summary_report[basename].update({'summary': temp_report['summary']})
 
     for key in common_info:
-        common_info[key] = ' '.join(common_info[key])
-
-    if os.path.exists(os.path.join(work_dir, LOST_TESTS_JSON_NAME)): 
-        with open(os.path.join(work_dir, LOST_TESTS_JSON_NAME), "r") as file:
-            lost_tests_count = json.load(file)
-        for lost_test_result in lost_tests_count:
-            test_case_found = False
-            gpu_name = lost_test_result.split('-')[0]
-            os_name = lost_test_result.split('-')[1]
-            for gpu_os_case in summary_report:
-                if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
-                    for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
-                    test_case_found = True
-                    break
-            # if all data for GPU + OS was lost (it can be regression.json execution)
-            if not test_case_found:
-                gpu_os_case = lost_test_result.replace('-', ' ')
-                summary_report[gpu_os_case] = {}
-                summary_report[gpu_os_case]['results'] = {}
-                summary_report[gpu_os_case]['summary'] = {}
-                summary_report[gpu_os_case]['summary']['duration'] = 0.0
-                summary_report[gpu_os_case]['summary']['error'] = 0
-                summary_report[gpu_os_case]['summary']['failed'] = 0
-                summary_report[gpu_os_case]['summary']['passed'] = 0
-                summary_report[gpu_os_case]['summary']['render_duration'] = -0.0
-                summary_report[gpu_os_case]['summary']['skipped'] = 0
-                summary_report[gpu_os_case]['summary']['total'] = 0
-                for lost_test_package in lost_tests_count[lost_test_result]:
-                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
+        common_info[key] = ', '.join(common_info[key])
 
     return summary_report, common_info
 
 
-def build_performance_report(summary_report):
+def build_performance_report(work_dir):
 
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
     summary_info_for_report = {}
+    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
+        for file in files:
+            if file.endswith(SESSION_REPORT):
+                with open(os.path.join(path, file), 'r') as report_file:
+                    temp_report = json.loads(report_file.read())
 
-    for key in summary_report:
-        platform = summary_report[key]
-        group = next(iter(platform['results']))
-        conf = list(platform['results'][group].keys())[0]
+                hw = temp_report['machine_info']['render_device']
+                if hw not in hardware:
+                    hardware[hw] = temp_report['summary']['render_duration']
+                tool = temp_report['machine_info']['tool']
 
-        hw = platform['results'][group][conf]['machine_info']['render_device']
-        if hw not in hardware:
-            hardware[hw] = platform['summary']['render_duration']
+                results = temp_report.pop('results', None)
+                info = temp_report
+                for test_package in results:
+                    for test_config in results[test_package]:
+                        results[test_package][test_config].pop('render_results', None)
 
-        temp_report = platform['results'][group][conf]
-        tool = temp_report['machine_info']['tool']
+                performance_report[tool].update({hw: info})
 
-        results = platform.pop('results', None)
-        info = temp_report
-        for test_package in results:
-            for test_config in results[test_package]:
-                results[test_package][test_config].pop('render_results', None)
+                for test_package in results:
+                    for test_config in results[test_package]:
+                        performance_report_detail[tool][test_package][test_config].update({hw: results[test_package][test_config]})
 
-        performance_report[tool].update({hw: info})
-
-        for test_package in results:
-            for test_config in results[test_package]:
-                performance_report_detail[tool][test_package][test_config].update(
-                    {hw: results[test_package][test_config]})
-
-        tmp = sorted(hardware.items(), key=operator.itemgetter(1))
-        summary_info_for_report[tool] = tmp
+                tmp = sorted(hardware.items(), key=operator.itemgetter(1))
+                summary_info_for_report[tool] = tmp
     hardware = sorted(hardware.items(), key=operator.itemgetter(1))
     return performance_report, hardware, performance_report_detail, summary_info_for_report
 
 
-def build_compare_report(summary_report):
+def build_compare_report(work_dir):
     compare_report = AutoDict()
     hardware = []
-    for platform in summary_report.keys():
-        for test_package in summary_report[platform]['results']:
-            for test_config in summary_report[platform]['results'][test_package]:
-                temp_report = summary_report[platform]['results'][test_package][test_config]
+    for path, dirs, files in os.walk(os.path.abspath(work_dir)):
+        for file in files:
+            if file == SESSION_REPORT:
+                with open(os.path.join(path, file), 'r') as report_file:
+                    temp_report = json.loads(report_file.read())
 
                 # force add gpu from baseline
                 hw = temp_report['machine_info']['render_device']
-                hw_bsln = temp_report['machine_info']['render_device'] + " [Baseline]"
-
-                if hw not in hardware:
-                    hardware.append(hw)
-                    hardware.append(hw_bsln)
+                hw_bsln = temp_report['machine_info']['render_device'] + "[Baseline"
+                hardware.append(hw)
+                hardware.append(hw_bsln)
 
                 # collect images links
-                for item in temp_report['render_results']:
-                    # if test is processing first time
-                    if not compare_report[item['test_case']]:
-                        compare_report[item['test_case']] = {}
-
-                    try:
-                        for img_key in POSSIBLE_JSON_IMG_RENDERED_KEYS + POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL:
-                            if img_key in item.keys():
-                                compare_report[item['test_case']].update({hw: item[img_key]})
-                        for img_key in POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL:
-                            if img_key in item.keys():
-                                compare_report[item['test_case']].update({hw_bsln: item[img_key]})
-                    except KeyError as err:
-                        main_logger.error("Missed testcase detected {}".format(str(err)))
+                for test_package in temp_report['results']:
+                    for test_config in temp_report['results'][test_package]:
+                        for item in temp_report['results'][test_package][test_config]['render_results']:
+                            # if test is processing first time
+                            if not compare_report[item['test_case']]:
+                                compare_report[item['test_case']] = {}
+                            try:
+                                compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['thumb256_render_color_path']), work_dir)})
+                                compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['thumb256_baseline_color_path']), work_dir)})
+                            except KeyError as err:
+                                # TODO: fix
+                                try:
+                                    compare_report[item['test_case']].update({hw: os.path.relpath(os.path.join(path, item['render_color_path']), work_dir)})
+                                    compare_report[item['test_case']].update({hw_bsln: os.path.relpath(os.path.join(path, item['baseline_color_path']), work_dir)})
+                                except:
+                                    pass
 
     return compare_report, hardware
 
@@ -384,10 +321,6 @@ def build_local_reports(work_dir, summary_report, common_info):
             for test in summary_report[execution]['results']:
                 for config in summary_report[execution]['results'][test]:
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
-
-                    # TODO: refactor it
-                    baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
-                    baseline_report = []
                     render_report = []
 
                     if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
@@ -398,30 +331,19 @@ def build_local_reports(work_dir, summary_report, common_info):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
 
-                    if os.path.exists(baseline_report_path):
-                        with open(baseline_report_path, 'r') as file:
-                            baseline_report = json.loads(file.read())
-                            for render_item in render_report:
-                                try:
-                                    baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
-                                    render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                except IndexError:
-                                    pass
-
                     try:
-                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['render_version']),
+                        html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, common_info['core_version']),
                                                common_info=common_info,
                                                render_report=render_report,
                                                pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
                         save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
                     except Exception as err:
-                        print(str(err))
-                        main_logger.error(str(err))
+                        main_logger.error("Error during rendering local html report: {}".format(str(err)))
     except Exception as err:
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefiend', branch_name='undefined', commit_message='undefined'):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         shutil.rmtree(os.path.join(work_dir, 'report_resources'), True)
@@ -474,8 +396,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     try:
         copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
-        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
-
+        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(work_dir)
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
         performance_html = performance_template.render(title=major_title + " Performance",
@@ -494,7 +415,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     try:
         compare_template = env.get_template('compare_template.html')
         copy_summary_report = copy.deepcopy(summary_report)
-        compare_report, hardware = build_compare_report(copy_summary_report)
+        compare_report, hardware = build_compare_report(work_dir)
         save_json_report(compare_report, work_dir, COMPARE_REPORT)
         compare_html = compare_template.render(title=major_title + " Compare",
                                                hardware=hardware,

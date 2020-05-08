@@ -11,4 +11,3 @@ pyscreenshot
 py-cpuinfo
 requests
 imageio
-opencv-python==4.1.2.30

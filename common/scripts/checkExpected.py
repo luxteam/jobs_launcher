@@ -2,7 +2,6 @@ import os
 import argparse
 import json
 import sys
-from shutil import copyfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
 
@@ -25,7 +24,7 @@ def main():
 
         rendered_cases = {x['test_case'] for x in rendered}
         expected_cases = {x for x in expected}
-        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFUL_KEYS}
+        common_info = {k: v for k, v in rendered[0].items() if k in core.config.RENDER_REPORT_BASE_USEFULL_KEYS}
     except OSError as err:
         core.config.main_logger.error("Not found report: {}".format(str(err)))
         return
@@ -44,16 +43,8 @@ def main():
             report_base = core.config.RENDER_REPORT_BASE.copy()
             report_base.update(
                 {"test_case": scase,
-                 "test_status": core.config.TEST_CRASH_STATUS,
-                 "file_name": 'Color/' + scase + ".jpg" }
+                 "test_status": core.config.TEST_CRASH_STATUS}
             )
-            if not os.path.exists(os.path.join(args.work_dir, 'Color', scase + '.jpg')):
-                try:
-                    copyfile(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'img', core.config.TEST_CRASH_STATUS + '.jpg')),
-                             os.path.join(args.work_dir, 'Color', scase + '.jpg'))
-                except:
-                    core.config.main_logger.error("Error copy error img for case")
-
             report_base.update(common_info)
             rendered.append(report_base)
 

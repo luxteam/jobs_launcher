@@ -93,16 +93,17 @@
     <table class="baseTable">
         <tr>
             <th>Testing start</th>
-            <th>Plugin version</th>
-            <th>Core version</th>
+<!--            TODO: implement versions as external var-->
+            <th>Major version</th>
+            <th>Minor version</th>
             <th>Branch name</th>
             <th>Commit SHA</th>
             <th>Commit message</th>
         </tr>
         <tr>
             <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
-            <td>{{ common_info.render_version }}</td>
             <td>{{ common_info.core_version }}</td>
+            <td>{{ common_info.minor_version }}</td>
             <td>{{ common_info.branch_name }}</td>
             <td>{{ common_info.commit_sha }}</td>
             <td>{{ common_info.commit_message }}</td>
@@ -119,7 +120,7 @@
     <div id="footer">
         Luxoft RPR CIS
         <br>
-        2017-2020
+        2017-2019
         <br>
         jobs_launcher v{{ "v" | get_jobs_launcher_version() }}
     </div>

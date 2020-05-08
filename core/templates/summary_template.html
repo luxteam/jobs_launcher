@@ -59,9 +59,8 @@
 
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
-
                 <td
-                {%- if report[i].summary.render_duration == -0.0 %}
+                {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
@@ -120,17 +119,11 @@
 <!--                <td>{{ test_conf }}</td>-->
 
                 <td>
-                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">
-                    {% if report[i].results[test_package][test_conf].machine_info %}
-                    {{ report[i].results[test_package][test_conf].machine_info.host }}
-                    {% else %}
-                    Unknown
-                    {% endif %}
-                    </button>
-                    <div class="popup" id="machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}">
+                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}');return false;">{{ report[i].results[test_package][test_conf].machine_info.host }}</button>
+                    <div class="popup" id="machineInfo{{ loop.index }}">
                         <div class="popupContent popupHalfWidth">
                             <form class="popupForm">
-                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('machineInfo{{ loop.index }}');return false;"><img src="report_resources/img/close-button.png"/></button>
                             </form>
                             <table>
                                 <tr>
@@ -141,34 +134,21 @@
                                     <th>GPU</th>
                                 </tr>
                                 <tr>
-                                    {% if report[i].results[test_package][test_conf].machine_info %}
                                     <td>{{ report[i].results[test_package][test_conf].machine_info.os }}</td>
                                     <td>{{ report[i].results[test_package][test_conf].machine_info.ram | round }}</td>
                                     <td>{{ report[i].results[test_package][test_conf].machine_info.cpu }}</td>
                                     <td>{{ report[i].results[test_package][test_conf].machine_info.cpu_count }}</td>
                                     <td>{{ report[i].results[test_package][test_conf].machine_info.render_device }}</td>
-                                    {% else %}
-                                    <td>{{ report[i].results[test_package][test_conf].recovered_info.os }}</td>
-                                    <td>0</td>
-                                    <td>Unknown</td>
-                                    <td>0</td>
-                                    <td>{{ report[i].results[test_package][test_conf].recovered_info.render_device }}</td>
-                                    {% endif %}                                    
                                 </tr>
                             </table>
                         </div>
                     </div>
+
                 </td>
 
-                {% if report[i].results[test_package][test_conf].result_path %}
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
-                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
+                <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/render_log.txt">Render Log</a></td>
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
-                {% else %}
-                <td>Report</td>
-                <td>Render Log</td>
-                <td>Engine log</td>
-                {% endif %}
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
@@ -195,7 +175,7 @@
                 <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
 
                 <td
-                {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
+                {% if report[i].results[test_package][test_conf].render_duration == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
@@ -224,10 +204,8 @@
                 class="skippedStatus"
                 {% endif %}
                 >{{ report[i].summary.skipped }}</td>
-
                 <td>{{ report[i].summary.duration }}</td>
                 <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
-
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
