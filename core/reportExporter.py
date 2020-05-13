@@ -15,7 +15,14 @@ import copy
 import sys
 import traceback
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
-from local_config import *
+
+try:
+    from local_config import *
+except ImportError:
+    main_logger.critical("local config file not found. Default values will be used.")
+    main_logger.critical("Correct report building isn't guaranteed")
+    from core.defaults_local_config import *
+
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):
     with open(os.path.abspath(os.path.join(session_dir, file_name)), "w", encoding='utf8') as file:

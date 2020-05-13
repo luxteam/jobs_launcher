@@ -3,6 +3,9 @@ function showImagesSubtraction(baselineId, renderId, reshalla) {
         infoBox("[Error] Can't read source image.", "#9b5e61");
         return;
     }
+    document.getElementById('pairComparisonDiv').style.display = "";
+    document.getElementsByName('increaseImgSizeButton')[0].disabled = false;
+    document.getElementsByName('reduceImgSizeButton')[0].disabled = false;
 
     var imagesTable = document.getElementById("imgsCompareTable");
     var diffTable = document.getElementById('imgsDiffTable');
@@ -64,9 +67,6 @@ function renderCanvasReshalla(baselineId, renderId) {
 
     var baselineImg = document.getElementById(baselineId);
     var renderedImg = document.getElementById(renderId);
-
-//    diffCanvas.width = renderedImg.naturalWidth;
-//    diffCanvas.height = renderedImg.naturalHeight;
 
     var renderImgData = cv.imread(renderedImg);
     var baselineImgData = cv.imread(baselineImg);

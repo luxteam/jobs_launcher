@@ -9,7 +9,13 @@ import core.reportExporter
 import core.system_info
 from core.auto_dict import AutoDict
 from core.config import *
-from local_config import *
+try:
+    from local_config import *
+except ImportError:
+    main_logger.critical("local config file not found. Default values will be used.")
+    main_logger.critical("Correct report building isn't guaranteed")
+    from core.defaults_local_config import *
+
 
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher

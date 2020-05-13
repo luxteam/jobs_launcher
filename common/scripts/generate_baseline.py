@@ -7,7 +7,13 @@ import common.scripts.generate_baseline_default as generate_baseline_default
 import common.scripts.generate_baseline_ct as generate_baseline_ct
 import common.scripts.generate_baseline_ec as generate_baseline_ec
 import core.config
-from local_config import *
+try:
+    from local_config import *
+except ImportError:
+    core.config.main_logger.critical("local config file not found. Default values will be used.")
+    core.config.main_logger.critical("Correct report building isn't guaranteed")
+    from core.defaults_local_config import *
+
 
 
 def create_args_parser():

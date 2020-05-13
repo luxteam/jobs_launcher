@@ -32,6 +32,10 @@ window.openFullImgSize = {
         var renderImg = document.getElementById('renderedImgPopup');
         var baselineImg = document.getElementById('baselineImgPopup');
 
+        document.getElementById('pairComparisonDiv').style.display = "";
+        document.getElementsByName('increaseImgSizeButton')[0].disabled = false;
+        document.getElementsByName('reduceImgSizeButton')[0].disabled = false;
+
         renderImg.src = "";
         baselineImg.src = "";
 

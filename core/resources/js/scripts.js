@@ -136,11 +136,23 @@ function showCarousel(baselineId, renderId) {
     }
 
     var carousel = document.getElementById('imagesCarousel');
+    var pairComparisonDiv = document.getElementById('pairComparisonDiv');
+    var increaseButton = document.getElementsByName('increaseImgSizeButton')[0];
+    var reduceButton = document.getElementsByName('reduceImgSizeButton')[0];
+    document.getElementById('thresholdRange').style.display = "none";
+    document.getElementById('thresholdView').style.display = "none";
+
     if (carousel.style.display === "none") {
         carousel.style.display = "block";
+        pairComparisonDiv.style.display = "none";
+        increaseButton.disabled = true;
+        reduceButton.disabled = true;
     }
     else {
         carousel.style.display = "none";
+        pairComparisonDiv.style.display = "";
+        increaseButton.disabled = false;
+        reduceButton.disabled = false;
         clearInterval(carouselTask);
         return;
     }

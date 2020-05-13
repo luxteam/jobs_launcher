@@ -317,6 +317,11 @@ a {
     background-color: #dededeeb;
 }
 
+.commonButton[disabled] {
+    cursor: default;
+    background-color: #a6a6a6;
+}
+
 .popupButton {
     border-radius: 9px;
     border: 0.8px solid #999999;
