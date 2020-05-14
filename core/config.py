@@ -1,10 +1,7 @@
-import logging
+from . import engine_logger
 
-logging.basicConfig(filename='launcher.engine.log',
-                    filemode='a',
-                    level=logging.INFO,
-                    format=u'%(filename)-19s[LINE:%(lineno)-3d] #%(levelname)-8s [%(asctime)s] %(message)s')
-main_logger = logging.getLogger('main_logger')
+
+main_logger = engine_logger.create_main_logger()
 
 RENDER_REPORT_BASE = {
     "file_name": "",
@@ -24,9 +21,34 @@ RENDER_REPORT_BASE = {
     "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_time_or": -0.0,
     "difference_color_2": -0
 }
+
+RENDER_REPORT_DEFAULT_PACK = {
+
+}
+
+RENDER_REPORT_EC_PACK = {
+    "minor_version": "",
+    "iterations": -0,
+    "width": -0,
+    "height": -0,
+    "system_memory_usage": -0.0,
+    "gpu_memory_usage": -0.0,
+    "gpu_memory_total": -0.0,
+    "gpu_memory_max": -0.0,
+    "baseline_gpu_memory_usage": -0.0,
+    "baseline_system_memory_usage": -0.0,
+    "difference_vram": -0.0,
+    "difference_ram": -0.0
+}
+
+RENDER_REPORT_CT_PACK = {
+    "difference_time_or": -0.0,
+    "or_render_time": -0.0,
+    "original_render_log": ""
+}
+
 RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
@@ -36,6 +58,7 @@ TIMEOUT_PAR = 3
 PIX_DIFF_MAX = 15
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
+VRAM_DIFF_MAX = 5
 
 """
 # Possible test case statuses
@@ -94,6 +117,9 @@ COMPARE_REPORT = 'compare_report.json'
 COMPARE_REPORT_HTML = 'compare_report.html'
 
 REPORT_RESOURCES_PATH = 'resources'
+REPORT_CONVERSION_LOG = 'conversion.log'
+REPORT_RPR_LOG = 'renderTool.log'
+
 
 TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
