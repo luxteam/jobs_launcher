@@ -5,6 +5,13 @@ import sys
 from shutil import copyfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
+try:
+    from local_config import *
+except ImportError:
+    core.config.main_logger.critical("local config file not found. Default values will be used.")
+    core.config.main_logger.critical("Correct report building isn't guaranteed")
+    from core.defaults_local_config import *
+
 
 
 def main():
@@ -42,6 +49,15 @@ def main():
 
         for scase in skipped_cases:
             report_base = core.config.RENDER_REPORT_BASE.copy()
+            # additional metrics which depend on type of report
+            report_type_pack = {}
+            if report_type == 'default':
+                report_type_pack = core.config.RENDER_REPORT_DEFAULT_PACK.copy()
+            elif report_type == 'ct':
+                report_type_pack = core.config.RENDER_REPORT_EC_PACK.copy()
+            elif report_type == 'ec':
+                report_type_pack = core.config.RENDER_REPORT_CT_PACK.copy()
+            report_base = dict(report_base.items() + report_type_pack.items())
             report_base.update(
                 {"test_case": scase,
                  "test_status": core.config.TEST_CRASH_STATUS,

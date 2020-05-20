@@ -32,6 +32,10 @@ window.openFullImgSize = {
         var renderImg = document.getElementById('renderedImgPopup');
         var baselineImg = document.getElementById('baselineImgPopup');
 
+        document.getElementById('pairComparisonDiv').style.display = "";
+        document.getElementsByName('increaseImgSizeButton')[0].disabled = false;
+        document.getElementsByName('reduceImgSizeButton')[0].disabled = false;
+
         renderImg.src = "";
         baselineImg.src = "";
 
@@ -50,6 +54,9 @@ window.openFullImgSize = {
 
         document.getElementById("imgsCompareTable").style.display = "";
         document.getElementById("imgsDiffTable").style.display = "none";
+        document.getElementById('imgsDiffTable').is_reshalla = undefined;
+        document.getElementById('thresholdRange').style.display = "none";
+        document.getElementById('thresholdView').style.display = "none";
 
         openModalWindow('imgsModal');
     }

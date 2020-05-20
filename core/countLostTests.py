@@ -6,7 +6,12 @@ import sys
 import argparse
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
-from local_config import *
+try:
+    from local_config import *
+except ImportError:
+    main_logger.critical("local config file not found. Default values will be used.")
+    main_logger.critical("Correct report building isn't guaranteed")
+    from core.defaults_local_config import *
 
 
 # match gpu and OS labels in Jenkins and platform name which session_report.json contains
