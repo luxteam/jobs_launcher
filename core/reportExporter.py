@@ -439,7 +439,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
@@ -469,6 +469,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     summary_report = None
 
     main_logger.info("Saving summary report...")
+
+    main_logger.info(node_retry_info)
     try:
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template_{}.html'.format(report_type))
