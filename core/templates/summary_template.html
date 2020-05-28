@@ -118,7 +118,13 @@
             <tr>
                 <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
+                {% for retry in node_retry_info %}
+                    {% if (retry['tests'] == test_package and retry['gpu'] == i) %}
+                <td style="background:red" title="{{ retry['test_package'] }}">
+                    {% else %}
                 <td>
+                    {% endif %}
+                {% endfor %}
                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">
                     {% if report[i].results[test_package][test_conf].machine_info %}
                     {{ report[i].results[test_package][test_conf].machine_info.host }}
