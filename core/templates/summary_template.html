@@ -120,7 +120,7 @@
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 {% for retry in node_retry_info %}
                     {% if (retry['tests'] == test_package and retry['gpu'] == i) %}
-                <td style="background:red" title="{{ retry['test_package'] }}">
+                <td style="background:red" title="{{ retry['nodeName }}">
                     {% else %}
                 <td>
                     {% endif %}
