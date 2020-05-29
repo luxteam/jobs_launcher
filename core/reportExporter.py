@@ -446,7 +446,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     branch_name = 'origin/develop'
     commit_message = 'buildmaster\u003a\u0020version\u0020update\u0020to\u00202.9.13'
     node_retry_info='[[\u0022nodeName\u0022\u003a\u0022PC-TESTER-BRUSSELS-WIN10\u0022,\u0022tests\u0022\u003a\u0022Emissive\u0022,\u0022gpu\u0022\u003a\u0022AMD_RXVEGA\u0022]]'
-    
+
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
 
@@ -474,7 +474,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    node_retry_info = json.loads(node_retry_info)
+    node_retry_info = json.loads(node_retry_info.decode('string_escape'))
 
     main_logger.info("Saving summary report...")
 
