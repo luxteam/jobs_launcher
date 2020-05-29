@@ -440,7 +440,13 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
 
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
-
+    work_dir = '..\\..\\Test_20Report\\'
+    major_title = 'Maya\u00202019'
+    commit_sha = '3885fcddfb9c690dd3eda064b231eabac53b9345'
+    branch_name = 'origin/develop'
+    commit_message = 'buildmaster\u003a\u0020version\u0020update\u0020to\u00202.9.13'
+    node_retry_info='[[\u0022nodeName\u0022\u003a\u0022PC-TESTER-BRUSSELS-WIN10\u0022,\u0022tests\u0022\u003a\u0022Emissive\u0022,\u0022gpu\u0022\u003a\u0022AMD_RXVEGA\u0022]]'
+    
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
 
