@@ -388,3 +388,9 @@ a {
   display: block;
   margin: auto;
 }
+
+.retry{
+  background-color: white;
+  padding: 50px;
+  border-radius: 6px;
+}

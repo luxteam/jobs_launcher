@@ -116,15 +116,9 @@
     {% for test_package, value in report[i].results | dictsort %}
         {% set resultsloop = loop %}
             <tr>
-                <td rowspan="{{ report[i].results[test_package] | length }}">{{ test_package }}</td>
+                {{ check_retry(node_retry_info, test_conf, test_package, report[i].results[test_package]['']['machine_info']['host']) | safe }}
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
-                {% for retry in node_retry_info %}
-                    {% if (retry['tests'] == test_package and retry['gpu'] == i) %}
-                <td style="background:red" title="{{ retry['nodeName }}">
-                    {% else %}
                 <td>
-                    {% endif %}
-                {% endfor %}
                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">
                     {% if report[i].results[test_package][test_conf].machine_info %}
                     {{ report[i].results[test_package][test_conf].machine_info.host }}

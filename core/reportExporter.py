@@ -440,13 +440,6 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
 
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
-    work_dir = '..\\..\\Test_20Report\\'
-    major_title = 'Maya\u00202019'
-    commit_sha = '3885fcddfb9c690dd3eda064b231eabac53b9345'
-    branch_name = 'origin/develop'
-    commit_message = 'buildmaster\u003a\u0020version\u0020update\u0020to\u00202.9.13'
-    node_retry_info='[[\u0022nodeName\u0022\u003a\u0022PC-TESTER-BRUSSELS-WIN10\u0022,\u0022tests\u0022\u003a\u0022Emissive\u0022,\u0022gpu\u0022\u003a\u0022AMD_RXVEGA\u0022]]'
-
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
 
@@ -474,7 +467,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    node_retry_info = json.loads(node_retry_info.decode('string_escape'))
+    node_retry_info = json.loads(node_retry_info) #.decode('string_escape'))
 
     main_logger.info("Saving summary report...")
 
@@ -494,7 +487,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               node_retry_info=node_retry_info)
+                                               node_retry_info=node_retry_info,
+                                               check_retry=check_retry)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -553,3 +547,37 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info, env)
+
+def check_retry(node_retry_info, config, test_package, node):
+    try:
+        for retry in node_retry_info:
+            for tester in retry['Testers']:
+                if node.upper() in tester:
+                    return'''
+                        <td class="skippedStatus">
+                            <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
+                                {test_package}
+                            </button>
+                        </td>
+                        <div class="popup" id="{id}">
+                            <form class="popupForm">
+                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{id}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                            </form>
+                            <div class="popupContent popupHalfWidth">
+                                <div class="retry">
+                                    {temp}
+                                </div>
+                            </div>
+                        </div>
+''' .format(test_package=test_package,
+            id = test_package+tester,
+            temp = get_retry_info(retry['Tries'][test_package]))
+    except Exception as e:
+        return '<td>{} {} {}</td>'.format(test_package, e, node)
+
+
+def get_retry_info(retries):
+    result = 'Crash logs:<br>'
+    for retry in retries:
+        result += '{}: {}'.format(retry['host'], retry['link'])
+    return result
