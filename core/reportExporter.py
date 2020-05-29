@@ -468,7 +468,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    node_retry_info = json.loads(node_retry_info)
+    node_retry_info = json.loads(node_retry_info.decode('string_escape'))
 
     main_logger.info("Saving summary report...")
 
