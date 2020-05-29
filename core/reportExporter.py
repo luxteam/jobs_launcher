@@ -467,11 +467,10 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    node_retry_info = json.loads(node_retry_info.decode('string_escape'))
+    node_retry_info = json.loads(bytes(node_retry_info, "utf-8").decode("unicode_escape"))
 
     main_logger.info("Saving summary report...")
 
-    main_logger.info(node_retry_info)
     try:
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template_{}.html'.format(report_type))
