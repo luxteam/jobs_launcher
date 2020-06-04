@@ -570,13 +570,14 @@ def check_retry(node_retry_info, config, test_package, node):
                         </div>
 ''' .format(test_package=test_package,
             id = test_package+tester,
-            temp = get_retry_info(retry['Tries'][test_package]))
+            temp = get_retry_info(retry['Tries'], test_package))
     except Exception as e:
-        return '<td>{} {} {}</td>'.format(test_package, e, node)
+        return '<td>{}</td>'.format(test_package)
 
 
-def get_retry_info(retries):
+def get_retry_info(retries, test_package):
     result = 'Crash logs:<br>'
     for retry in retries:
-        result += '{}: {}'.format(retry['host'], retry['link'])
+        for retry in retry.get(test_package, []):
+            result += '{}: {}'.format(retry['host'], retry['link'])
     return result
