@@ -564,7 +564,9 @@ def check_retry(node_retry_info, config, test_package, node):
                             </form>
                             <div class="popupContent popupHalfWidth">
                                 <div class="retry">
-                                    {temp}
+                                    <table>
+                                        {temp}
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -576,8 +578,8 @@ def check_retry(node_retry_info, config, test_package, node):
 
 
 def get_retry_info(retries, test_package):
-    result = 'Crash logs:<br>'
+    result = '<tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>'
     for retry in retries:
         for retry in retry.get(test_package, []):
-            result += '{}: {}'.format(retry['host'], retry['link'])
+            result += '<tr><th>{}</th><th>{}</th><th>{}</th></tr>'.format(retry['host'], retry['link'], retry['time'])
     return result
