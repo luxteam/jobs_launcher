@@ -195,14 +195,14 @@ def main():
         is_client = None
         try:
             is_client = ISClient(os.getenv("IMAGE_SERVICE_URL"))
-            main_logger.info("Image Service client created")
+            print("Image Service client created")
         except Exception as e:
-            main_logger.info("Image Service client creation error: {}".format(str(e)))
+            print("Image Service client creation error: {}".format(str(e)))
 
 
         res = []
         try:
-            main_logger.info('Start preparing results')
+            print('Start preparing results')
             cases = []
 
             with open(os.path.join(session_dir, 'session_report.json')) as file:
@@ -229,14 +229,14 @@ def main():
                 env = {"gpu": get_gpu(), **get_machine_info()}
                 env.pop('os')
                 env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
-                main_logger.info(env)
+                print(env)
 
                 response = rbs_client.send_test_suite(res=res, env=env)
-                main_logger.info('Test suite results sent with code {}'.format(response.status_code))
-                main_logger.info(response.content)
+                print('Test suite results sent with code {}'.format(response.status_code))
+                print(response.content)
 
         except Exception as e:
-            main_logger.info("Test case result creation error: {}".format(str(e)))
+            print("Test case result creation error: {}".format(str(e)))
 
 
 
