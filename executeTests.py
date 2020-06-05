@@ -211,9 +211,9 @@ def main():
                 suites = data["results"]
 
             for suite in suites:
-                cases = suite_id[""]["render_results"]
+                cases = suite[""]["render_results"]
                 for case in cases:
-                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case_info['render_color_path']))) if is_client else -1
+                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
                     res.append({
                         'name': case['test_case'],
                         'status': case['test_status'],
@@ -225,7 +225,7 @@ def main():
                         }
                     })
 
-                rbs_client.get_suite_id_by_name(case_info[0]['test_group'])
+                rbs_client.get_suite_id_by_name(case['test_group'])
                 # send machine info to rbs
                 env = {"gpu": get_gpu(), **get_machine_info()}
                 env.pop('os')
