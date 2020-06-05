@@ -22,6 +22,8 @@ import jobs_launcher.job_launcher
 
 from rbs_client import RBS_Client, str2bool
 from rbs_client import logger as rbs_logger
+from image_service_client import ISClient
+
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
@@ -187,6 +189,55 @@ def main():
     core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report\n\n')
     shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+
+    if rbs_client:
+        print("Try to send results to RBS")
+        is_client = None
+        try:
+            is_client = ISClient(os.getenv("IMAGE_SERVICE_URL"))
+            main_logger.info("Image Service client created")
+        except Exception as e:
+            main_logger.info("Image Service client creation error: {}".format(str(e)))
+
+
+        res = []
+        try:
+            main_logger.info('Start preparing results')
+            cases = []
+
+            with open(os.path.join(session_dir, 'session_report.json')) as file:
+                data = json.loads(file.read())
+                sites = data["results"]
+
+            for suite in suites:
+                cases = suite_id[""]["render_results"]
+                for case in cases:
+                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case_info['render_color_path']))) if is_client else -1
+                    res.append({
+                        'name': case['test_case'],
+                        'status': case['test_status'],
+                        'metrics': {
+                            'render_time': case['render_time']
+                        },
+                        "artefacts": {
+                            "rendered_image": str(image_id)
+                        }
+                    })
+
+                rbs_client.get_suite_id_by_name(case_info[0]['test_group'])
+                # send machine info to rbs
+                env = {"gpu": get_gpu(), **get_machine_info()}
+                env.pop('os')
+                env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
+                main_logger.info(env)
+
+                response = rbs_client.send_test_suite(res=res, env=env)
+                main_logger.info('Test suite results sent with code {}'.format(response.status_code))
+                main_logger.info(response.content)
+
+        except Exception as e:
+            main_logger.info("Test case result creation error: {}".format(str(e)))
+
 
 
 if __name__ == "__main__":
