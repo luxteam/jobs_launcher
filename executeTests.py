@@ -204,10 +204,11 @@ def main():
         try:
             print('Start preparing results')
             cases = []
+            suites = []
 
             with open(os.path.join(session_dir, 'session_report.json')) as file:
                 data = json.loads(file.read())
-                sites = data["results"]
+                suites = data["results"]
 
             for suite in suites:
                 cases = suite_id[""]["render_results"]
