@@ -227,7 +227,7 @@ def main():
 
                 rbs_client.get_suite_id_by_name(suite_name)
                 # send machine info to rbs
-                env = {"gpu": get_gpu(), **get_machine_info()}
+                env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
                 env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
                 print(env)
