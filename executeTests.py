@@ -210,7 +210,7 @@ def main():
                 data = json.loads(file.read())
                 suites = data["results"]
 
-            for suite_name, suite_result in suites:
+            for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
                 for case in cases:
                     image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
