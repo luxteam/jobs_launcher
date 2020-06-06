@@ -580,5 +580,5 @@ def get_retry_info(retries, test_package):
     result = '<tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>'
     for retry in retries:
         for retry in retry.get(test_package, []):
-            result += '<tr><td>{}</td><td>{}</td><td><a href="{}">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
+            result += '<tr><td>{}</td><td>{}</td><td><a href="{}.crash.log">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
     return result
