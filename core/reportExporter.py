@@ -416,6 +416,9 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                             for key_upd in keys_for_upd:
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
+                    else:
+                    	# test case was lost
+                    	continue
 
                     # for core baseline_render_time initialize via compareByJson script
                     if report_type != 'ec':
