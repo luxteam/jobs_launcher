@@ -548,13 +548,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     build_local_reports(work_dir, summary_report, common_info, env)
 
 def check_retry(node_retry_info, config, test_package, node):
+    result = '<td>{}</td>'.format(test_package)
     try:
         for retry in node_retry_info:
             for tester in retry['Testers']:
                 if node.upper() in tester:
                     for group in retry['Tries']:
                         if test_package in group.keys():
-                            return'''
+                            result = '''
                                 <td class="skippedStatus">
                                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
                                         {test_package}
@@ -572,9 +573,11 @@ def check_retry(node_retry_info, config, test_package, node):
                                 </td>
 ''' .format(test_package=test_package,
             id = test_package+tester,
-            temp = get_retry_info(retry['Tries'], test_package))
+            temp=get_retry_info(retry['Tries'], test_package))
     except Exception as e:
-        return '<td>{}</td>'.format(test_package)
+        pass
+
+    return result
 
 
 def get_retry_info(retries, test_package):
