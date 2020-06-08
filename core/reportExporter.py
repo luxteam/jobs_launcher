@@ -553,23 +553,24 @@ def check_retry(node_retry_info, config, test_package, node):
         for retry in node_retry_info:
             for tester in retry['Testers']:
                 if node.upper() in tester:
-                    return'''
-                        <td class="skippedStatus">
-                            <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
-                                {test_package}
-                            </button>
-                            <div class="popup" id="{id}">
-                                <form class="popupForm">
-                                    <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{id}');return false;"><img src="report_resources/img/close-button.png"/></button>
-                                </form>
-                                <div class="popupContent popupHalfWidth">
-                                    <table class="baseTable" data-toggle="table">
-                                        {temp}
-                                    </table>
-                                </div>
-                            </div>
-                        </td>
-                        
+                    for group in retry['Tries']:
+                        if test_package in group.keys():
+                            return'''
+                                <td class="skippedStatus">
+                                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
+                                        {test_package}
+                                    </button>
+                                    <div class="popup" id="{id}">
+                                        <form class="popupForm">
+                                            <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{id}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                                        </form>
+                                        <div class="popupContent popupHalfWidth">
+                                            <table class="baseTable" data-toggle="table">
+                                                {temp}
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
 ''' .format(test_package=test_package,
             id = test_package+tester,
             temp = get_retry_info(retry['Tries'], test_package))
