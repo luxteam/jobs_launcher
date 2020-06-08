@@ -554,7 +554,7 @@ def check_retry(node_retry_info, config, test_package, node):
             for tester in retry['Testers']:
                 if node.upper() in tester:
                     for group in retry['Tries']:
-                        if test_package in group.keys():
+                        if test_package in group.keys() or group.endswith('.json'):
                             result = '''
                                 <td class="skippedStatus">
                                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
