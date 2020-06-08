@@ -467,8 +467,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    #node_retry_info = json.loads(bytes(node_retry_info, "utf-8").decode("unicode_escape"))
-    node_retry_info = json.loads(bytes('[{\u0022Testers\u0022\u003a[\u0022PC-TESTER-VENICE-WIN10\u0022,\u0022PC-TESTER-LONDON-WIN10\u0022],\u0022Tries\u0022\u003a[{\u0022Emissive\u0022\u003a[{\u0022host\u0022\u003a\u0022PC-TESTER-JERUSALEM-WIN10\u0022,\u0022link\u0022\u003a\u0022link_to_crash\u0022,\u0022time\u0022\u003a\u00222020-06-05T18\u003a31\u003a06.496\u0022}]}]}]', "utf-8").decode("unicode_escape"))
+    node_retry_info = json.loads(bytes(node_retry_info, "utf-8").decode("unicode_escape"))
 
     main_logger.info("Saving summary report...")
 
@@ -582,5 +581,5 @@ def get_retry_info(retries, test_package):
     result = '<tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>'
     for retry in retries:
         for retry in retry.get(test_package, []):
-            result += '<tr><td>{}</td><td>{}</td><td><a href="{}">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
+            result += '<tr><td>{}</td><td>{}</td><td><a href="{}.crash.log">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
     return result
