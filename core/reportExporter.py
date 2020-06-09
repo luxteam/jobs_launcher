@@ -467,7 +467,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    node_retry_info = json.loads(bytes(node_retry_info, "utf-8").decode("unicode_escape"))
+    node_retry_info = json.loads('[{"Testers":["PC-TESTER-TORONTO-UBUNTU1804","PC-TESTER-PARIS-UBUNTU1804"],"Tries":[{"regression.json":[{"host":"PC-TESTER-TORONTO-UBUNTU1804","link":"regression.json.PC-TESTER-TORONTO-UBUNTU1804","time":"2020-06-09T19:01:08.516"}]}]},{"Testers":["PC-TESTER-GOTO-OSX","PC-TESTER-MUMBAI-OSX"],"Tries":[{"regression.json":[{"host":"PC-TESTER-MUMBAI-OSX","link":"regression.json.PC-TESTER-MUMBAI-OSX","time":"2020-06-09T19:50:52.621"}]}]}]')#bytes(node_retry_info, "utf-8").decode("unicode_escape"))
 
     main_logger.info("Saving summary report...")
 
@@ -554,7 +554,7 @@ def check_retry(node_retry_info, config, test_package, node):
             for tester in retry['Testers']:
                 if node.upper() in tester:
                     for group in retry['Tries']:
-                        if test_package in group.keys() or group.endswith('.json'):
+                        if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json')]:
                             result = '''
                                 <td class="skippedStatus">
                                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
