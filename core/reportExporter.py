@@ -579,6 +579,11 @@ def check_retry(node_retry_info, config, test_package, node):
 def get_retry_info(retries, test_package):
     result = '<tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>'
     for retry in retries:
-        for retry in retry.get(test_package, []):
+        for group in retry.keys():
+            if group.endswith('.json'):
+                groupOrJson = retry[str(next(iter(retries[0].keys())))]
+            else:
+                groupOrJson = retry.get(test_package, [])
+        for retry in groupOrJson:
             result += '<tr><td>{}</td><td>{}</td><td><a href="{}">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
     return result
