@@ -548,32 +548,36 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     build_local_reports(work_dir, summary_report, common_info, env)
 
 def check_retry(node_retry_info, config, test_package, node):
+    result = '<td>{}</td>'.format(test_package)
     try:
         for retry in node_retry_info:
             for tester in retry['Testers']:
                 if node.upper() in tester:
-                    return'''
-                        <td class="skippedStatus">
-                            <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
-                                {test_package}
-                            </button>
-                            <div class="popup" id="{id}">
-                                <form class="popupForm">
-                                    <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{id}');return false;"><img src="report_resources/img/close-button.png"/></button>
-                                </form>
-                                <div class="popupContent popupHalfWidth">
-                                    <table class="baseTable" data-toggle="table">
-                                        {temp}
-                                    </table>
-                                </div>
-                            </div>
-                        </td>
-                        
+                    for group in retry['Tries']:
+                        if test_package in group.keys() or group.endswith('.json'):
+                            result = '''
+                                <td class="skippedStatus">
+                                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
+                                        {test_package}
+                                    </button>
+                                    <div class="popup" id="{id}">
+                                        <form class="popupForm">
+                                            <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{id}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                                        </form>
+                                        <div class="popupContent popupHalfWidth">
+                                            <table class="baseTable" data-toggle="table">
+                                                {temp}
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
 ''' .format(test_package=test_package,
             id = test_package+tester,
-            temp = get_retry_info(retry['Tries'], test_package))
+            temp=get_retry_info(retry['Tries'], test_package))
     except Exception as e:
-        return '<td>{}</td>'.format(test_package)
+        pass
+
+    return result
 
 
 def get_retry_info(retries, test_package):
@@ -585,5 +589,5 @@ def get_retry_info(retries, test_package):
             else:
                 groupOrJson = retry.get(test_package, [])
         for retry in groupOrJson:
-            result += '<tr><td>{}</td><td>{}</td><td><a href="{}">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
+            result += '<tr><td>{}</td><td>{}</td><td><a href="{}.crash.log">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
     return result
