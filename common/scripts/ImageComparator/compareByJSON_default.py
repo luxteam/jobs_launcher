@@ -11,7 +11,7 @@ import core.config
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('file_name', ''), 'not.exist'))
+        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('test_case', '') + '.jpg', 'not.exist'))
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
