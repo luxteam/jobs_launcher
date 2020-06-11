@@ -2,7 +2,7 @@ import os
 import json
 from CompareMetrics_ec import CompareMetrics
 import sys
-import shutil
+from shutil import copyfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
 
@@ -20,17 +20,34 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
 
     for key in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
         if key in img.keys():
-            render_img_path = os.path.join(work_dir, img[key])
 
-            try:
-                baseline_img_path = os.path.join(base_dir, baseline_item[key])
-            except KeyError as err:
-                core.config.main_logger.error("No such file in baseline: {}".format(str(err)))
-                continue
+            baseline_img_path = os.path.join(base_dir, baseline_item.get('render_color_path', 'not.exist'))
+            # if baseline image not found - return
+            if not os.path.exists(baseline_img_path):
+                core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
+                img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
+                if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                    img.update({'test_status': core.config.TEST_DIFF_STATUS})
+                return img
+
+            # else add baseline images paths to json
+            img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_item['render_color_path']), work_dir)})
+            for thumb in core.config.THUMBNAIL_PREFIXES:
+                if thumb + img['file_name'] in baseline_item.keys() and os.path.exists(os.path.join(base_dir, baseline_item[thumb + img['file_name']])):
+                    img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_item[thumb + img['file_name']]), work_dir)})
+
+            # for crushed and non-executed cases only set baseline img src
+            if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
+                return img
+
+            render_img_path = os.path.join(work_dir, img[key])
+            if not os.path.exists(render_img_path):
+                core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
+                return img
 
             metrics = None
             try:
-                metrics = CompareMetrics(render_img_path, baseline_img_path)
+                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
             except (FileNotFoundError, OSError) as err:
                 core.config.main_logger.error("Error file open: ".format(str(err)))
                 return img
@@ -39,7 +56,7 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
             img.update({'difference_color': pix_difference})
             if type(pix_difference) is str or pix_difference > pix_diff_max:
                 img['test_status'] = core.config.TEST_DIFF_STATUS
-            img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_item[key]), work_dir)})
+            
 
     return img
 
@@ -88,16 +105,29 @@ def main(args):
         core.config.main_logger.error("Render report doesn't exists")
         return 1
 
+    if not os.path.exists(args.base_dir):
+        core.config.main_logger.error("Baseline folder doesn't exist. It will be created with baseline stub img.")
+        os.makedirs(args.base_dir)
+
+    try:
+        if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
+            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png'),
+                     os.path.join(args.base_dir, 'baseline.png'))
+    except (OSError, FileNotFoundError) as err:
+        core.config.main_logger.error("Couldn't copy baseline stub: {}".format(str(err)))
+
     if not os.path.exists(baseline_json_path):
         core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
         shutil.copyfile(render_json_path, os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED))
-        return 1
 
-    with open(render_json_path, 'r') as file:
-        render_json = json.loads(file.read())
-
-    with open(baseline_json_path, 'r') as file:
-        baseline_json = json.loads(file.read())
+    baseline_json = {}
+    try:
+        with open(render_json_path, 'r') as file:
+            render_json = json.loads(file.read())
+        with open(baseline_json_path, 'r') as file:
+            baseline_json = json.loads(file.read())
+    except (FileNotFoundError, OSError, json.JSONDecodeError) as err:
+        core.config.main_logger.error("Can't get input data: {}".format(str(err)))
 
     for img in render_json:
         baseline_item = [x for x in baseline_json if x['test_case'] == img['test_case']]
@@ -112,6 +142,9 @@ def main(args):
                 core.config.main_logger.error("Can't get baseline render device")
         else:
             core.config.main_logger.error("Found invalid count of test_cases in baseline json")
+            img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, 'baseline.png'), args.work_dir)})
+            if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                img.update({'test_status': core.config.TEST_DIFF_STATUS})
             continue
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
