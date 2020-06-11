@@ -575,7 +575,7 @@ def check_retry(node_retry_info, config, test_package, node):
             id = test_package+tester,
             temp=get_retry_info(retry['Tries'], test_package))
     except Exception as e:
-        pass
+        main_logger.error('Error {} while processing retry info'.format(str(e)))
 
     return result
 
