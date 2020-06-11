@@ -86,7 +86,7 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 				data = json.load(file)
 			# number of lost tests = number of tests in test package
-			if tool_name == 'blender' or tool_name == 'maya':
+			if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'core':
 				lost_tests_count = len(data)
 			elif tool_name == 'max':
 				lost_tests_count = len(data['cases'])

@@ -124,7 +124,8 @@ REPORT_RPR_LOG = 'renderTool.log'
 TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
         'maya': 'test_cases.json',
-        'max': 'case_list.json'
+        'max': 'case_list.json',
+        'core': 'SceneList.json'
     }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 
