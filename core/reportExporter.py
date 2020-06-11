@@ -589,5 +589,5 @@ def get_retry_info(retries, test_package):
             else:
                 groupOrJson = retry.get(test_package, [])
         for retry in groupOrJson:
-            result += '<tr><td>{}</td><td>{}</td><td><a href="{}.crash.log">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
+            result += '<tr><td>{}</td><td>{}</td><td><a href="{}">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
     return result
