@@ -44,9 +44,22 @@ PLATFORM_CONVERTATIONS = {
 	}
 }
 
-def main(lost_tests_results, tests_dir, output_dir, is_regression):
+def get_lost_tests_count(data, tool_name):
+	# number of lost tests = number of tests in test package
+	if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'core':
+		lost_tests_count = len(data)
+	elif tool_name == 'max':
+		lost_tests_count = len(data['cases'])
+	else:
+		raise Exception('Unexpected tool name: ' + tool_name)
+	return lost_tests_count
+
+
+def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 	lost_tests_data = {}
 	lost_tests_results = ast.literal_eval(lost_tests_results)
+
+	tests_list = tests_list.split(' ')
 
 	# check that session_reports is in each results directory
 	try:
@@ -66,7 +79,7 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 		# all results were lost
 		pass
 
-	if is_regression == 'true':
+	if execution_type == 'regression':
 		with open(os.path.join(tests_dir, "jobs", "regression.json"), "r") as file:
 			test_packages = json.load(file)
 		for test_package_name in test_packages:
@@ -79,25 +92,32 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 				if joined_gpu_os_names not in lost_tests_data:
 					lost_tests_data[joined_gpu_os_names] = {}
 				lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
-	else:
+	elif execution_type == 'split_execution':
 		for lost_test_result in lost_tests_results:
 			gpu_name = lost_test_result.split('-')[0]
 			os_name = lost_test_result.split('-')[1]
 			test_package_name = lost_test_result.split('-')[2]
 			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 				data = json.load(file)
-			# number of lost tests = number of tests in test package
-			if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'core':
-				lost_tests_count = len(data)
-			elif tool_name == 'max':
-				lost_tests_count = len(data['cases'])
-			else:
-				raise Exception('Unexpected tool name: ' + tool_name)
+			lost_tests_count = get_lost_tests_count(data, tool_name)
 			# join converted gpu name and os name
 			joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 			if joined_gpu_os_names not in lost_tests_data:
 				lost_tests_data[joined_gpu_os_names] = {}
 			lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
+	else:
+		for test_package_name in tests_list:
+			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
+				data = json.load(file)
+			lost_tests_count = get_lost_tests_count(data, tool_name)
+			for lost_test_result in lost_tests_results:
+				gpu_name = lost_test_result.split('-')[0]
+				os_name = lost_test_result.split('-')[1]
+				# join converted gpu name and os name
+				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
+				if joined_gpu_os_names not in lost_tests_data:
+					lost_tests_data[joined_gpu_os_names] = {}
+				lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
 
 	os.makedirs(output_dir, exist_ok=True)
 	with open(os.path.join(output_dir, LOST_TESTS_JSON_NAME), "w") as file:
