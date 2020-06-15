@@ -47,7 +47,7 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
 
             metrics = None
             try:
-                metrics = CompareMetrics.CompareMetrics(render_img_path, baseline_img_path)
+                metrics = CompareMetrics(render_img_path, baseline_img_path)
             except (FileNotFoundError, OSError) as err:
                 core.config.main_logger.error("Error file open: ".format(str(err)))
                 return img
