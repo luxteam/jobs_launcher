@@ -25,7 +25,8 @@ PLATFORM_CONVERTATIONS = {
 			"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
 			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
-			"NVIDIA_RTX2080TI": "GeForce RTX 2080 Ti"
+			"NVIDIA_RTX2080TI": "GeForce RTX 2080 Ti",
+			"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080"
 		}
 	},
 	"Ubuntu18": {
@@ -43,9 +44,30 @@ PLATFORM_CONVERTATIONS = {
 	}
 }
 
-def main(lost_tests_results, tests_dir, output_dir, is_regression):
+def get_lost_tests_count(data, tool_name, test_package_name):
+	# number of lost tests = number of tests in test package
+	if tool_name == 'blender' or tool_name == 'maya':
+		lost_tests_count = len(data)
+	elif tool_name == 'max':
+		lost_tests_count = len(data['cases'])
+	elif tool_name == 'core':
+		lost_tests_count = len(data)
+		for scene in data:
+			json_name = scene['scene'].replace('rpr', 'json')
+			with open(os.path.join("..", "core_tests_configuration", test_package_name, json_name), "r") as file:
+				configuration_data = json.load(file)
+			if 'aovs' in configuration_data:
+				lost_tests_count += len(configuration_data['aovs'])
+	else:
+		raise Exception('Unexpected tool name: ' + tool_name)
+	return lost_tests_count
+
+
+def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 	lost_tests_data = {}
 	lost_tests_results = ast.literal_eval(lost_tests_results)
+
+	tests_list = tests_list.split(' ')
 
 	# check that session_reports is in each results directory
 	try:
@@ -65,7 +87,7 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 		# all results were lost
 		pass
 
-	if is_regression == 'true':
+	if execution_type == 'regression':
 		with open(os.path.join(tests_dir, "jobs", "regression.json"), "r") as file:
 			test_packages = json.load(file)
 		for test_package_name in test_packages:
@@ -78,25 +100,32 @@ def main(lost_tests_results, tests_dir, output_dir, is_regression):
 				if joined_gpu_os_names not in lost_tests_data:
 					lost_tests_data[joined_gpu_os_names] = {}
 				lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
-	else:
+	elif execution_type == 'split_execution':
 		for lost_test_result in lost_tests_results:
 			gpu_name = lost_test_result.split('-')[0]
 			os_name = lost_test_result.split('-')[1]
 			test_package_name = lost_test_result.split('-')[2]
 			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 				data = json.load(file)
-			# number of lost tests = number of tests in test package
-			if tool_name == 'blender' or tool_name == 'maya':
-				lost_tests_count = len(data)
-			elif tool_name == 'max':
-				lost_tests_count = len(data['cases'])
-			else:
-				raise Exception('Unexpected tool name: ' + tool_name)
+			lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
 			# join converted gpu name and os name
 			joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 			if joined_gpu_os_names not in lost_tests_data:
 				lost_tests_data[joined_gpu_os_names] = {}
 			lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
+	else:
+		for test_package_name in tests_list:
+			with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
+				data = json.load(file)
+			lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
+			for lost_test_result in lost_tests_results:
+				gpu_name = lost_test_result.split('-')[0]
+				os_name = lost_test_result.split('-')[1]
+				# join converted gpu name and os name
+				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
+				if joined_gpu_os_names not in lost_tests_data:
+					lost_tests_data[joined_gpu_os_names] = {}
+				lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
 
 	os.makedirs(output_dir, exist_ok=True)
 	with open(os.path.join(output_dir, LOST_TESTS_JSON_NAME), "w") as file:
