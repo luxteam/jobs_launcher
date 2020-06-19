@@ -18,11 +18,17 @@ except ImportError:
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        if tool_name == 'rprviewer':
-            baseline_extension = '.png'
-        else:
-            baseline_extension = '.jpg'
-        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('test_case', '') + baseline_extension, 'not.exist'))
+        baseline_name = baseline_json.get(img.get('file_name', ''), 'not.exist')
+
+        if baseline_name == 'not.exist':
+            if tool_name == 'rprviewer':
+                baseline_extension = '.png'
+            else:
+            	# TODO if test case finishes with error it might replace png baseline by jpg baseline. It shouls find other way to restore baseline path
+                baseline_extension = '.jpg'
+            baseline_name = baseline_json.get(img.get('test_case', '') + baseline_extension, 'not.exist')
+
+        baseline_img_path = os.path.join(base_dir, baseline_name)
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
