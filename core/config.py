@@ -130,3 +130,5 @@ TEST_CASES_JSON_NAME = {
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 
 DONT_COMPARE = "Do not compare"
+
+POSSIBLE_BASELINE_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
