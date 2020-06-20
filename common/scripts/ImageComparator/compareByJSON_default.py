@@ -18,14 +18,13 @@ except ImportError:
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        baseline_name = baseline_json.get(img.get('file_name', ''), 'not.exist')
+        baseline_name = 'not.exist'
 
-        if baseline_name == 'not.exist':
-            for possible_extension in core.config.POSSIBLE_BASELINE_EXTENSIONS:
-                baseline_name = baseline_json.get(img.get('test_case', '') + '.' + possible_extension, 'not.exist')
-                if baseline_name != 'not.exist':
-                    # baseline found
-                    break
+        for possible_extension in core.config.POSSIBLE_BASELINE_EXTENSIONS:
+            baseline_name = baseline_json.get(img.get('test_case', '') + '.' + possible_extension, 'not.exist')
+            if baseline_name != 'not.exist':
+                # baseline found
+                break
 
         baseline_img_path = os.path.join(base_dir, baseline_name)
         # if baseline image not found - return
@@ -37,10 +36,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             return img
 
         # else add baseline images paths to json
-        img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[img['file_name']]), work_dir)})
+        img.update({'baseline_color_path': os.path.relpath(baseline_img_path, work_dir)})
         for thumb in core.config.THUMBNAIL_PREFIXES:
-            if thumb + img['file_name'] in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + img['file_name']])):
-                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + img['file_name']]), work_dir)})
+            if thumb + baseline_name in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + baseline_name])):
+                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + baseline_name]), work_dir)})
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
