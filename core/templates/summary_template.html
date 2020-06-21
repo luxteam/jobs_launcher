@@ -116,7 +116,7 @@
     {% for test_package, value in report[i].results | dictsort %}
         {% set resultsloop = loop %}
             <tr>
-                {% if report[i].results[test_package][''].machine_info.retries is iterable %}
+                {% if report[i].results[test_package][''].machine_info.retries is defined %}
                     <td class="skippedStatus">
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{i}}.{{test_package}}');return false;">
                             {{test_package}}
