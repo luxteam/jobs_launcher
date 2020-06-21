@@ -116,7 +116,7 @@
     {% for test_package, value in report[i].results | dictsort %}
         {% set resultsloop = loop %}
             <tr>
-                {% if report[i].results[test_package][''].machine_info.host is iterable and report[i].results[test_package][''].machine_info.host is not string %}
+                {% if report[i].results[test_package][''].machine_info.retries is iterable %}
                     <td class="skippedStatus">
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{i}}.{{test_package}}');return false;">
                             {{test_package}}
@@ -128,8 +128,8 @@
                             <div class="popupContent popupHalfWidth">
                                 <table class="baseTable" data-toggle="table">
                                     <tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>
-                                    {% for time, host_retry, link in report[i].results[test_package][''].machine_info.host | dictsort %}
-                                        <tr><td>{{time}}</td><td>{{host_retry}}</td><td><a href="{{link}}">Crash logs</a></td></tr>
+                                    {% for retry in report[i].results[test_package][''].machine_info.retries %}
+                                        <tr><td>{{retry['time']}}</td><td>{{retry['host']}}</td><td><a href="{{retry['link']}}">Crash logs</a></td></tr>
                                     {% endfor %}
                                 </table>
                             </div>

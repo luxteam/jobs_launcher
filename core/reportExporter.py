@@ -572,8 +572,7 @@ def add_retry_info(summary_report, retry_info):
                                         for retry in groupOrJson:
                                             retries_list.append(retry)
 
-                                    summary_report[config]['results'][test_package]['']['machine_info']['host'] = {'host': node,
-                                            'retries': retries_list}
+                                    summary_report[config]['results'][test_package]['']['machine_info']['retries'] = retries_list
     except Exception as e:
         main_logger.error(
             'Error "{}" while adding retry info'.format(str(e)))
