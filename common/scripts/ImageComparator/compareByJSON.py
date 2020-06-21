@@ -21,7 +21,10 @@ def createArgParser():
     if report_type == 'ct':
         argparser.add_argument('--case_suffix')
     argparser.add_argument('--pix_diff_tolerance', required=False, default=core.config.PIX_DIFF_TOLERANCE)
-    argparser.add_argument('--pix_diff_max', required=False, default=core.config.PIX_DIFF_MAX)
+    if report_type == 'ec':
+        argparser.add_argument('--pix_diff_max', required=False, default=core.config.PIX_DIFF_MAX_EC)
+    else:
+         argparser.add_argument('--pix_diff_max', required=False, default=core.config.PIX_DIFF_MAX)   
     argparser.add_argument('--time_diff_max', required=False, default=core.config.TIME_DIFF_MAX)
     if report_type == 'ec':
         argparser.add_argument('--vram_diff_max', required=False, default=core.config.VRAM_DIFF_MAX)
