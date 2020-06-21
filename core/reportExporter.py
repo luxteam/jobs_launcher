@@ -488,8 +488,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               node_retry_info=node_retry_info,
-                                               check_retry=check_retry)
+                                               node_retry_info=node_retry_info)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -502,7 +501,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
-        main_logger.error(summary_html)
+        main_logger.error(summary_html) #FIXME: referenced before assignment
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
 
@@ -577,4 +576,4 @@ def add_retry_info(summary_report, retry_info):
                                             'retries': retries_list}
     except Exception as e:
         main_logger.error(
-            'Error "{}" while adding retry info'.format(str(e))
+            'Error "{}" while adding retry info'.format(str(e)))
