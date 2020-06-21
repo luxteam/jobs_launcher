@@ -100,7 +100,7 @@
                 class="timeBetterStatus"
             {% endif -%}
             >
-            {{ item.difference_vram }}</td>
+            {{ item.difference_vram | round(2) }}</td>
         <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
 
         <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
