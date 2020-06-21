@@ -116,7 +116,28 @@
     {% for test_package, value in report[i].results | dictsort %}
         {% set resultsloop = loop %}
             <tr>
-                {{ check_retry(node_retry_info, test_conf, test_package, report[i].results[test_package]['']['machine_info']['host']) | safe }}
+                {% if report[i].results[test_package][''].machine_info.host is iterable and report[i].results[test_package][''].machine_info.host is not string %}
+                    <td class="skippedStatus">
+                        <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{i}}.{{test_package}}');return false;">
+                            {{test_package}}
+                        </button>
+                        <div class="popup" id="{{i}}.{{test_package}}">
+                            <form class="popupForm">
+                                <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{{i}}.{{test_package}}');return false;"><img src="report_resources/img/close-button.png"/></button>
+                            </form>
+                            <div class="popupContent popupHalfWidth">
+                                <table class="baseTable" data-toggle="table">
+                                    <tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>
+                                    {% for time, host_retry, link in report[i].results[test_package][''].machine_info.host | dictsort %}
+                                        <tr><td>{{time}}</td><td>{{host_retry}}</td><td><a href="{{link}}">Crash logs</a></td></tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                {% else %}
+                    <td>{{ test_package }}</td>
+                {% endif %}
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 <td>
                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">

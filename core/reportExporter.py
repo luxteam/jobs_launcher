@@ -477,6 +477,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         summary_report, common_info = build_summary_report(work_dir)
 
+        add_retry_info(summary_report, node_retry_info)
+
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
@@ -547,47 +549,32 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
     build_local_reports(work_dir, summary_report, common_info, env)
 
-def check_retry(node_retry_info, config, test_package, node):
-    result = '<td>{}</td>'.format(test_package)
+
+def add_retry_info(summary_report, retry_info):
     try:
-        for retry in node_retry_info:
-            for tester in retry['Testers']:
-                if node.upper() in tester:
-                    for group in retry['Tries']:
-                        if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json')]:
-                            result = '''
-                                <td class="skippedStatus">
-                                    <button class="commonButton popupButton" type="button" onclick="openModalWindow('{id}');return false;">
-                                        {test_package}
-                                    </button>
-                                    <div class="popup" id="{id}">
-                                        <form class="popupForm">
-                                            <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{id}');return false;"><img src="report_resources/img/close-button.png"/></button>
-                                        </form>
-                                        <div class="popupContent popupHalfWidth">
-                                            <table class="baseTable" data-toggle="table">
-                                                {temp}
-                                            </table>
-                                        </div>
-                                    </div>
-                                </td>
-''' .format(test_package=test_package,
-            id = test_package+tester,
-            temp=get_retry_info(retry['Tries'], test_package))
+        for config in summary_report:
+            for test_package in summary_report[config]['results']:
+                node = summary_report[config]['results'][test_package]['']['machine_info']['host']
+                for retry in retry_info:
+                    for tester in retry['Testers']:
+                        if str(node).upper() in tester:
+                            for group in retry['Tries']:
+                                if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json')]:
+                                    retries_list = []
+
+                                    for retry in retry['Tries']:
+                                        for group in retry.keys():
+                                            if group.endswith('.json'):
+                                                groupOrJson = retry[str(
+                                                    next(iter(retry['Tries'][0].keys())))]
+                                            else:
+                                                groupOrJson = retry.get(
+                                                    test_package, [])
+                                        for retry in groupOrJson:
+                                            retries_list.append(retry)
+
+                                    summary_report[config]['results'][test_package]['']['machine_info']['host'] = {'host': node,
+                                            'retries': retries_list}
     except Exception as e:
-        main_logger.error('Error {} while processing retry info'.format(str(e)))
-
-    return result
-
-
-def get_retry_info(retries, test_package):
-    result = '<tr><th>Time</th><th>Machine</th><th>Link to logs</th></tr>'
-    for retry in retries:
-        for group in retry.keys():
-            if group.endswith('.json'):
-                groupOrJson = retry[str(next(iter(retries[0].keys())))]
-            else:
-                groupOrJson = retry.get(test_package, [])
-        for retry in groupOrJson:
-            result += '<tr><td>{}</td><td>{}</td><td><a href="{}">Crash logs</a></td></tr>'.format(retry['time'], retry['host'], retry['link'])
-    return result
+        main_logger.error(
+            'Error "{}" while adding retry info'.format(str(e))
