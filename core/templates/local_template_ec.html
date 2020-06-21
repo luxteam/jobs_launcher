@@ -67,14 +67,19 @@
         {%- if item.difference_time > 5 %}
            {{ ' ' }}timeDiffFailedStatus
         {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
+            <b>Test status:</b> {{ item.test_status }}<br/>
+            <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
             <b>Scene:</b> {{ item.scene_name }}<br/>
-            <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
-            <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
-            <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
-            <b>Test info:</b><br/>
-            {% for param in item.script_info %}
-                {{ param }}<br/>
-            {% endfor %}
+            <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
+            <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
+            <b>GPU memory usage:</b> {{ item.gpu_memory_usage }}<br/>
+            <b>Baseline GPU memory usage:</b> {{ item.baseline_gpu_memory_usage }}<br/>
+            <b>GPU memory total:</b> {{ item.gpu_memory_total }}<br/>
+            <b>GPU memory max:</b> {{ item.gpu_memory_max }}<br/>
+            <b>System memory usage:</b> {{ item.system_memory_usage }}<br/>
+            <b>Width:</b> {{ item.width }}<br/>
+            <b>Height:</b> {{ item.height }}<br/>
+            <b>Iterations:</b> {{ item.iterations }}
         </td>
 
         <td {%- if config.TIME_DIFF_MAX < item.difference_time %}
