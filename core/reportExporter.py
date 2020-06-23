@@ -513,6 +513,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
     main_logger.info("Saving performance report...")
     try:
+        setup_time_count(work_dir)
         copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
 
@@ -553,3 +554,44 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info, env)
+
+
+def setup_time_count(work_dir):
+    performance_list = {}
+    for root, subdirs, files in os.walk(work_dir):
+        performance_jsons = [os.path.join(root, f) for f in files if '_performance.json' in f]
+        for perf_json in performance_jsons:
+            perf_list = json.load(open(perf_json))
+
+            summ_perf = {}
+            for event in perf_list:
+                if summ_perf.get(event['name'], ''):
+                    summ_perf[event['name']] += event['time']
+                else:
+                    summ_perf[event['name']] = event['time']
+
+            group = os.path.split(perf_json)[1].split('_')[0]
+            config = splitall(perf_json)[-4]
+            pcConfig = config.split('-')[0] + '-' + config.split('-')[1]
+            if performance_list.get(pcConfig, []):
+                performance_list[pcConfig].append({'group': group, 'events': summ_perf})
+            else:
+                performance_list[pcConfig] = [{'group': group, 'events': summ_perf}]
+    with open('setup_time.json', 'w') as f:
+        f.write(json.dumps(performance_list, indent=4))
+
+
+def splitall(path):
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path:
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
