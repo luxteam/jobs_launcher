@@ -571,13 +571,17 @@ def setup_time_count(work_dir):
                     summ_perf[event['name']] = event['time']
 
             group = os.path.split(perf_json)[1].split('_')[0]
-            config = splitall(perf_json)[-4]
-            pcConfig = config.split('-')[0] + '-' + config.split('-')[1]
+            try:
+                config = splitall(perf_json)[-4]
+                pcConfig = config.split('-')[0] + '-' + config.split('-')[1]
+            except:
+                pcConfig = 'undefined'
+
             if performance_list.get(pcConfig, []):
                 performance_list[pcConfig].append({'group': group, 'events': summ_perf})
             else:
                 performance_list[pcConfig] = [{'group': group, 'events': summ_perf}]
-    with open('setup_time.json', 'w') as f:
+    with open(os.path.join(work_dir, 'setup_time.json'), 'w') as f:
         f.write(json.dumps(performance_list, indent=4))
 
 
