@@ -570,7 +570,7 @@ def setup_time_count(work_dir):
                 else:
                     summ_perf[event['name']] = event['time']
 
-            group = os.path.split(perf_json)[1].split('_')[0]
+            group = os.path.split(perf_json)[1].rpartition('_')[0]
             try:
                 config = splitall(perf_json)[-4]
                 pcConfig = config.split('-')[0] + '-' + config.split('-')[1]
