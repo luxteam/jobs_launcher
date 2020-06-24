@@ -118,7 +118,7 @@ def main(args):
 
     if not os.path.exists(baseline_json_path):
         core.config.main_logger.warning("Baseline or manifest not found by path: {}".format(args.base_dir))
-        shutil.copyfile(render_json_path, os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED))
+        copyfile(render_json_path, os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED))
 
     baseline_json = {}
     try:

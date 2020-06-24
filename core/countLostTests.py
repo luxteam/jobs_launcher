@@ -78,6 +78,21 @@ def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 				for file in files:
 					if file.endswith(SESSION_REPORT):
 						session_report_exist = True
+						if execution_type == 'default':
+							with open(os.path.join(path, file), "r") as report:
+								session_report = json.load(report)
+							for test_package_name in session_report['results']:
+								case_results = session_report["results"][test_package_name][""]
+								if case_results["total"] == 0:
+									with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as tests_conf:
+										data = json.load(tests_conf)
+									number_of_cases = get_lost_tests_count(data, tool_name, test_package_name)
+									case_results["error"] = number_of_cases
+									case_results["total"] = number_of_cases
+									session_report["summary"]["error"] += number_of_cases
+									session_report["summary"]["total"] += number_of_cases
+							with open(os.path.join(path, file), "w") as report:
+								json.dump(session_report, report, indent=4, sort_keys=True)
 						break
 				if session_report_exist:
 					break
