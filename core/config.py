@@ -56,6 +56,7 @@ TIMEOUT = 2400
 TIMEOUT_PAR = 3
 
 PIX_DIFF_MAX = 15
+PIX_DIFF_MAX_EC = 0
 PIX_DIFF_TOLERANCE = 9
 TIME_DIFF_MAX = 5
 VRAM_DIFF_MAX = 5
@@ -124,7 +125,8 @@ REPORT_RPR_LOG = 'renderTool.log'
 TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
         'maya': 'test_cases.json',
-        'max': 'case_list.json'
+        'max': 'case_list.json',
+        'core': 'SceneList.json'
     }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 

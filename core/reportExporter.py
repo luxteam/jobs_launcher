@@ -325,6 +325,10 @@ def build_performance_report(summary_report):
         group = next(iter(platform['results']))
         conf = list(platform['results'][group].keys())[0]
 
+        if platform['results'][group][conf]['machine_info'] == "":
+            # if machine info is empty it's blank data for lost test cases
+            continue
+
         hw = platform['results'][group][conf]['machine_info']['render_device']
         if hw not in hardware:
             hardware[hw] = platform['summary']['render_duration']
@@ -358,6 +362,10 @@ def build_compare_report(summary_report):
         for test_package in summary_report[platform]['results']:
             for test_config in summary_report[platform]['results'][test_package]:
                 temp_report = summary_report[platform]['results'][test_package][test_config]
+
+                if temp_report['machine_info'] == "":
+                    # if machine info is empty it's blank data for lost test cases
+                    continue
 
                 # force add gpu from baseline
                 hw = temp_report['machine_info']['render_device']
@@ -408,6 +416,9 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                             for key_upd in keys_for_upd:
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
+                    else:
+                    	# test case was lost
+                    	continue
 
                     # for core baseline_render_time initialize via compareByJson script
                     if report_type != 'ec':
