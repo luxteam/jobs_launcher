@@ -94,7 +94,11 @@
 
         {# Log files #}
         <td>
-            <a href="{{ report[i].results[test_package][test_conf].result_path }}/tahoe.log">tahoe Log</a>
+            {% if 'tahoe_log' in item %}
+                <a href="{{ item.tahoe_log }}">tahoe Log</a>
+            {% else %}
+                None
+            {% endif %}
         </td>
 
     </tr>
