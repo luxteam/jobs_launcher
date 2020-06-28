@@ -43,6 +43,7 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
             render_img_path = os.path.join(work_dir, img[key])
             if not os.path.exists(render_img_path):
                 core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
+                img['test_status'] = core.config.TEST_CRASH_STATUS
                 return img
 
             metrics = None
