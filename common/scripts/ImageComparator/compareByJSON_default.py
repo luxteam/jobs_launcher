@@ -4,14 +4,29 @@ from CompareMetrics_default import CompareMetrics
 import sys
 from shutil import copyfile
 
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
+
+try:
+    from local_config import *
+except ImportError:
+    core.config.main_logger.critical("local config file not found. Default values will be used.")
+    core.config.main_logger.critical("Correct report building isn't guaranteed")
+    from core.defaults_local_config import *
 
 
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        baseline_img_path = os.path.join(base_dir, baseline_json.get(img.get('file_name', ''), 'not.exist'))
+        baseline_name = 'not.exist'
+
+        for possible_extension in core.config.POSSIBLE_BASELINE_EXTENSIONS:
+            baseline_name = baseline_json.get(img.get('test_case', '') + '.' + possible_extension, 'not.exist')
+            if baseline_name != 'not.exist':
+                # baseline found
+                break
+
+        baseline_img_path = os.path.join(base_dir, baseline_name)
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
@@ -21,10 +36,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             return img
 
         # else add baseline images paths to json
-        img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[img['file_name']]), work_dir)})
+        img.update({'baseline_color_path': os.path.relpath(baseline_img_path, work_dir)})
         for thumb in core.config.THUMBNAIL_PREFIXES:
-            if thumb + img['file_name'] in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + img['file_name']])):
-                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + img['file_name']]), work_dir)})
+            if thumb + baseline_name in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + baseline_name])):
+                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + baseline_name]), work_dir)})
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:

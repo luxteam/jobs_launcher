@@ -450,8 +450,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
-
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
 
@@ -479,12 +478,18 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
+    if node_retry_info:
+        node_retry_info = json.loads(bytes(node_retry_info, "utf-8").decode("unicode_escape"))
+
     main_logger.info("Saving summary report...")
+
     try:
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template_{}.html'.format(report_type))
 
         summary_report, common_info = build_summary_report(work_dir)
+
+        add_retry_info(summary_report, node_retry_info)
 
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
@@ -494,7 +499,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                report=summary_report,
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
-                                               common_info=common_info)
+                                               common_info=common_info,
+                                               node_retry_info=node_retry_info)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -507,7 +513,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
-        main_logger.error(summary_html)
+        main_logger.error(summary_html) #FIXME: referenced before assignment
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
 
@@ -553,3 +559,32 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info, env)
+
+
+def add_retry_info(summary_report, retry_info):
+    try:
+        for config in summary_report:
+            for test_package in summary_report[config]['results']:
+                node = summary_report[config]['results'][test_package]['']['machine_info']['host']
+                for retry in retry_info:
+                    for tester in retry['Testers']:
+                        if str(node).upper() in tester:
+                            for group in retry['Tries']:
+                                if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json')]:
+                                    retries_list = []
+
+                                    for retry in retry['Tries']:
+                                        for group in retry.keys():
+                                            if group.endswith('.json'):
+                                                groupOrJson = retry[str(
+                                                    next(iter(retry['Tries'][0].keys())))]
+                                            else:
+                                                groupOrJson = retry.get(
+                                                    test_package, [])
+                                        for retry in groupOrJson:
+                                            retries_list.append(retry)
+
+                                    summary_report[config]['results'][test_package]['']['machine_info']['retries'] = retries_list
+    except Exception as e:
+        main_logger.error(
+            'Error "{}" while adding retry info'.format(str(e)))
