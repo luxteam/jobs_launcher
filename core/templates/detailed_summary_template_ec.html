@@ -94,8 +94,8 @@
 
         {# Log files #}
         <td>
-            {% if 'tahoe_log' in item %}
-                <a href="{{ item.tahoe_log }}">tahoe Log</a>
+            {% if item.tahoe_log != 'not.exist' %}
+                <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.tahoe_log }}">tahoe Log</a>
             {% else %}
                 None
             {% endif %}
