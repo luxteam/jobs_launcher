@@ -30,6 +30,12 @@ function timeFormatter(value, row, index, field) {
     return time.toISOString().substr(11, 8);
 }
 
+function timeFormatterMilliseconds(value, row, index, field) {
+    var time = new Date(null);
+    time.setSeconds(value, (value % 1) * 1000);
+    return time.toISOString().substr(14, 9);
+}
+
 function openModalWindow(id) {
     var modal = document.getElementById(id);
     modal.style.display = "flex";

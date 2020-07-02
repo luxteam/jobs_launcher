@@ -494,6 +494,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         add_retry_info(summary_report, node_retry_info)
 
+        secondary_time = setup_secondary_time(summary_report)
+
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
@@ -503,7 +505,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               node_retry_info=node_retry_info)
+                                               node_retry_info=node_retry_info,
+                                               additional_time=secondary_time)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -563,6 +566,22 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info, env)
+
+
+def setup_secondary_time(summary_report):
+    if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
+        result = {'title': 'Synchronization', 'formatter': 'timeFormatterMilliseconds'}
+        for config in summary_report:
+            summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['synchronization_duration']
+            for test_package in summary_report[config]['results']:
+                summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration']
+    else:
+        result = {'title': 'Setup time', 'formatter': 'timeFormatter'}
+        for config in summary_report:
+            summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
+            for test_package in summary_report[config]['results']:
+                summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
+    return result
 
 
 def setup_time_count(work_dir):

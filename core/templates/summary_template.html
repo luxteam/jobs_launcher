@@ -24,7 +24,7 @@
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
                 <th data-formatter="timeFormatter">Time taken</th>
-                <th data-formatter="timeFormatter">Setup time</th>
+                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}</th>
                 <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
@@ -58,7 +58,7 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
+                <td>{{ report[i].summary.secondary_duration }}</td>
 
                 <td
                 {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
@@ -108,7 +108,7 @@
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
                 <th data-formatter="timeFormatter">Time taken</th>
-                <th data-formatter="timeFormatter">Setup time</th>
+                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}</th>
                 <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
@@ -218,7 +218,7 @@
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
 
-                <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
+                <td>{{ report[i].results[test_package][test_conf].secondary_duration }}</td>
 
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
@@ -258,7 +258,7 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
+                <td>{{ report[i].summary.secondary_duration }}</td>
 
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
