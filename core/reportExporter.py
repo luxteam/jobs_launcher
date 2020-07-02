@@ -124,7 +124,7 @@ def generate_thumbnails(session_dir):
 
 
 def build_session_report(report, session_dir):
-    total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
+    total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0, 'synchronization_duration': 0}
 
     generate_thumbnails(session_dir)
 
@@ -142,6 +142,7 @@ def build_session_report(report, session_dir):
                 report['results'][result][item].update({'render_duration': -0.0})
             else:
                 render_duration = 0.0
+                synchronization_duration = 0.0
                 try:
                     for jtem in current_test_report:
                         for group_report_file in REPORT_FILES:
@@ -152,6 +153,7 @@ def build_session_report(report, session_dir):
                                 jtem.update({group_report_file: os.path.relpath(cur_img_path, session_dir)})
 
                         render_duration += jtem['render_time']
+                        synchronization_duration += jtem.get('sync_time', 0.0)
                         if jtem['test_status'] == 'undefined':
                             report['results'][result][item]['total'] += 1
                         else:
@@ -183,6 +185,7 @@ def build_session_report(report, session_dir):
                     report['results'][result][item].update({'render_results': current_test_report})
 
                 report['results'][result][item].update({'render_duration': render_duration})
+                report['results'][result][item].update({'synchronization_duration': synchronization_duration})
 
     # get summary results
     for result in report['results']:
