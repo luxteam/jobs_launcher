@@ -13,6 +13,7 @@ RENDER_REPORT_BASE = {
     "test_status": "undefined",
     "tool": "",
     "render_time": -0.0,
+    "sync_time": -0.0,
     "baseline_render_time": -0.0,
     "render_mode": "",
     "scene_name": "",
