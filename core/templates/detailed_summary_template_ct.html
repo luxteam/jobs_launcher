@@ -17,9 +17,9 @@
         </th>
 
         {# Render time #}
-        <th data-field="original_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">{{ original_render | title }} render time</th>
-        <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
-        <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">RPR render time</th>
+        <th data-field="original_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterMilliseconds">{{ original_render | title }} render time</th>
+        <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterMilliseconds">Baseline render time</th>
+        <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterMilliseconds">RPR render time</th>
 
         <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
 
