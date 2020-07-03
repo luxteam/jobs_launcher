@@ -40,7 +40,8 @@ RENDER_REPORT_EC_PACK = {
     "baseline_gpu_memory_usage": -0.0,
     "baseline_system_memory_usage": -0.0,
     "difference_vram": -0.0,
-    "difference_ram": -0.0
+    "difference_ram": -0.0,
+    'tahoe_log': 'not.exist'
 }
 
 RENDER_REPORT_CT_PACK = {
