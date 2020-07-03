@@ -34,7 +34,7 @@
         <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Render time</th>
         <th data-field="baseline_render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
 
-        <th data-filed="render_log" data-visible="true" data-halign="center" data-valign="middle">Log files</th>
+        <th data-filed="render_log" data-visible="false" data-halign="center" data-valign="middle">Log files</th>
     </tr>
     </thead>
     <tbody>
@@ -110,7 +110,13 @@
         <td>{{ item.baseline_render_time | round(2) }}</td>
 
         {# Log files #}
-        <td><a href="{{ item.test_case }}.log">tahoe.log</a></td>
+        <td>
+            {% if item.tahoe_log != 'not.exist' %}
+                <a href="{{ item.tahoe_log }}">tahoe Log</a>
+            {% else %}
+                None
+            {% endif %}
+        </td>
 
     </tr>
     {% endfor %}
