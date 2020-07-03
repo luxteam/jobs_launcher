@@ -44,10 +44,10 @@
           {% endfor %}
           ]
 
-          {% for tool in performance_report %}
+          {% for tool in test_info %}
           ,['{{ tool }}'
             {% for hw in hardware %}
-            , {{ hw[1] }}
+            , {{ test_info[tool][hw[0]] }}
             {% endfor %}
             ]
           {% endfor %}
