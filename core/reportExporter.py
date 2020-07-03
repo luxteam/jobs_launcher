@@ -545,6 +545,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
+        setup_sum, setup_details = setup_time_report(work_dir, hardware)
+
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
         performance_html = performance_template.render(title=major_title + " Performance",
@@ -553,7 +555,9 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        performance_report_detail=performance_report_detail,
                                                        pageID="performanceA",
                                                        common_info=common_info,
-                                                       test_info=summary_info_for_report)
+                                                       test_info=summary_info_for_report,
+                                                       setupTimeSum=setup_sum,
+                                                       setupTimeDetails=setup_details)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
@@ -582,6 +586,25 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     build_local_reports(work_dir, summary_report, common_info, env)
 
 
+def setup_time_report(work_dir, hardware):
+    setup_steps_dict = {"Prepare tests": 0.0, "Open tool": 0.0, "Open scene": 0.0, "Prerender": 0.0,
+                "Postrender": 0.0, "Close tool": 0.0, "Make report json": 0.0, "Compare": 0.0}
+    setup_sum_list = ["Prepare tests", "Open tool", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]
+    setup_sum = {}
+
+    with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
+        setup_details = json.load(f)
+
+    for confing in setup_details:
+        setup_sum[confing] = setup_steps_dict
+        for group in setup_details[confing]:
+            for key in setup_sum_list:
+                setup_sum[confing][key] += group['events'].get(key, -0.0)
+    setup_sum['setps'] = setup_sum_list
+
+    return setup_sum, setup_details
+
+
 def setup_secondary_time(summary_report):
     try:
         if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
@@ -606,7 +629,7 @@ def setup_secondary_time(summary_report):
 def setup_time_count(work_dir):
     performance_list = {}
     for root, subdirs, files in os.walk(work_dir):
-        performance_jsons = [os.path.join(root, f) for f in files if '_performance.json' in f]
+        performance_jsons = [os.path.join(root, f) for f in files if f.endswith('_performance.json')]
         for perf_json in performance_jsons:
             perf_list = json.load(open(perf_json))
 
@@ -618,11 +641,13 @@ def setup_time_count(work_dir):
                     summ_perf[event['name']] = event['time']
 
             group = os.path.split(perf_json)[1].rpartition('_')[0]
-            try:
-                config = splitall(perf_json)[-4]
-                pcConfig = config.split('-')[0] + '-' + config.split('-')[1]
-            except:
-                pcConfig = 'undefined'
+            pcConfig = 'undefined'
+            for r, s, f in os.walk(work_dir):
+                render_json = next(iter([os.path.join(r, tmp) for tmp in f if tmp.endswith(config.CASE_REPORT_SUFFIX)]), '')
+                if os.path.exists(render_json):
+                    with open(render_json) as rpr_json_file:
+                        rpr_json = json.load(rpr_json_file)
+                        pcConfig = rpr_json[0]['render_device']
 
             if performance_list.get(pcConfig, []):
                 performance_list[pcConfig].append({'group': group, 'events': summ_perf})
