@@ -215,7 +215,7 @@
                     <td>{{ test_package }}</td>
                     {% for hw in hardware %}
                         <td>
-                            {{ performance_report_detail[test_package][hw[0]].sync | round(1) | replace("-0.0","-") }}
+                            {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
                         </td>
                     {% endfor %}
                 </tr>
