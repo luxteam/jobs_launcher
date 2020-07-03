@@ -23,9 +23,9 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatter">Time taken</th>
+                <th data-formatter="timeFormatter">Time taken, hh:mm:ss</th>
+                <th data-formatter="timeFormatter">Render time, hh:mm:ss</th>
                 <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}</th>
-                <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
         <tbody>
@@ -58,13 +58,13 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.secondary_duration }}</td>
 
                 <td
                 {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
+                <td>{{ report[i].summary.secondary_duration }}</td>
             </tr>
     {% endfor %}
         </tbody>
@@ -107,9 +107,9 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatter">Time taken</th>
+                <th data-formatter="timeFormatter">Time taken, hh:mm:ss</th>
+                <th data-formatter="timeFormatter">Render time, hh:mm:ss</th>
                 <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}</th>
-                <th data-formatter="timeFormatter">Render time</th>
             </tr>
         </thead>
         <tbody>
@@ -218,13 +218,13 @@
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
 
-                <td>{{ report[i].results[test_package][test_conf].secondary_duration }}</td>
-
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
+
+                <td>{{ report[i].results[test_package][test_conf].secondary_duration }}</td>
             </tr>
             <tr>
             {% endfor %}
@@ -258,13 +258,13 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.secondary_duration }}</td>
 
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
+                <td>{{ report[i].summary.secondary_duration }}</td>
             </tr>
         </tbody>
     </table>
