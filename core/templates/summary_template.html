@@ -25,7 +25,7 @@
                 </th>
                 <th data-formatter="timeFormatter">Time taken, <span style="color: gray">hh:mm:ss</span></th>
                 <th data-formatter="timeFormatter">Render time, <span style="color: gray">hh:mm:ss</span></th>
-                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}<span style="color: gray">mm:ss</span></th>
+                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}<span style="color: gray">{{ additional_time.format }}</span></th>
             </tr>
         </thead>
         <tbody>
@@ -109,7 +109,7 @@
                 </th>
                 <th data-formatter="timeFormatter">Time taken, <span style="color: gray">hh:mm:ss</span></th>
                 <th data-formatter="timeFormatter">Render time, <span style="color: gray">hh:mm:ss</span></th>
-                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}<span style="color: gray">mm:ss</span></th>
+                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}<span style="color: gray">{{ additional_time.format }}</span></th>
             </tr>
         </thead>
         <tbody>

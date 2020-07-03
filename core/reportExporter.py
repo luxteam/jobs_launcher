@@ -367,7 +367,6 @@ def build_performance_report(summary_report):
                 summary_info_for_report[tool][device]['render'] = -0.0
                 summary_info_for_report[tool][device]['sync'] = -0.0
 
-    main_logger.info(summary_info_for_report)
     hardware = sorted(hardware.items(), key=operator.itemgetter(1))
     return performance_report, hardware, performance_report_detail, summary_info_for_report
 
@@ -585,15 +584,17 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 def setup_secondary_time(summary_report):
     try:
         if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
-            result = {'title': 'Synchronization time, ', 'formatter': 'timeFormatterMilliseconds'}
+            result = {'title': 'Synchronization time, ', 'formatter': 'timeFormatterMilliseconds', 'format': 'mm:ss'}
             for config in summary_report:
                 summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['synchronization_duration']
+                summary_report[config]['summary']['duration'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
                 for test_package in summary_report[config]['results']:
                     summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration']
+                    summary_report[config]['results'][test_package]['']['duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
         else:
             raise Exception('Some "synchronization_time" is 0')
     except:
-        result = {'title': 'Setup time', 'formatter': 'timeFormatter'}
+        result = {'title': 'Setup time', 'formatter': 'timeFormatter', 'format': 'hh:mm:ss'}
         for config in summary_report:
             summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
             for test_package in summary_report[config]['results']:
