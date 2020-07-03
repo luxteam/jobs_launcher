@@ -15,7 +15,7 @@
     <tr>
         <td>{{ tool }}</td>
         {% for hw in hardware %}
-            <td>{{ test_info[tool][hw[0]] | round(1) }}</td>
+            <td>{{ test_info[tool][hw[0]] | round(1) | replace("-0.0","-") }}</td>
         {% endfor %}
     </tr>
     {% endfor %}
