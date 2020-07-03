@@ -321,7 +321,7 @@ def build_performance_report(summary_report):
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
-    summary_info_for_report = {}
+    render_info = []
 
     for key in summary_report:
         platform = summary_report[key]
@@ -333,6 +333,7 @@ def build_performance_report(summary_report):
             continue
 
         hw = platform['results'][group][conf]['machine_info']['render_device']
+        render_info.append([platform['results'][group][conf]['machine_info']['tool'], platform['results'][group][conf]['machine_info']['render_device'], platform['summary']['render_duration']])
         if hw not in hardware:
             hardware[hw] = platform['summary']['render_duration']
 
@@ -352,8 +353,16 @@ def build_performance_report(summary_report):
                 performance_report_detail[tool][test_package][test_config].update(
                     {hw: results[test_package][test_config]})
 
-        tmp = sorted(hardware.items(), key=operator.itemgetter(1))
-        summary_info_for_report[tool] = tmp
+    tools = set([tool for tool, device, duration in render_info])
+    devices = set([device for tool, device, duration in render_info])
+    summary_info_for_report = {t: {} for t in tools}
+    for tool, device, duration in render_info:
+        summary_info_for_report[tool][device] = duration
+    for tool in tools:
+        for device in devices:
+            if summary_info_for_report[tool].get(device, None) is None:
+                summary_info_for_report[tool][device] = -0.0
+
     hardware = sorted(hardware.items(), key=operator.itemgetter(1))
     return performance_report, hardware, performance_report_detail, summary_info_for_report
 
@@ -569,13 +578,16 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
 
 def setup_secondary_time(summary_report):
-    if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
-        result = {'title': 'Synchronization', 'formatter': 'timeFormatterMilliseconds'}
-        for config in summary_report:
-            summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['synchronization_duration']
-            for test_package in summary_report[config]['results']:
-                summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration']
-    else:
+    try:
+        if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
+            result = {'title': 'Synchronization', 'formatter': 'timeFormatterMilliseconds'}
+            for config in summary_report:
+                summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['synchronization_duration']
+                for test_package in summary_report[config]['results']:
+                    summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration']
+        else:
+            raise Exception('Some "synchronization_time" is 0')
+    except:
         result = {'title': 'Setup time', 'formatter': 'timeFormatter'}
         for config in summary_report:
             summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
