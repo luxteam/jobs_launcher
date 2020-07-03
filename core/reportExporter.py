@@ -350,8 +350,9 @@ def build_performance_report(summary_report):
 
         for test_package in results:
             for test_config in results[test_package]:
-                performance_report_detail[tool][test_package][test_config].update(
-                    {hw: results[test_package][test_config]})
+                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config].get('synchronization_duration', -0.0), 'total': results[test_package][test_config]['duration']}
+                performance_report_detail[test_package].update(
+                    {hw: test_info})
 
     tools = set([tool for tool, device, render, sync in render_info])
     devices = set([device for tool, device, render, sync in render_info])

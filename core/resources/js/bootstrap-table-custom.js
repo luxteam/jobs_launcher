@@ -100,7 +100,9 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
     var values = [];
     for (key in row) {
         if (key.indexOf('_') === -1 && key != 0) {
-            values.push(parseFloat(row[key]));
+            cellValue = row[key]
+            if (isNaN(parseInt(cellValue))) {values.push(parseFloat(0))}
+            else {values.push(parseFloat(cellValue))}
         }
     }
 
