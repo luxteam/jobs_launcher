@@ -47,7 +47,7 @@
           {% for tool in test_info %}
           ,['{{ tool }}'
             {% for hw in hardware %}
-            , {{ test_info[tool][hw[0]] }}
+            , {{ test_info[tool][hw[0]]['render'] }}
             {% endfor %}
             ]
           {% endfor %}
