@@ -5,14 +5,16 @@ from requests.exceptions import RequestException
 
 
 class ISClient:
-    def __init__(self, url):
+    def __init__(self, url, login, password):
         self.url = url
+        self.login = login
+        self.password = password
         self.get_token()
 
     def get_token(self):
         response = post(
             url="{url}/api/login".format(url=self.url),
-            auth=HTTPBasicAuth('admin', 'OCXybZvozF8QTI&c'),
+            auth=HTTPBasicAuth(self.login, self.password),
         )
         if response.status_code == 404:
             raise RequestException("Cant connect image service. Check url")

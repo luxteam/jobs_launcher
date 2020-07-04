@@ -4,6 +4,7 @@ import os
 import shutil
 import json
 import uuid
+import traceback
 
 import core.reportExporter
 import core.system_info
@@ -20,8 +21,7 @@ except ImportError:
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
-from rbs_client import RBS_Client, str2bool
-from rbs_client import logger as rbs_logger
+from ums_client import UMS_Client, str2bool
 from image_service_client import ISClient
 
 
@@ -38,24 +38,28 @@ def parse_cmd_variables(tests_root, cmd_variables):
 
 def main():
 
-    # create RBS client
-    rbs_client = None
-    use_rbs = None
+    # create UMS client
+    ums_client = None
+    use_ums = None
     try:
-        use_rbs = str2bool(os.getenv('RBS_USE'))
+        use_ums = str2bool(os.getenv('UMS_USE'))
     except Exception as e:
-        print('Exception when getenv RBS USE: {}'.format(str(e)))
-    if use_rbs:
+        print('Exception when getenv UMS USE: {}'.format(str(e)))
+    if use_ums:
         try:
-            rbs_client = RBS_Client(
-                job_id = os.getenv("RBS_JOB_ID"),
-                url = os.getenv("RBS_URL"),
-                build_id = os.getenv("RBS_BUILD_ID"),
-                env_label = os.getenv("RBS_ENV_LABEL"),
-                suite_id = None)
-            print("RBS Client created")
+            ums_client = UMS_Client(
+                job_id=os.getenv("UMS_JOB_ID"),
+                url=os.getenv("UMS_URL"),
+                build_id=os.getenv("UMS_BUILD_ID"),
+                env_label=os.getenv("UMS_ENV_LABEL"),
+                suite_id=None,
+                login=os.getenv("UMS_LOGIN"),
+                password=os.getenv("UMS_PASSWORD")
+            )
+            print("UMS Client created")
         except Exception as e:
-            print("RBS Client creation error: {}".format(e))
+            print("UMS Client creation error: {}".format(e))
+            print("Traceback: {}".format(traceback.format_exc()))
 
     level = 0
     delim = ' '*level
@@ -133,17 +137,17 @@ def main():
         print('{0: <16}: {1}'.format(mi, machine_info[mi]))
 
 
-    # send machine info to rbs
-    if rbs_client:
+    # send machine info to ums
+    if ums_client:
         print('Tests filter: ' + str(args.test_filter))
         for group in args.test_filter:
             group = group.replace(' ', '').replace(",", '').replace('"', '').replace('[', '').replace(']', '')
-            rbs_client.get_suite_id_by_name(group)
-            # send machine info to rbs
+            ums_client.get_suite_id_by_name(group)
+            # send machine info to ums
             env = {"gpu": core.system_info.get_gpu(), **machine_info}
             env.pop('os')
             env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
-            rbs_client.define_environment(env)
+            ums_client.define_environment(env)
 
     found_jobs = []
     report = AutoDict()
@@ -190,15 +194,17 @@ def main():
     main_logger.info('Saved session report\n\n')
     shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
-    if rbs_client:
-        print("Try to send results to RBS")
+    if ums_client:
+        print("Try to send results to UMS")
         is_client = None
         try:
-            is_client = ISClient(os.getenv("IMAGE_SERVICE_URL"))
+            is_client = ISClient(url=os.getenv("IS_URL"),
+                                 login=os.getenv("IS_LOGIN"),
+                                 password=os.getenv("IS_PASSWORD"))
             print("Image Service client created")
         except Exception as e:
             print("Image Service client creation error: {}".format(str(e)))
-
+            print("Traceback: {}".format(traceback.format_exc()))
 
         res = []
         try:
@@ -225,20 +231,20 @@ def main():
                         }
                     })
 
-                rbs_client.get_suite_id_by_name(suite_name)
-                # send machine info to rbs
+                ums_client.get_suite_id_by_name(suite_name)
+                # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
                 env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
                 print(env)
 
-                response = rbs_client.send_test_suite(res=res, env=env)
+                response = ums_client.send_test_suite(res=res, env=env)
                 print('Test suite results sent with code {}'.format(response.status_code))
                 print(response.content)
 
         except Exception as e:
             print("Test case result creation error: {}".format(str(e)))
-
+            print("Traceback: {}".format(traceback.format_exc()))
 
 
 if __name__ == "__main__":

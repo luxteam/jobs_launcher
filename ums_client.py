@@ -3,8 +3,6 @@ from requests.auth import HTTPBasicAuth
 from requests import get, post, put
 import logging
 
-logging.basicConfig(filename='rbs.log',level=logging.DEBUG)
-logger = logging.getLogger("rbs")
 
 def str2bool(v):
     v = str(v)
@@ -18,14 +16,16 @@ def str2bool(v):
         raise ValueError('Boolean value expected. Got <{}>'.format(v))
 
 
-class RBS_Client:
+class UMS_Client:
     def __init__(
         self,
         build_id,
         suite_id,
         job_id,
         url,
-        env_label
+        env_label,
+        login,
+        password
     ):
         # TODO: in thread loading schema from api
         self.job_id = job_id
@@ -35,6 +35,8 @@ class RBS_Client:
         self.suite_id = suite_id
         self.headers = None
         self.token = None
+        self.login = login
+        self.password = password
 
         # auth
         self.get_token()
@@ -43,7 +45,7 @@ class RBS_Client:
         print('Try to get auth token')
         response = post(
             url="{url}/user/login".format(url=self.url),
-            auth=HTTPBasicAuth('dm1tryG', 'root'),
+            auth=HTTPBasicAuth(self.login, self.password),
         )
         if 'error' in response.content.decode("utf-8"):
             print('Check login and password')
