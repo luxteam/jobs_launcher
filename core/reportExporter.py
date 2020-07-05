@@ -599,7 +599,8 @@ def setup_time_report(work_dir, hardware):
         setup_sum[confing] = setup_steps_dict
         for group in setup_details[confing]:
             for key in setup_sum_list:
-                setup_sum[confing][key] += setup_details[confing][group].get(key, -0.0)
+                setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
+                setup_sum[confing][key] += setup_details[confing][group][key]
     setup_sum['steps'] = setup_sum_list
 
     return setup_sum, setup_details

@@ -276,9 +276,9 @@
                         {% for hw in hardware %}
                             <td>
                                 {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
-                                    skipped
+                                    ~0.0
                                 {% else %}
-                                    {{ setupTimeDetails[hw[0]][test_package][setup_step] }}
+                                    {{ setupTimeDetails[hw[0]][test_package][setup_step] | replace("-0.0","-") }}
                                 {% endif %}
                             </td>
                         {% endfor %}
