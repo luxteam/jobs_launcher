@@ -350,7 +350,7 @@ def build_performance_report(summary_report):
 
         for test_package in results:
             for test_config in results[test_package]:
-                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config].get('synchronization_duration', -0.0), 'total': results[test_package][test_config]['duration']}
+                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config]['secondary_duration'], 'total': results[test_package][test_config]['duration']}
                 performance_report_detail[test_package].update(
                     {hw: test_info})
 
