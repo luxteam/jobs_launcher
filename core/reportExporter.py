@@ -642,13 +642,12 @@ def setup_time_count(work_dir):
 
             group = os.path.split(perf_json)[1].rpartition('_')[0]
             pcConfig = 'undefined'
-            for r, s, f in os.walk(work_dir):
+            for r, s, f in os.walk(root):
                 render_json = next(iter([os.path.join(r, tmp) for tmp in f if tmp.endswith(config.CASE_REPORT_SUFFIX)]), '')
                 if os.path.exists(render_json):
                     with open(render_json) as rpr_json_file:
                         rpr_json = json.load(rpr_json_file)
                         pcConfig = rpr_json[0]['render_device']
-
             if performance_list.get(pcConfig, []):
                 performance_list[pcConfig].append({'group': group, 'events': summ_perf})
             else:
