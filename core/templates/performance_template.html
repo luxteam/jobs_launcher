@@ -233,7 +233,7 @@
         {% endfor %}
     </tr>
 
-    {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating')%}
+    {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
     <tr>
         <td>{{ setup_step }}</td>
         {% for hw in hardware %}
@@ -245,46 +245,48 @@
 <hr/>
 
 <h1>details</h1>
-<h2>render duration by test groups in seconds</h2>
-<div class="jsTableWrapper">
-    <table class="baseTable"
-           data-toggle="table"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-show-pagination-switch="true"
-           data-pagination="false"
-           data-page-list="[5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
-           data-sort-name="test_status"
-           data-show-multi-sort="true"
-    >
-        <thead>
-        <tr>
-            <th data-halign="center" data-sortable="true">Test</th>
-            {% for hw in hardware %}
-                <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-            {% for test_package in performance_report_detail %}
-                <tr>
-                    <td>{{ test_package }}</td>
-                    {% for hw in hardware %}
-                        <td>
-                            {% if performance_report_detail[test_package][hw[0]].render == 0 %}
-                                skipped
-                            {% else %}
-                                {{ performance_report_detail[test_package][hw[0]].render | round(1) | replace("-0.0","-") }}
-                            {% endif %}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<hr/>
+{% for test_package in performance_report_detail %}
+    <h2>setup time by {{ test_package | lower }} in seconds</h2>
+    <div class="jsTableWrapper">
+        <table class="baseTable"
+            data-toggle="table"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-show-columns="true"
+            data-show-pagination-switch="true"
+            data-pagination="false"
+            data-page-list="[5, 10, 20, 45, ALL]"
+            data-sort-order="desc"
+            data-sort-name="test_status"
+            data-show-multi-sort="true"
+        >
+            <thead>
+            <tr>
+                <th data-halign="center" data-sortable="true">Test</th>
+                {% for hw in hardware %}
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+                {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
+                    <tr>
+                        <td>{{ setup_step }}</td>
+                        {% for hw in hardware %}
+                            <td>
+                                {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
+                                    skipped
+                                {% else %}
+                                    {{ setupTimeDetails[hw[0]][test_package][setup_step] }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <hr/>
+{% endfor %}
 {% endblock %}

@@ -595,11 +595,11 @@ def setup_time_report(work_dir, hardware):
     with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
         setup_details = json.load(f)
 
-    for confing in setup_details:
+    for confing in setup_details.keys():
         setup_sum[confing] = setup_steps_dict
         for group in setup_details[confing]:
             for key in setup_sum_list:
-                setup_sum[confing][key] += group['events'].get(key, -0.0)
+                setup_sum[confing][key] += setup_details[confing][group].get(key, -0.0)
     setup_sum['steps'] = setup_sum_list
 
     return setup_sum, setup_details
@@ -648,10 +648,9 @@ def setup_time_count(work_dir):
                     with open(render_json) as rpr_json_file:
                         rpr_json = json.load(rpr_json_file)
                         pcConfig = rpr_json[0]['render_device']
-            if performance_list.get(pcConfig, []):
-                performance_list[pcConfig].append({'group': group, 'events': summ_perf})
-            else:
-                performance_list[pcConfig] = [{'group': group, 'events': summ_perf}]
+            if pcConfig not in performance_list.keys():
+                performance_list[pcConfig] = {}
+            performance_list[pcConfig][group] = summ_perf
     with open(os.path.join(work_dir, 'setup_time.json'), 'w') as f:
         f.write(json.dumps(performance_list, indent=4))
 
