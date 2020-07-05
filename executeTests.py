@@ -141,7 +141,8 @@ def main():
     if ums_client:
         print('Tests filter: ' + str(args.test_filter))
         for group in args.test_filter:
-            group = group.replace(' ', '').replace(",", '').replace('"', '').replace('[', '').replace(']', '')
+            delete_chars = ' ,[]"'
+            group = group.translate(str.maketrans("", "", delete_chars))
             ums_client.get_suite_id_by_name(group)
             # send machine info to ums
             env = {"gpu": core.system_info.get_gpu(), **machine_info}
