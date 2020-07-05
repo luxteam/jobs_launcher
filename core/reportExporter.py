@@ -593,8 +593,11 @@ def setup_time_report(work_dir, hardware):
         setup_steps_dict[step] = -0.0
     setup_sum = {}
 
-    with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
-        setup_details = json.load(f)
+    try:
+        with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
+            setup_details = json.load(f)
+    except:
+        return (None, None)
 
     for confing in setup_details.keys():
         setup_sum[confing] = setup_steps_dict

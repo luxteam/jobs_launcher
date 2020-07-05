@@ -110,143 +110,36 @@
         </tbody>
     </table>
 </div>
-<hr/>
 
-<h1>summary</h1>
-<h2>total synchronization duration in seconds</h2>
-<table class="baseTable">
-    <tr>
-        <th>Tool</th>
-        {% for hw in hardware %}
-        <th>{{ hw[0] }}</th>
-        {% endfor %}
-    </tr>
-
-    {% for tool in test_info |sort(attribute='rating')%}
-    <tr>
-        <td>{{ tool }}</td>
-        {% for hw in hardware %}
-            <td>{{ test_info[tool][hw[0]].sync | round(1) | replace("-0.0","-") }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
-<hr/>
-
-<h1>graph</h1>
-<div id="columnchartSync"></div>
-<hr/>
-
-<h1>details</h1>
-<h2>synchronization duration by test groups in seconds</h2>
-<div class="jsTableWrapper">
-    <table class="baseTable"
-           data-toggle="table"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-show-pagination-switch="true"
-           data-pagination="false"
-           data-page-list="[5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
-           data-sort-name="test_status"
-           data-show-multi-sort="true"
-    >
-        <thead>
+{% if setupTimeSum != None %}
+    <hr/>
+    <h1>summary</h1>
+    <h2>total synchronization duration in seconds</h2>
+    <table class="baseTable">
         <tr>
-            <th data-halign="center" data-sortable="true">Test</th>
+            <th>Tool</th>
             {% for hw in hardware %}
-                <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+            <th>{{ hw[0] }}</th>
             {% endfor %}
         </tr>
-        </thead>
-        <tbody>
-            {% for test_package in performance_report_detail %}
-                <tr>
-                    <td>{{ test_package }}</td>
-                    {% for hw in hardware %}
-                        <td>
-                            {% if performance_report_detail[test_package][hw[0]].render == 0 %}
-                                skipped
-                            {% else %}
-                                {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
-                            {% endif %}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<hr/>
 
-<h1>normalized</h1>
-<h2>relative synchronization duration</h2>
-
-<div class="jsTableWrapper">
-    <table id="normalizedPerformance"
-           class="baseTable"
-           data-toggle="table"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-show-pagination-switch="true"
-           data-pagination="false"
-           data-page-list="[5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
-           data-sort-name="test_status"
-           data-show-multi-sort="true"
-    >
-        <thead>
+        {% for tool in test_info |sort(attribute='rating')%}
         <tr>
-            <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+            <td>{{ tool }}</td>
             {% for hw in hardware %}
-            <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                <td>{{ test_info[tool][hw[0]].sync | round(1) | replace("-0.0","-") }}</td>
             {% endfor %}
         </tr>
-        </thead>
-        <tbody>
-            {% for test_package in performance_report_detail %}
-                <tr>
-                    <td>{{ test_package }}</td>
-                    {% for hw in hardware %}
-                        <td>
-                            {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
+        {% endfor %}
     </table>
-</div>
-<hr/>
+    <hr/>
 
-<h1>summary</h1>
-<h2>total setup time duration in seconds</h2>
-<table class="baseTable">
-    <tr>
-        <th>Step</th>
-        {% for hw in hardware %}
-        <th>{{ hw[0] }}</th>
-        {% endfor %}
-    </tr>
+    <h1>graph</h1>
+    <div id="columnchartSync"></div>
+    <hr/>
 
-    {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
-    <tr>
-        <td>{{ setup_step }}</td>
-        {% for hw in hardware %}
-            <td>{{ setupTimeSum[hw[0]][setup_step] | round(1) | replace("-0.00","-") }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
-<hr/>
-
-<h1>details</h1>
-{% for test_package in performance_report_detail %}
-    <h2>setup time by {{ test_package | lower }} in seconds</h2>
+    <h1>details</h1>
+    <h2>synchronization duration by test groups in seconds</h2>
     <div class="jsTableWrapper">
         <table class="baseTable"
             data-toggle="table"
@@ -270,15 +163,15 @@
             </tr>
             </thead>
             <tbody>
-                {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
+                {% for test_package in performance_report_detail %}
                     <tr>
-                        <td>{{ setup_step }}</td>
+                        <td>{{ test_package }}</td>
                         {% for hw in hardware %}
                             <td>
-                                {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
-                                    ~0.0
+                                {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                    skipped
                                 {% else %}
-                                    {{ setupTimeDetails[hw[0]][test_package][setup_step] | replace("-0.0","-") }}
+                                    {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
                                 {% endif %}
                             </td>
                         {% endfor %}
@@ -288,5 +181,116 @@
         </table>
     </div>
     <hr/>
-{% endfor %}
+
+    <h1>normalized</h1>
+    <h2>relative synchronization duration</h2>
+
+    <div class="jsTableWrapper">
+        <table id="normalizedPerformance"
+            class="baseTable"
+            data-toggle="table"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-show-columns="true"
+            data-show-pagination-switch="true"
+            data-pagination="false"
+            data-page-list="[5, 10, 20, 45, ALL]"
+            data-sort-order="desc"
+            data-sort-name="test_status"
+            data-show-multi-sort="true"
+        >
+            <thead>
+            <tr>
+                <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+                {% for hw in hardware %}
+                <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+                {% for test_package in performance_report_detail %}
+                    <tr>
+                        <td>{{ test_package }}</td>
+                        {% for hw in hardware %}
+                            <td>
+                                {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+{% if setupTimeSum != None %}
+    <hr/>
+    <h1>summary</h1>
+    <h2>total setup time duration in seconds</h2>
+    <table class="baseTable">
+        <tr>
+            <th>Step</th>
+            {% for hw in hardware %}
+            <th>{{ hw[0] }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
+        <tr>
+            <td>{{ setup_step }}</td>
+            {% for hw in hardware %}
+                <td>{{ setupTimeSum[hw[0]][setup_step] | round(1) | replace("-0.00","-") }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <hr/>
+
+    <h1>details</h1>
+    {% for test_package in performance_report_detail %}
+        <h2>setup time by {{ test_package | lower }} in seconds</h2>
+        <div class="jsTableWrapper">
+            <table class="baseTable"
+                data-toggle="table"
+                data-search="true"
+                data-show-refresh="true"
+                data-show-toggle="true"
+                data-show-columns="true"
+                data-show-pagination-switch="true"
+                data-pagination="false"
+                data-page-list="[5, 10, 20, 45, ALL]"
+                data-sort-order="desc"
+                data-sort-name="test_status"
+                data-show-multi-sort="true"
+            >
+                <thead>
+                <tr>
+                    <th data-halign="center" data-sortable="true">Test</th>
+                    {% for hw in hardware %}
+                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
+                        <tr>
+                            <td>{{ setup_step }}</td>
+                            {% for hw in hardware %}
+                                <td>
+                                    {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
+                                        ~0.0
+                                    {% else %}
+                                        {{ setupTimeDetails[hw[0]][test_package][setup_step] | replace("-0.0","-") }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+{% endif %}
+
 {% endblock %}
