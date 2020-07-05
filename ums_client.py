@@ -47,6 +47,7 @@ class UMS_Client:
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth(self.login, self.password),
         )
+        print("user: {}\npassword: {}".format(self.login, self.password))
         print("response: {}".format(response.content.decode("utf-8")))
         if 'error' in response.content.decode("utf-8"):
             print('Check login and password')
