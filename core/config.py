@@ -134,3 +134,5 @@ LOST_TESTS_JSON_NAME = 'lost_tests.json'
 DONT_COMPARE = "Do not compare"
 
 POSSIBLE_BASELINE_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
+
+SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]

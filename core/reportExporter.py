@@ -587,9 +587,10 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
 
 def setup_time_report(work_dir, hardware):
-    setup_steps_dict = {"Prepare tests": 0.0, "Open tool": 0.0, "Open scene": 0.0, "Prerender": 0.0,
-                "Postrender": 0.0, "Close tool": 0.0, "Make report json": 0.0, "Compare": 0.0}
-    setup_sum_list = ["Prepare tests", "Open tool", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]
+    setup_sum_list = config.SETUP_STEPS_RPR_PLUGIN
+    setup_steps_dict = {}
+    for step in setup_sum_list:
+        setup_steps_dict[step] = -0.0
     setup_sum = {}
 
     with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
