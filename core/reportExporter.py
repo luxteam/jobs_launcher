@@ -600,7 +600,7 @@ def setup_time_report(work_dir, hardware):
         for group in setup_details[confing]:
             for key in setup_sum_list:
                 setup_sum[confing][key] += group['events'].get(key, -0.0)
-    setup_sum['setps'] = setup_sum_list
+    setup_sum['steps'] = setup_sum_list
 
     return setup_sum, setup_details
 
