@@ -358,6 +358,15 @@ def build_performance_report(summary_report):
     devices = set([device for tool, device, render, sync in render_info])
     summary_info_for_report = {t: {device: {} for device in devices} for t in tools}
 
+    tools_count = {}
+    for tool in tools:
+        for t, d, r, s in render_info:
+            if t == tool:
+                tools_count[tool] = tools_count.get('tools_count', 0) + 1
+    for t, d, r, s in render_info:
+        if t == max(tools_count.items(), key=operator.itemgetter(1))[0]:
+            summary_info_for_report[tool]['actual'] = True
+
     for tool, device, render, sync in render_info:
         summary_info_for_report[tool][device]['render'] = render
         summary_info_for_report[tool][device]['sync'] = sync

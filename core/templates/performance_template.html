@@ -11,11 +11,19 @@
         {% endfor %}
     </tr>
 
-    {% for tool in test_info |sort(attribute='rating')%}
+    {% for tool in test_info %}
     <tr>
         <td>{{ tool }}</td>
         {% for hw in hardware %}
-            <td>{{ test_info[tool][hw[0]].render | round(1) | replace("-0.0","-") }}</td>
+            {% if test_info[tool][hw[0]].render == -0.0 %}
+                <td>-</td>
+            {% else %}
+                <td
+                    {% if test_info[tool]['actual'] is not defined %}
+                        style="background-color: yellow"
+                    {% endif %}
+                >{{ test_info[tool][hw[0]].render | round(1)}}</td>
+            {% endif %}
         {% endfor %}
     </tr>
     {% endfor %}
