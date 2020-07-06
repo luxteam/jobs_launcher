@@ -622,7 +622,7 @@ def setup_time_report(work_dir, hardware):
 def setup_secondary_time(summary_report):
     try:
         if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
-            result = {'title': 'Synchronization time, ', 'formatter': 'timeFormatterMilliseconds', 'format': 'mm:ss'}
+            result = {'title': 'Synchronization time', 'formatter': 'timeFormatterMilliseconds', 'format': 'mm:ss'}
             for config in summary_report:
                 summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['synchronization_duration']
                 summary_report[config]['summary']['duration'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
