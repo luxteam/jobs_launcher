@@ -565,7 +565,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        common_info=common_info,
                                                        test_info=summary_info_for_report,
                                                        setupTimeSum=setup_sum,
-                                                       setupTimeDetails=setup_details)
+                                                       setupTimeDetails=setup_details,
+                                                       secondary_duration=setup_secondary_time(summary_report)['title'])
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
