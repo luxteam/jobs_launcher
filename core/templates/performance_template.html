@@ -130,7 +130,7 @@
         {% endfor %}
     </tr>
 
-    {% for tool in test_info |sort(attribute='rating')%}
+    {% for tool in test_info %}
     <tr>
         <td>{{ tool }}</td>
         {% for hw in hardware %}
@@ -250,7 +250,7 @@
             {% endfor %}
         </tr>
 
-        {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
+        {% for setup_step in setupTimeSum['steps'] %}
         <tr>
             <td>{{ setup_step }}</td>
             {% for hw in hardware %}
@@ -287,7 +287,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                    {% for setup_step in setupTimeSum['steps'] | sort(attribute='rating') %}
+                    {% for setup_step in setupTimeSum['steps'] %}
                         <tr>
                             <td>{{ setup_step }}</td>
                             {% for hw in hardware %}
