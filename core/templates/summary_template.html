@@ -5,7 +5,8 @@
 
 <div class="jsTableWrapper">
     <table class="baseTable"
-            data-toggle="table">
+            data-toggle="table"
+            data-show-columns="true">
         <thead>
             <tr>
                 <th>Job Name</th>
@@ -28,7 +29,7 @@
                 {% if synchronization_time %}
                     <th data-formatter="timeFormatterMilliseconds">Synchronization time, <span style="color: gray">mm:ss</span></th>
                 {% endif %}
-                <th data-formatter="timeFormatter">Setup time, <span style="color: gray">hh:mm:ss</th>
+                <th data-formatter="timeFormatter" data-visible="false">Setup time, <span style="color: gray">hh:mm:ss</th>
             </tr>
         </thead>
         <tbody>
@@ -89,7 +90,8 @@
 
 <div class="jsTableWrapper">
     <table class="baseTable"
-        data-toggle="table">
+        data-toggle="table"
+        data-show-columns="true">
         <thead>
             <tr>
                 <th>Test package name</th>
@@ -118,7 +120,7 @@
                 {% if synchronization_time %}
                     <th data-formatter="timeFormatterMilliseconds">Synchronization time, <span style="color: gray">mm:ss</span></th>
                 {% endif %}
-                <th data-formatter="timeFormatter">Setup time, <span style="color: gray">hh:mm:ss</th>
+                <th data-formatter="timeFormatter" data-visible="false">Setup time, <span style="color: gray">hh:mm:ss</th>
             </tr>
         </thead>
         <tbody>
