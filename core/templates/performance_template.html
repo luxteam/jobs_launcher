@@ -32,7 +32,7 @@
 <h1>graph</h1>
 <div id="columnchartRender"></div>
 
-<h1 href="#render_time" data-toggle="collapse">details</h1>
+<h1 class="card-header collapsed" href="#render_time" data-toggle="collapse">details</h1>
 <div id="render_time" class="collapse">
     <h2>render duration by test groups in seconds</h2>
     <div class="jsTableWrapper">
@@ -151,7 +151,7 @@
 <div id="columnchartSync"></div>
 <hr/>
 
-<h1 href="#sync_time" data-toggle="collapse">details</h1>
+<h1 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h1>
 <div id="sync_time" class="collapse">
     <h2>synchronization duration by test groups in seconds</h2>
     <div class="jsTableWrapper">
@@ -259,7 +259,7 @@
     </table>
     <hr/>
     
-    <h1 href="#setup_time" data-toggle="collapse">details</h1>
+    <h1 class="card-header collapsed" href="#setup_time" data-toggle="collapse">details</h1>
     <div id="setup_time" class="collapse">
         {% for test_package in performance_report_detail %}
             <h2>setup time by {{ test_package | lower }} in seconds</h2>
