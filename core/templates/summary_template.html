@@ -25,7 +25,10 @@
                 </th>
                 <th data-formatter="timeFormatter">Time taken, <span style="color: gray">hh:mm:ss</span></th>
                 <th data-formatter="timeFormatter">Render time, <span style="color: gray">hh:mm:ss</span></th>
-                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}, <span style="color: gray">{{ additional_time.format }}</span></th>
+                {% if synchronization_time %}
+                    <th data-formatter="timeFormatterMilliseconds">Synchronization time, <span style="color: gray">mm:ss</span></th>
+                {% endif %}
+                <th data-formatter="timeFormatter">Setup time, <span style="color: gray">hh:mm:ss</th>
             </tr>
         </thead>
         <tbody>
@@ -64,7 +67,10 @@
                 class="badResult"
                 {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
-                <td>{{ report[i].summary.secondary_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.synchronization_duration }}</td>
+                {% endif %}
+                <td>{{ report[i].summary.setup_duration }}</td>
             </tr>
     {% endfor %}
         </tbody>
@@ -109,7 +115,10 @@
                 </th>
                 <th data-formatter="timeFormatter">Time taken, <span style="color: gray">hh:mm:ss</span></th>
                 <th data-formatter="timeFormatter">Render time, <span style="color: gray">hh:mm:ss</span></th>
-                <th data-formatter="{{ additional_time.formatter }}">{{ additional_time.title }}, <span style="color: gray">{{ additional_time.format }}</span></th>
+                {% if synchronization_time %}
+                    <th data-formatter="timeFormatterMilliseconds">Synchronization time, <span style="color: gray">mm:ss</span></th>
+                {% endif %}
+                <th data-formatter="timeFormatter">Setup time, <span style="color: gray">hh:mm:ss</th>
             </tr>
         </thead>
         <tbody>
@@ -224,7 +233,10 @@
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
 
-                <td>{{ report[i].results[test_package][test_conf].secondary_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].results[test_package][test_conf].synchronization_duration }}</td>
+                {% endif %}
+                <td>{{ report[i].results[test_package][test_conf].setup_duration }}</td>
             </tr>
             <tr>
             {% endfor %}
@@ -264,7 +276,10 @@
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
-                <td>{{ report[i].summary.secondary_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.synchronization_duration }}</td>
+                {% endif %}
+                <td>{{ report[i].summary.setup_duration }}</td>
             </tr>
         </tbody>
     </table>

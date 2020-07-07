@@ -313,6 +313,11 @@ def build_summary_report(work_dir):
                 for lost_test_package in lost_tests_count[lost_test_result]:
                     generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
 
+    for config in summary_report:
+        summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
+        for test_package in summary_report[config]['results']:
+            summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
+
     return summary_report, common_info
 
 
@@ -350,7 +355,7 @@ def build_performance_report(summary_report):
 
         for test_package in results:
             for test_config in results[test_package]:
-                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config]['secondary_duration'], 'total': results[test_package][test_config]['duration']}
+                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config]['synchronization_duration'], 'total': results[test_package][test_config]['duration']}
                 performance_report_detail[test_package].update(
                     {hw: test_info})
 
@@ -516,7 +521,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         add_retry_info(summary_report, node_retry_info)
 
-        secondary_time = setup_secondary_time(summary_report)
+        synchronization_time = sync_time(summary_report)
 
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
@@ -528,7 +533,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
                                                node_retry_info=node_retry_info,
-                                               additional_time=secondary_time)
+                                               synchronization_time=synchronization_time)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -565,8 +570,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        common_info=common_info,
                                                        test_info=summary_info_for_report,
                                                        setupTimeSum=setup_sum,
-                                                       setupTimeDetails=setup_details,
-                                                       secondary_duration=setup_secondary_time(summary_report)['title'])
+                                                       setupTimeDetails=setup_details)
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
@@ -619,25 +623,20 @@ def setup_time_report(work_dir, hardware):
     return setup_sum, setup_details
 
 
-def setup_secondary_time(summary_report):
+def sync_time(summary_report):
     try:
-        if all(summary_report[config]['summary']['synchronization_duration'] > 0 for config in summary_report):
-            result = {'title': 'Synchronization time', 'formatter': 'timeFormatterMilliseconds', 'format': 'mm:ss'}
+        if sum(summary_report[config]['summary'].get('synchronization_duration', -0.0) for config in summary_report) > 0:
             for config in summary_report:
-                summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['synchronization_duration']
-                summary_report[config]['summary']['duration'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
-                for test_package in summary_report[config]['results']:
-                    summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration']
-                    summary_report[config]['results'][test_package]['']['duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
+                if 'synchronization_duration' in summary_report[config]['summary']:
+                    summary_report[config]['summary']['duration'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
+                    for test_package in summary_report[config]['results']:
+                        summary_report[config]['results'][test_package]['']['duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
         else:
             raise Exception('Some "synchronization_time" is 0')
     except:
-        result = {'title': 'Setup time', 'formatter': 'timeFormatter', 'format': 'hh:mm:ss'}
-        for config in summary_report:
-            summary_report[config]['summary']['secondary_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
-            for test_package in summary_report[config]['results']:
-                summary_report[config]['results'][test_package]['']['secondary_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
-    return result
+        main_logger.error(str(e))
+        return False
+    return True
 
 
 def setup_time_count(work_dir):
