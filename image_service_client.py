@@ -2,6 +2,8 @@ import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
 from requests.exceptions import RequestException
+from core.config import main_logger
+import traceback
 
 
 class ISClient:
@@ -19,7 +21,6 @@ class ISClient:
         if response.status_code == 404:
             raise RequestException("Cant connect image service. Check url")
         content = response.content.decode("utf-8")
-        print("response: {}".format(content))
         if 'error' in content:
             raise RequestException('Check login and password')
         token = json.loads(content)["token"]
@@ -30,6 +31,7 @@ class ISClient:
 
     def send_image(self, path2img):
         try:
+            main_logger.info("Try to send picture to Image Service")
             with open(path2img, 'rb') as img:
                 response = post(
                     url="{url}/api/".format(url=self.url),
@@ -39,7 +41,8 @@ class ISClient:
                     headers=self.headers
                 )
                 img.close()
+            main_logger.info("Image sent")
             return json.loads(response.content.decode("utf-8"))["image_id"]
         except Exception as e:
-            print("Image sending error: {}".format(str(e)))
-            return None
+            main_logger.error("Image sending error: {}".format(str(e)))
+            return -1

@@ -1,7 +1,9 @@
 import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
-import logging
+from requests.exceptions import RequestException
+from core.config import main_logger
+import traceback
 
 
 def str2bool(v):
@@ -42,19 +44,19 @@ class UMS_Client:
         self.get_token()
 
     def get_token(self):
-        print('Try to get auth token')
+        main_logger.info('Try to get auth token')
         response = post(
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth(self.login, self.password),
         )
-        print("response: {}".format(response.content.decode("utf-8")))
-        if 'error' in response.content.decode("utf-8"):
-            print('Check login and password')
-        token = json.loads(response.content.decode("utf-8"))["token"]
+        response_content = json.loads(response.content.decode("utf-8"))
+        if 'token' not in response_content:
+            raise RequestException('Check login and password')
+        token = response_content["token"]
         self.token = token
         self.headers = {"Authorization": "Bearer " + token}
 
-        print("Got auth token")
+        main_logger.info("Got auth token")
 
 
     def get_suite_id_by_name(self, suite_name):
@@ -66,19 +68,18 @@ class UMS_Client:
                 ),
                 headers=self.headers
             )
-            print("Get suite id by name {}".format(suite_name))
+            main_logger.info("Get suite id by name {}".format(suite_name))
             suites = [el['suite'] for el in json.loads(response.content.decode("utf-8"))['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
 
         except Exception as e:
             self.suite_id = None
-            print("Suite id getting error")
-            print(str(e))
-
+            main_logger.error("Suite id getting error")
+            main_logger.error(str(e))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
     def send_test_suite(self, res, env):
-        try:
             data = {
                 "test_cases_results": res,
                 "environment": env,
@@ -94,12 +95,13 @@ class UMS_Client:
                     job_id=self.job_id
                 )
             )
-            print('Test suite result sent with code {}'.format(response.status_code))
+            main_logger.info('Test suite result sent with code {}'.format(response.status_code))
 
             return response
 
         except Exception as e:
-            print("Test suite result send error: {}".format(str(e)))
+            main_logger.error("Test suite result send error: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     def define_environment(self, env):
         try:
@@ -117,8 +119,9 @@ class UMS_Client:
                     job_id=self.job_id
                 )
             )
-            print("Environment defined with code {}".format(response.status_code))
+            main_logger.info("Environment defined with code {}".format(response.status_code))
             return response
 
         except Exception as e:
-            print("Environment definition error: {}".format(str(e)))
+            main_logger.error("Environment definition error: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))

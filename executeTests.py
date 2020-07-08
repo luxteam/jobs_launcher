@@ -42,11 +42,13 @@ def main():
     ums_client = None
     use_ums = None
     try:
+        main_logger.info("Try to get environment variable UMS_USE")
         use_ums = str2bool(os.getenv('UMS_USE'))
     except Exception as e:
-        print('Exception when getenv UMS USE: {}'.format(str(e)))
+        main_logger.error('Exception when getenv UMS USE: {}'.format(str(e)))
     if use_ums:
         try:
+            main_logger.info("Try to create UMS client")
             ums_client = UMS_Client(
                 job_id=os.getenv("UMS_JOB_ID"),
                 url=os.getenv("UMS_URL"),
@@ -56,10 +58,12 @@ def main():
                 login=os.getenv("UMS_LOGIN"),
                 password=os.getenv("UMS_PASSWORD")
             )
-            print("UMS Client created")
+            main_logger.info("UMS Client created")
         except Exception as e:
-            print("UMS Client creation error: {}".format(e))
-            print("Traceback: {}".format(traceback.format_exc()))
+            main_logger.error("UMS Client creation error: {}".format(e))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+    else:
+        main_logger.info("UMS_USE set as false")
 
     level = 0
     delim = ' '*level
@@ -193,27 +197,26 @@ def main():
     print("Saving session report")
     core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report\n\n')
-    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
     if ums_client:
-        print("Try to send results to UMS")
+        main_logger.info("Try to send results to UMS")
         is_client = None
         try:
             is_client = ISClient(url=os.getenv("IS_URL"),
                                  login=os.getenv("IS_LOGIN"),
                                  password=os.getenv("IS_PASSWORD"))
-            print("Image Service client created")
+            main_logger.info("Image Service client created")
         except Exception as e:
-            print("Image Service client creation error: {}".format(str(e)))
-            print("Traceback: {}".format(traceback.format_exc()))
+            main_logger.error("Image Service client creation error: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
         res = []
         try:
-            print('Start preparing results')
+            main_logger.info('Start preparing results')
             cases = []
             suites = []
 
-            with open(os.path.join(session_dir, 'session_report.json')) as file:
+            with open(os.path.join(session_dir, SESSION_REPORT)) as file:
                 data = json.loads(file.read())
                 suites = data["results"]
 
@@ -237,15 +240,20 @@ def main():
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
                 env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
-                print(env)
+                main_logger.info("Generated results: {}".format(res))
+                main_logger.info("Environment: {}".format(env))
 
                 response = ums_client.send_test_suite(res=res, env=env)
-                print('Test suite results sent with code {}'.format(response.status_code))
-                print(response.content)
+                main_logger.info('Test suite results sent with code {}'.format(response.status_code))
+                main_logger.info('Response from UMS: \n{}'.format(response.content))
 
         except Exception as e:
-            print("Test case result creation error: {}".format(str(e)))
-            print("Traceback: {}".format(traceback.format_exc()))
+            main_logger.error("Test case result creation error: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+    else:
+        main_logger.info("UMS client did not set. Result won't be sent to UMS")
+
+    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
