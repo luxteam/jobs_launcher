@@ -82,16 +82,15 @@
 <h1>tests</h1>
 
 {% for i, value in report | dictsort %}
-    {% if i != "_cur_" %}
-<h3><a href="{{ i }}_detailed.html">{{ i }}</a></h3>
-
-<a class="hAnchor" name="{{ i }}"></a>
-    {% endif %}
 
 <div class="jsTableWrapper">
     <table class="baseTable"
         data-toggle="table"
         data-show-columns="true">
+        {% if i != "_cur_" %}
+            <caption><h3 style="margin-left: 0px;"><a href="{{ i }}_detailed.html">{{ i }}</a></h3></caption>
+        <a class="hAnchor" name="{{ i }}"></a>
+        {% endif %}
         <thead>
             <tr>
                 <th>Test package name</th>

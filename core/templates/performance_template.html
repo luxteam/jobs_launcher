@@ -2,6 +2,7 @@
 
 {% block report_body %}
 <h1>render time</h1>
+<h2>total render duration in seconds</h2>
 <table class="baseTable">
     <tr>
         <th>Tool</th>
@@ -118,6 +119,7 @@
 
 <hr/>
 <h1>synchronization time</h1>
+<h2>total synchronization duration in seconds</h2>
 <table class="baseTable">
     <tr>
         <th>Tool</th>
@@ -234,7 +236,8 @@
 
 {% if setupTimeSum != None %}
     <hr/>
-    <h1>Setup time steps</h1>
+    <h1>setup time steps</h1>
+    <h2>total setup time duration in seconds</h2>
     <table class="baseTable">
         <tr>
             <th>Step</th>
