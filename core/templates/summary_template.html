@@ -84,13 +84,16 @@
 {% for i, value in report | dictsort %}
 
 <div class="jsTableWrapper">
+    {% if i != "_cur_" %}
+        <div id="toolbar_{{i | replace(' ', '_') | replace('(', '') | replace(')', '')}}">
+            <caption><h3 style="margin: 2% 7%; width:130%;"><a href="{{ i }}_detailed.html">{{ i }}</a></h3></caption>
+            <a class="hAnchor" name="{{ i }}"></a>
+        </div>
+    {% endif %}
     <table class="baseTable"
         data-toggle="table"
-        data-show-columns="true">
-        {% if i != "_cur_" %}
-            <caption><h3 style="margin-left: 0px;"><a href="{{ i }}_detailed.html">{{ i }}</a></h3></caption>
-        <a class="hAnchor" name="{{ i }}"></a>
-        {% endif %}
+        data-show-columns="true"
+        data-toolbar="#toolbar_{{i | replace(' ', '_') | replace('(', '') | replace(')', '')}}">
         <thead>
             <tr>
                 <th>Test package name</th>
