@@ -1,8 +1,7 @@
 {% extends "base_template.html"%}
 
 {% block report_body %}
-<h1>summary</h1>
-<h2>total render duration in seconds</h2>
+<h1>render time</h1>
 <table class="baseTable">
     <tr>
         <th>Tool</th>
@@ -118,8 +117,7 @@
 </div>
 
 <hr/>
-<h1>summary</h1>
-<h2>total {{ secondary_duration | lower }} duration in seconds</h2>
+<h1>synchronization time</h1>
 <table class="baseTable">
     <tr>
         <th>Tool</th>
@@ -145,11 +143,9 @@
     </tr>
     {% endfor %}
 </table>
-<hr/>
 
 <h1>graph</h1>
 <div id="columnchartSync"></div>
-<hr/>
 
 <h1 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h1>
 <div id="sync_time" class="collapse">
@@ -238,8 +234,7 @@
 
 {% if setupTimeSum != None %}
     <hr/>
-    <h1>summary</h1>
-    <h2>total setup time duration in seconds</h2>
+    <h1>Setup time steps</h1>
     <table class="baseTable">
         <tr>
             <th>Step</th>
