@@ -80,6 +80,7 @@ class UMS_Client:
 
 
     def send_test_suite(self, res, env):
+        try:
             data = {
                 "test_cases_results": res,
                 "environment": env,
