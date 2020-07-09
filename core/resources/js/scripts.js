@@ -36,6 +36,14 @@ function timeFormatterMilliseconds(value, row, index, field) {
     return time.toISOString().substr(14, 9);
 }
 
+function timeFormatterFull(value, row, index, field) {
+    if (isFinite(value)) {
+        var time = new Date(null);
+        time.setSeconds(parseInt(value), (parseFloat(value) % 1) * 1000);
+        return time.toISOString().substr(11, 11);
+    }
+}
+
 function openModalWindow(id) {
     var modal = document.getElementById(id);
     modal.style.display = "flex";

@@ -3,31 +3,36 @@
 {% block report_body %}
 <h1>render time</h1>
 <h2>total render duration in seconds</h2>
-<table class="baseTable">
-    <tr>
-        <th>Tool</th>
-        {% for hw in hardware %}
-        <th>{{ hw[0] }}</th>
-        {% endfor %}
-    </tr>
-
-    {% for tool in test_info %}
-    <tr>
-        <td>{{ tool }}</td>
-        {% for hw in hardware %}
-            {% if test_info[tool][hw[0]].render == -0.0 %}
-                <td>-</td>
-            {% else %}
-                <td
-                    {% if test_info[tool]['actual'] is not defined %}
-                        class=skippedStatus
+<div class="jsTableWrapper">
+    <table class="baseTable" data-toggle="table">
+        <thead>
+            <tr>
+                <th>Tool</th>
+                {% for hw in hardware %}
+                <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for tool in test_info %}
+            <tr>
+                <td>{{ tool }}</td>
+                {% for hw in hardware %}
+                    {% if test_info[tool][hw[0]].render == -0.0 %}
+                        <td>-</td>
+                    {% else %}
+                        <td
+                            {% if test_info[tool]['actual'] is not defined %}
+                                class=skippedStatus
+                            {% endif %}
+                        >{{ test_info[tool][hw[0]].render | round(1)}}</td>
                     {% endif %}
-                >{{ test_info[tool][hw[0]].render | round(1)}}</td>
-            {% endif %}
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <h2>graph</h2>
 <div id="columnchartRender"></div>
@@ -50,13 +55,13 @@
             data-toolbar="#toolbar_render"
         >
             <div id="toolbar_render">
-                <h2 style="margin: auto;">render duration by test groups in seconds</h2>
+                <h2 style="margin: auto;">render duration by test groups, hh:mm:ss</h2>
             </div>
             <thead>
             <tr>
                 <th data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -125,31 +130,36 @@
 <hr/>
 <h1>synchronization time</h1>
 <h2>total synchronization duration in seconds</h2>
-<table class="baseTable">
-    <tr>
-        <th>Tool</th>
-        {% for hw in hardware %}
-        <th>{{ hw[0] }}</th>
-        {% endfor %}
-    </tr>
-
-    {% for tool in test_info %}
-    <tr>
-        <td>{{ tool }}</td>
-        {% for hw in hardware %}
-            {% if test_info[tool][hw[0]].sync == -0.0 %}
-                <td>-</td>
-            {% else %}
-                <td
-                    {% if test_info[tool]['actual'] is not defined %}
-                        class=skippedStatus
+<div class="jsTableWrapper">
+    <table class="baseTable" data-toggle="table">
+        <thead>
+            <tr>
+                <th>Tool</th>
+                {% for hw in hardware %}
+                <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for tool in test_info %}
+            <tr>
+                <td>{{ tool }}</td>
+                {% for hw in hardware %}
+                    {% if test_info[tool][hw[0]].sync == -0.0 %}
+                        <td>-</td>
+                    {% else %}
+                        <td
+                            {% if test_info[tool]['actual'] is not defined %}
+                                class=skippedStatus
+                            {% endif %}
+                        >{{ test_info[tool][hw[0]].sync | round(1)}}</td>
                     {% endif %}
-                >{{ test_info[tool][hw[0]].sync | round(1)}}</td>
-            {% endif %}
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <h2>graph</h2>
 <div id="columnchartSync"></div>
@@ -178,7 +188,7 @@
             <tr>
                 <th data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -248,23 +258,28 @@
     <hr/>
     <h1>setup time steps</h1>
     <h2>total setup time duration in seconds</h2>
-    <table class="baseTable">
-        <tr>
-            <th>Step</th>
-            {% for hw in hardware %}
-            <th>{{ hw[0] }}</th>
-            {% endfor %}
-        </tr>
-
-        {% for setup_step in setupTimeSum['steps'] %}
-        <tr>
-            <td>{{ setup_step }}</td>
-            {% for hw in hardware %}
-                <td>{{ setupTimeSum[hw[0]][setup_step] | round(1) | replace("-0.00","-") }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="jsTableWrapper">
+        <table class="baseTable" data-toggle="table">
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    {% for hw in hardware %}
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+                <tbody>
+                {% for setup_step in setupTimeSum['steps'] %}
+                <tr>
+                    <td>{{ setup_step }}</td>
+                    {% for hw in hardware %}
+                        <td>{{ setupTimeSum[hw[0]][setup_step] | round(1) | replace("-0.00","-") }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <h2 class="card-header collapsed" href="#setup_time" data-toggle="collapse">details</h2>
     <div id="setup_time" class="collapse">
@@ -289,9 +304,9 @@
                     </div>
                     <thead>
                     <tr>
-                        <th data-halign="center" data-sortable="true">Test</th>
+                        <th data-halign="center" data-sortable="true">Step</th>
                         {% for hw in hardware %}
-                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                         {% endfor %}
                     </tr>
                     </thead>
