@@ -559,6 +559,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
         setup_sum, setup_details = setup_time_report(work_dir, hardware)
+        main_logger.error(setup_sum)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
@@ -613,7 +614,7 @@ def setup_time_report(work_dir, hardware):
         return (None, None)
 
     for confing in setup_details.keys():
-        setup_sum[confing] = setup_steps_dict
+        setup_sum[confing] = setup_steps_dict.copy()
         for group in setup_details[confing]:
             for key in setup_sum_list:
                 setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
