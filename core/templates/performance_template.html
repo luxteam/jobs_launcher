@@ -2,7 +2,7 @@
 
 {% block report_body %}
 <h1>render time</h1>
-<h2>total render duration in seconds</h2>
+<h2>total render duration, hh:mm:ss</h2>
 <div class="jsTableWrapper">
     <table class="baseTable" data-toggle="table">
         <thead>
@@ -129,7 +129,7 @@
 
 <hr/>
 <h1>synchronization time</h1>
-<h2>total synchronization duration in seconds</h2>
+<h2>total synchronization duration, hh:mm:ss</h2>
 <div class="jsTableWrapper">
     <table class="baseTable" data-toggle="table">
         <thead>
@@ -182,7 +182,7 @@
             data-toolbar="#toolbar_sync"
         >
             <div id="toolbar_sync">
-                <h2 style="margin: auto;">synchronization duration by test groups in seconds</h2>
+                <h2 style="margin: auto;">synchronization duration by test groups, hh:mm:ss</h2>
             </div>
             <thead>
             <tr>
@@ -257,7 +257,7 @@
 {% if setupTimeSum != None %}
     <hr/>
     <h1>setup time steps</h1>
-    <h2>total setup time duration in seconds</h2>
+    <h2>total setup time duration, hh:mm:ss</h2>
     <div class="jsTableWrapper">
         <table class="baseTable" data-toggle="table">
             <thead>
@@ -300,7 +300,7 @@
                     data-toolbar="#toolbar_setup_{{ test_package }}"
                 >
                     <div id="toolbar_setup_{{ test_package }}">
-                        <h2 style="margin: auto;">setup time for {{ test_package | lower }} in seconds</h2>
+                        <h2 style="margin: auto;">setup time for {{ test_package | lower }}, hh:mm:ss</h2>
                     </div>
                     <thead>
                     <tr>
