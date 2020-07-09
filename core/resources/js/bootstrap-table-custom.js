@@ -93,14 +93,19 @@ window.copyTestCaseName = {
 }
 
 function performanceNormalizeFormatter(value, row, index, field) {
-    return (value * 100 / row[1]).toFixed(2) + " %";
+    for (key in row) {
+        if (isFinite(parseFloat((value * 100 / row[key]).toFixed(2)))) {
+            return (value * 100 / row[key]).toFixed(2) + " %"
+        }
+    }
+    return "Skipped"
 }
 
 function performanceNormalizeStyleFormatter(value, row, index, field) {
     var values = [];
     for (key in row) {
-        if (key.indexOf('_') === -1 && key != 0) {
-            if (!isFinite(parseInt(row[key]))) {values.push(parseFloat(0))}
+        if (key != 0) {
+            if (!isFinite(parseFloat(row[key]))) {values.push(parseFloat(1))}
             else {values.push(parseFloat(row[key]))}
         }
     }

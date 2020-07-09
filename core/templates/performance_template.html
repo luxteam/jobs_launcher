@@ -29,12 +29,11 @@
     {% endfor %}
 </table>
 
-<h1>graph</h1>
+<h2>graph</h2>
 <div id="columnchartRender"></div>
 
-<h1 class="card-header collapsed" href="#render_time" data-toggle="collapse">details</h1>
+<h2 class="card-header collapsed" href="#render_time" data-toggle="collapse">details</h2>
 <div id="render_time" class="collapse">
-    <h2>render duration by test groups in seconds</h2>
     <div class="jsTableWrapper">
         <table class="baseTable"
             data-toggle="table"
@@ -48,7 +47,11 @@
             data-sort-order="desc"
             data-sort-name="test_status"
             data-show-multi-sort="true"
+            data-toolbar="#toolbar_render"
         >
+            <div id="toolbar_render">
+                <h2 style="margin: auto;">render duration by test groups in seconds</h2>
+            </div>
             <thead>
             <tr>
                 <th data-halign="center" data-sortable="true">Test</th>
@@ -76,8 +79,6 @@
         </table>
     </div>
 
-    <h2>relative render duration</h2>
-
     <div class="jsTableWrapper">
         <table id="normalizedPerformance"
             class="baseTable"
@@ -92,7 +93,11 @@
             data-sort-order="desc"
             data-sort-name="test_status"
             data-show-multi-sort="true"
+            data-toolbar="#toolbar_render_norm"
         >
+            <div id="toolbar_render_norm">
+                <h2 style="margin: auto;">relative render duration</h2>
+            </div>
             <thead>
             <tr>
                 <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
@@ -146,12 +151,11 @@
     {% endfor %}
 </table>
 
-<h1>graph</h1>
+<h2>graph</h2>
 <div id="columnchartSync"></div>
 
-<h1 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h1>
+<h2 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h2>
 <div id="sync_time" class="collapse">
-    <h2>synchronization duration by test groups in seconds</h2>
     <div class="jsTableWrapper">
         <table class="baseTable"
             data-toggle="table"
@@ -165,7 +169,11 @@
             data-sort-order="desc"
             data-sort-name="test_status"
             data-show-multi-sort="true"
+            data-toolbar="#toolbar_sync"
         >
+            <div id="toolbar_sync">
+                <h2 style="margin: auto;">synchronization duration by test groups in seconds</h2>
+            </div>
             <thead>
             <tr>
                 <th data-halign="center" data-sortable="true">Test</th>
@@ -193,8 +201,6 @@
         </table>
     </div>
 
-    <h2>relative synchronization duration</h2>
-
     <div class="jsTableWrapper">
         <table id="normalizedPerformance"
             class="baseTable"
@@ -209,7 +215,11 @@
             data-sort-order="desc"
             data-sort-name="test_status"
             data-show-multi-sort="true"
+            data-toolbar="#toolbar_sync_norm"
         >
+            <div id="toolbar_sync_norm">
+                <h2 style="margin: auto;">relative synchronization duration</h2>
+            </div>
             <thead>
             <tr>
                 <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
@@ -256,10 +266,9 @@
         {% endfor %}
     </table>
 
-    <h1 class="card-header collapsed" href="#setup_time" data-toggle="collapse">details</h1>
+    <h2 class="card-header collapsed" href="#setup_time" data-toggle="collapse">details</h2>
     <div id="setup_time" class="collapse">
         {% for test_package in performance_report_detail %}
-            <h2>setup time by {{ test_package | lower }} in seconds</h2>
             <div class="jsTableWrapper">
                 <table class="baseTable"
                     data-toggle="table"
@@ -273,7 +282,11 @@
                     data-sort-order="desc"
                     data-sort-name="test_status"
                     data-show-multi-sort="true"
+                    data-toolbar="#toolbar_setup_{{ test_package }}"
                 >
+                    <div id="toolbar_setup_{{ test_package }}">
+                        <h2 style="margin: auto;">setup time for {{ test_package | lower }} in seconds</h2>
+                    </div>
                     <thead>
                     <tr>
                         <th data-halign="center" data-sortable="true">Test</th>

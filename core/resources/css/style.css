@@ -396,10 +396,10 @@ a {
   margin: auto;
 }
 
-.card-header:after {
-  content: "\2212";
+.card-header:before {
+  content: "\25BE";
 }
 
-.card-header.collapsed:after {
-  content: "\002B";
+.card-header.collapsed:before {
+  content: "\25B8";
 }
