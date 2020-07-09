@@ -40,7 +40,7 @@ function timeFormatterFull(value, row, index, field) {
     if (isFinite(value)) {
         var time = new Date(null);
         time.setSeconds(parseInt(value), (parseFloat(value) % 1) * 1000);
-        return time.toISOString().substr(11, 11);
+        return time.toISOString().substr(11, 12);
     }
 }
 
