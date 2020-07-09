@@ -559,7 +559,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
         setup_sum, setup_details = setup_time_report(work_dir, hardware)
-        main_logger.error(setup_sum)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
