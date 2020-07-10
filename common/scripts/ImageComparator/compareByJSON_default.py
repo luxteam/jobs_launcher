@@ -87,7 +87,13 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             except ZeroDivisionError:
                 return 0
 
-        img.update({'difference_time': get_diff()})
+        time_diff = get_diff()
+
+        for threshold, diff_max in time_diff_max:
+            if baseline_time < threshold and time_diff > diff_max:
+                img['test_status'] = core.config.TEST_DIFF_STATUS
+
+        img.update({'difference_time': time_diff})
         img.update({'baseline_render_time': baseline_time})
     else:
         img.update({'difference_time': -0.0})
