@@ -91,7 +91,8 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
 
         for threshold in time_diff_max:
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
-                img['test_status'] = core.config.TEST_DIFF_STATUS
+                img.update({'test_status': core.config.TEST_DIFF_STATUS})
+                img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
 
         img.update({'difference_time': get_diff()})
         img.update({'baseline_render_time': baseline_time})
