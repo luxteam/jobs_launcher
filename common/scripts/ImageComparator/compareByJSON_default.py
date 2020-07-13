@@ -87,7 +87,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             except ZeroDivisionError:
                 return 0
 
-        time_diff = abs(render_time - baseline_time)
+        time_diff = render_time - baseline_time
 
         for threshold in time_diff_max:
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
