@@ -127,134 +127,136 @@
     </div>
 </div>
 
-<hr/>
-<h1>synchronization time</h1>
-<h2>total synchronization duration, hh:mm:ss</h2>
-<div class="jsTableWrapper">
-    <table class="baseTable" data-toggle="table">
-        <thead>
-            <tr>
-                <th>Tool</th>
-                {% for hw in hardware %}
-                <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for tool in test_info %}
-            <tr>
-                <td>{{ tool }}</td>
-                {% for hw in hardware %}
-                    {% if test_info[tool][hw[0]].sync == -0.0 %}
-                        <td>-</td>
-                    {% else %}
-                        <td
-                            {% if test_info[tool]['actual'] is not defined %}
-                                class=skippedStatus
-                            {% endif %}
-                        >{{ test_info[tool][hw[0]].sync | round(1)}}</td>
-                    {% endif %}
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<h2>graph</h2>
-<div id="columnchartSync"></div>
-
-<h2 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h2>
-<div id="sync_time" class="collapse">
+{% if synchronization_time %}
+    <hr/>
+    <h1>synchronization time</h1>
+    <h2>total synchronization duration, hh:mm:ss</h2>
     <div class="jsTableWrapper">
-        <table class="baseTable"
-            data-toggle="table"
-            data-search="true"
-            data-show-refresh="true"
-            data-show-toggle="true"
-            data-show-columns="true"
-            data-show-pagination-switch="true"
-            data-pagination="false"
-            data-page-list="[5, 10, 20, 45, ALL]"
-            data-sort-order="desc"
-            data-sort-name="test_status"
-            data-show-multi-sort="true"
-            data-toolbar="#toolbar_sync"
-        >
-            <div id="toolbar_sync">
-                <h2 style="margin: auto;">synchronization duration by test groups, hh:mm:ss</h2>
-            </div>
+        <table class="baseTable" data-toggle="table">
             <thead>
-            <tr>
-                <th data-halign="center" data-sortable="true">Test</th>
-                {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
-                {% endfor %}
-            </tr>
+                <tr>
+                    <th>Tool</th>
+                    {% for hw in hardware %}
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                    {% endfor %}
+                </tr>
             </thead>
             <tbody>
-                {% for test_package in performance_report_detail %}
-                    <tr>
-                        <td>{{ test_package }}</td>
-                        {% for hw in hardware %}
-                            <td>
-                                {% if performance_report_detail[test_package][hw[0]].render == 0 %}
-                                    Skipped
-                                {% else %}
-                                    {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                {% for tool in test_info %}
+                <tr>
+                    <td>{{ tool }}</td>
+                    {% for hw in hardware %}
+                        {% if test_info[tool][hw[0]].sync == -0.0 %}
+                            <td>-</td>
+                        {% else %}
+                            <td
+                                {% if test_info[tool]['actual'] is not defined %}
+                                    class=skippedStatus
                                 {% endif %}
-                            </td>
-                        {% endfor %}
-                    </tr>
+                            >{{ test_info[tool][hw[0]].sync | round(1)}}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <div class="jsTableWrapper">
-        <table id="normalizedPerformance"
-            class="baseTable"
-            data-toggle="table"
-            data-search="true"
-            data-show-refresh="true"
-            data-show-toggle="true"
-            data-show-columns="true"
-            data-show-pagination-switch="true"
-            data-pagination="false"
-            data-page-list="[5, 10, 20, 45, ALL]"
-            data-sort-order="desc"
-            data-sort-name="test_status"
-            data-show-multi-sort="true"
-            data-toolbar="#toolbar_sync_norm"
-        >
-            <div id="toolbar_sync_norm">
-                <h2 style="margin: auto;">relative synchronization duration</h2>
-            </div>
-            <thead>
-            <tr>
-                <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
-                {% for hw in hardware %}
-                <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-                {% for test_package in performance_report_detail %}
-                    <tr>
-                        <td>{{ test_package }}</td>
-                        {% for hw in hardware %}
-                            <td>
-                                {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+    <h2>graph</h2>
+    <div id="columnchartSync"></div>
 
-{% if setupTimeSum != None %}
+    <h2 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h2>
+    <div id="sync_time" class="collapse">
+        <div class="jsTableWrapper">
+            <table class="baseTable"
+                data-toggle="table"
+                data-search="true"
+                data-show-refresh="true"
+                data-show-toggle="true"
+                data-show-columns="true"
+                data-show-pagination-switch="true"
+                data-pagination="false"
+                data-page-list="[5, 10, 20, 45, ALL]"
+                data-sort-order="desc"
+                data-sort-name="test_status"
+                data-show-multi-sort="true"
+                data-toolbar="#toolbar_sync"
+            >
+                <div id="toolbar_sync">
+                    <h2 style="margin: auto;">synchronization duration by test groups, hh:mm:ss</h2>
+                </div>
+                <thead>
+                <tr>
+                    <th data-halign="center" data-sortable="true">Test</th>
+                    {% for hw in hardware %}
+                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for test_package in performance_report_detail %}
+                        <tr>
+                            <td>{{ test_package }}</td>
+                            {% for hw in hardware %}
+                                <td>
+                                    {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                        Skipped
+                                    {% else %}
+                                        {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="jsTableWrapper">
+            <table id="normalizedPerformance"
+                class="baseTable"
+                data-toggle="table"
+                data-search="true"
+                data-show-refresh="true"
+                data-show-toggle="true"
+                data-show-columns="true"
+                data-show-pagination-switch="true"
+                data-pagination="false"
+                data-page-list="[5, 10, 20, 45, ALL]"
+                data-sort-order="desc"
+                data-sort-name="test_status"
+                data-show-multi-sort="true"
+                data-toolbar="#toolbar_sync_norm"
+            >
+                <div id="toolbar_sync_norm">
+                    <h2 style="margin: auto;">relative synchronization duration</h2>
+                </div>
+                <thead>
+                <tr>
+                    <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+                    {% for hw in hardware %}
+                    <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for test_package in performance_report_detail %}
+                        <tr>
+                            <td>{{ test_package }}</td>
+                            {% for hw in hardware %}
+                                <td>
+                                    {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+{% if setupTimeDetails != {} %}
     <hr/>
     <h1>setup time steps</h1>
     <h2>total setup time duration, hh:mm:ss</h2>

@@ -521,8 +521,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         add_retry_info(summary_report, node_retry_info)
 
-        synchronization_time = sync_time(summary_report)
-
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
@@ -533,7 +531,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
                                                node_retry_info=node_retry_info,
-                                               synchronization_time=synchronization_time)
+                                               synchronization_time=sync_time(summary_report))
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -559,6 +557,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
         setup_sum, setup_details = setup_time_report(work_dir, hardware)
+        main_logger.error(sync_time(summary_report))
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
@@ -570,11 +569,12 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        common_info=common_info,
                                                        test_info=summary_info_for_report,
                                                        setupTimeSum=setup_sum,
-                                                       setupTimeDetails=setup_details)
+                                                       setupTimeDetails=setup_details,
+                                                       synchronization_time=sync_time(summary_report))
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
-        main_logger.error(performance_html)
+        main_logger.error(performance_html) #local variable 'performance_html' referenced before assignment
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
 
     main_logger.info("Saving compare report...")
@@ -633,7 +633,7 @@ def sync_time(summary_report):
                         summary_report[config]['results'][test_package]['']['duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
         else:
             raise Exception('Some "synchronization_time" is 0')
-    except:
+    except Exception as e:
         main_logger.error(str(e))
         return False
     return True
