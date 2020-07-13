@@ -221,14 +221,7 @@ a {
   max-width: 300px;
 }
 
-#columnchartRender {
-  display: block;
-  margin: auto;
-  width: 800px;
-  height: 500px;
-}
-
-#columnchartSync {
+#columnchartRender, #columnchartSync {
   display: block;
   margin: auto;
   width: 800px;

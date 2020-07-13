@@ -668,22 +668,6 @@ def setup_time_count(work_dir):
         f.write(json.dumps(performance_list, indent=4))
 
 
-def splitall(path):
-    allparts = []
-    while 1:
-        parts = os.path.split(path)
-        if parts[0] == path:
-            allparts.insert(0, parts[0])
-            break
-        elif parts[1] == path:
-            allparts.insert(0, parts[1])
-            break
-        else:
-            path = parts[0]
-            allparts.insert(0, parts[1])
-    return allparts
-
-
 def add_retry_info(summary_report, retry_info):
     try:
         for config in summary_report:
