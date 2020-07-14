@@ -7,12 +7,15 @@
  * - skipped - case wasn't launched
  */
 
-$('.twoSetupTimes').bootstrapTable({
-    onColumnSwitch: function (field, checked) {
+var tables = $('.twoSetupTimes')
+Array.prototype.forEach.call(tables, function(table) {
+    $(table.id).on('column-switch.bs.table', function (field, checked) {
+        alert(field)
         if (field.includes('Setup time')){
             $(this).getElementsByClassName('fullTimeTaken').prop("data-visible", checked)
+            $(this).getElementsByClassName('syncTimeTaken').prop("data-visible", !checked)
         }
-    }
+    })
 })
 
 function statusSorter(x, y) {

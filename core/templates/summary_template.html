@@ -6,7 +6,8 @@
 <div class="jsTableWrapper">
     <table class="baseTable twoSetupTimes"
             data-toggle="table"
-            data-show-columns="true">
+            data-show-columns="true"
+            id="summary_table">
         <thead>
             <tr>
                 <th>Job Name</th>
@@ -26,12 +27,12 @@
                 </th>
                 <th data-formatter="timeFormatterFull"
                 {% if synchronization_time %}
-                    data-switchable="false" data-visible="false"
+                    data-switchable="false" data-visible="false" class="fullTimeTaken"
                 {% endif %}>Time taken
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                 </th>
                 {% if synchronization_time %}
-                    <th data-formatter="timeFormatterFull">Time taken
+                    <th data-formatter="timeFormatterFull" class="syncTimeTaken">Time taken
                         <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                     </th>
                 {% endif %}
@@ -110,7 +111,8 @@
     <table class="baseTable twoSetupTimes"
         data-toggle="table"
         data-show-columns="true"
-        data-toolbar="#toolbar_{{ i | replace(' ', '_') | replace('(', '_') | replace(')', '_') | replace('.', '_')  }}">
+        data-toolbar="#toolbar_{{ i | replace(' ', '_') | replace('(', '_') | replace(')', '_') | replace('.', '_') }}"
+        id="{{ i | replace(' ', '_') | replace('(', '_') | replace(')', '_') | replace('.', '_') }}">
         <thead>
             <tr>
                 <th>Test package name</th>
