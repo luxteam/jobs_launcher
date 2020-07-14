@@ -4,6 +4,27 @@
 
 {% include "images_compare_block.html" %}
 
+{% if report_type == 'default' %}
+    {% set template_columns = [
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'test_case'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'test_case_copy'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'baseline_img'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'rendered_img'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'info'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'time_diff'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'pix_diff_2'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'test_status'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'render_time'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'baseline_render_time'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'render_log'}
+    ] 
+    %}
+{% elif report_type == 'ec' %}
+
+{% elif report_type == 'ct' %}
+
+{% endif %}
+
 <div class="jsTableWrapper">
     <div id="toolbar">
         <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ render_report | selectattr("test_status", "equalto", "passed") | list | count }}]</button>
@@ -37,8 +58,26 @@
            data-sort-name="test_status"
            data-show-multi-sort="true">
 
-        {% block results_table_content %}
-        {% endblock %}
+		<thead>
+		    <tr>
+    	    	{% for column in template_columns %}
+                {% with column_name=column, is_head=True %}
+    	    	        {% include 'local_template_columns.html' %}
+                {% endwith %}
+    	    	{% endfor %}
+		    </tr>
+		</thead>
+		<tbody>
+		    {% for item in render_report %}
+		    <tr>
+  		    	{% for column in template_columns %}
+                {% with column_name=column, is_head=False %}
+                    {% include 'local_template_columns.html' %}
+                {% endwith %}
+  		    	{% endfor %}
+		    </tr>
+		    {% endfor %}
+		</tbody>
 
     </table>
 </div>

@@ -1,0 +1,140 @@
+{% if column.name == 'test_case' %}
+	{% if is_head %}
+		<th data-field="test_case" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case</th>
+	{% else %}
+		<td>{{ item.test_case }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'test_case_copy' %}
+	{% if is_head %}
+		<th data-field="test_case_copy" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="copyTestCaseName">
+            Test case
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
+        </th>
+	{% else %}
+		<td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'baseline_img' %}
+	{% if is_head %}
+		<th data-field="baseline_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
+	{% else %}
+		<td class="hatching">
+        {% if item.baseline_color_path %}
+            {% if 'thumb256_baseline_color_path' in item %}
+            <img data-src="{{ item.thumb256_baseline_color_path }}"/>
+            {% else %}
+            <img data-src="{{ item.baseline_color_path }}"/>
+            {% endif %}
+        {% else %}
+            Not compared
+        {% endif %}
+        </td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'rendered_img' %}
+	{% if is_head %}
+		<th data-field="rendered_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+	{% else %}
+		<td class="hatching">
+            {% if 'thum256_render_color_path' in item %}
+            <img data-src="{{ item.thumb256_render_color_path }}"/>
+            {% else %}
+            <img data-src="{{ item.render_color_path }}"/>
+            {% endif %}
+        </td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'info' %}
+	{% if is_head %}
+		<th data-filed="info" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Info</th>
+	{% else %}
+		<td class="infoColumn
+        {%- if item.difference_time > 5 %}
+           {{ ' ' }}timeDiffFailedStatus
+        {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
+            <b>Scene:</b> {{ item.scene_name }}<br/>
+            <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
+            <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
+            <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
+            <b>Test info:</b><br/>
+            {% for param in item.script_info %}
+                {{ param }}<br/>
+            {% endfor %}
+        </td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'time_diff' %}
+	{% if is_head %}
+		<th data-field="time_diff" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Render time diff, %</th>
+	{% else %}
+		<td {%- if config.TIME_DIFF_MAX < item.difference_time %}
+                class="timeWorseStatus"
+            {% elif item.difference_time < -config.TIME_DIFF_MAX %}
+                class="timeBetterStatus"
+            {% endif -%}
+            >
+            {{ item.difference_time | round (2) }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'pix_diff_2' %}
+	{% if is_head %}
+		<th data-field="pix_diff_2" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">
+            Diff new
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+[0] - equals images.
+[-1] - images has diff resolution, so couldn't be compared."></span>
+        </th>
+	{% else %}
+		<td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'test_status' %}
+	{% if is_head %}
+		<th data-field="test_status" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test status
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[Failed] status means that pixel difference with baseline image is too large.
+[Error] status means fatal error during render, terminating by timeout, or case wasn't launched at all.
+[Skipped] status means case wasn't launched by QA team decision."></span>
+        </th>
+	{% else %}
+		<td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'render_time' %}
+	{% if is_head %}
+		<th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">Render time</th>
+	{% else %}
+		<td>{{ item.render_time | round(2) }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'baseline_render_time' %}
+	{% if is_head %}
+		<th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}"data-formatter="timeFormatter">Baseline render time</th>
+	{% else %}
+		<td>{{ item.baseline_render_time | round(2) }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'render_log' %}
+	{% if is_head %}
+		<th data-filed="render_log" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Log files</th>
+	{% else %}
+		<td>
+            {%- if 'render_log' in item %}
+            <a href="{{ item.render_log }}">Render log</a>
+            {% else %}
+            <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
+            {% endif -%}
+        </td>
+	{% endif %}
+{% endif %}
+
