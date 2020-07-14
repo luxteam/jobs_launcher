@@ -377,7 +377,7 @@ def build_performance_report(summary_report):
 
     for tool in tools:
         for device in devices:
-            if summary_info_for_report[tool][device].get('render', None) is None:
+            if 'render' in summary_info_for_report[tool][device]:
                 summary_info_for_report[tool][device]['render'] = -0.0
                 summary_info_for_report[tool][device]['sync'] = -0.0
 
@@ -609,6 +609,7 @@ def setup_time_report(work_dir, hardware):
         with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
             setup_details = json.load(f)
     except:
+        main_logger.error("Can't open setup_time.json")
         return (None, None)
 
     for confing in setup_details.keys():
