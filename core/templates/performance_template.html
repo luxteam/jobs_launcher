@@ -9,7 +9,9 @@
             <tr>
                 <th>Tool</th>
                 {% for hw in hardware %}
-                <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                <th data-formatter="timeFormatterFull">{{ hw[0] }}
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
                 {% endfor %}
             </tr>
         </thead>
@@ -61,7 +63,9 @@
             <tr>
                 <th data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
                 {% endfor %}
             </tr>
             </thead>
@@ -137,7 +141,9 @@
                 <tr>
                     <th>Tool</th>
                     {% for hw in hardware %}
-                    <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -189,7 +195,9 @@
                 <tr>
                     <th data-halign="center" data-sortable="true">Test</th>
                     {% for hw in hardware %}
-                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
+                            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                        </th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -266,7 +274,9 @@
                 <tr>
                     <th>Step</th>
                     {% for hw in hardware %}
-                    <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -308,7 +318,9 @@
                     <tr>
                         <th data-halign="center" data-sortable="true">Step</th>
                         {% for hw in hardware %}
-                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
+                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
+                                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                            </th>
                         {% endfor %}
                     </tr>
                     </thead>

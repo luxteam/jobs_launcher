@@ -24,12 +24,20 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatter">Time taken, <span style="color: gray">hh:mm:ss</span></th>
-                <th data-formatter="timeFormatter">Render time, <span style="color: gray">hh:mm:ss</span></th>
+                <th data-formatter="timeFormatterFull">Time taken
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                <th data-formatter="timeFormatterFull">Render time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
                 {% if synchronization_time %}
-                    <th data-formatter="timeFormatterMilliseconds">Synchronization time, <span style="color: gray">mm:ss</span></th>
+                    <th data-formatter="timeFormatterFull">Synchronization time
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
                 {% endif %}
-                <th data-formatter="timeFormatter" data-visible="false">Setup time, <span style="color: gray">hh:mm:ss</th>
+                <th data-formatter="timeFormatterFull" data-visible="false">Setup time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -117,12 +125,20 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatter">Time taken, <span style="color: gray">hh:mm:ss</span></th>
-                <th data-formatter="timeFormatter">Render time, <span style="color: gray">hh:mm:ss</span></th>
+                <th data-formatter="timeFormatterFull">Time taken
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                <th data-formatter="timeFormatterFull">Render time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
                 {% if synchronization_time %}
-                    <th data-formatter="timeFormatterMilliseconds">Synchronization time, <span style="color: gray">mm:ss</span></th>
+                    <th data-formatter="timeFormatterFull">Synchronization time
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
                 {% endif %}
-                <th data-formatter="timeFormatter" data-visible="false">Setup time, <span style="color: gray">hh:mm:ss</th>
+                <th data-formatter="timeFormatterFull" data-visible="false">Setup time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
             </tr>
         </thead>
         <tbody>
