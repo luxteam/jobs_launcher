@@ -6,6 +6,15 @@
  * - passed - case executed without crushes; acceptable diff
  * - skipped - case wasn't launched
  */
+
+$('.twoSetupTimes').bootstrapTable({
+    onColumnSwitch: function (field, checked) {
+        if (field.includes('Setup time')){
+            $(this).getElementsByClassName('fullTimeTaken').prop("data-visible", checked)
+        }
+    }
+})
+
 function statusSorter(x, y) {
     var a = x.toLowerCase();
     var b = y.toLowerCase();

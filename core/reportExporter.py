@@ -628,9 +628,9 @@ def sync_time(summary_report):
         if sum(summary_report[config]['summary'].get('synchronization_duration', -0.0) for config in summary_report) > 0:
             for config in summary_report:
                 if 'synchronization_duration' in summary_report[config]['summary']:
-                    summary_report[config]['summary']['duration'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
+                    summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
                     for test_package in summary_report[config]['results']:
-                        summary_report[config]['results'][test_package]['']['duration'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
+                        summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
         else:
             raise Exception('Some "synchronization_time" is 0')
     except Exception as e:
