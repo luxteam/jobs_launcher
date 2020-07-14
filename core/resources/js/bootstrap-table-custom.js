@@ -9,11 +9,15 @@
 
 var tables = $('.twoSetupTimes')
 Array.prototype.forEach.call(tables, function(table) {
-    $(table.id).on('column-switch.bs.table', function (field, checked) {
-        alert(field)
+    $('#' + table.id).on('column-switch.bs.table', function (field, checked) {
         if (field.includes('Setup time')){
-            $(this).getElementsByClassName('fullTimeTaken').prop("data-visible", checked)
-            $(this).getElementsByClassName('syncTimeTaken').prop("data-visible", !checked)
+            if (checked){
+                $(this).bootstrapTable('showColumn', 'fullTimeTaken')
+                $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
+            }else{
+                $(this).bootstrapTable('hideColumn', 'fullTimeTaken')
+                $(this).bootstrapTable('showColumn', 'syncTimeTaken')
+            }
         }
     })
 })

@@ -26,13 +26,13 @@
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
                 <th data-formatter="timeFormatterFull"
-                {% if synchronization_time %}
-                    data-switchable="false" data-visible="false" class="fullTimeTaken"
-                {% endif %}>Time taken
+                    {% if synchronization_time %}
+                        data-switchable="false" data-visible="false" data-field="fullTimeTaken"
+                    {% endif %}>Time taken
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                 </th>
                 {% if synchronization_time %}
-                    <th data-formatter="timeFormatterFull" class="syncTimeTaken">Time taken
+                    <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken
                         <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                     </th>
                 {% endif %}
@@ -138,15 +138,15 @@
                 </th>
                 <th data-formatter="timeFormatterFull"
                 {% if synchronization_time %}
-                    data-switchable="false" data-visible="false" class="fullTimeTaken"
+                    data-switchable="false" data-visible="false" data-field="fullTimeTaken"
                 {% endif %}>Time taken
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                 </th>
                 {% if synchronization_time %}
-                    <th data-formatter="timeFormatterFull">Time taken
+                    <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken
                         <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                     </th>
-                {% endif %}>Time taken
+                {% endif %}
                 <th data-formatter="timeFormatterFull">Render time
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
                 </th>
@@ -310,6 +310,7 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
+                <td>{{ report[i].summary.duration_sync }}</td>
 
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
