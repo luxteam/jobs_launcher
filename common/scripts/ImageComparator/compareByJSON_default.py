@@ -48,8 +48,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         render_img_path = os.path.join(work_dir, img['render_color_path'])
         if not os.path.exists(render_img_path):
             core.config.main_logger.error("Rendered image not found by path: {}".format(render_img_path))
-            if os.path.exists(os.path.join(work_dir, "Color\\failed.jpg")):
-                img['render_color_path'] = "Color\\failed.jpg"
+            for possible_extension in core.config.POSSIBLE_BASELINE_EXTENSIONS:
+                if os.path.exists(os.path.join(work_dir, "Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)):
+                    img['render_color_path'] = os.path.join("Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)
+                    break
             img['test_status'] = core.config.TEST_CRASH_STATUS
             return img
 
