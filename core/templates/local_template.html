@@ -5,7 +5,8 @@
 {% include "images_compare_block.html" %}
 
 {% if report_type == 'default' %}
-    {% set template_columns = [
+    {%
+    set template_columns = [
         {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'test_case'},
         {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'test_case_copy'},
         {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'baseline_img'},
@@ -20,7 +21,23 @@
     ] 
     %}
 {% elif report_type == 'ec' %}
-
+    {%
+    set template_columns = [
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'test_case'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'test_case_copy'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'test_status'},
+		{'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'render_time'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'baseline_render_time'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'time_diff'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'baseline_img'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'rendered_img'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'false', 'name': 'render_vram'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'baseline_vram'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'vram_diff'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'pix_diff'},
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true', 'data_visible': 'true',  'name': 'render_log'}
+    ] 
+    %}
 {% elif report_type == 'ct' %}
 
 {% endif %}

@@ -1,3 +1,5 @@
+{# General columns #}
+
 {% if column.name == 'test_case' %}
 	{% if is_head %}
 		<th data-field="test_case" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case</th>
@@ -16,6 +18,12 @@
 		<td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
 	{% endif %}
 {% endif %}
+
+
+
+
+
+{# Baselines and results #}
 
 {% if column.name == 'baseline_img' %}
 	{% if is_head %}
@@ -83,6 +91,12 @@
 	{% endif %}
 {% endif %}
 
+
+
+
+
+{# Other info #}
+
 {% if column.name == 'pix_diff_2' %}
 	{% if is_head %}
 		<th data-field="pix_diff_2" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">
@@ -108,6 +122,12 @@
 	{% endif %}
 {% endif %}
 
+
+
+
+
+{# Render time #}
+
 {% if column.name == 'render_time' %}
 	{% if is_head %}
 		<th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">Render time</th>
@@ -123,6 +143,50 @@
 		<td>{{ item.baseline_render_time | round(2) }}</td>
 	{% endif %}
 {% endif %}
+
+{% if column.name == 'render_vram' %}
+	{% if is_head %}
+		<th data-field="render_vram" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Render GPU RAM, Mb</th>
+	{% else %}
+		<td>{{ item.gpu_memory_usage }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'baseline_vram' %}
+	{% if is_head %}
+		<th data-field="baseline_vram" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Baseline GPU RAM, Mb</th>
+	{% else %}
+		<td>{{ item.baseline_gpu_memory_usage }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'vram_diff' %}
+	{% if is_head %}
+		<th data-field="vram_diff" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">GPU RAM diff, %</th>
+	{% else %}
+		<td {%- if config.VRAM_DIFF_MAX < item.difference_vram %}
+                class="timeWorseStatus"
+            {% elif item.difference_vram < -config.VRAM_DIFF_MAX %}
+                class="timeBetterStatus"
+            {% endif -%}
+            >
+            {{ item.difference_vram }}</td>
+	{% endif %}
+{% endif %}
+
+{% if column.name == 'pix_diff' %}
+	{% if is_head %}
+		<th data-field="pix_diff" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Pixel diff, %</th>
+	{% else %}
+		<td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
+	{% endif %}
+{% endif %}
+
+
+
+
+
+{# Logs #}
 
 {% if column.name == 'render_log' %}
 	{% if is_head %}
