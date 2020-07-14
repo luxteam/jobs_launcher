@@ -377,7 +377,7 @@ def build_performance_report(summary_report):
 
     for tool in tools:
         for device in devices:
-            if 'render' in summary_info_for_report[tool][device]:
+            if not 'render' in summary_info_for_report[tool][device]:
                 summary_info_for_report[tool][device]['render'] = -0.0
                 summary_info_for_report[tool][device]['sync'] = -0.0
 

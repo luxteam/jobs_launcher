@@ -27,7 +27,7 @@
                             {% if test_info[tool]['actual'] is not defined %}
                                 class=skippedStatus
                             {% endif %}
-                        >{{ test_info[tool][hw[0]].render | round(1)}}</td>
+                        >{{ test_info[tool][hw[0]].render | round(3)}}</td>
                     {% endif %}
                 {% endfor %}
             </tr>
@@ -78,7 +78,7 @@
                                 {% if performance_report_detail[test_package][hw[0]].render == 0 %}
                                     Skipped
                                 {% else %}
-                                    {{ performance_report_detail[test_package][hw[0]].render | round(1) | replace("-0.0","-") }}
+                                    {{ performance_report_detail[test_package][hw[0]].render | round(3) | replace("-0.0","-") }}
                                 {% endif %}
                             </td>
                         {% endfor %}
@@ -121,7 +121,7 @@
                         <td>{{ test_package }}</td>
                         {% for hw in hardware %}
                             <td>
-                                {{ performance_report_detail[test_package][hw[0]].render | round(1) | replace("-0.0","-") }}
+                                {{ performance_report_detail[test_package][hw[0]].render | round(2) | replace("-0.0","-") }}
                             </td>
                         {% endfor %}
                     </tr>
@@ -210,7 +210,7 @@
                                     {% if performance_report_detail[test_package][hw[0]].render == 0 %}
                                         Skipped
                                     {% else %}
-                                        {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                                        {{ performance_report_detail[test_package][hw[0]].sync | round(3) | replace("-0.00","-") }}
                                     {% endif %}
                                 </td>
                             {% endfor %}
@@ -285,7 +285,7 @@
                 <tr>
                     <td>{{ setup_step }}</td>
                     {% for hw in hardware %}
-                        <td>{{ setupTimeSum[hw[0]][setup_step] | round(1) | replace("-0.00","-") }}</td>
+                        <td>{{ setupTimeSum[hw[0]][setup_step] | round(3) | replace("-0.00","-") }}</td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
