@@ -1,18 +1,9 @@
-/**
- * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
- * Case statuses (from highest to lowest sort priority):
- * - error - crash during test execution
- * - failed - pixel/time/ram diff too large
- * - passed - case executed without crushes; acceptable diff
- * - skipped - case wasn't launched
- */
-
 window.onload = function WindowLoad(event) {
     var tables = $('.twoSetupTimes')
     Array.prototype.forEach.call(tables, function(table) {
         $('#' + table.id).on('column-switch.bs.table', function () {
-            hiddenColumns = $('#' + table.id).bootstrapTable('getHiddenColumns').map(function (it) {return it.field})
-            if (JSON.stringify(hiddenColumns).indexOf('setupTime') < 0){
+            hiddenColumns = $('#' + table.id).bootstrapTable('getHiddenColumns').map(function (it) {return it.field}) // get string with hidden columns
+            if (JSON.stringify(hiddenColumns).indexOf('setupTime') < 0){ // if setup time column is shown
                 $(this).bootstrapTable('showColumn', 'fullTimeTaken')
                 $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
             }else{
@@ -23,6 +14,14 @@ window.onload = function WindowLoad(event) {
     })
 }
 
+/**
+ * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
+ * Case statuses (from highest to lowest sort priority):
+ * - error - crash during test execution
+ * - failed - pixel/time/ram diff too large
+ * - passed - case executed without crushes; acceptable diff
+ * - skipped - case wasn't launched
+ */
 function statusSorter(x, y) {
     var a = x.toLowerCase();
     var b = y.toLowerCase();
