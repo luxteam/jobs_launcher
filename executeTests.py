@@ -240,7 +240,7 @@ def main():
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
                 env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
-                main_logger.info("Generated results: {}".format(json.dumps(res, sort_keys=True, indent=2)))
+                main_logger.info("Generated results:\n{}".format(json.dumps(res, indent=2)))
                 main_logger.info("Environment: {}".format(env))
 
                 response = ums_client.send_test_suite(res=res, env=env)
