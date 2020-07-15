@@ -58,7 +58,7 @@ def main():
                 login=os.getenv("UMS_LOGIN"),
                 password=os.getenv("UMS_PASSWORD")
             )
-            main_logger.info("UMS Client created")
+            main_logger.info("UMS Client created with url {}".format(ums_client.url))
         except Exception as e:
             main_logger.error("UMS Client creation error: {}".format(e))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
@@ -205,7 +205,7 @@ def main():
             is_client = ISClient(url=os.getenv("IS_URL"),
                                  login=os.getenv("IS_LOGIN"),
                                  password=os.getenv("IS_PASSWORD"))
-            main_logger.info("Image Service client created")
+            main_logger.info("Image Service client created with url {}".format(is_client.url))
         except Exception as e:
             main_logger.error("Image Service client creation error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
