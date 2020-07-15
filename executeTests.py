@@ -58,7 +58,14 @@ def main():
                 login=os.getenv("UMS_LOGIN"),
                 password=os.getenv("UMS_PASSWORD")
             )
-            main_logger.info("UMS Client created with url {}".format(ums_client.url))
+            main_logger.info("UMS Client created with url {url}\n" +
+                 "build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
+                     url=ums_client.url,
+                     build_id=ums_client.build_id,
+                     label=ums_client.env_label,
+                     job_id=ums_client.job_id
+                 )
+            )
         except Exception as e:
             main_logger.error("UMS Client creation error: {}".format(e))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
