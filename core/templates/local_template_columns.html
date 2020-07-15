@@ -25,6 +25,24 @@
 
 {# Baselines and results #}
 
+{% if column.name == 'original_img' %}
+    {% if is_head %}
+        <th data-field="original_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+    {% else %}
+        <td class="hatching">
+        {% if item.original_color_path %}
+            {% if 'thumb256_baseline_color_path' in item %}
+            <img data-src="{{ item.thumb256_original_color_path }}"/>
+            {% else %}
+            <img data-src="{{ item.original_color_path }}"/>
+            {% endif %}
+        {% else %}
+            Not compared
+        {% endif %}
+        </td>
+    {% endif %}
+{% endif %}
+
 {% if column.name == 'baseline_img' %}
     {% if is_head %}
         <th data-field="baseline_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
@@ -153,7 +171,13 @@
     {% if is_head %}
         <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">Render time</th>
     {% else %}
-        <td>{{ item.render_time | round(2) }}</td>
+        {% if report_type == 'default' %}
+            <td>{{ item.render_time | round(2) }}</td>
+        {% elif report_type == 'ec' %}
+            <td>{{ item.render_time | round(2) }}</td>
+        {% elif report_type == 'ct' %}
+            <td>{{ item.render_time }}</td>
+        {% endif %}
     {% endif %}
 {% endif %}
 
@@ -161,7 +185,21 @@
     {% if is_head %}
         <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}"data-formatter="timeFormatter">Baseline render time</th>
     {% else %}
-        <td>{{ item.baseline_render_time | round(2) }}</td>
+        {% if report_type == 'default' %}
+            <td>{{ item.baseline_render_time | round(2) }}</td>
+        {% elif report_type == 'ec' %}
+            <td>{{ item.baseline_render_time | round(2) }}</td>
+        {% elif report_type == 'ct' %}
+            <td>{{ item.baseline_render_time }}</td>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+{% if column.name == 'original_time' %}
+    {% if is_head %}
+        <th data-field="original_time" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">{{ original_render | title }} render time</th>
+    {% else %}
+        <td>{{ item.or_render_time }}</td>
     {% endif %}
 {% endif %}
 
@@ -214,11 +252,29 @@
         <th data-filed="render_log" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Log files</th>
     {% else %}
         <td>
-            {%- if 'render_log' in item %}
-            <a href="{{ item.render_log }}">Render log</a>
-            {% else %}
-            <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
-            {% endif -%}
+            {% if report_type == 'default' %}
+                <td>
+                    {%- if 'render_log' in item %}
+                    <a href="{{ item.render_log }}">Render log</a>
+                    {% else %}
+                    <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
+                    {% endif -%}
+                </td>
+            {% elif report_type == 'ec' %}
+                <td>
+                    {% if item.tahoe_log != 'not.exist' %}
+                        <a href="{{ item.tahoe_log }}">tahoe Log</a>
+                    {% else %}
+                        None
+                    {% endif %}
+                </td>
+            {% elif report_type == 'ct' %}
+                <td>
+                    <a href="{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
+                    <a href="{{ item.scene_name }}.{{ config.REPORT_CONVERSION_LOG }}">Conversion log</a><br/>
+                    <a href="{{ config.REPORT_RPR_LOG }}">RPR log</a>
+                </td>
+            {% endif %}
         </td>
     {% endif %}
 {% endif %}
