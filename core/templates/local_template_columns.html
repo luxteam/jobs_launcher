@@ -45,7 +45,13 @@
 
 {% if column.name == 'baseline_img' %}
     {% if is_head %}
-        <th data-field="baseline_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
+        <th data-field="baseline_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">
+            {% if report_type == 'default' or report_type == 'ec' %}
+                Baseline Color
+            {% elif report_type == 'ct' %}
+                RPR Baseline
+            {% endif %}
+        </th>
     {% else %}
         <td class="hatching">
         {% if item.baseline_color_path %}
@@ -63,7 +69,13 @@
 
 {% if column.name == 'rendered_img' %}
     {% if is_head %}
-        <th data-field="rendered_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+        <th data-field="rendered_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">
+            {% if report_type == 'default' or report_type == 'ec' %}
+                Rendered color
+            {% elif report_type == 'ct' %}
+                RPR
+            {% endif %}
+        </th>
     {% else %}
         <td class="hatching">
             {% if 'thum256_render_color_path' in item %}
@@ -169,11 +181,15 @@
 
 {% if column.name == 'render_time' %}
     {% if is_head %}
-        <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">Render time</th>
+        <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">
+            {% if report_type == 'default' or report_type == 'ec' %}
+                Render time
+            {% elif report_type == 'ct' %}
+                RPR render time
+            {% endif %}
+        </th>
     {% else %}
-        {% if report_type == 'default' %}
-            <td>{{ item.render_time | round(2) }}</td>
-        {% elif report_type == 'ec' %}
+        {% if report_type == 'default' or report_type == 'ec' %}
             <td>{{ item.render_time | round(2) }}</td>
         {% elif report_type == 'ct' %}
             <td>{{ item.render_time }}</td>
@@ -185,9 +201,7 @@
     {% if is_head %}
         <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">Baseline render time</th>
     {% else %}
-        {% if report_type == 'default' %}
-            <td>{{ item.baseline_render_time | round(2) }}</td>
-        {% elif report_type == 'ec' %}
+        {% if report_type == 'default' or report_type == 'ec' %}
             <td>{{ item.baseline_render_time | round(2) }}</td>
         {% elif report_type == 'ct' %}
             <td>{{ item.baseline_render_time }}</td>
