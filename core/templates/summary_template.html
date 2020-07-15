@@ -79,7 +79,9 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration_sync }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.duration_sync }}</td>
+                {% endif %}
 
                 <td
                 {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
@@ -265,7 +267,9 @@
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-                <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>
+                {% endif %}
 
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 %}
@@ -310,7 +314,9 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration_sync }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.duration_sync }}</td>
+                {% endif %}
 
                 <td
                 {% if report[i].summary.render_duration == -0.0 %}
