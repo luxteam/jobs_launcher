@@ -79,15 +79,15 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             except IndexError:
                 baseline_time = -0.0
 
-        def get_diff():
-            if render_time == baseline_time:
-                return 0.0
-            try:
-                return (render_time - baseline_time) / baseline_time * 100.0
-            except ZeroDivisionError:
-                return 0
+        time_diff = render_time - baseline_time
 
-        img.update({'difference_time': get_diff()})
+        for threshold in time_diff_max:
+            if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
+                img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
+                if img.get('test_status') == core.config.TEST_SUCCESS_STATUS:
+                    img.update({'test_status': core.config.TEST_DIFF_STATUS})
+
+        img.update({'difference_time': time_diff})
         img.update({'baseline_render_time': baseline_time})
     else:
         img.update({'difference_time': -0.0})

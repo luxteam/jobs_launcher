@@ -16,7 +16,7 @@
 
         <th data-filed="info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
 
-        <th data-field="time_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, %</th>
+        <th data-field="time_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, sec</th>
 
         {# Other info #}
         <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
@@ -79,16 +79,22 @@
             {% endfor %}
         </td>
 
-        <td {%- if config.TIME_DIFF_MAX < item.difference_time %}
-                class="timeWorseStatus"
-            {% elif item.difference_time < -config.TIME_DIFF_MAX %}
-                class="timeBetterStatus"
+        <td
+            {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
+                class="{{ config.TEST_DIFF_STATUS }}Status"
+            {% else -%}
+                class="{{ config.TEST_SUCCESS_STATUS }}Status"
             {% endif -%}
-            >
-            {{ item.difference_time | round (2) }}</td>
+        >{{ item.difference_time | round (2) }}</td>
 
         {# Other info #}
-        <td class="{{ item.test_status }}Status">{{ item.difference_color_2 }}</td>
+        <td
+            {% if item.difference_color_2 != 0 -%}
+                class="{{ config.TEST_DIFF_STATUS }}Status"
+            {% else -%}
+                class="{{ config.TEST_SUCCESS_STATUS }}Status"
+            {% endif -%}
+        >{{ item.difference_color_2 }}</td>
 
         <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
 
