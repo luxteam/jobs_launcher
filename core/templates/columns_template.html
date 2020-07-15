@@ -55,11 +55,21 @@
     {% else %}
         <td class="hatching">
         {% if item.baseline_color_path %}
-            {% if 'thumb256_baseline_color_path' in item %}
-            <img data-src="{{ item.thumb256_baseline_color_path }}"/>
-            {% else %}
-            <img data-src="{{ item.baseline_color_path }}"/>
+
+            {% if template_name == 'local' %}
+                {% if 'thumb256_baseline_color_path' in item %}
+                <img data-src="{{ item.thumb256_baseline_color_path }}"/>
+                {% else %}
+                <img data-src="{{ item.baseline_color_path }}"/>
+                {% endif %}
+            {% elif template_name == 'detailed' %}
+                {% if 'thumb64_baseline_color_path' in item %}
+                <img data-src="{{ item.thumb64_baseline_color_path }}"/>
+                {% else %}
+                <img data-src="{{ item.baseline_color_path }}"/>
+                {% endif %}
             {% endif %}
+
         {% else %}
             Not compared
         {% endif %}
@@ -78,11 +88,21 @@
         </th>
     {% else %}
         <td class="hatching">
-            {% if 'thum256_render_color_path' in item %}
-            <img data-src="{{ item.thumb256_render_color_path }}"/>
-            {% else %}
-            <img data-src="{{ item.render_color_path }}"/>
+
+            {% if template_name == 'local' %}
+                {% if 'thum256_render_color_path' in item %}
+                <img data-src="{{ item.thumb256_render_color_path }}"/>
+                {% else %}
+                <img data-src="{{ item.render_color_path }}"/>
+                {% endif %}
+            {% elif template_name == 'detailed' %}
+                {% if 'thumb64_render_color_path' in item %}
+                <img data-src="{{ item.thumb64_render_color_path }}"/>
+                {% else %}
+                <img data-src="{{ item.render_color_path }}"/>
+                {% endif %}
             {% endif %}
+
         </td>
     {% endif %}
 {% endif %}
@@ -125,6 +145,18 @@
                 <b>Iterations:</b> {{ item.iterations }}
             </td>
         {% endif %}
+    {% endif %}
+{% endif %}
+
+{% if column.name == 'parameters' %}
+    {% if is_head %}
+        <th data-field="parameters" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Parameters</th>
+    {% else %}
+        <td>
+            {% for param in item.script_info %}
+            {{ param }}<br>
+            {% endfor %}
+        </td>
     {% endif %}
 {% endif %}
 
@@ -270,7 +302,13 @@
                 {%- if 'render_log' in item %}
                 <a href="{{ item.render_log }}">Render log</a>
                 {% else %}
-                <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
+
+                    {% if template_name == 'local' %}
+                        <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
+                    {% elif template_name == 'detailed' %}
+                        <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">Render Log</a>
+                    {% endif %}
+
                 {% endif -%}
             </td>
         {% elif report_type == 'ec' %}

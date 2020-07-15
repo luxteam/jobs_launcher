@@ -94,21 +94,21 @@
         <thead>
             <tr>
                 {% for column in template_columns %}
-                {% with column_name=column, is_head=True %}
-                        {% include 'local_template_columns.html' %}
-                {% endwith %}
+                    {% with column_name=column, is_head=True, template_name='local' %}
+                        {% include 'columns_template.html' %}
+                    {% endwith %}
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for item in render_report %}
-            <tr>
-                {% for column in template_columns %}
-                {% with column_name=column, is_head=False %}
-                    {% include 'local_template_columns.html' %}
-                {% endwith %}
-                {% endfor %}
-            </tr>
+                <tr>
+                    {% for column in template_columns %}
+                        {% with column_name=column, is_head=False, template_name='local' %}
+                            {% include 'columns_template.html' %}
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
             {% endfor %}
         </tbody>
 
