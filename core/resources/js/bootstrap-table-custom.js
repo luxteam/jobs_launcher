@@ -7,19 +7,21 @@
  * - skipped - case wasn't launched
  */
 
-var tables = $('.twoSetupTimes')
-Array.prototype.forEach.call(tables, function(table) {
-    $('#' + table.id).on('column-switch.bs.table', function () {
-        hiddenColumns = $('#' + table.id).bootstrapTable('getHiddenColumns').map(function (it) {return it.field})
-        if (JSON.stringify(hiddenColumns).indexOf('setupTime') < 0){
-            $(this).bootstrapTable('showColumn', 'fullTimeTaken')
-            $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
-        }else{
-            $(this).bootstrapTable('hideColumn', 'fullTimeTaken')
-            $(this).bootstrapTable('showColumn', 'syncTimeTaken')
-        }
+window.onload = function WindowLoad(event) {
+    var tables = $('.twoSetupTimes')
+    Array.prototype.forEach.call(tables, function(table) {
+        $('#' + table.id).on('column-switch.bs.table', function () {
+            hiddenColumns = $('#' + table.id).bootstrapTable('getHiddenColumns').map(function (it) {return it.field})
+            if (JSON.stringify(hiddenColumns).indexOf('setupTime') < 0){
+                $(this).bootstrapTable('showColumn', 'fullTimeTaken')
+                $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
+            }else{
+                $(this).bootstrapTable('hideColumn', 'fullTimeTaken')
+                $(this).bootstrapTable('showColumn', 'syncTimeTaken')
+            }
+        })
     })
-})
+}
 
 function statusSorter(x, y) {
     var a = x.toLowerCase();
