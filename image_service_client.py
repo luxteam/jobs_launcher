@@ -31,7 +31,7 @@ class ISClient:
 
     def send_image(self, path2img):
         try:
-            main_logger.info("Try to send picture to Image Service")
+            main_logger.info("Try to send picture {} to Image Service".format(path2img))
             with open(path2img, 'rb') as img:
                 response = post(
                     url="{url}/api/".format(url=self.url),
@@ -41,8 +41,9 @@ class ISClient:
                     headers=self.headers
                 )
                 img.close()
-            main_logger.info("Image sent")
-            return json.loads(response.content.decode("utf-8"))["image_id"]
+            image_id = json.loads(response.content.decode("utf-8"))["image_id"]
+            main_logger.info("Image sent. Got an image_id: {}".format(image_id))
+            return image_id
         except Exception as e:
             main_logger.error("Image sending error: {}".format(str(e)))
             return -1
