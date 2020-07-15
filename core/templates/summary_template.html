@@ -103,7 +103,7 @@
 
 <div class="jsTableWrapper">
     {% if i != "_cur_" %}
-        <div id="toolbar_{{ i | replace(' ', '_') | replace('(', '_') | replace(')', '_') | replace('.', '_') }}">
+        <div id="summary_table_toolbar_{{ loop.index }}">
             <caption><h3 style="margin: 2% 7%; width:130%;"><a href="{{ i }}_detailed.html">{{ i }}</a></h3></caption>
             <a class="hAnchor" name="{{ i }}"></a>
         </div>
@@ -111,8 +111,8 @@
     <table class="baseTable twoSetupTimes"
         data-toggle="table"
         data-show-columns="true"
-        data-toolbar="#toolbar_{{ i | replace(' ', '_') | replace('(', '_') | replace(')', '_') | replace('.', '_') }}"
-        id="{{ i | replace(' ', '_') | replace('(', '_') | replace(')', '_') | replace('.', '_') }}">
+        data-toolbar="#summary_table_toolbar_{{ loop.index }}"
+        id="summary_table_{{ loop.index }}">
         <thead>
             <tr>
                 <th>Test package name</th>
