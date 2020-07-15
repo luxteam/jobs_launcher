@@ -9,15 +9,14 @@
 
 var tables = $('.twoSetupTimes')
 Array.prototype.forEach.call(tables, function(table) {
-    $('#' + table.id).on('column-switch.bs.table', function (field, checked) {
-        if (field.includes('Setup time')){
-            if (checked){
-                $(this).bootstrapTable('showColumn', 'fullTimeTaken')
-                $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
-            }else{
-                $(this).bootstrapTable('hideColumn', 'fullTimeTaken')
-                $(this).bootstrapTable('showColumn', 'syncTimeTaken')
-            }
+    $('#' + table.id).on('column-switch.bs.table', function () {
+        hiddenColumns = $('#' + table.id).bootstrapTable('getHiddenColumns').map(function (it) {return it.field})
+        if (JSON.stringify(hiddenColumns).indexOf('setupTime') < 0){
+            $(this).bootstrapTable('showColumn', 'fullTimeTaken')
+            $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
+        }else{
+            $(this).bootstrapTable('hideColumn', 'fullTimeTaken')
+            $(this).bootstrapTable('showColumn', 'syncTimeTaken')
         }
     })
 })
