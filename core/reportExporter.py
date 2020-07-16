@@ -642,7 +642,6 @@ def setup_time_count(work_dir):
     performance_list = {}
     for root, subdirs, files in os.walk(work_dir):
         performance_jsons = [os.path.join(root, f) for f in files if f.endswith('_performance.json')]
-        main_logger.error(root)
         for perf_json in performance_jsons:
             perf_list = json.load(open(perf_json))
             summ_perf = {}
