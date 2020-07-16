@@ -95,16 +95,18 @@
             options: toolOptions
         });
 
-        syncData = {}
-        Object.assign(syncData, renderData);
-        syncData["datasets"] = syncDataSet;
-        toolOptions["title"]["text"] = "Total synchronization time";
-        var ctxSync = document.getElementById('columnChartSync').getContext('2d');
-        var chartSync = new Chart(ctxSync, {
-            type: 'bar',
-            data: syncData,
-            options: toolOptions
-        });
+        {% if synchronization_time %}
+          syncData = {}
+          Object.assign(syncData, renderData);
+          syncData["datasets"] = syncDataSet;
+          toolOptions["title"]["text"] = "Total synchronization time";
+          var ctxSync = document.getElementById('columnChartSync').getContext('2d');
+          var chartSync = new Chart(ctxSync, {
+              type: 'bar',
+              data: syncData,
+              options: toolOptions
+          });
+        {% endif %}
       }
     </script>
     {% endif %}
