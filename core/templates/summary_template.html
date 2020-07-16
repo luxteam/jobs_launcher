@@ -4,8 +4,10 @@
 <h1>info</h1>
 
 <div class="jsTableWrapper">
-    <table class="baseTable"
-            data-toggle="table">
+    <table class="baseTable twoSetupTimes"
+            data-toggle="table"
+            data-show-columns="true"
+            id="summary_table">
         <thead>
             <tr>
                 <th>Job Name</th>
@@ -23,9 +25,28 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatter">Time taken</th>
-                <th data-formatter="timeFormatter">Setup time</th>
-                <th data-formatter="timeFormatter">Render time</th>
+                <th data-formatter="timeFormatterFull"
+                    {% if synchronization_time %}
+                        data-switchable="false" data-visible="false" data-field="fullTimeTaken"
+                    {% endif %}>Time taken
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                {% if synchronization_time %}
+                    <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                {% endif %}
+                <th data-formatter="timeFormatterFull">Render time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                {% if synchronization_time %}
+                    <th data-formatter="timeFormatterFull">Synchronization time
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                {% endif %}
+                <th data-formatter="timeFormatterFull" data-visible="false" data-field="setupTime">Setup time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -58,13 +79,19 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.duration_sync }}</td>
+                {% endif %}
 
                 <td
                 {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif -%}
                 >{{ report[i].summary.render_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.synchronization_duration }}</td>
+                {% endif %}
+                <td>{{ report[i].summary.setup_duration }}</td>
             </tr>
     {% endfor %}
         </tbody>
@@ -75,15 +102,19 @@
 <h1>tests</h1>
 
 {% for i, value in report | dictsort %}
-    {% if i != "_cur_" %}
-<h3><a href="{{ i }}_detailed.html">{{ i }}</a></h3>
-
-<a class="hAnchor" name="{{ i }}"></a>
-    {% endif %}
 
 <div class="jsTableWrapper">
-    <table class="baseTable"
-        data-toggle="table">
+    {% if i != "_cur_" %}
+        <div id="summary_table_toolbar_{{ loop.index }}">
+            <caption><h3 style="margin: 2% 7%; width:130%;"><a href="{{ i }}_detailed.html">{{ i }}</a></h3></caption>
+            <a class="hAnchor" name="{{ i }}"></a>
+        </div>
+    {% endif %}
+    <table class="baseTable twoSetupTimes"
+        data-toggle="table"
+        data-show-columns="true"
+        data-toolbar="#summary_table_toolbar_{{ loop.index }}"
+        id="summary_table_{{ loop.index }}">
         <thead>
             <tr>
                 <th>Test package name</th>
@@ -107,9 +138,28 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatter">Time taken</th>
-                <th data-formatter="timeFormatter">Setup time</th>
-                <th data-formatter="timeFormatter">Render time</th>
+                <th data-formatter="timeFormatterFull"
+                {% if synchronization_time %}
+                    data-switchable="false" data-visible="false" data-field="fullTimeTaken"
+                {% endif %}>Time taken
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                {% if synchronization_time %}
+                    <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                {% endif %}
+                <th data-formatter="timeFormatterFull">Render time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                {% if synchronization_time %}
+                    <th data-formatter="timeFormatterFull">Synchronization time
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                {% endif %}
+                <th data-formatter="timeFormatterFull" data-visible="false" data-field="setupTime">Setup time
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -177,7 +227,7 @@
                                     <td>Unknown</td>
                                     <td>0</td>
                                     <td>{{ report[i].results[test_package][test_conf].recovered_info.render_device }}</td>
-                                    {% endif %}                                    
+                                    {% endif %}
                                 </tr>
                             </table>
                         </div>
@@ -190,7 +240,7 @@
                 {% if report_type == 'default' %}
                     <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
                 {% elif report_type == 'ec' %}
-                    <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/render_log.txt">Render Log</a></td>                
+                    <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/render_log.txt">Render Log</a></td>
                 {% endif %}
 
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/../launcher.engine.log">Engine log</a></td>
@@ -221,20 +271,26 @@
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
                 <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-
-                <td>{{ report[i].results[test_package][test_conf].duration - report[i].results[test_package][test_conf].render_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>
+                {% endif %}
 
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration | round(1) }}</td>
+
+                {% if synchronization_time %}
+                    <td>{{ report[i].results[test_package][test_conf].synchronization_duration }}</td>
+                {% endif %}
+                <td>{{ report[i].results[test_package][test_conf].setup_duration }}</td>
             </tr>
             {% endfor %}
         {% endfor %}
 
             <tr class="summary_tr">
-                <td 
+                <td
                 {% if report_type == 'ct' %}
                     colspan="4"
                 {% else %}
@@ -260,13 +316,19 @@
                 >{{ report[i].summary.skipped }}</td>
 
                 <td>{{ report[i].summary.duration }}</td>
-                <td>{{ report[i].summary.duration - report[i].summary.render_duration }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.duration_sync }}</td>
+                {% endif %}
 
                 <td
                 {% if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(1) }}</td>
+                {% if synchronization_time %}
+                    <td>{{ report[i].summary.synchronization_duration }}</td>
+                {% endif %}
+                <td>{{ report[i].summary.setup_duration }}</td>
             </tr>
         </tbody>
     </table>

@@ -1,3 +1,19 @@
+window.onload = function WindowLoad(event) {
+    var tables = $('.twoSetupTimes')
+    Array.prototype.forEach.call(tables, function(table) {
+        $('#' + table.id).on('column-switch.bs.table', function () {
+            hiddenColumns = $('#' + table.id).bootstrapTable('getHiddenColumns').map(function (it) {return it.field}) // get string with hidden columns
+            if (JSON.stringify(hiddenColumns).indexOf('setupTime') < 0){ // if setup time column is shown
+                $(this).bootstrapTable('showColumn', 'fullTimeTaken')
+                $(this).bootstrapTable('hideColumn', 'syncTimeTaken')
+            }else{
+                $(this).bootstrapTable('hideColumn', 'fullTimeTaken')
+                $(this).bootstrapTable('showColumn', 'syncTimeTaken')
+            }
+        })
+    })
+}
+
 /**
  * Function for sorting test results by status. Uses 'data-sorter' attribute by bootstrap tables.
  * Case statuses (from highest to lowest sort priority):
@@ -93,14 +109,20 @@ window.copyTestCaseName = {
 }
 
 function performanceNormalizeFormatter(value, row, index, field) {
-    return (value * 100 / row[1]).toFixed(2) + " %";
+    for (key in row) {
+        if (isFinite(parseFloat((value * 100 / row[key]).toFixed(2)))) {
+            return (value * 100 / row[key]).toFixed(2) + " %"
+        }
+    }
+    return "Skipped"
 }
 
 function performanceNormalizeStyleFormatter(value, row, index, field) {
     var values = [];
     for (key in row) {
-        if (key.indexOf('_') === -1 && key != 0) {
-            values.push(parseFloat(row[key]));
+        if (key != 0) {
+            if (!isFinite(parseFloat(row[key]))) {values.push(parseFloat(1))}
+            else {values.push(parseFloat(row[key]))}
         }
     }
 

@@ -221,7 +221,7 @@ a {
   max-width: 300px;
 }
 
-#columnchart {
+#columnchartRender, #columnchartSync {
   display: block;
   margin: auto;
   width: 800px;
@@ -387,4 +387,12 @@ a {
   width: auto;
   display: block;
   margin: auto;
+}
+
+.card-header:before {
+  content: "\25BE";
+}
+
+.card-header.collapsed:before {
+  content: "\25B8";
 }

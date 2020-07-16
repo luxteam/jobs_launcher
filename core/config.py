@@ -13,6 +13,7 @@ RENDER_REPORT_BASE = {
     "test_status": "undefined",
     "tool": "",
     "render_time": -0.0,
+    "sync_time": -0.0,
     "baseline_render_time": -0.0,
     "render_mode": "",
     "scene_name": "",
@@ -136,3 +137,5 @@ LOST_TESTS_JSON_NAME = 'lost_tests.json'
 DONT_COMPARE = "Do not compare"
 
 POSSIBLE_BASELINE_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
+
+SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]

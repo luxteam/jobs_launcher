@@ -1,120 +1,349 @@
 {% extends "base_template.html"%}
 
 {% block report_body %}
-<h1>summary</h1>
-<h2>total render duration in seconds</h2>
-<table class="baseTable">
-    <tr>
-        <th>Tool</th>
-        {% for hw in hardware %}
-        <th>{{ hw[0] }}</th>
-        {% endfor %}
-    </tr>
-
-    {% for tool in test_info %}
-    <tr>
-        <td>{{ tool }}</td>
-        {% for hw in test_info[tool] %}
-            <td>{{ hw[1] | round(1) }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
-
-<hr/>
-
-<h1>graph</h1>
-<div id="columnchart"></div>
-
-<hr/>
-<h1>details</h1>
-<h2>render duration by test groups in seconds</h2>
-{% for tool in performance_report_detail %}
-<h3>{{ tool }}</h3>
+<h1>render time</h1>
+<h2>total render duration, hh:mm:ss</h2>
 <div class="jsTableWrapper">
-    <table class="baseTable"
-           data-toggle="table"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-show-pagination-switch="true"
-           data-pagination="false"
-           data-page-list="[5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
-           data-sort-name="test_status"
-           data-show-multi-sort="true"
-    >
+    <table class="baseTable" data-toggle="table">
         <thead>
-        <tr>
-            <th data-halign="center" data-sortable="true">Test</th>
-            {% for hw in hardware %}
-            <th data-halign="center" data-sortable="true">{{ hw[0] }}</th>
-            {% endfor %}
-        </tr>
+            <tr>
+                <th>Tool</th>
+                {% for hw in hardware %}
+                <th data-formatter="timeFormatterFull">{{ hw[0] }}
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                </th>
+                {% endfor %}
+            </tr>
         </thead>
         <tbody>
-    {% for test_package in performance_report_detail[tool] %}
-        {% for test_config in performance_report_detail[tool][test_package] %}
-        <tr>
-            <td>{{ test_package }} {{ test_config }}</td>
-            {% for hw in test_info[tool] %}
-                {% if performance_report_detail[tool][test_package][test_config][hw[0]].render_duration is number %}
-                    <td>{{ performance_report_detail[tool][test_package][test_config][hw[0]].render_duration | round(3) }}</td>
-                {% else %}
-                    <td class="errorStatus">NaN</td>
-                {% endif %}
+            {% for tool in test_info %}
+            <tr>
+                <td>{{ tool }}</td>
+                {% for hw in hardware %}
+                    {% if test_info[tool][hw[0]].render == -0.0 %}
+                        <td>-</td>
+                    {% else %}
+                        <td
+                            {% if test_info[tool]['actual'] is not defined %}
+                                class=skippedStatus
+                            {% endif %}
+                        >{{ test_info[tool][hw[0]].render | round(3)}}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-    {% endfor %}
-        </tbody>
-    </table>
-{% endfor %}
-</div>
-
-<hr/>
-<h1>normalized</h1>
-<h2>relative render duration</h2>
-{% for tool in performance_report_detail %}
-<h3>{{ tool }}</h3>
-<div class="jsTableWrapper">
-    <table id="normalizedPerformance"
-           class="baseTable"
-           data-toggle="table"
-           data-search="true"
-           data-show-refresh="true"
-           data-show-toggle="true"
-           data-show-columns="true"
-           data-show-pagination-switch="true"
-           data-pagination="false"
-           data-page-list="[5, 10, 20, 45, ALL]"
-           data-sort-order="desc"
-           data-sort-name="test_status"
-           data-show-multi-sort="true"
-    >
-        <thead>
-        <tr>
-            <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
-            {% for hw in hardware %}
-            <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for test_package in performance_report_detail[tool] %}
-        {% for test_config in performance_report_detail[tool][test_package] %}
-        <tr>
-            <td>{{ test_package }} {{ test_config }}</td>
-            {% for hw in test_info[tool] %}
-            <td>{{ performance_report_detail[tool][test_package][test_config][hw[0]].render_duration }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    {% endfor %}
         </tbody>
     </table>
 </div>
-{% endfor %}
+
+<h2>graph</h2>
+<div id="columnchartRender"></div>
+
+<h2 class="card-header collapsed" href="#render_time" data-toggle="collapse">details</h2>
+<div id="render_time" class="collapse">
+    <div class="jsTableWrapper">
+        <table class="baseTable"
+            data-toggle="table"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-show-columns="true"
+            data-show-pagination-switch="true"
+            data-pagination="false"
+            data-page-list="[5, 10, 20, 45, ALL]"
+            data-sort-order="desc"
+            data-sort-name="test_status"
+            data-show-multi-sort="true"
+            data-toolbar="#toolbar_render"
+        >
+            <div id="toolbar_render">
+                <h2 style="margin: auto;">render duration by test groups, hh:mm:ss</h2>
+            </div>
+            <thead>
+            <tr>
+                <th data-halign="center" data-sortable="true">Test</th>
+                {% for hw in hardware %}
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+                {% for test_package in performance_report_detail %}
+                    <tr>
+                        <td>{{ test_package }}</td>
+                        {% for hw in hardware %}
+                            <td>
+                                {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                    Skipped
+                                {% else %}
+                                    {{ performance_report_detail[test_package][hw[0]].render | round(3) | replace("-0.0","-") }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="jsTableWrapper">
+        <table id="normalizedPerformance"
+            class="baseTable"
+            data-toggle="table"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-show-columns="true"
+            data-show-pagination-switch="true"
+            data-pagination="false"
+            data-page-list="[5, 10, 20, 45, ALL]"
+            data-sort-order="desc"
+            data-sort-name="test_status"
+            data-show-multi-sort="true"
+            data-toolbar="#toolbar_render_norm"
+        >
+            <div id="toolbar_render_norm">
+                <h2 style="margin: auto;">relative render duration</h2>
+            </div>
+            <thead>
+            <tr>
+                <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+                {% for hw in hardware %}
+                <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+                {% for test_package in performance_report_detail %}
+                    <tr>
+                        <td>{{ test_package }}</td>
+                        {% for hw in hardware %}
+                            <td>
+                                {{ performance_report_detail[test_package][hw[0]].render | round(2) | replace("-0.0","-") }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if synchronization_time %}
+    <hr/>
+    <h1>synchronization time</h1>
+    <h2>total synchronization duration, hh:mm:ss</h2>
+    <div class="jsTableWrapper">
+        <table class="baseTable" data-toggle="table">
+            <thead>
+                <tr>
+                    <th>Tool</th>
+                    {% for hw in hardware %}
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for tool in test_info %}
+                <tr>
+                    <td>{{ tool }}</td>
+                    {% for hw in hardware %}
+                        {% if test_info[tool][hw[0]].sync == -0.0 %}
+                            <td>-</td>
+                        {% else %}
+                            <td
+                                {% if test_info[tool]['actual'] is not defined %}
+                                    class=skippedStatus
+                                {% endif %}
+                            >{{ test_info[tool][hw[0]].sync | round(3)}}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>graph</h2>
+    <div id="columnchartSync"></div>
+
+    <h2 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h2>
+    <div id="sync_time" class="collapse">
+        <div class="jsTableWrapper">
+            <table class="baseTable"
+                data-toggle="table"
+                data-search="true"
+                data-show-refresh="true"
+                data-show-toggle="true"
+                data-show-columns="true"
+                data-show-pagination-switch="true"
+                data-pagination="false"
+                data-page-list="[5, 10, 20, 45, ALL]"
+                data-sort-order="desc"
+                data-sort-name="test_status"
+                data-show-multi-sort="true"
+                data-toolbar="#toolbar_sync"
+            >
+                <div id="toolbar_sync">
+                    <h2 style="margin: auto;">synchronization duration by test groups, hh:mm:ss</h2>
+                </div>
+                <thead>
+                <tr>
+                    <th data-halign="center" data-sortable="true">Test</th>
+                    {% for hw in hardware %}
+                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
+                            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                        </th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for test_package in performance_report_detail %}
+                        <tr>
+                            <td>{{ test_package }}</td>
+                            {% for hw in hardware %}
+                                <td>
+                                    {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                        Skipped
+                                    {% else %}
+                                        {{ performance_report_detail[test_package][hw[0]].sync | round(3) | replace("-0.00","-") }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="jsTableWrapper">
+            <table id="normalizedPerformance"
+                class="baseTable"
+                data-toggle="table"
+                data-search="true"
+                data-show-refresh="true"
+                data-show-toggle="true"
+                data-show-columns="true"
+                data-show-pagination-switch="true"
+                data-pagination="false"
+                data-page-list="[5, 10, 20, 45, ALL]"
+                data-sort-order="desc"
+                data-sort-name="test_status"
+                data-show-multi-sort="true"
+                data-toolbar="#toolbar_sync_norm"
+            >
+                <div id="toolbar_sync_norm">
+                    <h2 style="margin: auto;">relative synchronization duration</h2>
+                </div>
+                <thead>
+                <tr>
+                    <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+                    {% for hw in hardware %}
+                    <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for test_package in performance_report_detail %}
+                        <tr>
+                            <td>{{ test_package }}</td>
+                            {% for hw in hardware %}
+                                <td>
+                                    {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+{% if setupTimeDetails != {} %}
+    <hr/>
+    <h1>setup time steps</h1>
+    <h2>total setup time duration, hh:mm:ss</h2>
+    <div class="jsTableWrapper">
+        <table class="baseTable" data-toggle="table">
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    {% for hw in hardware %}
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}
+                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+                <tbody>
+                {% for setup_step in setupTimeSum['steps'] %}
+                <tr>
+                    <td>{{ setup_step }}</td>
+                    {% for hw in hardware %}
+                        <td>{{ setupTimeSum[hw[0]][setup_step] | round(3) | replace("-0.00","-") }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="card-header collapsed" href="#setup_time" data-toggle="collapse">details</h2>
+    <div id="setup_time" class="collapse">
+        {% for test_package in performance_report_detail %}
+            <div class="jsTableWrapper">
+                <table class="baseTable"
+                    data-toggle="table"
+                    data-search="true"
+                    data-show-refresh="true"
+                    data-show-toggle="true"
+                    data-show-columns="true"
+                    data-show-pagination-switch="true"
+                    data-pagination="false"
+                    data-page-list="[5, 10, 20, 45, ALL]"
+                    data-sort-order="desc"
+                    data-sort-name="test_status"
+                    data-show-multi-sort="true"
+                    data-toolbar="#toolbar_setup_{{ test_package }}"
+                >
+                    <div id="toolbar_setup_{{ test_package }}">
+                        <h2 style="margin: auto;">setup time for {{ test_package | lower }}, hh:mm:ss</h2>
+                    </div>
+                    <thead>
+                    <tr>
+                        <th data-halign="center" data-sortable="true">Step</th>
+                        {% for hw in hardware %}
+                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
+                                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for setup_step in setupTimeSum['steps'] %}
+                            <tr>
+                                <td>{{ setup_step }}</td>
+                                {% for hw in hardware %}
+                                    <td>
+                                        {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
+                                            ~0.0
+                                        {% else %}
+                                            {{ setupTimeDetails[hw[0]][test_package][setup_step] | replace("-0.0","-") }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 {% endblock %}
