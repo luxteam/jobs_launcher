@@ -63,14 +63,14 @@
         {% endfor %}
       ]
 
-      var toolData = {
+      var renderData = {
         labels: [
             {% for hw in hardware %}
               '{{ hw[0] }}'{{ "," if not loop.last }}
             {% endfor %}
           ],
 
-        datasets: []
+        datasets: renderDataSet
       }
 
       toolOptions = {
@@ -78,7 +78,7 @@
         legend: {position: 'right'},
         title: {
           display: true,
-          text: 'Total synchronization time'
+          text: 'Total time'
         },
         scales: {
           xAxes: [{stacked: true}],
@@ -87,21 +87,25 @@
       }
 
       window.onload = function () {
-        var ctx = document.getElementById('columnchartRender').getContext('2d');
-        toolData["datasets"] = renderDataSet;
-        var chart = new Chart(ctx, {
+        var ctxRender = document.getElementById('columnchartRender').getContext('2d');
+        toolOptions["title"]["text"] = "Total render time";
+        var chartRender = new Chart(ctxRender, {
             type: 'bar',
-            data: toolData,
+            data: renderData,
             options: toolOptions
         });
 
-        toolData["datasets"] = syncDataSet;
-        var ctx = document.getElementById('columnChartSync').getContext('2d');
-        var chart = new Chart(ctx, {
+        syncData = {}
+        Object.assign(syncData, renderData);
+        syncData["datasets"] = syncDataSet;
+        toolOptions["title"]["text"] = "Total synchronization time";
+        var ctxSync = document.getElementById('columnChartSync').getContext('2d');
+        var chartSync = new Chart(ctxSync, {
             type: 'bar',
-            data: toolData,
+            data: syncData,
             options: toolOptions
         });
+        chartRender.update() //could not be rendered after reload page without this
       }
     </script>
     {% endif %}
