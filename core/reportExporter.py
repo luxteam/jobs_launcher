@@ -397,7 +397,7 @@ def build_compare_report(summary_report):
                     continue
 
                 # force add gpu from baseline
-                hw = temp_report['machine_info']['render_device']
+                hw = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os'].split()[0]
                 hw_bsln = temp_report['machine_info']['render_device'] + " [Baseline]"
 
                 if hw not in hardware:
