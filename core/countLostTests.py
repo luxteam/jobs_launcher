@@ -46,7 +46,7 @@ PLATFORM_CONVERTATIONS = {
 
 def get_lost_tests_count(data, tool_name, test_package_name):
 	# number of lost tests = number of tests in test package
-	if tool_name == 'blender' or tool_name == 'maya':
+	if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'rprviewer':
 		lost_tests_count = len(data)
 	elif tool_name == 'max':
 		lost_tests_count = len(data['cases'])

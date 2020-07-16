@@ -59,13 +59,14 @@ TIMEOUT_PAR = 3
 PIX_DIFF_MAX = 15
 PIX_DIFF_MAX_EC = 0
 PIX_DIFF_TOLERANCE = 9
+TIME_DIFF_TOLERANCE = {'10': 6, '30': 9, '60': 12, '120': 18, 'inf': 30}
 TIME_DIFF_MAX = 5
 VRAM_DIFF_MAX = 5
 
 """
 # Possible test case statuses
   passed - status means case was executed without errors and difference with baseline is permissible.
-  skipped - status means case wasn't launched by QA team decision. 
+  skipped - status means case wasn't launched by QA team decision.
   error - status means fatal error during render, terminating by timeout, or case wasn't launched at all.
   failed - status means that pixel difference with baseline image is too large.
 """
@@ -127,7 +128,8 @@ TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
         'maya': 'test_cases.json',
         'max': 'case_list.json',
-        'core': 'SceneList.json'
+        'core': 'SceneList.json',
+        'rprviewer': 'test.cases.json'
     }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 
