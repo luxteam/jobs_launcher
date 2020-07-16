@@ -120,49 +120,27 @@ function performanceNormalizeFormatter(value, row, index, field) {
 function performanceNormalizeStyleFormatter(value, row, index, field) {
     var values = [];
     for (key in row) {
-        if (key != 0) {
-            if (!isFinite(parseFloat(row[key]))) {values.push(parseFloat(1))}
-            else {values.push(parseFloat(row[key]))}
+        if (key != 0 && !isNaN(parseInt(key))) {
+            if (isFinite(parseFloat(row[key]))) {values.push(parseFloat(row[key]))}
         }
     }
 
-    var max = Math.max.apply(Math, values);
+    var opacity = parseFloat(value) === 0.0 ? 0 : 1;
+    var min = Math.min.apply(Math, values),
+    ratio = (Math.max.apply(Math, values) - min) / 100;
 
-    var redInit = 180;
-    var greenInit = 215;
-    var blueInit = 125;
-
-    var redWorst = 255;
-    var greenWorst = 113;
-    var blueWorst = 119;
-
-    var redBest = 110;
-    var greenBest = 190;
-    var blueBest = 120;
-
-    if (field == 1) {
-        var red = redInit;
-        var blue = blueInit;
-        var green = greenInit;
-    } else if (parseFloat(value) > values[0]) {
-        var red = Math.round(redInit + (redWorst - redInit)* value/max);
-        var green = Math.round(greenInit + (greenWorst - greenInit)* value/max);
-        var blue = Math.round(blueInit + (blueWorst - blueInit)* value/max);
-    } else {
-        var red = Math.round(redInit + (redBest - redInit)* value/max);
-        var green = Math.round(greenInit + (greenBest - greenInit)* value/max);
-        var blue = Math.round(blueInit + (blueBest - blueInit)* value/max);
-    }
-
-    var opacity = 1;
-    if (parseFloat(value) === 0.0) {
-        opacity = 0;
-    }
+    value = Math.round((value - min) / ratio);
 
     return {
         classes: "",
-        css: {"background-color": "rgba(" + red + ", " + green + ", " + blue + ", " + opacity + ")"}
+        css: {"background-color": getGreenToRed(value, opacity)}
     };
+}
+
+function getGreenToRed(percent, opacity){
+    g = percent<50 ? 200 : Math.floor(200-(percent*2-100)*200/100);
+    r = percent>50 ? 200 : Math.floor((percent*2)*200/100);
+    return 'rgb('+r+','+g+',50,'+opacity+')';
 }
 
 function searchTextInBootstrapTable(status) {
