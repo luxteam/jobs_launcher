@@ -642,9 +642,9 @@ def setup_time_count(work_dir):
     performance_list = {}
     for root, subdirs, files in os.walk(work_dir):
         performance_jsons = [os.path.join(root, f) for f in files if f.endswith('_performance.json')]
+        main_logger.error(root)
         for perf_json in performance_jsons:
             perf_list = json.load(open(perf_json))
-
             summ_perf = {}
             for event in perf_list:
                 if summ_perf.get(event['name'], ''):
@@ -654,12 +654,11 @@ def setup_time_count(work_dir):
 
             group = os.path.split(perf_json)[1].rpartition('_')[0]
             pcConfig = 'undefined'
-            for r, s, f in os.walk(root):
-                render_json = next(iter([os.path.join(r, tmp) for tmp in f if tmp.endswith(config.CASE_REPORT_SUFFIX)]), '')
-                if os.path.exists(render_json):
-                    with open(render_json) as rpr_json_file:
-                        rpr_json = json.load(rpr_json_file)
-                        pcConfig = rpr_json[0]['render_device']
+            render_json = next(iter([os.path.join(root, tmp) for tmp in files if tmp.endswith(config.SESSION_REPORT)]), '')
+            if os.path.exists(render_json):
+                with open(render_json) as rpr_json_file:
+                    rpr_json = json.load(rpr_json_file)
+                    pcConfig = rpr_json['machine_info']['render_device'] + ' ' + rpr_json['machine_info']['os'].split()[0]
             if pcConfig not in performance_list.keys():
                 performance_list[pcConfig] = {}
             performance_list[pcConfig][group] = summ_perf
