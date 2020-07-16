@@ -44,10 +44,10 @@
           {% endfor %}
           ]
 
-          {% for tool in performance_report %}
+          {% for tool in test_info %}
           ,['{{ tool }}'
             {% for hw in hardware %}
-            , {{ hw[1] }}
+            , {{ test_info[tool][hw[0]]['render'] }}
             {% endfor %}
             ]
           {% endfor %}
@@ -66,7 +66,46 @@
 
         };
 
-        var chart = new google.charts.Bar(document.getElementById('columnchart'));
+        var chart = new google.charts.Bar(document.getElementById('columnchartRender'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Hadrware'
+          {% for hw in hardware %}
+          , '{{ hw[0] }}'
+          {% endfor %}
+          ]
+
+          {% for tool in test_info %}
+          ,['{{ tool }}'
+            {% for hw in hardware %}
+            , {{ test_info[tool][hw[0]]['sync'] }}
+            {% endfor %}
+            ]
+          {% endfor %}
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Synchronization Time',
+            subtitle: 'The lower is better'
+          },
+          axes: {
+            y: {0: {side: 'left', label: 'Time, s'}},
+            x: {0: {side: 'bottom', label: 'Hardware, grouped by applications'}}
+          },
+          bar: { groupWidth: "80%" }
+
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchartSync'));
 
         chart.draw(data, google.charts.Bar.convertOptions(options));
       }

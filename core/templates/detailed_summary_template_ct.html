@@ -17,9 +17,15 @@
         </th>
 
         {# Render time #}
-        <th data-field="original_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">{{ original_render | title }} render time</th>
-        <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">Baseline render time</th>
-        <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatter">RPR render time</th>
+        <th data-field="original_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">{{ original_render | title }} render time
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+        </th>
+        <th data-field="baseline_render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">Baseline render time
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+        </th>
+        <th data-field="render_time" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">RPR render time
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
+        </th>
 
         <th data-field="time_diff" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, sec</th>
 

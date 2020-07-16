@@ -7,6 +7,7 @@ from shutil import copyfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir, os.path.pardir)))
 import core.config
+import core.performance_counter as perf_count
 
 try:
     from local_config import *
@@ -102,11 +103,13 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
 
 
 def main(args):
+    perf_count.event_record(args.work_dir, 'Compare', True)
     render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
     baseline_json_manifest_path = os.path.join(args.base_dir, core.config.BASELINE_MANIFEST)
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
+        perf_count.event_record(args.work_dir, 'Compare', False)
         return
 
     if not os.path.exists(args.base_dir):
@@ -142,6 +145,7 @@ def main(args):
             img.update({'test_status': core.config.TEST_DIFF_STATUS})
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
+        perf_count.event_record(args.work_dir, 'Compare', False)
         exit(1)
 
     try:
@@ -162,3 +166,5 @@ def main(args):
 
     with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
         json.dump(render_json, file, indent=4)
+
+    perf_count.event_record(args.work_dir, 'Compare', False)

@@ -124,7 +124,7 @@ def generate_thumbnails(session_dir):
 
 
 def build_session_report(report, session_dir):
-    total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0}
+    total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0, 'synchronization_duration': 0}
 
     generate_thumbnails(session_dir)
 
@@ -142,6 +142,7 @@ def build_session_report(report, session_dir):
                 report['results'][result][item].update({'render_duration': -0.0})
             else:
                 render_duration = 0.0
+                synchronization_duration = 0.0
                 try:
                     for jtem in current_test_report:
                         for group_report_file in REPORT_FILES:
@@ -152,6 +153,7 @@ def build_session_report(report, session_dir):
                                 jtem.update({group_report_file: os.path.relpath(cur_img_path, session_dir)})
 
                         render_duration += jtem['render_time']
+                        synchronization_duration += jtem.get('sync_time', 0.0)
                         if jtem['test_status'] == 'undefined':
                             report['results'][result][item]['total'] += 1
                         else:
@@ -183,6 +185,7 @@ def build_session_report(report, session_dir):
                     report['results'][result][item].update({'render_results': current_test_report})
 
                 report['results'][result][item].update({'render_duration': render_duration})
+                report['results'][result][item].update({'synchronization_duration': synchronization_duration})
 
     # get summary results
     for result in report['results']:
@@ -310,6 +313,11 @@ def build_summary_report(work_dir):
                 for lost_test_package in lost_tests_count[lost_test_result]:
                     generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
 
+    for config in summary_report:
+        summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
+        for test_package in summary_report[config]['results']:
+            summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
+
     return summary_report, common_info
 
 
@@ -318,7 +326,7 @@ def build_performance_report(summary_report):
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
-    summary_info_for_report = {}
+    render_info = []
 
     for key in summary_report:
         platform = summary_report[key]
@@ -330,6 +338,7 @@ def build_performance_report(summary_report):
             continue
 
         hw = platform['results'][group][conf]['machine_info']['render_device']
+        render_info.append([platform['results'][group][conf]['machine_info']['tool'], platform['results'][group][conf]['machine_info']['render_device'], platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
         if hw not in hardware:
             hardware[hw] = platform['summary']['render_duration']
 
@@ -346,11 +355,32 @@ def build_performance_report(summary_report):
 
         for test_package in results:
             for test_config in results[test_package]:
-                performance_report_detail[tool][test_package][test_config].update(
-                    {hw: results[test_package][test_config]})
+                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config]['synchronization_duration'], 'total': results[test_package][test_config]['duration']}
+                performance_report_detail[test_package].update(
+                    {hw: test_info})
 
-        tmp = sorted(hardware.items(), key=operator.itemgetter(1))
-        summary_info_for_report[tool] = tmp
+    tools = set([tool for tool, device, render, sync in render_info])
+    devices = set([device for tool, device, render, sync in render_info])
+    summary_info_for_report = {t: {device: {} for device in devices} for t in tools}
+
+    tools_count = {}
+    for tool in tools:
+        for t, d, r, s in render_info:
+            if t == tool:
+                tools_count[tool] = tools_count.get(tool, 0) + 1
+    for t, d, r, s in render_info:
+        summary_info_for_report[max(tools_count.items(), key=operator.itemgetter(1))[0]]['actual'] = True
+
+    for tool, device, render, sync in render_info:
+        summary_info_for_report[tool][device]['render'] = render
+        summary_info_for_report[tool][device]['sync'] = sync
+
+    for tool in tools:
+        for device in devices:
+            if not 'render' in summary_info_for_report[tool][device]:
+                summary_info_for_report[tool][device]['render'] = -0.0
+                summary_info_for_report[tool][device]['sync'] = -0.0
+
     hardware = sorted(hardware.items(), key=operator.itemgetter(1))
     return performance_report, hardware, performance_report_detail, summary_info_for_report
 
@@ -500,7 +530,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               node_retry_info=node_retry_info)
+                                               node_retry_info=node_retry_info,
+                                               synchronization_time=sync_time(summary_report))
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
@@ -519,10 +550,13 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
     main_logger.info("Saving performance report...")
     try:
+        setup_time_count(work_dir)
         copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
 
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
+
+        setup_sum, setup_details = setup_time_report(work_dir, hardware)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
@@ -532,11 +566,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        performance_report_detail=performance_report_detail,
                                                        pageID="performanceA",
                                                        common_info=common_info,
-                                                       test_info=summary_info_for_report)
+                                                       test_info=summary_info_for_report,
+                                                       setupTimeSum=setup_sum,
+                                                       setupTimeDetails=setup_details,
+                                                       synchronization_time=sync_time(summary_report))
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
-        main_logger.error(performance_html)
+        main_logger.error(performance_html) #local variable 'performance_html' referenced before assignment
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
 
     main_logger.info("Saving compare report...")
@@ -559,6 +596,76 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     build_local_reports(work_dir, summary_report, common_info, env)
+
+
+def setup_time_report(work_dir, hardware):
+    setup_sum_list = config.SETUP_STEPS_RPR_PLUGIN
+    setup_steps_dict = {}
+    for step in setup_sum_list:
+        setup_steps_dict[step] = -0.0
+    setup_sum = {}
+
+    try:
+        with open(os.path.abspath(os.path.join(work_dir, 'setup_time.json'))) as f:
+            setup_details = json.load(f)
+    except:
+        main_logger.error("Can't open setup_time.json")
+        return (None, None)
+
+    for confing in setup_details.keys():
+        setup_sum[confing] = setup_steps_dict.copy()
+        for group in setup_details[confing]:
+            for key in setup_sum_list:
+                setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
+                setup_sum[confing][key] += setup_details[confing][group][key]
+    setup_sum['steps'] = setup_sum_list
+
+    return setup_sum, setup_details
+
+
+def sync_time(summary_report):
+    try:
+        if sum(summary_report[config]['summary'].get('synchronization_duration', -0.0) for config in summary_report) > 0:
+            for config in summary_report:
+                if 'synchronization_duration' in summary_report[config]['summary']:
+                    summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
+                    for test_package in summary_report[config]['results']:
+                        summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
+        else:
+            raise Exception('Some "synchronization_time" is 0')
+    except Exception as e:
+        main_logger.error(str(e))
+        return False
+    return True
+
+
+def setup_time_count(work_dir):
+    performance_list = {}
+    for root, subdirs, files in os.walk(work_dir):
+        performance_jsons = [os.path.join(root, f) for f in files if f.endswith('_performance.json')]
+        for perf_json in performance_jsons:
+            perf_list = json.load(open(perf_json))
+
+            summ_perf = {}
+            for event in perf_list:
+                if summ_perf.get(event['name'], ''):
+                    summ_perf[event['name']] += event['time']
+                else:
+                    summ_perf[event['name']] = event['time']
+
+            group = os.path.split(perf_json)[1].rpartition('_')[0]
+            pcConfig = 'undefined'
+            for r, s, f in os.walk(root):
+                render_json = next(iter([os.path.join(r, tmp) for tmp in f if tmp.endswith(config.CASE_REPORT_SUFFIX)]), '')
+                if os.path.exists(render_json):
+                    with open(render_json) as rpr_json_file:
+                        rpr_json = json.load(rpr_json_file)
+                        pcConfig = rpr_json[0]['render_device']
+            if pcConfig not in performance_list.keys():
+                performance_list[pcConfig] = {}
+            performance_list[pcConfig][group] = summ_perf
+    with open(os.path.join(work_dir, 'setup_time.json'), 'w') as f:
+        f.write(json.dumps(performance_list, indent=4))
 
 
 def add_retry_info(summary_report, retry_info):
