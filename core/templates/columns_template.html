@@ -237,7 +237,7 @@
 {#- ------------------------------ RENDER TIME ------------------------------ -#}
 {%- if column.name == 'render_time' -%}
     {%- if is_head -%}
-        <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatter">
+        <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">
             {%- if report_type == 'default' or report_type == 'ec' -%}
                 Render time
             {%- elif report_type == 'ct' -%}
@@ -257,7 +257,7 @@
 {#- ------------------------------ BASELINE RENDER TIME ------------------------------ -#}
 {%- if column.name == 'baseline_render_time' -%}
     {%- if is_head -%}
-        <th data-field="baseline_render_time" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">Baseline render time
+        <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">Baseline render time
             <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
         </th>
     {%- else -%}
@@ -272,7 +272,7 @@
 {#- ------------------------------ ORIGINAL RENDER TIME ------------------------------ -#}
 {%- if column.name == 'original_time' -%}
     {%- if is_head -%}
-        <th data-field="original_time" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">{{ original_render | title }} render time
+        <th data-field="original_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">{{ original_render | title }} render time
             <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
         </th>
     {%- else -%}
