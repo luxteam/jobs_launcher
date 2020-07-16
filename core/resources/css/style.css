@@ -221,7 +221,7 @@ a {
   max-width: 300px;
 }
 
-#columnchartRender, #columnchartSync {
+#columnchartRender, #columnChartSync {
   display: block;
   margin: auto;
   width: 800px;

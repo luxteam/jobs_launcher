@@ -31,83 +31,90 @@
     </script>
 
     {% if performance_report is defined %}
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['bar']});
-      google.charts.setOnLoadCallback(drawChart);
+      var toolColors = ['#a228', '#2a28', '#22a8']
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Hadrware'
-          {% for hw in hardware %}
-          , '{{ hw[0] }}'
-          {% endfor %}
-          ]
+      window.onload = function () {
+        var ctx = document.getElementById('columnchartRender').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
 
-          {% for tool in test_info %}
-          ,['{{ tool }}'
-            {% for hw in hardware %}
-            , {{ test_info[tool][hw[0]]['render'] }}
-            {% endfor %}
-            ]
-          {% endfor %}
-        ]);
+            data: {
+                labels: [
+                    {% for hw in hardware %}
+                      '{{ hw[0] }}'{{ "," if not loop.last }}
+                    {% endfor %}
+                  ],
 
-        var options = {
-          chart: {
-            title: 'Render Time',
-            subtitle: 'The lower is better'
-          },
-          axes: {
-            y: {0: {side: 'left', label: 'Time, s'}},
-            x: {0: {side: 'bottom', label: 'Hardware, grouped by applications'}}
-          },
-          bar: { groupWidth: "80%" }
+                datasets: [
+                  {% for tool in test_info %}
+                    {
+                      label: '{{ tool }}',
+                      backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+                      data: [
+                        {% for hw in hardware %}
+                          '{{ test_info[tool][hw[0]].render }}'{{ "," if not loop.last }}
+                        {% endfor %}
+                      ]
+                    }{{ "," if not loop.last }}
+                  {% endfor %}
+                ]
+            },
 
-        };
+            options: {
+              maintainAspectRatio: false,
+              legend: {position: 'right'},
+              title: {
+                display: true,
+                text: 'Total synchronization time'
+              },
+              scales: {
+                xAxes: [{stacked: true}],
+                yAxes: [{stacked: true}]
+              }
+            }
+        });
 
-        var chart = new google.charts.Bar(document.getElementById('columnchartRender'));
+        var ctx = document.getElementById('columnChartSync').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
 
-        chart.draw(data, google.charts.Bar.convertOptions(options));
-      }
-    </script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['bar']});
-      google.charts.setOnLoadCallback(drawChart);
+            data: {
+                labels: [
+                    {% for hw in hardware %}
+                      '{{ hw[0] }}'{{ "," if not loop.last }}
+                    {% endfor %}
+                  ],
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Hadrware'
-          {% for hw in hardware %}
-          , '{{ hw[0] }}'
-          {% endfor %}
-          ]
+                datasets: [
+                  {% for tool in test_info %}
+                    {
+                      label: '{{ tool }}',
+                      backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+                      data: [
+                        {% for hw in hardware %}
+                          '{{ test_info[tool][hw[0]].sync }}'{{ "," if not loop.last }}
+                        {% endfor %}
+                      ]
+                    }{{ "," if not loop.last }}
+                  {% endfor %}
+                ]
+            },
 
-          {% for tool in test_info %}
-          ,['{{ tool }}'
-            {% for hw in hardware %}
-            , {{ test_info[tool][hw[0]]['sync'] }}
-            {% endfor %}
-            ]
-          {% endfor %}
-        ]);
-
-        var options = {
-          chart: {
-            title: 'Synchronization Time',
-            subtitle: 'The lower is better'
-          },
-          axes: {
-            y: {0: {side: 'left', label: 'Time, s'}},
-            x: {0: {side: 'bottom', label: 'Hardware, grouped by applications'}}
-          },
-          bar: { groupWidth: "80%" }
-
-        };
-
-        var chart = new google.charts.Bar(document.getElementById('columnchartSync'));
-
-        chart.draw(data, google.charts.Bar.convertOptions(options));
+            options: {
+              maintainAspectRatio: false,
+              legend: {position: 'right'},
+              title: {
+                display: true,
+                text: 'Total synchronization time'
+              },
+              scales: {
+                xAxes: [{stacked: true}],
+                yAxes: [{stacked: true}]
+              }
+            }
+        });
       }
     </script>
     {% endif %}
