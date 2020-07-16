@@ -35,85 +35,72 @@
     <script type="text/javascript">
       var toolColors = ['#aa28', '#a2a8', '#2aa8', '#a228', '#2a28', '#22a8']
 
+      renderDataSet = [
+        {% for tool in test_info %}
+          {
+            label: '{{ tool }}',
+            backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+            data: [
+              {% for hw in hardware %}
+                '{{ test_info[tool][hw[0]].render | round(3) }}'{{ "," if not loop.last }}
+              {% endfor %}
+            ]
+          }{{ "," if not loop.last }}
+        {% endfor %}
+      ]
+
+      syncDataSet = [
+        {% for tool in test_info %}
+          {
+            label: '{{ tool }}',
+            backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+            data: [
+              {% for hw in hardware %}
+                '{{ test_info[tool][hw[0]].sync | round(3) }}'{{ "," if not loop.last }}
+              {% endfor %}
+            ]
+          }{{ "," if not loop.last }}
+        {% endfor %}
+      ]
+
+      var toolData = {
+        labels: [
+            {% for hw in hardware %}
+              '{{ hw[0] }}'{{ "," if not loop.last }}
+            {% endfor %}
+          ],
+
+        datasets: []
+      }
+
+      toolOptions = {
+        maintainAspectRatio: false,
+        legend: {position: 'right'},
+        title: {
+          display: true,
+          text: 'Total synchronization time'
+        },
+        scales: {
+          xAxes: [{stacked: true}],
+          yAxes: [{stacked: true}]
+        }
+      }
+
       window.onload = function () {
         var ctx = document.getElementById('columnchartRender').getContext('2d');
+        toolData["datasets"] = renderDataSet;
         var chart = new Chart(ctx, {
             type: 'bar',
-
-            data: {
-                labels: [
-                    {% for hw in hardware %}
-                      '{{ hw[0] }}'{{ "," if not loop.last }}
-                    {% endfor %}
-                  ],
-
-                datasets: [
-                  {% for tool in test_info %}
-                    {
-                      label: '{{ tool }}',
-                      backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
-                      data: [
-                        {% for hw in hardware %}
-                          '{{ test_info[tool][hw[0]].render | round(3) }}'{{ "," if not loop.last }}
-                        {% endfor %}
-                      ]
-                    }{{ "," if not loop.last }}
-                  {% endfor %}
-                ]
-            },
-
-            options: {
-              maintainAspectRatio: false,
-              legend: {position: 'right'},
-              title: {
-                display: true,
-                text: 'Total synchronization time'
-              },
-              scales: {
-                xAxes: [{stacked: true}],
-                yAxes: [{stacked: true}]
-              }
-            }
+            data: toolData,
+            options: toolOptions
         });
 
+        toolData["datasets"] = syncDataSet;
         var ctx = document.getElementById('columnChartSync').getContext('2d');
         var chart = new Chart(ctx, {
             type: 'bar',
-
-            data: {
-                labels: [
-                    {% for hw in hardware %}
-                      '{{ hw[0] }}'{{ "," if not loop.last }}
-                    {% endfor %}
-                  ],
-
-                datasets: [
-                  {% for tool in test_info %}
-                    {
-                      label: '{{ tool }}',
-                      backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
-                      data: [
-                        {% for hw in hardware %}
-                          '{{ test_info[tool][hw[0]].sync | round(3) }}'{{ "," if not loop.last }}
-                        {% endfor %}
-                      ]
-                    }{{ "," if not loop.last }}
-                  {% endfor %}
-                ]
-            },
-
-            options: {
-              maintainAspectRatio: false,
-              legend: {position: 'right'},
-              title: {
-                display: true,
-                text: 'Total synchronization time'
-              },
-              scales: {
-                xAxes: [{stacked: true}],
-                yAxes: [{stacked: true}]
-              }
-            }
+            data: toolData,
+            options: toolOptions
         });
       }
     </script>
