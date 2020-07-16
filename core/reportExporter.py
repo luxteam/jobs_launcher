@@ -322,7 +322,6 @@ def build_summary_report(work_dir):
 
 
 def build_performance_report(summary_report):
-
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
@@ -337,8 +336,8 @@ def build_performance_report(summary_report):
             # if machine info is empty it's blank data for lost test cases
             continue
 
-        hw = platform['results'][group][conf]['machine_info']['render_device']
-        render_info.append([platform['results'][group][conf]['machine_info']['tool'], platform['results'][group][conf]['machine_info']['render_device'], platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
+        hw = platform['results'][group][conf]['machine_info']['render_device'] + ' ' + platform['results'][group][conf]['machine_info']['os'].split()[0]
+        render_info.append([platform['results'][group][conf]['machine_info']['tool'], hw, platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
         if hw not in hardware:
             hardware[hw] = platform['summary']['render_duration']
 
@@ -556,7 +555,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
-        setup_sum, setup_details = setup_time_report(work_dir, hardware)
+        setup_sum, setup_details = setup_time_report(work_dir)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
@@ -598,7 +597,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     build_local_reports(work_dir, summary_report, common_info, env)
 
 
-def setup_time_report(work_dir, hardware):
+def setup_time_report(work_dir):
     setup_sum_list = config.SETUP_STEPS_RPR_PLUGIN
     setup_steps_dict = {}
     for step in setup_sum_list:
