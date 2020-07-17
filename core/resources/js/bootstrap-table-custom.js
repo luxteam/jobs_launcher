@@ -142,10 +142,6 @@ function getGreenToRed(percent, opacity){
     rmin = 103;
     gmax = 171;
     gmin = 85;
-    // rmax = 180;
-    // rmin = 90;
-    // gmax = 165;
-    // gmin = 70;
     r = Math.floor((rmax - rmin) * percent / 100 + rmin);
     g = Math.floor((gmax - gmin) * (100 - percent) / 100 + gmin);
     return 'rgb(' + r + ',' + g + ',0,' + opacity + ')';
