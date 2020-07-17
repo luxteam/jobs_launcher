@@ -322,7 +322,6 @@ def build_summary_report(work_dir):
 
 
 def build_performance_report(summary_report):
-
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
@@ -337,8 +336,8 @@ def build_performance_report(summary_report):
             # if machine info is empty it's blank data for lost test cases
             continue
 
-        hw = platform['results'][group][conf]['machine_info']['render_device']
-        render_info.append([platform['results'][group][conf]['machine_info']['tool'], platform['results'][group][conf]['machine_info']['render_device'], platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
+        hw = platform['results'][group][conf]['machine_info']['render_device'] + ' ' + platform['results'][group][conf]['machine_info']['os'].split()[0]
+        render_info.append([platform['results'][group][conf]['machine_info']['tool'], hw, platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
         if hw not in hardware:
             hardware[hw] = platform['summary']['render_duration']
 
@@ -398,7 +397,7 @@ def build_compare_report(summary_report):
                     continue
 
                 # force add gpu from baseline
-                hw = temp_report['machine_info']['render_device']
+                hw = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os'].split()[0]
                 hw_bsln = temp_report['machine_info']['render_device'] + " [Baseline]"
 
                 if hw not in hardware:
@@ -556,7 +555,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
-        setup_sum, setup_details = setup_time_report(work_dir, hardware)
+        setup_sum, setup_details = setup_time_report(work_dir)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
@@ -598,7 +597,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     build_local_reports(work_dir, summary_report, common_info, env)
 
 
-def setup_time_report(work_dir, hardware):
+def setup_time_report(work_dir):
     setup_sum_list = config.SETUP_STEPS_RPR_PLUGIN
     setup_steps_dict = {}
     for step in setup_sum_list:
@@ -632,6 +631,10 @@ def sync_time(summary_report):
                     for test_package in summary_report[config]['results']:
                         summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
         else:
+            for config in summary_report:
+                summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary']['render_duration']
+                for test_package in summary_report[config]['results']:
+                    summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package]['']['render_duration']
             raise Exception('Some "synchronization_time" is 0')
     except Exception as e:
         main_logger.error(str(e))
@@ -645,7 +648,6 @@ def setup_time_count(work_dir):
         performance_jsons = [os.path.join(root, f) for f in files if f.endswith('_performance.json')]
         for perf_json in performance_jsons:
             perf_list = json.load(open(perf_json))
-
             summ_perf = {}
             for event in perf_list:
                 if summ_perf.get(event['name'], ''):
@@ -655,12 +657,11 @@ def setup_time_count(work_dir):
 
             group = os.path.split(perf_json)[1].rpartition('_')[0]
             pcConfig = 'undefined'
-            for r, s, f in os.walk(root):
-                render_json = next(iter([os.path.join(r, tmp) for tmp in f if tmp.endswith(config.CASE_REPORT_SUFFIX)]), '')
-                if os.path.exists(render_json):
-                    with open(render_json) as rpr_json_file:
-                        rpr_json = json.load(rpr_json_file)
-                        pcConfig = rpr_json[0]['render_device']
+            render_json = next(iter([os.path.join(root, tmp) for tmp in files if tmp.endswith(config.SESSION_REPORT)]), '')
+            if os.path.exists(render_json):
+                with open(render_json) as rpr_json_file:
+                    rpr_json = json.load(rpr_json_file)
+                    pcConfig = rpr_json['machine_info']['render_device'] + ' ' + rpr_json['machine_info']['os'].split()[0]
             if pcConfig not in performance_list.keys():
                 performance_list[pcConfig] = {}
             performance_list[pcConfig][group] = summ_perf

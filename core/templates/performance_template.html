@@ -2,16 +2,14 @@
 
 {% block report_body %}
 <h1>render time</h1>
-<h2>total render duration, hh:mm:ss</h2>
+<h2>total render duration</h2>
 <div class="jsTableWrapper">
     <table class="baseTable" data-toggle="table">
         <thead>
             <tr>
                 <th>Tool</th>
                 {% for hw in hardware %}
-                <th data-formatter="timeFormatterFull">{{ hw[0] }}
-                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
-                </th>
+                <th data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -36,8 +34,11 @@
     </table>
 </div>
 
-<h2>graph</h2>
-<div id="columnchartRender"></div>
+<h2>render time chart</h2>
+<div style="position: relative; height:500px; width:1000px; margin:auto;">
+    <canvas id="chartRender"></canvas>
+    <input id="checkboxChartRender" type="checkbox" style="margin-left: 350px;"> Tool version
+</div>
 
 <h2 class="card-header collapsed" href="#render_time" data-toggle="collapse">details</h2>
 <div id="render_time" class="collapse">
@@ -57,15 +58,13 @@
             data-toolbar="#toolbar_render"
         >
             <div id="toolbar_render">
-                <h2 style="margin: auto;">render duration by test groups, hh:mm:ss</h2>
+                <h2 style="margin: auto;">render duration by test groups<h2>
             </div>
             <thead>
             <tr>
                 <th data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
-                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
-                    </th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -111,7 +110,7 @@
             <tr>
                 <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-                <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -134,16 +133,14 @@
 {% if synchronization_time %}
     <hr/>
     <h1>synchronization time</h1>
-    <h2>total synchronization duration, hh:mm:ss</h2>
+    <h2>total synchronization duration</h2>
     <div class="jsTableWrapper">
         <table class="baseTable" data-toggle="table">
             <thead>
                 <tr>
                     <th>Tool</th>
                     {% for hw in hardware %}
-                    <th data-formatter="timeFormatterFull">{{ hw[0] }}
-                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
-                    </th>
+                    <th data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -168,8 +165,11 @@
         </table>
     </div>
 
-    <h2>graph</h2>
-    <div id="columnchartSync"></div>
+    <h2>synchronization chart</h2>
+    <div style="position: relative; height:500px; width:1000px; margin:auto;">
+        <canvas id="chartSync"></canvas>
+        <input id="checkboxChartSync" type="checkbox" style="margin-left: 350px;"> Tool version
+    </div>
 
     <h2 class="card-header collapsed" href="#sync_time" data-toggle="collapse">details</h2>
     <div id="sync_time" class="collapse">
@@ -189,15 +189,13 @@
                 data-toolbar="#toolbar_sync"
             >
                 <div id="toolbar_sync">
-                    <h2 style="margin: auto;">synchronization duration by test groups, hh:mm:ss</h2>
+                    <h2 style="margin: auto;">synchronization duration by test groups</h2>
                 </div>
                 <thead>
                 <tr>
                     <th data-halign="center" data-sortable="true">Test</th>
                     {% for hw in hardware %}
-                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
-                            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
-                        </th>
+                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -243,7 +241,7 @@
                 <tr>
                     <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
                     {% for hw in hardware %}
-                    <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+                    <th data-filed="{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -267,16 +265,14 @@
 {% if setupTimeDetails != {} %}
     <hr/>
     <h1>setup time steps</h1>
-    <h2>total setup time duration, hh:mm:ss</h2>
+    <h2>total setup time duration</h2>
     <div class="jsTableWrapper">
         <table class="baseTable" data-toggle="table">
             <thead>
                 <tr>
                     <th>Step</th>
                     {% for hw in hardware %}
-                    <th data-formatter="timeFormatterFull">{{ hw[0] }}
-                        <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
-                    </th>
+                    <th data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -312,15 +308,13 @@
                     data-toolbar="#toolbar_setup_{{ test_package }}"
                 >
                     <div id="toolbar_setup_{{ test_package }}">
-                        <h2 style="margin: auto;">setup time for {{ test_package | lower }}, hh:mm:ss</h2>
+                        <h2 style="margin: auto;">setup time for {{ test_package | lower }}</h2>
                     </div>
                     <thead>
                     <tr>
                         <th data-halign="center" data-sortable="true">Step</th>
                         {% for hw in hardware %}
-                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}
-                                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
-                            </th>
+                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                         {% endfor %}
                     </tr>
                     </thead>
