@@ -35,6 +35,79 @@
     <script type="text/javascript">
       var toolColors = ['#aa2a', '#a2aa', '#2aaa', '#a22a', '#2a2a', '#22aa', '#ff2a', '#f2fa', '#2ffa', '#f22a', '#2f2a', '#22fa']
 
+      {% if synchronization_time %}
+
+        syncDataSet = [
+          {% for hw in hardware %}
+            {
+              label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+              backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+              data: [
+                {% for tool in test_info %}
+                  {% if test_info[tool][hw[0]].sync > 0 %}
+                    '{{test_info[tool][hw[0]].sync}}'
+                  {% endif %}
+                {% endfor %}
+              ]
+            }{{ "," if not loop.last }}
+          {% endfor %}
+        ]
+
+        var syncData = {
+          labels: [' '],
+
+          datasets: syncDataSet
+        }
+
+        syncToolDataSet = [
+          {% for tool in test_info %}
+            {
+              label: '{{ tool }}',
+              backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+              data: [
+                {% for hw in hardware %}
+                  '{{ test_info[tool][hw[0]].sync | round(3) }}'{{ "," if not loop.last }}
+                {% endfor %}
+              ]
+            }{{ "," if not loop.last }}
+          {% endfor %}
+        ]
+
+        syncToolData = {
+          labels: [
+              {% for hw in hardware %}
+                '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+              {% endfor %}
+            ],
+
+          datasets: syncToolDataSet
+        }
+
+        syncOptions = {
+          maintainAspectRatio: false,
+          legend: {position: 'right'},
+          title: {
+            display: true,
+            text: 'Total synchronization time'
+          },
+          scales: {yAxes: [{ticks: {beginAtZero: true}}]}
+        }
+
+        syncToolOptions = {
+          maintainAspectRatio: false,
+          legend: {position: 'right'},
+          title: {
+            display: true,
+            text: 'Total synchronization time'
+          },
+          scales: {
+            xAxes: [{stacked: true}],
+            yAxes: [{stacked: true}]
+          }
+        }
+
+      {% endif %}
+
       renderDataSet = [
         {% for hw in hardware %}
           {
@@ -42,24 +115,8 @@
             backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
             data: [
               {% for tool in test_info %}
-                {% if test_info[tool][hw[0]].sync > 0 %}
-                  '{{test_info[tool][hw[0]].sync}}'
-                {% endif %}
-              {% endfor %}
-            ]
-          }{{ "," if not loop.last }}
-        {% endfor %}
-      ]
-
-      syncDataSet = [
-        {% for hw in hardware %}
-          {
-            label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
-            backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
-            data: [
-              {% for tool in test_info %}
-                {% if test_info[tool][hw[0]].sync > 0 %}
-                  '{{test_info[tool][hw[0]].sync}}'
+                {% if test_info[tool][hw[0]].render > 0 %}
+                  '{{test_info[tool][hw[0]].render}}'
                 {% endif %}
               {% endfor %}
             ]
@@ -81,20 +138,6 @@
             data: [
               {% for hw in hardware %}
                 '{{ test_info[tool][hw[0]].render | round(3) }}'{{ "," if not loop.last }}
-              {% endfor %}
-            ]
-          }{{ "," if not loop.last }}
-        {% endfor %}
-      ]
-
-      syncToolDataSet = [
-        {% for tool in test_info %}
-          {
-            label: '{{ tool }}',
-            backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
-            data: [
-              {% for hw in hardware %}
-                '{{ test_info[tool][hw[0]].sync | round(3) }}'{{ "," if not loop.last }}
               {% endfor %}
             ]
           }{{ "," if not loop.last }}
@@ -135,50 +178,41 @@
       }
 
       function createChart(elementID, dataSet, toolOptions) {
-        var ctxRender = document.getElementById(elementID).getContext('2d');
-        var chartRender = new Chart(ctxRender, {
+        var ctx = document.getElementById(elementID).getContext('2d');
+        var chart = new Chart(ctx, {
             type: 'bar',
             data: dataSet,
             options: toolOptions
         });
+        return chart;
       }
 
       window.onload = function () {
-        createChart('chartRender', renderData, renderOptions);
+        chartRender = createChart('chartRender', renderData, renderOptions);
 
         $('#checkboxChartRender').change(function(){
           if($(this).is(':checked')) {
-            createChart('chartRender', renderToolData, renderToolOptions);
+            chartRender.data = renderToolData;
+            chartRender.options = renderToolOptions;
           } else {
-            createChart('chartRender', renderData, renderOptions);
+            chartRender.data = renderData;
+            chartRender.options = renderOptions;
           }
+          chartRender.update();
         })
 
         {% if synchronization_time %}
-          syncData = {}
-          Object.assign(syncData, renderData);
-          syncData["datasets"] = syncDataSet;
-
-          syncOptions = {};
-          Object.assign(syncOptions, renderOptions)
-          syncOptions["title"]["text"] = "Total synchronization time";
-
-          syncToolData = {}
-          Object.assign(syncToolData, renderToolData);
-          syncToolData["datasets"] = syncToolDataSet;
-
-          syncToolOptions = {};
-          Object.assign(syncToolOptions, renderToolOptions)
-          syncOptions["title"]["text"] = "Total synchronization time";
-
-          createChart('chartSync', syncData, syncOptions);
+          chartSync = createChart('chartSync', syncData, syncOptions);
 
           $('#checkboxChartSync').change(function(){
             if($(this).is(':checked')) {
-              createChart('chartSync', syncToolData, syncToolOptions);
+            chartSync.data = syncToolData;
+            chartSync.options = syncToolOptions;
             } else {
-              createChart('chartSync', syncData, syncOptions);
+            chartSync.data = syncData;
+            chartSync.options = syncOptions;
             }
+            chartSync.update();
           })
         {% endif %}
       }
