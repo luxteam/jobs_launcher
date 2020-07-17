@@ -138,13 +138,16 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
 }
 
 function getGreenToRed(percent, opacity){
-    rmax = 184;
-    rmin = 103;
-    gmax = 171;
-    gmin = 85;
+    rmax = 209;
+    rmin = 128;
+    gmax = 209;
+    gmin = 117;
+    bmax = 155;
+    bmin = 85;
     r = Math.floor((rmax - rmin) * percent / 100 + rmin);
     g = Math.floor((gmax - gmin) * (100 - percent) / 100 + gmin);
-    return 'rgb(' + r + ',' + g + ',0,' + opacity + ')';
+    b = Math.floor((bmax - bmin) * (100 - percent) / 100 + bmin);
+    return 'rgb(' + r + ',' + g + ',' + b + ',' + opacity + ')';
 }
 
 function searchTextInBootstrapTable(status) {

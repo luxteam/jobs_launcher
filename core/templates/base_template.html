@@ -33,7 +33,7 @@
     {% if performance_report is defined %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script type="text/javascript">
-      var toolColors = ['#aa2a', '#a2aa', '#2aaa', '#a22a', '#2a2a', '#22aa', '#ff2a', '#f2fa', '#2ffa', '#f22a', '#2f2a', '#22fa']
+      var toolColors = ['#82438CFF', '#327A5BFF', '#F4B400FF', '#2D538FFF', '#DB4437FF', '#4285F4FF', '#E8E541FF', '#24C959FF', '#00ACC1FF', '#FF7043FF']
 
       {% if synchronization_time %}
 
@@ -86,20 +86,12 @@
         syncOptions = {
           maintainAspectRatio: false,
           legend: {position: 'right'},
-          title: {
-            display: true,
-            text: 'Total synchronization time'
-          },
           scales: {yAxes: [{ticks: {beginAtZero: true}}]}
         }
 
         syncToolOptions = {
           maintainAspectRatio: false,
           legend: {position: 'right'},
-          title: {
-            display: true,
-            text: 'Total synchronization time'
-          },
           scales: {
             xAxes: [{stacked: true}],
             yAxes: [{stacked: true}]
@@ -157,20 +149,12 @@
       renderOptions = {
         maintainAspectRatio: false,
         legend: {position: 'right'},
-        title: {
-          display: true,
-          text: 'Total render time'
-        },
         scales: {yAxes: [{ticks: {beginAtZero: true}}]}
       }
 
       renderToolOptions = {
         maintainAspectRatio: false,
         legend: {position: 'right'},
-        title: {
-          display: true,
-          text: 'Total render time'
-        },
         scales: {
           xAxes: [{stacked: true}],
           yAxes: [{stacked: true}]

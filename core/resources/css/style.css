@@ -89,14 +89,14 @@ table.baseTable {
 .baseTable tr, td {
   width: auto;
   padding: 10px;
-  border: 1px solid black;
+  border: 1px solid #949494;
   background-color: rgba(256, 256, 256, 1);
 }
 .baseTable th {
   background-color: rgba(222, 222, 222, 1);
   width: auto;
   padding: 10px;
-  border: 1px solid black;
+  border: 1px solid #949494;
   text-align: center;
 }
 .summary_tr td {
