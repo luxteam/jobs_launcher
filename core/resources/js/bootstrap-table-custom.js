@@ -138,13 +138,17 @@ function performanceNormalizeStyleFormatter(value, row, index, field) {
 }
 
 function getGreenToRed(percent, opacity){
-    rmax = 200;
-    rmin = 50;
-    gmax = 200;
-    gmin = 50;
-    r = percent > 50 ? rmax : Math.floor((rmax - rmin) * percent / 100 + rmin);
-    g = percent < 50 ? gmax : Math.floor((gmax - gmin) * (100 - percent) / 100 + gmin);
-    return 'rgb(' + r + ',' + g + ',50,' + opacity + ')';
+    rmax = 184;
+    rmin = 103;
+    gmax = 171;
+    gmin = 85;
+    // rmax = 180;
+    // rmin = 90;
+    // gmax = 165;
+    // gmin = 70;
+    r = Math.floor((rmax - rmin) * percent / 100 + rmin);
+    g = Math.floor((gmax - gmin) * (100 - percent) / 100 + gmin);
+    return 'rgb(' + r + ',' + g + ',0,' + opacity + ')';
 }
 
 function searchTextInBootstrapTable(status) {
