@@ -33,9 +33,47 @@
     {% if performance_report is defined %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script type="text/javascript">
-      var toolColors = ['#aa2a', '#a2aa', '#2aaa', '#a22a', '#2a2a', '#22aa']
+      var toolColors = ['#aa2a', '#a2aa', '#2aaa', '#a22a', '#2a2a', '#22aa', '#ff2a', '#f2fa', '#2ffa', '#f22a', '#2f2a', '#22fa']
 
       renderDataSet = [
+        {% for hw in hardware %}
+          {
+            label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+            backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+            data: [
+              {% for tool in test_info %}
+                {% if test_info[tool][hw[0]].sync > 0 %}
+                  '{{test_info[tool][hw[0]].sync}}'
+                {% endif %}
+              {% endfor %}
+            ]
+          }{{ "," if not loop.last }}
+        {% endfor %}
+      ]
+
+      syncDataSet = [
+        {% for hw in hardware %}
+          {
+            label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+            backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+            data: [
+              {% for tool in test_info %}
+                {% if test_info[tool][hw[0]].sync > 0 %}
+                  '{{test_info[tool][hw[0]].sync}}'
+                {% endif %}
+              {% endfor %}
+            ]
+          }{{ "," if not loop.last }}
+        {% endfor %}
+      ]
+
+      var renderData = {
+        labels: [' '],
+
+        datasets: renderDataSet
+      }
+
+      renderToolDataSet = [
         {% for tool in test_info %}
           {
             label: '{{ tool }}',
@@ -49,7 +87,7 @@
         {% endfor %}
       ]
 
-      syncDataSet = [
+      syncToolDataSet = [
         {% for tool in test_info %}
           {
             label: '{{ tool }}',
@@ -63,22 +101,32 @@
         {% endfor %}
       ]
 
-      var renderData = {
+      var renderToolData = {
         labels: [
             {% for hw in hardware %}
               '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
             {% endfor %}
           ],
 
-        datasets: renderDataSet
+        datasets: renderToolDataSet
       }
 
-      toolOptions = {
+      renderOptions = {
         maintainAspectRatio: false,
         legend: {position: 'right'},
         title: {
           display: true,
-          text: 'Total time'
+          text: 'Total render time'
+        },
+        scales: {yAxes: [{ticks: {beginAtZero: true}}]}
+      }
+
+      renderToolOptions = {
+        maintainAspectRatio: false,
+        legend: {position: 'right'},
+        title: {
+          display: true,
+          text: 'Total render time'
         },
         scales: {
           xAxes: [{stacked: true}],
@@ -86,26 +134,52 @@
         }
       }
 
-      window.onload = function () {
-        var ctxRender = document.getElementById('columnchartRender').getContext('2d');
-        toolOptions["title"]["text"] = "Total render time";
+      function createChart(elementID, dataSet, toolOptions) {
+        var ctxRender = document.getElementById(elementID).getContext('2d');
         var chartRender = new Chart(ctxRender, {
             type: 'bar',
-            data: renderData,
+            data: dataSet,
             options: toolOptions
         });
+      }
+
+      window.onload = function () {
+        createChart('chartRender', renderData, renderOptions);
+
+        $('#checkboxChartRender').change(function(){
+          if($(this).is(':checked')) {
+            createChart('chartRender', renderToolData, renderToolOptions);
+          } else {
+            createChart('chartRender', renderData, renderOptions);
+          }
+        })
 
         {% if synchronization_time %}
           syncData = {}
           Object.assign(syncData, renderData);
           syncData["datasets"] = syncDataSet;
-          toolOptions["title"]["text"] = "Total synchronization time";
-          var ctxSync = document.getElementById('columnChartSync').getContext('2d');
-          var chartSync = new Chart(ctxSync, {
-              type: 'bar',
-              data: syncData,
-              options: toolOptions
-          });
+
+          syncOptions = {};
+          Object.assign(syncOptions, renderOptions)
+          syncOptions["title"]["text"] = "Total synchronization time";
+
+          syncToolData = {}
+          Object.assign(syncToolData, renderToolData);
+          syncToolData["datasets"] = syncToolDataSet;
+
+          syncToolOptions = {};
+          Object.assign(syncToolOptions, renderToolOptions)
+          syncOptions["title"]["text"] = "Total synchronization time";
+
+          createChart('chartSync', syncData, syncOptions);
+
+          $('#checkboxChartSync').change(function(){
+            if($(this).is(':checked')) {
+              createChart('chartSync', syncToolData, syncToolOptions);
+            } else {
+              createChart('chartSync', syncData, syncOptions);
+            }
+          })
         {% endif %}
       }
     </script>
