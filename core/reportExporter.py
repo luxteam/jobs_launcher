@@ -633,6 +633,8 @@ def sync_time(summary_report):
         else:
             for config in summary_report:
                 summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary']['render_duration']
+                for test_package in summary_report[config]['results']:
+                    summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package]['']['render_duration']
             raise Exception('Some "synchronization_time" is 0')
     except Exception as e:
         main_logger.error(str(e))
