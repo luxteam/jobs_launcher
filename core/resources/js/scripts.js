@@ -26,9 +26,13 @@ function resizeImg(img){
 
 function timeFormatterFull(value, row, index, field) {
     if (isFinite(value)) {
-        var time = new Date(null);
+        var time = new Date('July 20, 69 00:00:00');
         time.setSeconds(parseInt(value), (parseFloat(value) % 1) * 1000);
-        return time.toISOString().substr(11, 12);
+        if (time.getHours() > 0){
+            return time.getHours() + 'h ' + time.getMinutes() + 'm ' + time.getSeconds() + 's '
+        } else {
+            return time.getMinutes() + 'm ' + time.getSeconds() + 's ' + time.getMilliseconds() + 'ms'
+        }
     }
 }
 

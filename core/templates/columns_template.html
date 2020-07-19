@@ -243,7 +243,6 @@
             {%- elif report_type == 'ct' -%}
                 RPR render time
             {%- endif -%}
-            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
         </th>
     {%- else -%}
         {%- if report_type == 'default' or report_type == 'ec' -%}
@@ -258,7 +257,6 @@
 {%- if column.name == 'baseline_render_time' -%}
     {%- if is_head -%}
         <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">Baseline render time
-            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
         </th>
     {%- else -%}
         {%- if report_type == 'default' or report_type == 'ec' -%}
@@ -273,7 +271,6 @@
 {%- if column.name == 'original_time' -%}
     {%- if is_head -%}
         <th data-field="original_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">{{ original_render | title }} render time
-            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="hh:mm:ss"></span>
         </th>
     {%- else -%}
         <td>{{ item.or_render_time }}</td>
