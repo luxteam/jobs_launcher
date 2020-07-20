@@ -121,9 +121,9 @@
                {{ ' ' }}timeDiffFailedStatus
             {%- endif -%} {{ ' ' }} {{ item.test_status }}Status">
                 <b>Scene:</b> {{ item.scene_name }}<br/>
-                <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
-                <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
-                <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
+                <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
+                <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
+                <b>Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
                 <b>Test info:</b><br/>
                 {%- for param in item.script_info -%}
                     {{ param }}<br/>
@@ -177,7 +177,7 @@
                 class="timeBetterStatus"
             {% endif -%}
             >
-            {{ item.difference_time | round (2) }}</td>
+            {{ item.difference_time | round (3) }}</td>
         {%- elif report_type == 'ec' or report_type == 'ct' -%}
             <td
                 {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
@@ -185,7 +185,7 @@
                 {% else -%}
                     class="{{ config.TEST_SUCCESS_STATUS }}Status"
                 {% endif -%}
-            >{{ item.difference_time | round (2) }}</td>
+            >{{ item.difference_time | round (3) }}</td>
         {%- endif -%}
 
     {%- endif -%}
@@ -246,7 +246,7 @@
         </th>
     {%- else -%}
         {%- if report_type == 'default' or report_type == 'ec' -%}
-            <td>{{ item.render_time | round(2) }}</td>
+            <td>{{ item.render_time | round(3) }}</td>
         {%- elif report_type == 'ct' -%}
             <td>{{ item.render_time }}</td>
         {%- endif -%}
@@ -260,7 +260,7 @@
         </th>
     {%- else -%}
         {%- if report_type == 'default' or report_type == 'ec' -%}
-            <td>{{ item.baseline_render_time | round(2) }}</td>
+            <td>{{ item.baseline_render_time | round(3) }}</td>
         {%- elif report_type == 'ct' -%}
             <td>{{ item.baseline_render_time }}</td>
         {%- endif -%}

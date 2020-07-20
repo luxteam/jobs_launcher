@@ -1,0 +1,118 @@
+{% extends "local_template.html"%}
+
+{% block results_table_content %}
+
+<thead>
+    <tr>
+        <th data-field="test_case" data-halign="center" data-valign="middle" data-sortable="true" data-visible="false">Test case</th>
+        <th data-field="test_case_copy" data-halign="center" data-valign="middle" data-sortable="true" data-events="copyTestCaseName">
+            Test case
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="Button click copy direct test case link to clipboard"></span>
+        </th>
+
+        {# Baselines and results #}
+        <th data-field="baseline_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Baseline Color</th>
+        <th data-field="rendered_img" data-halign="center" data-valign="middle" data-sortable="true" data-events="openFullImgSize" data-formatter="metaAJAX">Rendered color</th>
+
+        <th data-filed="info" data-halign="center" data-valign="middle" data-sortable="true">Info</th>
+
+        <th data-field="time_diff" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">Render time diff, sec</th>
+
+        {# Other info #}
+        <th data-field="pix_diff_2" data-visible="true" data-halign="center" data-valign="middle" data-sortable="true">
+            Diff new
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+[0] - equals images.
+[-1] - images has diff resolution, so couldn't be compared."></span>
+        </th>
+
+        <th data-field="test_status"data-visible="false" data-halign="center" data-valign="middle" data-sortable="true">Test status
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[Failed] status means that pixel difference with baseline image is too large.
+[Error] status means fatal error during render, terminating by timeout, or case wasn't launched at all.
+[Skipped] status means case wasn't launched by QA team decision."></span>
+        </th>
+
+        {# Render time #}
+        <th data-field="render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">Render time</th>
+        <th data-field="baseline_render_time" data-visible="false" data-halign="center" data-valign="middle" data-sortable="true" data-formatter="timeFormatterFull">Baseline render time</th>
+
+        <th data-filed="render_log" data-visible="true" data-halign="center" data-valign="middle">Log files</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in render_report %}
+    <tr>
+        <td>{{ item.test_case }}</td>
+        <td><button class="commonButton" type="button" name="copyDirectLinkButton">{{ item.test_case }}</button></td>
+
+        {# Baselines and results #}
+        <td class="hatching">
+        {% if item.baseline_color_path %}
+            {% if 'thumb256_baseline_color_path' in item %}
+            <img data-src="{{ item.thumb256_baseline_color_path }}"/>
+            {% else %}
+            <img data-src="{{ item.baseline_color_path }}"/>
+            {% endif %}
+        {% else %}
+            Not compared
+        {% endif %}
+        </td>
+        <td class="hatching">
+            {% if 'thum256_render_color_path' in item %}
+            <img data-src="{{ item.thumb256_render_color_path }}"/>
+            {% else %}
+            <img data-src="{{ item.render_color_path }}"/>
+            {% endif %}
+        </td>
+
+        <td class="infoColumn
+        {%- if item.difference_time > 5 %}
+           {{ ' ' }}timeDiffFailedStatus
+        {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
+            <b>Scene:</b> {{ item.scene_name }}<br/>
+            <b>Render time:</b> {{ item.render_time | round (3) }}<br/>
+            <b>Baseline render time:</b> {{ item.baseline_render_time | round (3) }}<br/>
+            <b>Difference render time:</b> {{ item.difference_time | round (3) }} %<br/>
+            <b>Test info:</b><br/>
+            {% for param in item.script_info %}
+                {{ param }}<br/>
+            {% endfor %}
+        </td>
+
+        <td
+            {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
+                class="{{ config.TEST_DIFF_STATUS }}Status"
+            {% else -%}
+                class="{{ config.TEST_SUCCESS_STATUS }}Status"
+            {% endif -%}
+        >{{ item.difference_time | round (3) }}</td>
+
+        {# Other info #}
+        <td
+            {% if item.difference_color_2 != 0 -%}
+                class="{{ config.TEST_DIFF_STATUS }}Status"
+            {% else -%}
+                class="{{ config.TEST_SUCCESS_STATUS }}Status"
+            {% endif -%}
+        >{{ item.difference_color_2 }}</td>
+
+        <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+
+        {# Render time #}
+        <td>{{ item.render_time | round (3) }}</td>
+        <td>{{ item.baseline_render_time | round (3) }}</td>
+
+        {# Log files #}
+        <td>
+            {%- if 'render_log' in item %}
+            <a href="{{ item.render_log }}">Render log</a>
+            {% else %}
+            <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
+            {% endif -%}
+        </td>
+
+    </tr>
+    {% endfor %}
+    </tbody>
+
+{% endblock %}

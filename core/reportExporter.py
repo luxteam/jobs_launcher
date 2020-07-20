@@ -354,7 +354,7 @@ def build_performance_report(summary_report):
 
         for test_package in results:
             for test_config in results[test_package]:
-                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config]['synchronization_duration'], 'total': results[test_package][test_config]['duration']}
+                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config].get('synchronization_duration', -0.0), 'total': results[test_package][test_config]['duration']}
                 performance_report_detail[test_package].update(
                     {hw: test_info})
 
@@ -627,9 +627,9 @@ def sync_time(summary_report):
         if sum(summary_report[config]['summary'].get('synchronization_duration', -0.0) for config in summary_report) > 0:
             for config in summary_report:
                 if 'synchronization_duration' in summary_report[config]['summary']:
-                    summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary']['synchronization_duration'] + summary_report[config]['summary']['render_duration']
+                    summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary'].get('synchronization_duration', -0.0) + summary_report[config]['summary']['render_duration']
                     for test_package in summary_report[config]['results']:
-                        summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package]['']['synchronization_duration'] + summary_report[config]['results'][test_package]['']['render_duration']
+                        summary_report[config]['results'][test_package]['']['duration_sync'] = summary_report[config]['results'][test_package][''].get('synchronization_duration', -0.0) + summary_report[config]['results'][test_package]['']['render_duration']
         else:
             for config in summary_report:
                 summary_report[config]['summary']['duration_sync'] = summary_report[config]['summary']['render_duration']
@@ -647,24 +647,27 @@ def setup_time_count(work_dir):
     for root, subdirs, files in os.walk(work_dir):
         performance_jsons = [os.path.join(root, f) for f in files if f.endswith('_performance.json')]
         for perf_json in performance_jsons:
-            perf_list = json.load(open(perf_json))
-            summ_perf = {}
-            for event in perf_list:
-                if summ_perf.get(event['name'], ''):
-                    summ_perf[event['name']] += event['time']
-                else:
-                    summ_perf[event['name']] = event['time']
+            try:
+                perf_list = json.load(open(perf_json))
+                summ_perf = {}
+                for event in perf_list:
+                    if summ_perf.get(event['name'], ''):
+                        summ_perf[event['name']] += event['time']
+                    else:
+                        summ_perf[event['name']] = event['time']
 
-            group = os.path.split(perf_json)[1].rpartition('_')[0]
-            pcConfig = 'undefined'
-            render_json = next(iter([os.path.join(root, tmp) for tmp in files if tmp.endswith(config.SESSION_REPORT)]), '')
-            if os.path.exists(render_json):
-                with open(render_json) as rpr_json_file:
-                    rpr_json = json.load(rpr_json_file)
-                    pcConfig = rpr_json['machine_info']['render_device'] + ' ' + rpr_json['machine_info']['os'].split()[0]
-            if pcConfig not in performance_list.keys():
-                performance_list[pcConfig] = {}
-            performance_list[pcConfig][group] = summ_perf
+                group = os.path.split(perf_json)[1].rpartition('_')[0]
+                pcConfig = 'undefined'
+                render_json = next(iter([os.path.join(root, tmp) for tmp in files if tmp.endswith(config.SESSION_REPORT)]), '')
+                if os.path.exists(render_json):
+                    with open(render_json) as rpr_json_file:
+                        rpr_json = json.load(rpr_json_file)
+                        pcConfig = rpr_json['machine_info']['render_device'] + ' ' + rpr_json['machine_info']['os'].split()[0]
+                if pcConfig not in performance_list.keys():
+                    performance_list[pcConfig] = {}
+                performance_list[pcConfig][group] = summ_perf
+            except Exception as err:
+                main_logger.error('Error while setup time steps occurred "{}"'.format(str(err)))
     with open(os.path.join(work_dir, 'setup_time.json'), 'w') as f:
         f.write(json.dumps(performance_list, indent=4))
 
