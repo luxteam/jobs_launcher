@@ -70,9 +70,9 @@
            {{ ' ' }}timeDiffFailedStatus
         {% endif -%} {{ ' ' }} {{ item.test_status }}Status">
             <b>Scene:</b> {{ item.scene_name }}<br/>
-            <b>Render time:</b> {{ item.render_time | round(2) }}<br/>
-            <b>Baseline render time:</b> {{ item.baseline_render_time | round(2) }}<br/>
-            <b>Difference render time:</b> {{ item.difference_time | round(2) }} %<br/>
+            <b>Render time:</b> {{ item.render_time | round (3) }}<br/>
+            <b>Baseline render time:</b> {{ item.baseline_render_time | round (3) }}<br/>
+            <b>Difference render time:</b> {{ item.difference_time | round (3) }} %<br/>
             <b>Test info:</b><br/>
             {% for param in item.script_info %}
                 {{ param }}<br/>
@@ -85,7 +85,7 @@
             {% else -%}
                 class="{{ config.TEST_SUCCESS_STATUS }}Status"
             {% endif -%}
-        >{{ item.difference_time | round (2) }}</td>
+        >{{ item.difference_time | round (3) }}</td>
 
         {# Other info #}
         <td
@@ -99,8 +99,8 @@
         <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
 
         {# Render time #}
-        <td>{{ item.render_time | round(2) }}</td>
-        <td>{{ item.baseline_render_time | round(2) }}</td>
+        <td>{{ item.render_time | round (3) }}</td>
+        <td>{{ item.baseline_render_time | round (3) }}</td>
 
         {# Log files #}
         <td>
