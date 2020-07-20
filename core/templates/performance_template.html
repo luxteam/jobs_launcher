@@ -74,7 +74,9 @@
                         <td>{{ test_package }}</td>
                         {% for hw in hardware %}
                             <td>
-                                {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                {% if performance_report_detail[test_package][hw[0]].render is not number %}
+                                    Error
+                                {% elif performance_report_detail[test_package][hw[0]].render == 0 %}
                                     Skipped
                                 {% else %}
                                     {{ performance_report_detail[test_package][hw[0]].render | round(3) | replace("-0.0","-") }}
@@ -120,7 +122,11 @@
                         <td>{{ test_package }}</td>
                         {% for hw in hardware %}
                             <td>
-                                {{ performance_report_detail[test_package][hw[0]].render | round (3) | replace("-0.0","-") }}
+                                {% if performance_report_detail[test_package][hw[0]].render is not number %}
+                                    Error
+                                {% else %}
+                                    {{ performance_report_detail[test_package][hw[0]].render | round (3) | replace("-0.0","-") }}
+                                {% endif %}
                             </td>
                         {% endfor %}
                     </tr>
@@ -205,7 +211,9 @@
                             <td>{{ test_package }}</td>
                             {% for hw in hardware %}
                                 <td>
-                                    {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                    {% if performance_report_detail[test_package][hw[0]].sync is not number %}
+                                        Error
+                                    {% elif performance_report_detail[test_package][hw[0]].sync == 0 %}
                                         Skipped
                                     {% else %}
                                         {{ performance_report_detail[test_package][hw[0]].sync | round(3) | replace("-0.00","-") }}
@@ -251,7 +259,11 @@
                             <td>{{ test_package }}</td>
                             {% for hw in hardware %}
                                 <td>
-                                    {{ performance_report_detail[test_package][hw[0]].sync | round (3) | replace("-0.00","-") }}
+                                    {% if performance_report_detail[test_package][hw[0]].sync is not number %}
+                                        Error
+                                    {% else %}
+                                        {{ performance_report_detail[test_package][hw[0]].sync | round (3) | replace("-0.00","-") }}
+                                    {% endif %}
                                 </td>
                             {% endfor %}
                         </tr>
@@ -324,7 +336,11 @@
                                 <td>{{ setup_step }}</td>
                                 {% for hw in hardware %}
                                     <td>
-                                        {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
+                                        {% if test_package not in setupTimeDetails[hw[0]] %}
+                                            Error
+                                        {% elif setupTimeDetails[hw[0]][test_package][setup_step] is not number %}
+                                            Error
+                                        {% elif setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
                                             ~0.0
                                         {% else %}
                                             {{ setupTimeDetails[hw[0]][test_package][setup_step] | replace("-0.0","-") }}
