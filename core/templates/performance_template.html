@@ -411,10 +411,10 @@
       maintainAspectRatio: false,
       legend: {position: 'right'},
       scales: {yAxes: [
-          {ticks: {beginAtZero: true}},
-          {scaleLabel: {display: true,
-            labelString: 'Time, sec'}}
-        ]}
+          {ticks: {beginAtZero: true,
+          callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]}
     }
 
     syncToolOptions = {
@@ -480,7 +480,11 @@
   renderOptions = {
     maintainAspectRatio: false,
     legend: {position: 'right'},
-    scales: {yAxes: [{ticks: {beginAtZero: true}}]}
+      scales: {yAxes: [
+          {ticks: {beginAtZero: true,
+          callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]}
   }
 
   renderToolOptions = {
