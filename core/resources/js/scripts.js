@@ -28,6 +28,7 @@ function timeFormatterFull(value, row, index, field) {
     if (isFinite(value)) {
         var time = new Date('July 20, 69 00:00:00');
         time.setSeconds(parseInt(value), (parseFloat(value) % 1) * 1000);
+        if (!isFinite(time.getSeconds())) {return value;}
         if (time.getHours() > 0){
             return time.getHours() + 'h ' + time.getMinutes() + 'm ' + time.getSeconds() + 's '
         } else {

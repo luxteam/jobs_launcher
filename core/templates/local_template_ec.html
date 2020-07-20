@@ -88,7 +88,7 @@
                 class="timeBetterStatus"
             {% endif -%}
             >
-            {{ item.difference_time | round (2) }}</td>
+            {{ item.difference_time | round (3) }}</td>
 
         {# Other info #}
         <td>{{ item.gpu_memory_usage }}</td>
@@ -100,14 +100,14 @@
                 class="timeBetterStatus"
             {% endif -%}
             >
-            {{ item.difference_vram | round(2) }}</td>
+            {{ item.difference_vram | round (3) }}</td>
         <td class="{{ item.test_status }}Status">{{ item.difference_color }}</td>
 
         <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
 
         {# Render time #}
-        <td>{{ item.render_time | round(2) }}</td>
-        <td>{{ item.baseline_render_time | round(2) }}</td>
+        <td>{{ item.render_time | round (3) }}</td>
+        <td>{{ item.baseline_render_time | round (3) }}</td>
 
         {# Log files #}
         <td>

@@ -74,7 +74,9 @@
                         <td>{{ test_package }}</td>
                         {% for hw in hardware %}
                             <td>
-                                {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                {% if performance_report_detail[test_package][hw[0]].render is not number %}
+                                    Error
+                                {% elif performance_report_detail[test_package][hw[0]].render == 0 %}
                                     Skipped
                                 {% else %}
                                     {{ performance_report_detail[test_package][hw[0]].render | round(3) | replace("-0.0","-") }}
@@ -120,7 +122,11 @@
                         <td>{{ test_package }}</td>
                         {% for hw in hardware %}
                             <td>
-                                {{ performance_report_detail[test_package][hw[0]].render | round(2) | replace("-0.0","-") }}
+                                {% if performance_report_detail[test_package][hw[0]].render is not number %}
+                                    Error
+                                {% else %}
+                                    {{ performance_report_detail[test_package][hw[0]].render | round (3) | replace("-0.0","-") }}
+                                {% endif %}
                             </td>
                         {% endfor %}
                     </tr>
@@ -205,7 +211,9 @@
                             <td>{{ test_package }}</td>
                             {% for hw in hardware %}
                                 <td>
-                                    {% if performance_report_detail[test_package][hw[0]].render == 0 %}
+                                    {% if performance_report_detail[test_package][hw[0]].sync is not number %}
+                                        Error
+                                    {% elif performance_report_detail[test_package][hw[0]].sync == 0 %}
                                         Skipped
                                     {% else %}
                                         {{ performance_report_detail[test_package][hw[0]].sync | round(3) | replace("-0.00","-") }}
@@ -251,7 +259,11 @@
                             <td>{{ test_package }}</td>
                             {% for hw in hardware %}
                                 <td>
-                                    {{ performance_report_detail[test_package][hw[0]].sync | round(2) | replace("-0.00","-") }}
+                                    {% if performance_report_detail[test_package][hw[0]].sync is not number %}
+                                        Error
+                                    {% else %}
+                                        {{ performance_report_detail[test_package][hw[0]].sync | round (3) | replace("-0.00","-") }}
+                                    {% endif %}
                                 </td>
                             {% endfor %}
                         </tr>
@@ -324,7 +336,11 @@
                                 <td>{{ setup_step }}</td>
                                 {% for hw in hardware %}
                                     <td>
-                                        {% if setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
+                                        {% if test_package not in setupTimeDetails[hw[0]] %}
+                                            Error
+                                        {% elif setupTimeDetails[hw[0]][test_package][setup_step] is not number %}
+                                            Error
+                                        {% elif setupTimeDetails[hw[0]][test_package][setup_step] == 0 %}
                                             ~0.0
                                         {% else %}
                                             {{ setupTimeDetails[hw[0]][test_package][setup_step] | replace("-0.0","-") }}
@@ -339,5 +355,191 @@
         {% endfor %}
     </div>
 {% endif %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script type="text/javascript">
+  var toolColors = ['#82438CFF', '#327A5BFF', '#F4B400FF', '#2D538FFF', '#DB4437FF', '#4285F4FF', '#E8E541FF', '#24C959FF', '#00ACC1FF', '#FF7043FF']
+
+  {% if synchronization_time %}
+
+    syncDataSet = [
+      {% for hw in hardware %}
+        {
+          label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+          backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+          data: [
+            {% for tool in test_info %}
+              {% if test_info[tool][hw[0]].sync > 0 %}
+                '{{test_info[tool][hw[0]].sync}}'
+              {% endif %}
+            {% endfor %}
+          ]
+        }{{ "," if not loop.last }}
+      {% endfor %}
+    ]
+
+    var syncData = {
+      labels: [' '],
+
+      datasets: syncDataSet
+    }
+
+    syncToolDataSet = [
+      {% for tool in test_info %}
+        {
+          label: '{{ tool }}',
+          backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+          data: [
+            {% for hw in hardware %}
+              '{{ test_info[tool][hw[0]].sync | round(3) }}'{{ "," if not loop.last }}
+            {% endfor %}
+          ]
+        }{{ "," if not loop.last }}
+      {% endfor %}
+    ]
+
+    syncToolData = {
+      labels: [
+          {% for hw in hardware %}
+            '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+          {% endfor %}
+        ],
+
+      datasets: syncToolDataSet
+    }
+
+    syncOptions = {
+      maintainAspectRatio: false,
+      legend: {position: 'right'},
+      scales: {yAxes: [
+          {ticks: {beginAtZero: true,
+          callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]}
+    }
+
+    syncToolOptions = {
+      maintainAspectRatio: false,
+      legend: {position: 'right'},
+      scales: {
+        xAxes: [{stacked: true}],
+        yAxes: [{stacked: true,
+                ticks: {beginAtZero: true,
+                callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]
+      }
+    }
+
+  {% endif %}
+
+  renderDataSet = [
+    {% for hw in hardware %}
+      {
+        label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+        backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+        data: [
+          {% for tool in test_info %}
+            {% if test_info[tool][hw[0]].render > 0 %}
+              '{{test_info[tool][hw[0]].render}}'
+            {% endif %}
+          {% endfor %}
+        ]
+      }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+
+  var renderData = {
+    labels: [' '],
+
+    datasets: renderDataSet
+  }
+
+  renderToolDataSet = [
+    {% for tool in test_info %}
+      {
+        label: '{{ tool }}',
+        backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+        data: [
+          {% for hw in hardware %}
+            '{{ test_info[tool][hw[0]].render | round(3) }}'{{ "," if not loop.last }}
+          {% endfor %}
+        ]
+      }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+
+  var renderToolData = {
+    labels: [
+        {% for hw in hardware %}
+          '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+        {% endfor %}
+      ],
+
+    datasets: renderToolDataSet
+  }
+
+  renderOptions = {
+    maintainAspectRatio: false,
+    legend: {position: 'right'},
+      scales: {yAxes: [
+          {ticks: {beginAtZero: true,
+          callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]}
+  }
+
+  renderToolOptions = {
+    maintainAspectRatio: false,
+    legend: {position: 'right'},
+    scales: {
+      xAxes: [{stacked: true}],
+      yAxes: [{stacked: true,
+                ticks: {beginAtZero: true,
+                callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]
+    }
+  }
+
+  function createChart(elementID, dataSet, toolOptions) {
+    var ctx = document.getElementById(elementID).getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: dataSet,
+        options: toolOptions
+    });
+    return chart;
+  }
+
+  window.onload = function () {
+    chartRender = createChart('chartRender', renderData, renderOptions);
+
+    $('#checkboxChartRender').change(function(){
+      if($(this).is(':checked')) {
+        chartRender.data = renderToolData;
+        chartRender.options = renderToolOptions;
+      } else {
+        chartRender.data = renderData;
+        chartRender.options = renderOptions;
+      }
+      chartRender.update();
+    })
+
+    {% if synchronization_time %}
+      chartSync = createChart('chartSync', syncData, syncOptions);
+
+      $('#checkboxChartSync').change(function(){
+        if($(this).is(':checked')) {
+        chartSync.data = syncToolData;
+        chartSync.options = syncToolOptions;
+        } else {
+        chartSync.data = syncData;
+        chartSync.options = syncOptions;
+        }
+        chartSync.update();
+      })
+    {% endif %}
+  }
+</script>
 
 {% endblock %}

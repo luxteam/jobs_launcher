@@ -56,8 +56,8 @@
         <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
 
         {# Render time #}
-        <td>{{ item.render_time | round(2) }}</td>
-        <td>{{ item.baseline_render_time | round(2) }}</td>
+        <td>{{ item.render_time | round (3) }}</td>
+        <td>{{ item.baseline_render_time | round (3) }}</td>
 
         <td
             {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
@@ -65,7 +65,7 @@
             {% else -%}
                 class="{{ config.TEST_SUCCESS_STATUS }}Status"
             {% endif -%}
-        >{{ item.difference_time | round (2) }}</td>
+        >{{ item.difference_time | round (3) }}</td>
 
         {# Baselines and results #}
         <td class="hatching">
