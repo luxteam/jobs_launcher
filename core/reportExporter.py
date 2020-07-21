@@ -427,7 +427,7 @@ def build_compare_report(summary_report):
 def build_local_reports(work_dir, summary_report, common_info, jinja_env):
     work_dir = os.path.abspath(work_dir)
 
-    template = jinja_env.get_template('local_template_{}.html'.format(report_type))
+    template = jinja_env.get_template('local_template.html')
     report_dir = ""
 
     try:
@@ -514,7 +514,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
     try:
         summary_template = env.get_template('summary_template.html')
-        detailed_summary_template = env.get_template('detailed_summary_template_{}.html'.format(report_type))
+        detailed_summary_template = env.get_template('detailed_summary_template.html')
 
         summary_report, common_info = build_summary_report(work_dir)
 
