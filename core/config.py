@@ -138,4 +138,4 @@ DONT_COMPARE = "Do not compare"
 
 POSSIBLE_BASELINE_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
 
-SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]
+SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Load rpr", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]
