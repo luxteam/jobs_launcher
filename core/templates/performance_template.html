@@ -301,6 +301,11 @@
         </table>
     </div>
 
+    <h2>setup time steps chart</h2>
+    <div style="position: relative; height:500px; width:1000px; margin:auto;">
+        <canvas id="chartSetup"></canvas>
+    </div>
+
     <h2 class="card-header collapsed" href="#setup_time" data-toggle="collapse">details</h2>
     <div id="setup_time" class="collapse">
         {% for test_package in performance_report_detail %}
@@ -369,7 +374,7 @@
           data: [
             {% for tool in test_info %}
               {% if test_info[tool][hw[0]].sync > 0 %}
-                '{{test_info[tool][hw[0]].sync}}'
+                '{{ test_info[tool][hw[0]].sync | round(3) }}'
               {% endif %}
             {% endfor %}
           ]
@@ -430,6 +435,36 @@
       }
     }
 
+    setupOptions = {
+    maintainAspectRatio: false,
+    legend: {position: 'right'},
+    scales: {yAxes: [
+        {ticks: {beginAtZero: true,
+        callback: function(value, index, values) {
+                                return value + " sec";
+                            }}}]}
+    }
+
+    setupDataSet = [
+      {% for step in setupTimeSum["steps"] %}
+        {
+          label: '{{ step }}',
+          backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
+          data: [
+            {% for hw in hardware %}
+              '{{ setupTimeSum[hw[0]][step] | round(3) }}'{{ "," if not loop.last }}
+            {% endfor %}
+          ]
+        }{{ "," if not loop.last }}
+      {% endfor %}
+    ]
+
+    var setupData = {
+    labels: [' '],
+
+    datasets: setupDataSet
+    }
+
   {% endif %}
 
   renderDataSet = [
@@ -440,7 +475,7 @@
         data: [
           {% for tool in test_info %}
             {% if test_info[tool][hw[0]].render > 0 %}
-              '{{test_info[tool][hw[0]].render}}'
+              '{{ test_info[tool][hw[0]].render  | round(3) }}'
             {% endif %}
           {% endfor %}
         ]
@@ -526,6 +561,7 @@
     })
 
     {% if synchronization_time %}
+      chartSetup = createChart('chartSetup', setupData, setupOptions);
       chartSync = createChart('chartSync', syncData, syncOptions);
 
       $('#checkboxChartSync').change(function(){
