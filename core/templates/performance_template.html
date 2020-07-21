@@ -469,6 +469,8 @@
     datasets: setupDataSet
     }
 
+    chartSetup = createChart('chartSetup', setupData, setupOptions);
+
   {% endif %}
 
   renderDataSet = [
@@ -565,7 +567,6 @@
     })
 
     {% if synchronization_time %}
-      chartSetup = createChart('chartSetup', setupData, setupOptions);
       chartSync = createChart('chartSync', syncData, syncOptions);
 
       $('#checkboxChartSync').change(function(){
