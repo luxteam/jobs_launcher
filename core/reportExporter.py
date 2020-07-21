@@ -614,10 +614,10 @@ def setup_time_report(work_dir):
     for confing in setup_details.keys():
         setup_sum[confing] = setup_steps_dict.copy()
         for group in setup_details[confing]:
-            for key in setup_sum_list:
+            for key in list(set().union(setup_sum_list, setup_details[confing][group].keys())):
                 setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
-                setup_sum[confing][key] += setup_details[confing][group][key]
-    setup_sum['steps'] = setup_sum_list
+                setup_sum[confing][key] = setup_sum[confing].get(key, -0.0) + setup_details[confing][group][key]
+    setup_sum['steps'] = list(set().union(setup_sum_list, setup_details[confing][group].keys()))
 
     return setup_sum, setup_details
 
