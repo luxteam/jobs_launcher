@@ -142,7 +142,7 @@
                 <tr>
                     <th>Tool</th>
                     {% for hw in hardware %}
-                    <th data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                     {% endfor %}
                 </tr>
             </thead>

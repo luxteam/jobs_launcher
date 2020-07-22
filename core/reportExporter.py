@@ -167,6 +167,7 @@ def build_session_report(report, session_dir):
                         else:
                             report['machine_info'].update({'minor_version': jtem['minor_version']})
                         report['machine_info'].update({'core_version': jtem['core_version']})
+                        report['machine_info'].update({'render_engine': jtem['render_engine']})
                     except Exception as err:
                         print("Exception while updating machine_info in session_report")
                         main_logger.warning(str(err))
