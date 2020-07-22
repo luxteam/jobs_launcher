@@ -252,7 +252,7 @@ def build_summary_report(work_dir):
                                             common_info[key].append(temp_report['machine_info'][key])
                                 else:
                                     common_info.update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
-                                    
+
                                     if report_type != 'ec':
                                         common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
                                     else:
@@ -284,7 +284,7 @@ def build_summary_report(work_dir):
     for key in common_info:
         common_info[key] = ' '.join(common_info[key])
 
-    if os.path.exists(os.path.join(work_dir, LOST_TESTS_JSON_NAME)): 
+    if os.path.exists(os.path.join(work_dir, LOST_TESTS_JSON_NAME)):
         with open(os.path.join(work_dir, LOST_TESTS_JSON_NAME), "r") as file:
             lost_tests_count = json.load(file)
         for lost_test_result in lost_tests_count:
@@ -319,6 +319,66 @@ def build_summary_report(work_dir):
             summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
 
     return summary_report, common_info
+
+
+def build_performance_report_engine(summary_report):
+    performance_report = AutoDict()
+    performance_report_detail = AutoDict()
+    hardware = {}
+    render_info = []
+
+    for key in summary_report:
+        platform = summary_report[key]
+        group = next(iter(platform['results']))
+        conf = list(platform['results'][group].keys())[0]
+
+        if platform['results'][group][conf]['machine_info'] == "":
+            # if machine info is empty it's blank data for lost test cases
+            continue
+
+        hw = platform['results'][group][conf]['machine_info']['render_device'] + ' ' + platform['results'][group][conf]['machine_info']['os'].split(' ')[0]
+        render_info.append([platform['results'][group][conf]['machine_info']['tool'],
+                            hw,
+                            platform['summary']['render_duration'],
+                            platform['summary'].get('synchronization_duration', -0.0),
+                            platform['results'][group][conf]['machine_info']['render_engine']])
+
+        if hw not in hardware:
+            hardware[hw] = platform['summary']['render_duration']
+
+        temp_report = platform['results'][group][conf]
+        tool = temp_report['machine_info']['tool']
+        render_engine = platform['results'][group][conf]['machine_info']['render_engine']
+
+        results = platform.pop('results', None)
+        info = temp_report
+        for test_package in results:
+            for test_config in results[test_package]:
+                results[test_package][test_config].pop('render_results', None)
+
+        performance_report[render_engine].update({hw: info})
+
+        for test_package in results:
+            for test_config in results[test_package]:
+                test_info = {'render': results[test_package][test_config]['render_duration'],
+                             'sync': results[test_package][test_config].get('synchronization_duration', -0.0),
+                             'total': results[test_package][test_config]['duration'],
+                             'render_engine': render_engine}
+
+                performance_report_detail[test_package].update({hw: test_info})
+
+    tools = set([render_engine for tool, device, render, sync, render_engine in render_info])
+    # tools = {render_engine}
+    devices = set([device for tool, device, render, sync, render_engine in render_info])
+
+    summary_info_for_report = {tool_item: {device: {} for device in devices} for tool_item in tools}
+
+    for tool, device, render, sync, render_engine in render_info:
+        summary_info_for_report[render_engine][device]['render'] = render
+        summary_info_for_report[render_engine][device]['sync'] = sync
+
+    hardware = sorted(hardware.items(), key=operator.itemgetter(1))
+    return performance_report, hardware, performance_report_detail, summary_info_for_report
 
 
 def build_performance_report(summary_report):
@@ -446,8 +506,8 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
                     else:
-                    	# test case was lost
-                    	continue
+                        # test case was lost
+                        continue
 
                     # for core baseline_render_time initialize via compareByJson script
                     if report_type != 'ec':
@@ -543,7 +603,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
-        main_logger.error(summary_html) #FIXME: referenced before assignment
+        main_logger.error(summary_html)
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
 
@@ -551,14 +611,37 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     try:
         setup_time_count(work_dir)
         copy_summary_report = copy.deepcopy(summary_report)
+
         performance_template = env.get_template('performance_template.html')
 
-        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
+        if os.getenv("JL_ENGINES_COMPARE", False):
+            performance_template = env.get_template('performance_template_engine.html')
+
+            for path, dirs, files in os.walk(os.path.abspath(work_dir)):
+                for file in files:
+                    # build summary report
+                    if file.endswith('session_report_ENGINE.json'):
+                        with open(os.path.join(path, file), 'r') as engine_report_file:
+                            temp_report = json.loads(engine_report_file.read())
+
+                            basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                            for test_package in temp_report['results']:
+                                for test_conf in temp_report['results'][test_package]:
+                                    temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
+                            if basename in copy_summary_report.keys():
+                                copy_summary_report[basename + temp_report['machine_info']['render_engine']] = {}
+                                copy_summary_report[basename + temp_report['machine_info']['render_engine']].update({'results': temp_report['results']})
+                                copy_summary_report[basename + temp_report['machine_info']['render_engine']].update({'summary': temp_report['summary']})
+
+            performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report_engine(copy_summary_report)
+        else:
+            performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
 
         setup_sum, setup_details = setup_time_report(work_dir)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
+        save_json_report(summary_info_for_report, work_dir, 'summary_info_for_report.json')
         performance_html = performance_template.render(title=major_title + " Performance",
                                                        performance_report=performance_report,
                                                        hardware=hardware,

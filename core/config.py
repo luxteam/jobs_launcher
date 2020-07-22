@@ -22,7 +22,8 @@ RENDER_REPORT_BASE = {
     "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_color_2": -0
+    "difference_color_2": -0,
+    "render_engine": ""
 }
 
 RENDER_REPORT_DEFAULT_PACK = {
