@@ -442,11 +442,14 @@
     setupOptions = {
     maintainAspectRatio: false,
     legend: {position: 'right'},
-    scales: {yAxes: [
-        {ticks: {beginAtZero: true,
-        callback: function(value, index, values) {
+    scales: {
+        xAxes: [{stacked: true}],
+        yAxes: [{stacked: true,
+                ticks: {beginAtZero: true,
+                callback: function(value, index, values) {
                                 return value + " sec";
-                            }}}]}
+                            }}}]
+      }
     }
 
     setupDataSet = [
@@ -464,7 +467,11 @@
     ]
 
     var setupData = {
-    labels: [' '],
+    labels: [
+        {% for hw in hardware %}
+          '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+        {% endfor %}
+      ],
 
     datasets: setupDataSet
     }
