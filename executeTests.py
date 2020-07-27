@@ -58,7 +58,13 @@ def main():
                 login=os.getenv("UMS_LOGIN"),
                 password=os.getenv("UMS_PASSWORD")
             )
-            main_logger.info("UMS Client created")
+            main_logger.info("UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
+                     url=ums_client.url,
+                     build_id=ums_client.build_id,
+                     label=ums_client.env_label,
+                     job_id=ums_client.job_id
+                 )
+            )
         except Exception as e:
             main_logger.error("UMS Client creation error: {}".format(e))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
@@ -205,7 +211,7 @@ def main():
             is_client = ISClient(url=os.getenv("IS_URL"),
                                  login=os.getenv("IS_LOGIN"),
                                  password=os.getenv("IS_PASSWORD"))
-            main_logger.info("Image Service client created")
+            main_logger.info("Image Service client created with url {}".format(is_client.url))
         except Exception as e:
             main_logger.error("Image Service client creation error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
@@ -240,7 +246,7 @@ def main():
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
                 env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
-                main_logger.info("Generated results: {}".format(res))
+                main_logger.info("Generated results:\n{}".format(json.dumps(res, indent=2)))
                 main_logger.info("Environment: {}".format(env))
 
                 response = ums_client.send_test_suite(res=res, env=env)
