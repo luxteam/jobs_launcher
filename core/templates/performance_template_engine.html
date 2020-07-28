@@ -365,7 +365,7 @@
           data: [
             {% for tool in test_info %}
               {% if test_info[tool][hw[0]].sync > 0 %}
-                '{{test_info[tool][hw[0]].sync}}'
+                '{{test_info[tool][hw[0]].sync}}'{{ "," if not loop.last }}
               {% endif %}
             {% endfor %}
           ]
@@ -437,6 +437,7 @@
           {% for tool in test_info %}
             {% if test_info[tool][hw[0]].render > 0 %}
               '{{test_info[tool][hw[0]].render}}'
+              {{ "," if not loop.last }}
             {% endif %}
           {% endfor %}
         ]

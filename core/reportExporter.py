@@ -643,6 +643,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
         save_json_report(summary_info_for_report, work_dir, 'summary_info_for_report.json')
+        save_json_report(hardware, work_dir, 'hardware.json')
         performance_html = performance_template.render(title=major_title + " Performance",
                                                        performance_report=performance_report,
                                                        hardware=hardware,
