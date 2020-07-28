@@ -140,7 +140,7 @@
         <table class="baseTable" data-toggle="table">
             <thead>
                 <tr>
-                    <th>Tool</th>
+                    <th>Engine</th>
                     {% for hw in hardware %}
                     <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                     {% endfor %}
@@ -358,12 +358,12 @@
   {% if synchronization_time %}
 
     syncDataSet = [
-      {% for hw in hardware %}
+      {% for tool in test_info %}
         {
-          label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+          label: '{{ tool }}',
           backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
           data: [
-            {% for tool in test_info %}
+            {% for hw in hardware %}
               {% if test_info[tool][hw[0]].sync > 0 %}
                 '{{test_info[tool][hw[0]].sync}}'{{ "," if not loop.last }}
               {% endif %}
@@ -374,8 +374,11 @@
     ]
 
     var syncData = {
-      labels: [' '],
-
+      labels: [
+          {% for hw in hardware %}
+            '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+          {% endfor %}
+        ],
       datasets: syncDataSet
     }
 
@@ -429,12 +432,12 @@
   {% endif %}
 
   renderDataSet = [
-    {% for hw in hardware %}
+    {% for tool in test_info %}
       {
-        label: '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}',
+        label: '{{ tool }}',
         backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
         data: [
-          {% for tool in test_info %}
+          {% for hw in hardware %}
             {% if test_info[tool][hw[0]].render > 0 %}
               '{{test_info[tool][hw[0]].render}}'
               {{ "," if not loop.last }}
@@ -446,7 +449,11 @@
   ]
 
   var renderData = {
-    labels: [' '],
+    labels: [
+        {% for hw in hardware %}
+          '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+        {% endfor %}
+      ],
 
     datasets: renderDataSet
   }

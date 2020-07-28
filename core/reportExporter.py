@@ -366,7 +366,7 @@ def build_performance_report_engine(summary_report):
                              'total': results[test_package][test_config]['duration'],
                              'render_engine': render_engine}
 
-                performance_report_detail[test_package].update({hw: test_info})
+                performance_report_detail[test_package + " " + render_engine].update({hw: test_info})
 
     tools = set([render_engine for tool, device, render, sync, render_engine in render_info])
     # tools = {render_engine}
