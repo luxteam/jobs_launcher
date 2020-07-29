@@ -621,7 +621,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             for path, dirs, files in os.walk(os.path.abspath(work_dir)):
                 for file in files:
                     # build summary report
-                    if file.endswith('session_report_ENGINE.json'):
+                    if file.endswith(jobs/../jobs_launcher/common/scripts/ImageComparator/compareByJSON.py'session_report_ENGINE.json'):
                         with open(os.path.join(path, file), 'r') as engine_report_file:
                             temp_report = json.loads(engine_report_file.read())
 

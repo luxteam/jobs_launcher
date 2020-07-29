@@ -36,7 +36,10 @@ if __name__ == '__main__':
     if report_type == 'default':
         import common.scripts.ImageComparator.compareByJSON_default as compareByJSON
     elif report_type == 'ct':
-        import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON
+        if os.getenv('JL_ENGINES_COMPARE', False):
+            import common.scripts.ImageComparator.compareByJSON_ct_engineComp as compareByJSON
+        else:
+            import common.scripts.ImageComparator.compareByJSON_ct as compareByJSON
     elif report_type == 'ec':
         import common.scripts.ImageComparator.compareByJSON_ec as compareByJSON
     compareByJSON.main(args)

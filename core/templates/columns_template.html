@@ -51,7 +51,11 @@
             {%- if report_type == 'default' or report_type == 'ec' -%}
                 Baseline Color
             {%- elif report_type == 'ct' -%}
-                RPR Baseline
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    NorthStar Baseline
+                {%- else -%}
+                    RPR Baseline
+                {%- endif -%}
             {%- endif -%}
         </th>
     {%- else -%}
