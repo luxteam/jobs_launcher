@@ -28,7 +28,7 @@
 {#- ------------------------------ ORIGINAL IMAGE ------------------------------ -#}
 {%- if column.name == 'original_img' -%}
     {%- if is_head -%}
-        <th data-field="original_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }}</th>
+        <th data-field="original_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">{{ original_render | title }} Baseline</th>
     {%- else -%}
         <td class="hatching">
         {%- if item.original_color_path -%}
@@ -90,7 +90,11 @@
             {%- if report_type == 'default' or report_type == 'ec' -%}
                 Rendered color
             {%- elif report_type == 'ct' -%}
-                RPR
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    NorthStar
+                {%- else -%}
+                    RPR
+                {%- endif -%}
             {%- endif -%}
         </th>
     {%- else -%}
@@ -245,7 +249,11 @@
             {%- if report_type == 'default' or report_type == 'ec' -%}
                 Render time
             {%- elif report_type == 'ct' -%}
-                RPR render time
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    NorthStar render time
+                {%- else -%}
+                    RPR render time
+                {%- endif -%}
             {%- endif -%}
         </th>
     {%- else -%}
@@ -260,8 +268,11 @@
 {#- ------------------------------ BASELINE RENDER TIME ------------------------------ -#}
 {%- if column.name == 'baseline_render_time' -%}
     {%- if is_head -%}
-        <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">Baseline render time
-        </th>
+        {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+            <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">NorthStar render time</th>
+        {%- else -%}
+            <th data-field="baseline_render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">Baseline render time</th>
+        {%- endif -%}
     {%- else -%}
         {%- if report_type == 'default' or report_type == 'ec' -%}
             <td>{{ item.baseline_render_time | round(3) }}</td>
@@ -363,14 +374,22 @@
             </td>
         {%- elif report_type == 'ct' -%}
             <td>
-                <a href="{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    {%- if template_name == 'local' -%}
+                        <a href="{{ config.REPORT_RPR_LOG }}">Render log</a>
+                    {%- elif template_name == 'detailed' -%}
+                        <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">Render log</a>
+                    {%- endif -%}
+                {%- else -%}
+                    <a href="{{ item.original_render_log }}">{{ original_render | title }} log</a><br/>
 
-                {%- if template_name == 'local' -%}
-                    <a href="{{ item.scene_name }}.{{ config.REPORT_CONVERSION_LOG }}">Conversion log</a><br/>
-                    <a href="{{ config.REPORT_RPR_LOG }}">RPR log</a>
-                {%- elif template_name == 'detailed' -%}
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.{{ config.REPORT_CONVERSION_LOG }}">Conversion log</a><br/>
-                    <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">RPR Log</a>
+                    {%- if template_name == 'local' -%}
+                        <a href="{{ item.scene_name }}.{{ config.REPORT_CONVERSION_LOG }}">Conversion log</a><br/>
+                        <a href="{{ config.REPORT_RPR_LOG }}">RPR log</a>
+                    {%- elif template_name == 'detailed' -%}
+                        <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.scene_name }}.{{ config.REPORT_CONVERSION_LOG }}">Conversion log</a><br/>
+                        <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">RPR Log</a>
+                    {%- endif -%}
                 {%- endif -%}
 
             </td>

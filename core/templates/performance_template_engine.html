@@ -154,11 +154,7 @@
                         {% if test_info[tool][hw[0]].sync == -0.0 %}
                             <td>-</td>
                         {% else %}
-                            <td
-                                {% if test_info[tool]['actual'] is not defined %}
-                                    class=skippedStatus
-                                {% endif %}
-                            >{{ test_info[tool][hw[0]].sync | round(3)}}</td>
+                            <td>{{ test_info[tool][hw[0]].sync | round(3)}}</td>
                         {% endif %}
                     {% endfor %}
                 </tr>
