@@ -24,7 +24,8 @@ RENDER_REPORT_BASE = {
     "render_device": "",
     "difference_color_2": -0,
     "timeout": -0,
-    "message": []
+    "message": [],
+    "terminated": False
 }
 
 RENDER_REPORT_DEFAULT_PACK = {

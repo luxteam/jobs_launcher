@@ -54,7 +54,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
                 if os.path.exists(os.path.join(work_dir, "Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)):
                     img['render_color_path'] = os.path.join("Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)
                     break
-            img['message'].append('Rendered image not found')
+            if img['terminated']:
+                img['message'].append('Rendered image not found')
+            else:
+                img['message'].append('Jobs launcher timeout exceeded')
             img['test_status'] = core.config.TEST_CRASH_STATUS
             return img
 
