@@ -246,6 +246,9 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
         for part in host_name_parts:
             processed_host_name_parts.append(part.capitalize())
         host_name = '-'.join(processed_host_name_parts)
+
+        # Windows -> WIN10
+        host_name = host_name.replace('Windows', 'WIN10')
     else:
         host_name = 'Unknown'
 
