@@ -32,8 +32,8 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
             img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
+            img['message'].append('Baseline not found')
             if img['test_status'] != core.config.TEST_CRASH_STATUS:
-                img['message'].append('Baseline not found')
                 img.update({'test_status': core.config.TEST_DIFF_STATUS})
             return img
 
@@ -93,8 +93,8 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
         for threshold in time_diff_max:
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
                 img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
-                img['message'].append('Unacceptable time difference')
                 if img.get('test_status') == core.config.TEST_SUCCESS_STATUS:
+                    img['message'].append('Unacceptable time difference')
                     img.update({'test_status': core.config.TEST_DIFF_STATUS})
 
         img.update({'difference_time': time_diff})

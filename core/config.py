@@ -23,6 +23,7 @@ RENDER_REPORT_BASE = {
     "core_version": "",
     "render_device": "",
     "difference_color_2": -0,
+    "timeout": -0,
     "message": []
 }
 
