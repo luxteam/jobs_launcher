@@ -200,7 +200,7 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count):
+def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info):
     summary_report[gpu_os_case]['results'][lost_test_package] = {}
     # add empty conf
     summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
@@ -216,7 +216,21 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
     summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
 
+    host_name = 'Unknown'
+    for retry_info in node_retry_info:
+        if retry_info['gpuName'] in gpu_os_case and retry_info['osName'] in gpu_os_case:
+            if str(node).upper() in tester:
+                for group in retry['Tries']:
+                    if lost_test_package in group.keys():
+                        host_name = group[lost_test_package][-1]['host']
+                    else:
+                        for key in group.keys():
+                            if key.endswith('.json'):
+                                host_name = group[key][-1]['host']
+
+
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['host'] = host_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
 
@@ -224,7 +238,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['summary']['total'] += lost_tests_count
 
 
-def build_summary_report(work_dir):
+def build_summary_report(work_dir, node_retry_info):
     summary_report = {}
     common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
@@ -294,7 +308,7 @@ def build_summary_report(work_dir):
             for gpu_os_case in summary_report:
                 if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                     for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
+                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
                     test_case_found = True
                     break
             # if all data for GPU + OS was lost (it can be regression.json execution)
@@ -311,7 +325,7 @@ def build_summary_report(work_dir):
                 summary_report[gpu_os_case]['summary']['skipped'] = 0
                 summary_report[gpu_os_case]['summary']['total'] = 0
                 for lost_test_package in lost_tests_count[lost_test_result]:
-                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
+                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
 
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
@@ -446,8 +460,8 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
                     else:
-                    	# test case was lost
-                    	continue
+                        # test case was lost
+                        continue
 
                     # for core baseline_render_time initialize via compareByJson script
                     if report_type != 'ec':
@@ -516,7 +530,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template.html')
 
-        summary_report, common_info = build_summary_report(work_dir)
+        summary_report, common_info = build_summary_report(work_dir, node_retry_info)
 
         add_retry_info(summary_report, node_retry_info)
 

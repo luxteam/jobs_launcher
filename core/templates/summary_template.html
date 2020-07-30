@@ -166,7 +166,7 @@
                     {% if report[i].results[test_package][test_conf].machine_info %}
                     {{ report[i].results[test_package][test_conf].machine_info.host }}
                     {% else %}
-                    Unknown
+                    {{ report[i].results[test_package][test_conf].recovered_info.host }}
                     {% endif %}
                     </button>
                     <div class="popup" id="machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}">
