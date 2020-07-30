@@ -183,7 +183,7 @@
             Group timeout:</b> {{ item.timeout }}<br/>
             {%- if config.TIME_DIFF_MAX < item.difference_time -%}
                 <b>&times; Difference render time:</b> {{ item.difference_time | round(3) }} %
-            {%- elif item.difference_time < -config.TIME_DIFF_MAX -%}
+            {%- elif item.difference_time < -config.TIME_DIFF_MAX and item.render_time > 0 -%}
                 <span style="color: green"><b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %</span>
             {%- else -%}
                 <b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %
