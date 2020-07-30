@@ -14,6 +14,7 @@ from core.auto_dict import AutoDict
 import copy
 import sys
 import traceback
+from core.countLostTests import PLATFORM_CONVERTATIONS
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 try:
@@ -218,15 +219,16 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
 
     host_name = 'Unknown'
     for retry_info in node_retry_info:
-        if retry_info['gpuName'] in gpu_os_case and retry_info['osName'] in gpu_os_case:
-            if str(node).upper() in tester:
-                for group in retry['Tries']:
-                    if lost_test_package in group.keys():
-                        host_name = group[lost_test_package][-1]['host']
-                    else:
-                        for key in group.keys():
-                            if key.endswith('.json'):
-                                host_name = group[key][-1]['host']
+        retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
+        retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
+        if retry_gpu_name in gpu_os_case and retry_os_name in gpu_os_case:
+            for group in retry_info['Tries']:
+                if lost_test_package in group.keys():
+                    host_name = group[lost_test_package][-1]['host']
+                else:
+                    for key in group.keys():
+                        if key.endswith('.json'):
+                            host_name = group[key][-1]['host']
 
 
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
@@ -690,7 +692,10 @@ def add_retry_info(summary_report, retry_info):
     try:
         for config in summary_report:
             for test_package in summary_report[config]['results']:
-                node = summary_report[config]['results'][test_package]['']['machine_info']['host']
+                if summary_report[config]['results'][test_package]['']['machine_info']:
+                    node = summary_report[config]['results'][test_package]['']['machine_info']['host']
+                else:
+                    node = summary_report[config]['results'][test_package]['']['recovered_info']['host']
                 for retry in retry_info:
                     for tester in retry['Testers']:
                         if str(node).upper() in tester:
@@ -709,7 +714,7 @@ def add_retry_info(summary_report, retry_info):
                                         for retry in groupOrJson:
                                             retries_list.append(retry)
 
-                                    summary_report[config]['results'][test_package]['']['machine_info']['retries'] = retries_list
+                                    summary_report[config]['results'][test_package]['']['retries'] = retries_list
     except Exception as e:
         main_logger.error(
             'Error "{}" while adding retry info'.format(str(e)))
