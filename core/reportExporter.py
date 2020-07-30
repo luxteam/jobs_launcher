@@ -217,7 +217,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
     summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
 
-    host_name = 'Unknown'
+    host_name = ''
     for retry_info in node_retry_info:
         retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
         retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
@@ -232,6 +232,23 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
 
 
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
+
+    if host_name:
+        # replace tester prefix
+        host_name = host_name.replace('PC-TESTER-', '')
+        # replace OSX postfix
+        host_name = host_name.replace('-OSX', '')
+        # Ubuntu1804 -> Ubuntu18
+        host_name = host_name.replace('1804', '18')
+        # capitalize only first letter of each word of host name
+        host_name_parts = host_name.split('-')
+        processed_host_name_parts = []
+        for part in host_name_parts:
+            processed_host_name_parts.append(part.capitalize())
+        host_name = '-'.join(processed_host_name_parts)
+    else:
+        host_name = 'Unknown'
+
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['host'] = host_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
