@@ -33,6 +33,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
             img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
             if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                img['message'].append('Baseline not found')
                 img.update({'test_status': core.config.TEST_DIFF_STATUS})
             return img
 
@@ -53,6 +54,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
                 if os.path.exists(os.path.join(work_dir, "Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)):
                     img['render_color_path'] = os.path.join("Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)
                     break
+            img['message'].append('Rendered image not found')
             img['test_status'] = core.config.TEST_CRASH_STATUS
             return img
 
@@ -70,6 +72,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             img.update({'difference_color_2': pix_difference_2})
             # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
             if pix_difference_2 != 0:
+                img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
 
     return img
@@ -90,6 +93,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
         for threshold in time_diff_max:
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
                 img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
+                img['message'].append('Unacceptable time difference')
                 if img.get('test_status') == core.config.TEST_SUCCESS_STATUS:
                     img.update({'test_status': core.config.TEST_DIFF_STATUS})
 
@@ -142,6 +146,7 @@ def main(args):
     if not os.path.exists(baseline_json_manifest_path):
         core.config.main_logger.warning("Baseline manifest not found by path: {}".format(args.base_dir))
         for img in render_json:
+            img['message'].append('Baseline manifest not found')
             img.update({'test_status': core.config.TEST_DIFF_STATUS})
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
