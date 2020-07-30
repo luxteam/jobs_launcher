@@ -518,7 +518,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         summary_report, common_info = build_summary_report(work_dir)
 
-        add_retry_info(summary_report, node_retry_info)
+        add_retry_info(summary_report, node_retry_info, work_dir)
 
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
@@ -529,7 +529,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               node_retry_info=node_retry_info,
                                                synchronization_time=sync_time(summary_report))
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
@@ -673,7 +672,7 @@ def setup_time_count(work_dir):
         f.write(json.dumps(performance_list, indent=4))
 
 
-def add_retry_info(summary_report, retry_info):
+def add_retry_info(summary_report, retry_info, work_dir):
     try:
         for config in summary_report:
             for test_package in summary_report[config]['results']:
@@ -695,6 +694,10 @@ def add_retry_info(summary_report, retry_info):
                                                     test_package, [])
                                         for retry in groupOrJson:
                                             retries_list.append(retry)
+
+                                    for retry in retries_list:
+                                        if not os.path.exists(os.path.join(work_dir, retry['link'])):
+                                            retry['link'] = ''
 
                                     summary_report[config]['results'][test_package]['']['machine_info']['retries'] = retries_list
     except Exception as e:
