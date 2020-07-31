@@ -173,7 +173,11 @@
             {%- else -%}
                 &check; 
             {%- endif %}
-            Pixel difference new:</b> {{ item.difference_color_2 }}<br/>
+            Pixel difference new:
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+[0] - equals images.
+[-1] - images has diff resolution, so couldn't be compared."></span>
+            </b> {{ item.difference_color_2 }}<br/>
             <b>
             {%- if item.terminated -%}
                 &check; 
@@ -187,10 +191,7 @@
                 <span style="color: green"><b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %</span>
             {%- else -%}
                 <b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %
-            {%- endif %}
-            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
-[0] - equals images.
-[-1] - images has diff resolution, so couldn't be compared."></span><br/>
+            {%- endif %}<br/>
             {%- if item.message -%}
                 <b>Message:</b> {{ item.message | join('. ') }}<br/>
             {%- endif -%}

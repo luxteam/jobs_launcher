@@ -235,7 +235,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
 
     if host_name:
         # replace tester prefix
-        host_name = host_name.replace('PC-TESTER-', '')
+        host_name = host_name.replace('PC-TESTER-', '').replace('PC-RENDERER-', '')
         # replace OSX postfix
         host_name = host_name.replace('-OSX', '')
         # Ubuntu1804 -> Ubuntu18
