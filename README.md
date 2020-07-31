@@ -20,3 +20,12 @@ report_type = 'default'
 - [:octocat: Pixelmatch](https://github.com/mapbox/pixelmatch)
 
 
+## What to test when upgrading a version
+
+- [Blender](https://github.com/luxteam/jobs_test_blender) : Regression group and any few test groups   
+- [Maya](https://github.com/luxteam/jobs_test_maya) : Regression group and any few test groups   
+- [Max](https://github.com/luxteam/jobs_test_max) : Regression group and any few test groups   
+- [RPRViewer](https://github.com/luxteam/jobs_test_rprviewer) : Scene_tests test group   
+- [Core](https://github.com/luxteam/jobs_test_core) : Full 
+- Conversion tools : Any conversion tool job with any few test groups   
+- Northstar jobs : Fill in later
