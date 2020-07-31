@@ -293,7 +293,7 @@
                 <tr>
                     <td>{{ setup_step }}</td>
                     {% for hw in hardware %}
-                        <td>{{ setupTimeSum[hw[0]][setup_step] | round(3) | replace("-0.00","-") }}</td>
+                        <td>{{ setupTimeSum[hw[0]][setup_step] | replace("-0.00","-") }}</td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
@@ -459,7 +459,7 @@
           backgroundColor: toolColors[{{ loop.index }} % toolColors.length],
           data: [
             {% for hw in hardware %}
-              '{{ setupTimeSum[hw[0]][step] | round(3) }}'{{ "," if not loop.last }}
+              '{{ setupTimeSum[hw[0]][step] }}'{{ "," if not loop.last }}
             {% endfor %}
           ]
         }{{ "," if not loop.last }}

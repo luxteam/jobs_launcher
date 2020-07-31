@@ -150,7 +150,15 @@
                                     </thead>
                                     <tbody>
                                         {% for retry in report[i].results[test_package][''].retries %}
-                                            <tr><td>{{loop.index}}</td><td>{{retry['time']}}</td><td>{{retry['host']}}</td><td><a href="{{retry['link']}}">Crash logs</a></td></tr>
+                                            <tr><td>{{loop.index}}</td><td>{{retry['time']}}</td><td>{{retry['host']}}</td>
+                                                <td>
+                                                    {% if retry['link'] != '' %}
+                                                    <a href="{{retry['link']}}">Crash logs</a>
+                                                    {% else %}
+                                                    -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>

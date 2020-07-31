@@ -554,7 +554,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         summary_report, common_info = build_summary_report(work_dir, node_retry_info)
 
-        add_retry_info(summary_report, node_retry_info)
+        add_retry_info(summary_report, node_retry_info, work_dir)
 
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
@@ -565,7 +565,6 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               node_retry_info=node_retry_info,
                                                synchronization_time=sync_time(summary_report))
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
@@ -647,13 +646,14 @@ def setup_time_report(work_dir):
         main_logger.error("Can't open setup_time.json")
         return (None, None)
 
-    for confing in setup_details.keys():
-        setup_sum[confing] = setup_steps_dict.copy()
-        for group in setup_details[confing]:
-            for key in list(set().union(setup_sum_list, setup_details[confing][group].keys())):
-                setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
-                setup_sum[confing][key] = setup_sum[confing].get(key, -0.0) + setup_details[confing][group][key]
-    setup_sum['steps'] = list(set().union(setup_sum_list, setup_details[confing][group].keys()))
+    if setup_details.keys():
+        for confing in setup_details.keys():
+            setup_sum[confing] = setup_steps_dict.copy()
+            for group in setup_details[confing]:
+                for key in list(set().union(setup_sum_list, setup_details[confing][group].keys())):
+                    setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
+                    setup_sum[confing][key] = round(setup_sum[confing].get(key, -0.0) + setup_details[confing][group][key], 3)
+        setup_sum['steps'] = list(set().union(setup_sum_list, setup_details[confing][group].keys()))
 
     return setup_sum, setup_details
 
@@ -708,7 +708,7 @@ def setup_time_count(work_dir):
         f.write(json.dumps(performance_list, indent=4))
 
 
-def add_retry_info(summary_report, retry_info):
+def add_retry_info(summary_report, retry_info, work_dir):
     try:
         for config in summary_report:
             for test_package in summary_report[config]['results']:
@@ -733,6 +733,10 @@ def add_retry_info(summary_report, retry_info):
                                                     test_package, [])
                                         for retry in groupOrJson:
                                             retries_list.append(retry)
+
+                                    for retry in retries_list:
+                                        if not os.path.exists(os.path.join(work_dir, retry['link'])):
+                                            retry['link'] = ''
 
                                     summary_report[config]['results'][test_package]['']['retries'] = retries_list
     except Exception as e:
