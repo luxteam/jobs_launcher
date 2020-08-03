@@ -179,12 +179,20 @@
 [-1] - images has diff resolution, so couldn't be compared."></span>
             </b> {{ item.difference_color_2 }}<br/>
             <b>
-            {%- if item.terminated -%}
+            {%- if item.testcase_timeout != 0 -%}
+                {%- if not item.testcase_timeout_exceeded -%}
+                    &check;
+                {%- else -%}
+                    &times;
+                {- endif -}
+                Testcase timeout:</b> {{ item.testcase_timeout }}<br/>
+            {- endif -}
+            {%- if not item.group_timeout_exceeded -%}
                 &check; 
             {%- else -%}
                 &times; 
             {%- endif %}
-            Group timeout:</b> {{ item.timeout }}<br/>
+            Test group timeout:</b> {{ item.group_timeout }}<br/>
             {%- if config.TIME_DIFF_MAX < item.difference_time -%}
                 <b>&times; Difference render time:</b> {{ item.difference_time | round(3) }} %
             {%- elif item.difference_time < -config.TIME_DIFF_MAX and item.render_time > 0 -%}

@@ -45,8 +45,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
-            if not img['terminated']:
-                img['message'].append('Jobs launcher timeout exceeded')
+            if img['testcase_timeout_exceeded']:
+                img['message'].append('Testcase timeout exceeded')
+            elif img['group_timeout_exceeded']:
+                img['message'].append('Test group timeout exceeded')
             return img
 
         render_img_path = os.path.join(work_dir, img['render_color_path'])

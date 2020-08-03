@@ -25,9 +25,11 @@ RENDER_REPORT_BASE = {
     "core_version": "",
     "render_device": "",
     "difference_color_2": -0,
-    "timeout": TIMEOUT,
+    "testcase_timeout": 0,
+    "group_timeout": TIMEOUT,
     "message": [],
-    "terminated": False
+    "testcase_timeout_exceeded": False,
+    "group_timeout_exceeded": True
 }
 
 RENDER_REPORT_DEFAULT_PACK = {
