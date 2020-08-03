@@ -166,18 +166,40 @@
     {%- if is_head -%}
         <th data-field="test_status_new" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case status</th>
     {%- else -%}
+        {%- report_type == 'default' -%}
+            {%- if config.TIME_DIFF_MAX < item.difference_time -%}
+                {% set time_diff_status = 'worse' %}
+            {%- elif item.difference_time < -config.TIME_DIFF_MAX and item.render_time > 0 -%}
+                {% set time_diff_status = 'better' %}
+            {%- else -%}
+                {% set time_diff_status = 'normal' %}
+            {%- endif %}
+        {%- else -%}
+            {%- if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
+                {% set time_diff_status = 'worse' %}
+            {%- else -%}
+                {% set time_diff_status = 'better' %}
+            {%- endif %}
+        {%- endif -%}
+
         <td class="infoColumn {{ item.test_status }}Status">
             <b>
-            {%- if item.difference_color_2 != 0 -%}
-                &times; 
-            {%- else -%}
-                &check; 
-            {%- endif %}
-            Pixel difference new
-            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+            {%- if report_type == 'default' -%}
+                {%- if item.difference_color_2 != 0 -%}
+                    &times; 
+                {%- else -%}
+                    &check; 
+                {%- endif %}
+                Pixel difference new
+                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
 [-1] - images has diff resolution, so couldn't be compared."></span> :
-            </b> {{ item.difference_color_2 }}<br/>
+                </b> {{ item.difference_color_2 }}<br/>
+            {%- else -%}
+                <b>&check; Pixel difference:</b> {{ item.difference_color }} %<br/>
+            {%- endif -%}
+
+
             {%- if item.testcase_timeout != 0 -%}
                 <b>
                 {%- if not item.testcase_timeout_exceeded -%}
@@ -187,6 +209,8 @@
                 {%- endif %}
                 Testcase timeout:</b> {{ item.testcase_timeout }}<br/>
             {%- endif -%}
+
+
             <b>
             {%- if not item.group_timeout_exceeded -%}
                 &check; 
@@ -194,9 +218,11 @@
                 &times; 
             {%- endif %}
             Test group timeout:</b> {{ item.group_timeout }}<br/>
-            {%- if config.TIME_DIFF_MAX < item.difference_time -%}
+
+
+            {%- if time_diff_status == 'worse' -%}
                 <b>&times; Difference render time:</b> {{ item.difference_time | round(3) }} %
-            {%- elif item.difference_time < -config.TIME_DIFF_MAX and item.render_time > 0 -%}
+            {%- elif time_diff_status == 'better' -%}
                 <span style="color: green"><b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %</span>
             {%- else -%}
                 <b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %
