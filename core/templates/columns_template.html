@@ -173,20 +173,21 @@
             {%- else -%}
                 &check; 
             {%- endif %}
-            Pixel difference new:
+            Pixel difference new
             <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
-[-1] - images has diff resolution, so couldn't be compared."></span>
+[-1] - images has diff resolution, so couldn't be compared."></span> :
             </b> {{ item.difference_color_2 }}<br/>
-            <b>
             {%- if item.testcase_timeout != 0 -%}
+                <b>
                 {%- if not item.testcase_timeout_exceeded -%}
                     &check;
                 {%- else -%}
                     &times;
-                {- endif -}
+                {%- endif %}
                 Testcase timeout:</b> {{ item.testcase_timeout }}<br/>
-            {- endif -}
+            {%- endif -%}
+            <b>
             {%- if not item.group_timeout_exceeded -%}
                 &check; 
             {%- else -%}
