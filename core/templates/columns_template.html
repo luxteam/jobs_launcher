@@ -166,7 +166,7 @@
     {%- if is_head -%}
         <th data-field="test_status_new" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case status</th>
     {%- else -%}
-        {%- report_type == 'default' -%}
+        {%- if report_type == 'default' -%}
             {%- if config.TIME_DIFF_MAX < item.difference_time -%}
                 {% set time_diff_status = 'worse' %}
             {%- elif item.difference_time < -config.TIME_DIFF_MAX and item.render_time > 0 -%}
@@ -196,7 +196,7 @@
 [-1] - images has diff resolution, so couldn't be compared."></span> :
                 </b> {{ item.difference_color_2 }}<br/>
             {%- else -%}
-                <b>&check; Pixel difference:</b> {{ item.difference_color }} %<br/>
+                &check; Pixel difference:</b> {{ item.difference_color }} %<br/>
             {%- endif -%}
 
 
