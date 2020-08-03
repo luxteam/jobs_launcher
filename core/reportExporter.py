@@ -516,6 +516,8 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
 
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
+    rc = 0
+
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
 
@@ -581,6 +583,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(summary_html) #FIXME: referenced before assignment
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
+        rc = -1
 
     main_logger.info("Saving performance report...")
     try:
@@ -609,6 +612,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         traceback.print_exc()
         main_logger.error(performance_html) #local variable 'performance_html' referenced before assignment
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+        rc = -1
 
     main_logger.info("Saving compare report...")
     try:
@@ -628,8 +632,16 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         traceback.print_exc()
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+        rc = -1
 
-    build_local_reports(work_dir, summary_report, common_info, env)
+    try:
+        build_local_reports(work_dir, summary_report, common_info, env)
+    except Exception as err:
+        traceback.print_exc()
+        main_logger.error(str(err))
+        rc = -1
+
+    return rc
 
 
 def setup_time_report(work_dir):
