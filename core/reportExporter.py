@@ -641,7 +641,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(str(err))
         rc = -1
 
-    return rc
+    exit(rc)
 
 
 def setup_time_report(work_dir):
