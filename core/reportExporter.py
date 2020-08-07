@@ -738,8 +738,7 @@ def add_retry_info(summary_report, retry_info, work_dir):
                                     for retry in retry['Tries']:
                                         for group in retry.keys():
                                             if group.endswith('.json'):
-                                                groupOrJson = retry[str(
-                                                    next(iter(retry['Tries'][0].keys())))]
+                                                groupOrJson = retry[group]
                                             else:
                                                 groupOrJson = retry.get(
                                                     test_package, [])
