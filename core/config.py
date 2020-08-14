@@ -105,10 +105,6 @@ POSSIBLE_JSON_IMG_BASELINE_KEYS = ['render_color_path', 'render_opacity_path']
 POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_BASELINE_KEYS]
 POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_BASELINE_KEYS]
 
-BASELINE_MANIFEST = 'baseline_manifest.json'
-BASELINE_SESSION_REPORT = 'session_baseline_report.json'
-BASELINE_REPORT_NAME = 'render_copied_report.json'
-
 SUMMARY_REPORT = 'summary_report.json'
 SUMMARY_REPORT_EMBED_IMG = 'summary_report_embed_img.json'
 SUMMARY_REPORT_HTML = 'summary_report.html'
