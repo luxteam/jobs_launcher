@@ -17,8 +17,8 @@ except ImportError:
 
 def create_args_parser():
     args = argparse.ArgumentParser()
-    args.add_argument('--results_root')
-    args.add_argument('--baseline_root')
+    args.add_argument('--results_root', default='Work\Results\Maya')
+    args.add_argument('--baseline_root', default='Work\Baseline')
     if report_type == 'ct':
         args.add_argument('--case_suffix', required=False, default=core.config.CASE_REPORT_SUFFIX)
     return args
@@ -38,11 +38,12 @@ if __name__ == '__main__':
     # find and process report_compare.json files
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
-            if file == core.config.TEST_REPORT_NAME_COMPARED:
+            if file == core.config.TEST_REPORT_NAME:
                 # create destination folder in baseline location
                 os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))
                 # copy json report with new names
-                cases = json.load(file.read())
+                with open(os.path.join(path, file)) as f:
+                    cases = json.load(f)
                 for case in cases:
                     # remove odd fields
                     case.pop('baseline_color_path', None)
@@ -51,17 +52,15 @@ if __name__ == '__main__':
                     case.pop('difference_time', None)
                     case.pop('test_status', None)
 
-                    with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case']), 'w') as f:
+                    with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case'] + '.json'), 'w') as f:
                         f.write(json.dumps(case, indent=4))
 
                     # copy rendered images and thumbnails
                     for img in core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS_THUMBNAIL + core.config.POSSIBLE_JSON_IMG_RENDERED_KEYS:
                         if img in case.keys():
-                            rendered_img_path = os.path.join(path, test[img])
+                            rendered_img_path = os.path.join(path, case[img])
                             baseline_img_path = os.path.relpath(rendered_img_path, args.results_root)
 
-                            # add img to baseline manifest
-                            baseline_manifest.update({os.path.split(test[img])[-1]: baseline_img_path})
                             # create folder in first step for current folder
                             if not os.path.exists(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0])):
                                 os.makedirs(os.path.join(args.baseline_root, os.path.split(baseline_img_path)[0]))
