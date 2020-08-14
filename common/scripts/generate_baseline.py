@@ -50,7 +50,7 @@ if __name__ == '__main__':
                     case.pop('difference_time', None)
                     case.pop('test_status', None)
 
-                    with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case.['test_case']), 'w') as f:
+                    with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case']), 'w') as f:
                         f.write(json.dumps(case, indent=4))
 
                     # copy rendered images and thumbnails
@@ -70,9 +70,3 @@ if __name__ == '__main__':
                                                 os.path.join(args.baseline_root, baseline_img_path))
                             except IOError as err:
                                 core.config.main_logger.warning("Error baseline copy file: {}".format(str(err)))
-    try:
-        # save baseline manifest (using in compareByJSON.py)
-        with open(baseline_manifest_path, 'w') as file:
-            json.dump(baseline_manifest, file, indent=" ")
-    except Exception as err:
-        core.config.main_logger.error("Error while saving baseline manifest: {}".format(str(err)))
