@@ -116,9 +116,10 @@ def createArgParser():
         argparser.add_argument('--vram_diff_max', required=False, default=core.config.VRAM_DIFF_MAX)
     return argparser
 
+
 def main(args):
     perf_count.event_record(args.work_dir, 'Compare', True)
-    render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
+    render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED)
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
