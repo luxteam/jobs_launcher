@@ -153,6 +153,15 @@ def main(args):
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
 
+    if not os.path.exists(args.base_dir):
+        core.config.main_logger.warning("Baseline directory not found by path: {}".format(args.base_dir))
+        for img in render_json:
+            img.update({'test_status': core.config.TEST_DIFF_STATUS})
+        with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
+            json.dump(render_json, file, indent=4)
+        perf_count.event_record(args.work_dir, 'Compare', False)
+        exit(1)
+
     try:
         with open(render_json_path, 'r') as file:
             render_json = json.loads(file.read())
