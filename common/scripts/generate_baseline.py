@@ -46,6 +46,7 @@ if __name__ == '__main__':
                     cases = json.load(f)
                 for case in cases:
                     # remove odd fields
+                    case.pop('baseline_render_time', None)
                     case.pop('baseline_color_path', None)
                     case.pop('difference_color_2', None)
                     case.pop('difference_color', None)
