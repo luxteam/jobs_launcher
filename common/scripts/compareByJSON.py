@@ -17,17 +17,15 @@ except ImportError:
     from core.defaults_local_config import *
 
 
-def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
+def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        baseline_name = 'not.exist'
-
-        for possible_extension in core.config.POSSIBLE_BASELINE_EXTENSIONS:
-            baseline_name = baseline_json.get(img.get('test_case', '') + '.' + possible_extension, 'not.exist')
-            if baseline_name != 'not.exist':
-                # baseline found
-                break
-
-        baseline_img_path = os.path.join(base_dir, baseline_name)
+        if os.path.exists(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')):
+            with open(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')) as f:
+                baseline_json = json.load(f)
+        else:
+            core.config.main_logger.error('Error while read {}.json'.format(img['test_case']))
+            return img
+        baseline_img_path = baseline_json['render_color_path']
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
@@ -39,7 +37,7 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
         # else add baseline images paths to json
         img.update({'baseline_color_path': os.path.relpath(baseline_img_path, work_dir)})
         for thumb in core.config.THUMBNAIL_PREFIXES:
-            if thumb + baseline_name in baseline_json.keys() and os.path.exists(os.path.join(base_dir, baseline_json[thumb + baseline_name])):
+            if thumb + baseline_name in baseline_json.keys() and os.path.exists(os.path.join(base_dir, img[thumb + baseline_name])):
                 img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(base_dir, baseline_json[thumb + baseline_name]), work_dir)})
 
         # for crushed and non-executed cases only set baseline img src
@@ -76,26 +74,26 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
 
 def get_rendertime_difference(base_dir, img, time_diff_max):
-    if os.path.exists(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME)):
-        render_time = img['render_time']
-        with open(os.path.join(base_dir, img['test_group'], core.config.BASELINE_REPORT_NAME), 'r') as file:
-            baseline_report_json = json.loads(file.read())
-            try:
-                baseline_time = [x for x in baseline_report_json if x['test_case'] == img['test_case']][0]['render_time']
-            except IndexError:
-                baseline_time = -0.0
+    if os.path.exists(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')):
+        with open(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')) as f:
+            baseline_json = json.load(f)
+        try:
+            baseline_time = baseline_json['render_time']
+        except IndexError:
+            baseline_time = -0.0
 
-        time_diff = render_time - baseline_time
+            time_diff = render_time - baseline_time
 
-        for threshold in time_diff_max:
-            if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
-                img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
-                if img.get('test_status') == core.config.TEST_SUCCESS_STATUS:
-                    img.update({'test_status': core.config.TEST_DIFF_STATUS})
+            for threshold in time_diff_max:
+                if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
+                    img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
+                    if img.get('test_status') == core.config.TEST_SUCCESS_STATUS:
+                        img.update({'test_status': core.config.TEST_DIFF_STATUS})
 
-        img.update({'difference_time': time_diff})
-        img.update({'baseline_render_time': baseline_time})
+            img.update({'difference_time': time_diff})
+            img.update({'baseline_render_time': baseline_time})
     else:
+        core.config.main_logger.error('Error while read {}.json'.format(img['test_case']))
         img.update({'difference_time': -0.0})
         img.update({'baseline_render_time': -0.0})
 
@@ -163,7 +161,7 @@ def main(args):
 
     core.config.main_logger.info("Began metrics calculation")
     for img in render_json:
-        img.update(get_pixel_difference(args.work_dir, args.base_dir, img, baseline_json, args.pix_diff_tolerance,
+        img.update(get_pixel_difference(args.work_dir, args.base_dir, img, args.pix_diff_tolerance,
                                         args.pix_diff_max))
         img.update(get_rendertime_difference(args.base_dir, img, args.time_diff_max))
 
