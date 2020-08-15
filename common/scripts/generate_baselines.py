@@ -54,6 +54,7 @@ if __name__ == '__main__':
                     case.pop('difference_color', None)
                     case.pop('difference_time', None)
                     case.pop('test_status', None)
+                    case.pop('render_log', None)
 
                     with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case'] + '.json'), 'w') as f:
                         f.write(json.dumps(case, indent=4))
