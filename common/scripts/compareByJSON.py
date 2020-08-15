@@ -25,7 +25,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
         else:
             core.config.main_logger.error('Error while read {}.json'.format(img['test_case']))
             return img
-        baseline_img_path = baseline_json['render_color_path']
+        baseline_img_path = os.path.join(base_dir, baseline_json['render_color_path'])
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
@@ -119,7 +119,7 @@ def createArgParser():
 
 def main(args):
     perf_count.event_record(args.work_dir, 'Compare', True)
-    render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED)
+    render_json_path = os.path.join(args.work_dir, core.config.TEST_REPORT_NAME)
 
     if not os.path.exists(render_json_path):
         core.config.main_logger.error("Render report doesn't exists")
@@ -132,7 +132,7 @@ def main(args):
 
     try:
         if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
-            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, 'img', 'baseline.png'),
+            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, 'img', 'baseline.png'),
                      os.path.join(args.base_dir, 'baseline.png'))
     except (OSError, FileNotFoundError) as err:
         core.config.main_logger.error("Couldn't copy baseline stub: {}".format(str(err)))

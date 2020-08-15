@@ -17,7 +17,8 @@ except ImportError:
 
 def create_args_parser():
     args = argparse.ArgumentParser()
-    args.add_argument('--results_root', default='Work\Results\Maya')
+    args.add_argument('--remove_old', default=False)
+    args.add_argument('--results_root', default='Work\Results')
     args.add_argument('--baseline_root', default='Work\Baseline')
     if report_type == 'ct':
         args.add_argument('--case_suffix', required=False, default=core.config.CASE_REPORT_SUFFIX)
@@ -32,15 +33,16 @@ if __name__ == '__main__':
     args.baseline_root = os.path.abspath(args.baseline_root)
 
     report = []
-    if os.path.exists(args.baseline_root):
+    if os.path.exists(args.baseline_root) and args.remove_old:
         shutil.rmtree(args.baseline_root)
 
     # find and process report_compare.json files
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
-            if file == core.config.TEST_REPORT_NAME:
+            if file == core.config.TEST_REPORT_NAME_COMPARED:
                 # create destination folder in baseline location
-                os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))
+                if args.remove_old:
+                    os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))
                 # copy json report with new names
                 with open(os.path.join(path, file)) as f:
                     cases = json.load(f)
