@@ -41,7 +41,7 @@ if __name__ == '__main__':
         for file in files:
             if file == core.config.TEST_REPORT_NAME_COMPARED:
                 # create destination folder in baseline location
-                if args.remove_old:
+                if args.remove_old or not os.path.exists(args.baseline_root):
                     os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))
                 # copy json report with new names
                 with open(os.path.join(path, file)) as f:
