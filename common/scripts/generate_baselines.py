@@ -18,7 +18,7 @@ except ImportError:
 def create_args_parser():
     args = argparse.ArgumentParser()
     args.add_argument('--remove_old', default=False)
-    args.add_argument('--results_root', default='Work\Results')
+    args.add_argument('--results_root', default='Work\Results\Core')
     args.add_argument('--baseline_root', default='Work\Baseline')
     if report_type == 'ct':
         args.add_argument('--case_suffix', required=False, default=core.config.CASE_REPORT_SUFFIX)
@@ -41,7 +41,7 @@ if __name__ == '__main__':
         for file in files:
             if file == core.config.TEST_REPORT_NAME_COMPARED:
                 # create destination folder in baseline location
-                if os.path.exists(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root))):
+                if not os.path.exists(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root))):
                     os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))
                 # copy json report with new names
                 with open(os.path.join(path, file)) as f:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                     case.pop('test_status', None)
                     case.pop('render_log', None)
 
-                    with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case'] + '.json'), 'w') as f:
+                    with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case'] + core.config.CASE_REPORT_SUFFIX), 'w') as f:
                         f.write(json.dumps(case, indent=4))
 
                     # copy rendered images and thumbnails
