@@ -196,7 +196,12 @@
 [-1] - images has diff resolution, so couldn't be compared."></span> :
                 </b> {{ item.difference_color_2 }}<br/>
             {%- else -%}
-                &check; Pixel difference:</b> {{ item.difference_color }} %<br/>
+                {%- if item.test_status == 'failed' -%}
+                    &times; 
+                {%- else -%}
+                    &check; 
+                {%- endif %}
+                Pixel difference:</b> {{ item.difference_color }} %<br/>
             {%- endif -%}
 
 
