@@ -180,7 +180,7 @@
             {{ item.difference_time | round (3) }}</td>
         {%- elif report_type == 'ec' or report_type == 'ct' -%}
             <td
-                {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
+                {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS and item.test_status != config.TEST_CRASH_STATUS -%}
                     class="{{ config.TEST_DIFF_STATUS }}Status"
                 {% else -%}
                     class="{{ config.TEST_SUCCESS_STATUS }}Status"

@@ -87,7 +87,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             for threshold in time_diff_max:
                 if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
                     img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
-                    if img.get('test_status') == core.config.TEST_SUCCESS_STATUS:
+                    if img['test_status'] != core.config.TEST_CRASH_STATUS:
                         img.update({'test_status': core.config.TEST_DIFF_STATUS})
 
             img.update({'difference_time': time_diff})
@@ -156,7 +156,8 @@ def main(args):
     if not os.path.exists(args.base_dir):
         core.config.main_logger.warning("Baseline directory not found by path: {}".format(args.base_dir))
         for img in render_json:
-            img.update({'test_status': core.config.TEST_DIFF_STATUS})
+            if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                img.update({'test_status': core.config.TEST_DIFF_STATUS})
         with open(os.path.join(args.work_dir, core.config.TEST_REPORT_NAME_COMPARED), 'w') as file:
             json.dump(render_json, file, indent=4)
         perf_count.event_record(args.work_dir, 'Compare', False)
