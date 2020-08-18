@@ -67,7 +67,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             pix_difference_2 = metrics.getPrediction()
             img.update({'difference_color_2': pix_difference_2})
             # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
-            if pix_difference_2 != 0:
+            if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
                 img['test_status'] = core.config.TEST_DIFF_STATUS
 
     return img
