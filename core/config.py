@@ -26,7 +26,6 @@ RENDER_REPORT_BASE = {
     "render_device": "",
     "difference_color_2": -0,
     "testcase_timeout": 0,
-    "group_timeout": TIMEOUT,
     "message": [],
     "testcase_timeout_exceeded": False,
     "group_timeout_exceeded": True
