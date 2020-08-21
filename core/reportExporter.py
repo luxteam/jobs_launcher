@@ -14,6 +14,7 @@ from core.auto_dict import AutoDict
 import copy
 import sys
 import traceback
+import uuid
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 try:
@@ -784,3 +785,258 @@ def add_retry_info(summary_report, retry_info):
     except Exception as e:
         main_logger.error(
             'Error "{}" while adding retry info'.format(str(e)))
+
+
+def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
+    # emulate sessions
+    total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0, 'render_duration': 0,
+             'synchronization_duration': 0}
+    report_base = {'failed_tests': [],
+                   'machine_info': {'os': '',
+                                    'host': '',
+                                    'cpu_count': '',
+                                    'ram': '',
+                                    'cpu': ''},
+                   'guid': uuid.uuid1().__str__(),
+                   'results': {},
+                   'summary': {}}
+
+    for root_dir in os.listdir(rpr_dir):
+        if os.path.isdir(os.path.join(rpr_dir, root_dir)):
+            session_gpu, session_os = os.path.basename(root_dir).split('-')
+
+            for path, dirs, files in os.walk(os.path.join(rpr_dir, root_dir)):
+                for json_report in files:
+                    if json_report == BASELINE_REPORT_NAME:
+                        with open(os.path.join(path, json_report), 'r') as file:
+                            current_test_report = json.loads(file.read())
+                        current_session_report = copy.deepcopy(report_base)
+                        current_session_report['machine_info'].update({'os': session_os,
+                                                                       'render_engine': 'RPR Tahoe'})
+                        current_session_report['results'].update(
+                            {current_test_report[0]['test_group']: {"": {
+                                "render_results": current_test_report,
+                                "result_path": current_test_report[0]['test_group'],
+                                "skipped": 0,
+                                "synchronization_duration": 0,
+                                "total": 0,
+                                "duration": 0,
+                                "error": 0,
+                                "failed": 0,
+                                "passed": 0,
+                                "render_duration": 0}}
+                            })
+                        render_duration = 0.0
+                        synchronization_duration = 0.0
+                        # try:
+                        for jtem in current_test_report:
+                            for group_report_file in REPORT_FILES:
+                                if group_report_file in jtem.keys():
+                                    # update paths
+                                    cur_img_path = os.path.abspath(
+                                        os.path.join(rpr_dir, root_dir, current_session_report['results'][current_test_report[0]['test_group']]['']['result_path'],
+                                                     jtem[group_report_file]))
+
+                                    jtem.update({group_report_file: os.path.relpath(cur_img_path, work_dir)})
+
+                            render_duration += jtem['render_time']
+                            synchronization_duration += jtem.get('sync_time', 0.0)
+                            if jtem['test_status'] == 'undefined':
+                                current_session_report['results'][current_test_report[0]['test_group']]['']['total'] += 1
+                            else:
+                                current_session_report['results'][current_test_report[0]['test_group']][''][jtem['test_status']] += 1
+
+                        try:
+                            current_session_report['machine_info'].update({'render_device': jtem['render_device']})
+                            current_session_report['machine_info'].update({'tool': jtem['tool']})
+                            current_session_report['machine_info'].update({'render_version': jtem['render_version']})
+                            current_session_report['machine_info'].update({'core_version': jtem['core_version']})
+                            current_session_report['machine_info'].update({'render_engine': 'RPR Tahoe'})
+                        except Exception as err:
+                            print("Exception while updating machine_info in session_report")
+                            print(str(err))
+                            main_logger.warning(str(err))
+
+                        current_session_report['results'][current_test_report[0]['test_group']]['']['synchronization_duration'] = synchronization_duration
+                        current_session_report['results'][current_test_report[0]['test_group']]['']['render_duration'] = render_duration
+                        current_session_report['results'][current_test_report[0]['test_group']]['']['total'] += current_session_report['results'][current_test_report[0]['test_group']]['']['passed'] + \
+                                                                    current_session_report['results'][current_test_report[0]['test_group']]['']['failed'] + \
+                                                                    current_session_report['results'][current_test_report[0]['test_group']]['']['skipped'] + \
+                                                                    current_session_report['results'][current_test_report[0]['test_group']]['']['error']
+
+                        # except Exception as err:
+                        #     print(str(err))
+
+                        # get summary results
+                        total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0,
+                                 'render_duration': 0,
+                                 'synchronization_duration': 0}
+                        for result in current_session_report['results']:
+                            for item in current_session_report['results'][result]:
+                                for key in total:
+                                    total[key] += current_session_report['results'][result][item][key]
+                        current_session_report.update({'summary': total})
+                        current_session_report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
+
+                        with open(os.path.join(path, SESSION_REPORT), 'w') as file:
+                            json.dump(current_session_report, file, indent=4)
+
+    summary_report_gen, common_info_gen = build_summary_report(os.path.join(rpr_dir))
+
+    with open(os.path.join(work_dir, SUMMARY_REPORT), 'w') as file:
+        json.dump(summary_report_gen, file, indent=4)
+
+    for root_dir in os.listdir(northstar_dir):
+        if os.path.isdir(os.path.join(northstar_dir, root_dir)):
+            session_gpu, session_os, engine_postf = os.path.basename(root_dir).split('-')
+
+            for path, dirs, files in os.walk(os.path.join(northstar_dir, root_dir)):
+                for json_report in files:
+                    if json_report == BASELINE_REPORT_NAME:
+                        with open(os.path.join(path, json_report), 'r') as file:
+                            current_test_report = json.loads(file.read())
+                        current_session_report = copy.deepcopy(report_base)
+                        current_session_report['machine_info'].update({'os': session_os,
+                                                                       'render_engine': 'NorthStar'})
+                        current_session_report['results'].update(
+                            {current_test_report[0]['test_group']: {"": {
+                                "render_results": current_test_report,
+                                "result_path": current_test_report[0]['test_group'],
+                                "skipped": 0,
+                                "synchronization_duration": 0,
+                                "total": 0,
+                                "duration": 0,
+                                "error": 0,
+                                "failed": 0,
+                                "passed": 0,
+                                "render_duration": 0}}
+                            })
+                        render_duration = 0.0
+                        synchronization_duration = 0.0
+                        # try:
+                        for jtem in current_test_report:
+                            for group_report_file in REPORT_FILES:
+                                if group_report_file in jtem.keys():
+                                    # update paths
+                                    cur_img_path = os.path.abspath(
+                                        os.path.join(northstar_dir, root_dir, current_session_report['results'][current_test_report[0]['test_group']]['']['result_path'],
+                                                     jtem[group_report_file]))
+
+                                    jtem.update({group_report_file: os.path.relpath(cur_img_path, work_dir)})
+
+                            render_duration += jtem['render_time']
+                            synchronization_duration += jtem.get('sync_time', 0.0)
+                            if jtem['test_status'] == 'undefined':
+                                current_session_report['results'][current_test_report[0]['test_group']]['']['total'] += 1
+                            else:
+                                current_session_report['results'][current_test_report[0]['test_group']][''][jtem['test_status']] += 1
+
+                        try:
+                            current_session_report['machine_info'].update({'render_device': jtem['render_device']})
+                            current_session_report['machine_info'].update({'tool': jtem['tool']})
+                            current_session_report['machine_info'].update({'render_version': jtem['render_version']})
+                            current_session_report['machine_info'].update({'core_version': jtem['core_version']})
+                            current_session_report['machine_info'].update({'render_engine': 'NorthStar'})
+                        except Exception as err:
+                            print("Exception while updating machine_info in session_report")
+                            print(str(err))
+                            main_logger.warning(str(err))
+
+                        current_session_report['results'][current_test_report[0]['test_group']]['']['synchronization_duration'] = synchronization_duration
+                        current_session_report['results'][current_test_report[0]['test_group']]['']['render_duration'] = render_duration
+                        current_session_report['results'][current_test_report[0]['test_group']]['']['total'] += current_session_report['results'][current_test_report[0]['test_group']]['']['passed'] + \
+                                                                    current_session_report['results'][current_test_report[0]['test_group']]['']['failed'] + \
+                                                                    current_session_report['results'][current_test_report[0]['test_group']]['']['skipped'] + \
+                                                                    current_session_report['results'][current_test_report[0]['test_group']]['']['error']
+
+                        # except Exception as err:
+                        #     print(str(err))
+
+                        # get summary results
+                        total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0,
+                                 'render_duration': 0,
+                                 'synchronization_duration': 0}
+                        for result in current_session_report['results']:
+                            for item in current_session_report['results'][result]:
+                                for key in total:
+                                    total[key] += current_session_report['results'][result][item][key]
+                        current_session_report.update({'summary': total})
+                        current_session_report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
+
+                        with open(os.path.join(path, 'session_report_ENGINE.json'), 'w') as file:
+                            json.dump(current_session_report, file, indent=4)
+
+    if os.path.exists(os.path.join(work_dir, 'report_resources')):
+        rmtree(os.path.join(work_dir, 'report_resources'), True)
+    try:
+        copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
+                 os.path.join(work_dir, 'report_resources'))
+    except Exception as err:
+        main_logger.error("Failed to copy report resources: {}".format(str(err)))
+
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
+        autoescape=True
+    )
+    env.globals.update({'original_render': '',
+                        'report_type': report_type,
+                        'pre_path': '.',
+                        'config': config})
+    env.filters['env_override'] = env_override
+    env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
+
+    common_info = common_info_gen
+    summary_report = summary_report_gen
+
+    main_logger.info("Saving performance report...")
+    try:
+        # setup_time_count(work_dir)
+        copy_summary_report = copy.deepcopy(summary_report)
+
+        performance_template = env.get_template('performance_template_engine.html')
+
+        for path, dirs, files in os.walk(os.path.abspath(northstar_dir)):
+            for file in files:
+                # build summary report
+                if file.endswith('session_report_ENGINE.json'):
+                    with open(os.path.join(path, file), 'r') as engine_report_file:
+                        temp_report = json.loads(engine_report_file.read())
+
+                        basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                        for test_package in temp_report['results']:
+                            for test_conf in temp_report['results'][test_package]:
+                                temp_report['results'][test_package][test_conf].update(
+                                    {'machine_info': temp_report['machine_info']})
+                        if basename in copy_summary_report.keys():
+                            copy_summary_report[basename + temp_report['machine_info']['render_engine']] = {}
+                            copy_summary_report[basename + temp_report['machine_info']['render_engine']].update(
+                                {'results': temp_report['results']})
+                            copy_summary_report[basename + temp_report['machine_info']['render_engine']].update(
+                                {'summary': temp_report['summary']})
+
+        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report_engine(copy_summary_report)
+
+        setup_sum, setup_details = setup_time_report(work_dir)
+
+        save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
+        save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
+        save_json_report(summary_info_for_report, work_dir, 'summary_info_for_report.json')
+        save_json_report(hardware, work_dir, 'hardware.json')
+        performance_html = performance_template.render(title="RPR NorthStar" + " Performance",
+                                                       performance_report=performance_report,
+                                                       hardware=hardware,
+                                                       performance_report_detail=performance_report_detail,
+                                                       pageID="performanceA",
+                                                       common_info=common_info,
+                                                       test_info=summary_info_for_report,
+                                                       setupTimeSum=setup_sum,
+                                                       setupTimeDetails=setup_details,
+                                                       synchronization_time=sync_time(summary_report))
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+    except Exception as err:
+        traceback.print_exc()
+        main_logger.error(performance_html)  # local variable 'performance_html' referenced before assignment
+        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+
+    # build_performance_report_engine()
+    pass
