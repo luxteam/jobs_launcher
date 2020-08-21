@@ -18,11 +18,12 @@ except ImportError:
 
 def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        if os.path.exists(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')):
+        path_to_baseline_json = os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')
+        if os.path.exists(path_to_baseline_json):
             with open(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')) as f:
                 baseline_json = json.load(f)
         else:
-            core.config.main_logger.error('Error while read {}.json'.format(img['test_case']))
+            core.config.main_logger.error('Error while read {}'.format(path_to_baseline_json))
             return img
         baseline_img_path = os.path.join(base_dir, baseline_json['render_color_path'])
         # if baseline image not found - return
