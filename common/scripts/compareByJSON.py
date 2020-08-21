@@ -18,7 +18,7 @@ except ImportError:
 
 def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        path_to_baseline_json = os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')
+        path_to_baseline_json = os.path.join(base_dir, os.path.pardir, img['test_group'], img['test_case'] + '.json')
         if os.path.exists(path_to_baseline_json):
             with open(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')) as f:
                 baseline_json = json.load(f)
