@@ -139,3 +139,19 @@ DONT_COMPARE = "Do not compare"
 POSSIBLE_BASELINE_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
 
 SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Load rpr", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]
+
+ODD_FOR_BASELINES = [
+    'baseline_render_time',
+    'baseline_color_path',
+    'difference_color_2',
+    'difference_color',
+    'difference_time',
+    'test_status',
+    'render_log',
+    'baseline_system_memory_usage',
+    'baseline_gpu_memory_usage',
+    'baseline_render_device',
+    'difference_vram',
+    'difference_ram',
+    'tahoe_log'
+]

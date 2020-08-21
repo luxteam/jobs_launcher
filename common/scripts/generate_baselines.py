@@ -48,19 +48,8 @@ if __name__ == '__main__':
                     cases = json.load(f)
                 for case in cases:
                     # remove odd fields
-                    case.pop('baseline_render_time', None)
-                    case.pop('baseline_color_path', None)
-                    case.pop('difference_color_2', None)
-                    case.pop('difference_color', None)
-                    case.pop('difference_time', None)
-                    case.pop('test_status', None)
-                    case.pop('render_log', None)
-                    case.pop('baseline_system_memory_usage', None)
-                    case.pop('baseline_gpu_memory_usage', None)
-                    case.pop('baseline_render_device', None)
-                    case.pop('difference_vram', None)
-                    case.pop('difference_ram', None)
-                    case.pop('tahoe_log', None)
+                    for field in core.config.ODD_FOR_BASELINES:
+                        case.pop(field, None)
 
                     with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case'] + core.config.CASE_REPORT_SUFFIX), 'w') as f:
                         f.write(json.dumps(case, indent=4))

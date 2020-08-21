@@ -6,7 +6,6 @@ from shutil import copyfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
 import core.performance_counter as perf_count
-import common.scripts.compareByJSON
 
 try:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
