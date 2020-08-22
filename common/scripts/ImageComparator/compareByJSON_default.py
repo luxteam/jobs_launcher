@@ -28,6 +28,12 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
                 break
 
         baseline_img_path = os.path.join(base_dir, baseline_name)
+
+        if img['testcase_timeout_exceeded']:
+            img['message'].append('Testcase timeout exceeded')
+        elif img['group_timeout_exceeded']:
+            img['message'].append('Test group timeout exceeded')
+        
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
@@ -45,10 +51,6 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
-            if img['testcase_timeout_exceeded']:
-                img['message'].append('Testcase timeout exceeded')
-            elif img['group_timeout_exceeded']:
-                img['message'].append('Test group timeout exceeded')
             return img
 
         render_img_path = os.path.join(work_dir, img['render_color_path'])
