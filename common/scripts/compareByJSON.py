@@ -94,7 +94,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             img.update({'difference_time': time_diff})
             img.update({'baseline_render_time': baseline_time})
     else:
-        core.config.main_logger.error('Error while read {}.json'.format(path_to_baseline_json))
+        core.config.main_logger.error('Error while read {}'.format(path_to_baseline_json))
         img.update({'difference_time': -0.0})
         img.update({'baseline_render_time': -0.0})
 
