@@ -18,9 +18,9 @@ except ImportError:
 
 def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
-        path_to_baseline_json = os.path.join(base_dir, os.path.pardir, img['test_group'], img['test_case'] + '.json')
+        path_to_baseline_json = os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')
         if os.path.exists(path_to_baseline_json):
-            with open(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')) as f:
+            with open(path_to_baseline_json) as f:
                 baseline_json = json.load(f)
         else:
             core.config.main_logger.error('Error while read {}'.format(path_to_baseline_json))
@@ -74,8 +74,9 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
 
 
 def get_rendertime_difference(base_dir, img, time_diff_max):
-    if os.path.exists(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')):
-        with open(os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')) as f:
+    path_to_baseline_json = os.path.join(base_dir, img['test_group'], img['test_case'] + '.json')
+    if os.path.exists(path_to_baseline_json):
+        with open(path_to_baseline_json) as f:
             baseline_json = json.load(f)
         try:
             baseline_time = baseline_json['render_time']
@@ -93,7 +94,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             img.update({'difference_time': time_diff})
             img.update({'baseline_render_time': baseline_time})
     else:
-        core.config.main_logger.error('Error while read {}.json'.format(img['test_case']))
+        core.config.main_logger.error('Error while read {}.json'.format(path_to_baseline_json))
         img.update({'difference_time': -0.0})
         img.update({'baseline_render_time': -0.0})
 
