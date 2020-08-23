@@ -5,6 +5,7 @@ import shutil
 import json
 import uuid
 import traceback
+import hashlib
 
 import core.reportExporter
 import core.system_info
@@ -228,8 +229,25 @@ def main():
 
             for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
+                cases_hashes = {}
+                cases_hashes_info = {}
                 for case in cases:
-                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
+                    with open(case['render_color_path'], 'rb') as img:
+                        bytes_data = img.read()
+                        case['hash'] = hashlib.md5(bytes_file_data).hexdigest()
+
+                hash_info_from_is = is_client.get_existense_info_by_hash(case['hash'] for case in cases if 'hash' in cases and cases['hash'])
+                if hash_info_from_is:
+                    cases_hashes_info = {
+                        case['render_color_path']: hash_info_from_is[case['hash']]
+                        for case in cases if 'hash' in cases and cases['hash'] in hash_info_from_is
+                    }
+
+                for case in cases:
+                    if case['render_color_path'] in cases_hashes_info and cases_hashes_info[case['render_color_path']]:
+                        image_id = cases_hashes_info[case['render_color_path']]['id']
+                    else
+                        image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
                     res.append({
                         'name': case['test_case'],
                         'status': case['test_status'],
