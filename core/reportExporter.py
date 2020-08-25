@@ -161,7 +161,8 @@ def build_session_report(report, session_dir):
 
                     try:
                         report['machine_info'].update({'render_device': jtem['render_device']})
-                        report['machine_info'].update({'tool': jtem['tool']})
+                        if jtem['tool']:
+                            report['machine_info'].update({'tool': jtem['tool']})
                         if report_type != 'ec':
                             report['machine_info'].update({'render_version': jtem['render_version']})
                         else:
