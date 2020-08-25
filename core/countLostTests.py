@@ -93,6 +93,11 @@ def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 									session_report["summary"]["total"] += number_of_cases
 							with open(os.path.join(path, file), "w") as report:
 								json.dump(session_report, report, indent=4, sort_keys=True)
+						elif execution_type == 'split_execution':
+							with open(os.path.join(path, file), "r") as report:
+								session_report = json.load(report)
+							if 'summary' not in session_report or 'total' not in session_report['summary'] or session_report['summary']['total'] <= 0:
+								lost_tests_results.append(results_directory)
 						break
 				if session_report_exist:
 					break
