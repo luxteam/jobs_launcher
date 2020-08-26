@@ -158,8 +158,7 @@ def createArgParser():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--work_dir')
     argparser.add_argument('--base_dir')
-    if report_type == 'ct':
-        argparser.add_argument('--case_suffix')
+    argparser.add_argument('--case_suffix', default='')
     argparser.add_argument(
         '--pix_diff_tolerance', required=False, default=core.config.PIX_DIFF_TOLERANCE)
     if report_type == 'ec':
