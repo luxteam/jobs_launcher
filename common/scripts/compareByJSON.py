@@ -34,12 +34,17 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             return img
         baseline_img_path = os.path.join(
             base_dir, img['test_group'], baseline_json['render_color_path'])
+        if img['testcase_timeout_exceeded']:
+            img['message'].append('Testcase timeout exceeded')
+        elif img['group_timeout_exceeded']:
+            img['message'].append('Test group timeout exceeded')
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning(
                 "Baseline image not found by path: {}".format(baseline_img_path))
             img.update({'baseline_color_path': os.path.relpath(
                 os.path.join(base_dir, 'baseline.png'), work_dir)})
+            img['message'].append('Baseline not found')
             if img['test_status'] != core.config.TEST_CRASH_STATUS:
                 img.update({'test_status': core.config.TEST_DIFF_STATUS})
             return img
@@ -51,6 +56,8 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             if thumb + 'render_color_path' and os.path.exists(os.path.join(base_dir, img['test_group'], baseline_json[thumb + 'render_color_path'])):
                 img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(
                     base_dir, img['test_group'], baseline_json[thumb + 'render_color_path']), work_dir)})
+            else:
+                core.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], baseline_json[thumb + 'render_color_path'])))
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
@@ -65,6 +72,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                     img['render_color_path'] = os.path.join(
                         "Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)
                     break
+            img['message'].append('Rendered image not found')
             img['test_status'] = core.config.TEST_CRASH_STATUS
             return img
 
@@ -83,6 +91,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             img.update({'difference_color_2': pix_difference_2})
             # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
             if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
+                img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
 
     return img
@@ -105,6 +114,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
                 img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
                 if img['test_status'] != core.config.TEST_CRASH_STATUS:
+                    img['message'].append('Unacceptable time difference')
                     img.update({'test_status': core.config.TEST_DIFF_STATUS})
 
         img.update({'difference_time': time_diff})
@@ -150,8 +160,7 @@ def createArgParser():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--work_dir')
     argparser.add_argument('--base_dir')
-    if report_type == 'ct':
-        argparser.add_argument('--case_suffix')
+    argparser.add_argument('--case_suffix', default='')
     argparser.add_argument(
         '--pix_diff_tolerance', required=False, default=core.config.PIX_DIFF_TOLERANCE)
     if report_type == 'ec':
