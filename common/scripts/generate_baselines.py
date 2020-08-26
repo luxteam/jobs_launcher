@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # find and process report_compare.json files
     for path, dirs, files in os.walk(args.results_root):
         for file in files:
-            if file == core.config.TEST_REPORT_NAME_COMPARED:
+            if file.endswith(args.case_suffix):
                 # create destination folder in baseline location
                 if not os.path.exists(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root))):
                     os.makedirs(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root)))

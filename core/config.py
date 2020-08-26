@@ -153,5 +153,6 @@ ODD_FOR_BASELINES = [
     'baseline_render_device',
     'difference_vram',
     'difference_ram',
-    'tahoe_log'
+    'tahoe_log',
+    'render_mode'
 ]
