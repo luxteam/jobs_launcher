@@ -1,4 +1,5 @@
 set JL_ENGINES_COMPARE="True"
 set PATH=c:\python35\;c:\python35\scripts\;%PATH%
 
-python -c "import core.reportExporter; core.reportExporter.generate_reports_for_perf_comparison('%1', '%2', '%3')"
+python -c "import core.reportExporter; core.reportExporter.build_summary_reports('%3')"
+rem python -c "import core.reportExporter; core.reportExporter.generate_reports_for_perf_comparison('%1', '%2', '%3')"

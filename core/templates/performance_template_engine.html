@@ -361,7 +361,7 @@
           data: [
             {% for hw in hardware %}
               {% if test_info[tool][hw[0]].sync > 0 %}
-                '{{test_info[tool][hw[0]].sync}}'{{ "," if not loop.last }}
+                '{{test_info[tool][hw[0]].sync }}'{{ "," if not loop.last }}
               {% endif %}
             {% endfor %}
           ]
@@ -372,7 +372,7 @@
     var syncData = {
       labels: [
           {% for hw in hardware %}
-            '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+            '{{ hw[0] }}'{{ "," if not loop.last }}
           {% endfor %}
         ],
       datasets: syncDataSet
@@ -395,7 +395,7 @@
     syncToolData = {
       labels: [
           {% for hw in hardware %}
-            '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+            '{{ hw[0] }}'{{ "," if not loop.last }}
           {% endfor %}
         ],
 
@@ -447,7 +447,7 @@
   var renderData = {
     labels: [
         {% for hw in hardware %}
-          '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+          '{{ hw[0] }}'{{ "," if not loop.last }}
         {% endfor %}
       ],
 
