@@ -257,8 +257,8 @@ def main(args):
             if os.path.exists(path_to_baseline_json):
                 with open(path_to_baseline_json) as f:
                     baseline_item = json.load(f)
-            check_vram_difference(img, baseline_item, args.vram_diff_max)
-            check_ram_difference(img, baseline_item, args.vram_diff_max)
+                    check_vram_difference(img, baseline_item, args.vram_diff_max)
+                    check_ram_difference(img, baseline_item, args.vram_diff_max)
 
         if args.case_suffix:
             or_baseline_json_path = os.path.join(
