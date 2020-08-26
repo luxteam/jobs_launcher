@@ -21,6 +21,15 @@ except ImportError:
     from core.defaults_local_config import *
 
 
+def get_diff(current, previous):
+    if current == previous:
+        return 0.0
+    try:
+        return (current - previous) / previous * 100.0
+    except ZeroDivisionError:
+        return 0
+
+
 def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
         path_to_baseline_json = os.path.join(
@@ -98,6 +107,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
 
 
 def get_rendertime_difference(base_dir, img, time_diff_max):
+    render_time = img['render_time']
     path_to_baseline_json = os.path.join(
         base_dir, img['test_group'], img['test_case'] + core.config.CASE_REPORT_SUFFIX)
     if os.path.exists(path_to_baseline_json):
@@ -129,7 +139,6 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
 
 
 def check_vram_difference(img, baseline_item, vram_diff_max):
-
     try:
         img.update(
             {'baseline_gpu_memory_usage': baseline_item['gpu_memory_usage']})
@@ -143,7 +152,6 @@ def check_vram_difference(img, baseline_item, vram_diff_max):
 
 
 def check_ram_difference(img, baseline_item, ram_diff_max):
-
     try:
         img.update(
             {'baseline_system_memory_usage': baseline_item['system_memory_usage']})
@@ -244,8 +252,13 @@ def main(args):
             args.base_dir, img, args.time_diff_max))
 
         if args.vram_diff_max:
-            check_vram_difference(img, baseline_item[0], args.vram_diff_max)
-            check_ram_difference(img, baseline_item[0], args.vram_diff_max)
+            path_to_baseline_json = os.path.join(
+                args.base_dir, img['test_group'], img['test_case'] + core.config.CASE_REPORT_SUFFIX)
+            if os.path.exists(path_to_baseline_json):
+                with open(path_to_baseline_json) as f:
+                    baseline_item = json.load(f)
+            check_vram_difference(img, baseline_item, args.vram_diff_max)
+            check_ram_difference(img, baseline_item, args.vram_diff_max)
 
         if args.case_suffix:
             or_baseline_json_path = os.path.join(
