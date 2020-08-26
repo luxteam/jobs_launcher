@@ -14,6 +14,7 @@ from core.auto_dict import AutoDict
 import copy
 import sys
 import traceback
+from core.countLostTests import PLATFORM_CONVERTATIONS
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
 try:
@@ -201,7 +202,7 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count):
+def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info):
     summary_report[gpu_os_case]['results'][lost_test_package] = {}
     # add empty conf
     summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
@@ -217,7 +218,42 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
     summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
 
+    host_name = ''
+    for retry_info in node_retry_info:
+        retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
+        retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
+        if retry_gpu_name in gpu_os_case and retry_os_name in gpu_os_case:
+            for group in retry_info['Tries']:
+                if lost_test_package in group.keys():
+                    host_name = group[lost_test_package][-1]['host']
+                else:
+                    for key in group.keys():
+                        if key.endswith('.json'):
+                            host_name = group[key][-1]['host']
+
+
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
+
+    if host_name:
+        # replace tester prefix
+        host_name = host_name.replace('PC-TESTER-', '').replace('PC-RENDERER-', '')
+        # replace OSX postfix
+        host_name = host_name.replace('-OSX', '')
+        # Ubuntu1804 -> Ubuntu18
+        host_name = host_name.replace('1804', '18')
+        # capitalize only first letter of each word of host name
+        host_name_parts = host_name.split('-')
+        processed_host_name_parts = []
+        for part in host_name_parts:
+            processed_host_name_parts.append(part.capitalize())
+        host_name = '-'.join(processed_host_name_parts)
+
+        # Windows -> WIN10
+        host_name = host_name.replace('Windows', 'WIN10')
+    else:
+        host_name = 'Unknown'
+
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['host'] = host_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
 
@@ -225,7 +261,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['summary']['total'] += lost_tests_count
 
 
-def build_summary_report(work_dir):
+def build_summary_report(work_dir, node_retry_info):
     summary_report = {}
     common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
@@ -295,7 +331,7 @@ def build_summary_report(work_dir):
             for gpu_os_case in summary_report:
                 if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                     for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
+                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
                     test_case_found = True
                     break
             # if all data for GPU + OS was lost (it can be regression.json execution)
@@ -312,7 +348,7 @@ def build_summary_report(work_dir):
                 summary_report[gpu_os_case]['summary']['skipped'] = 0
                 summary_report[gpu_os_case]['summary']['total'] = 0
                 for lost_test_package in lost_tests_count[lost_test_result]:
-                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package])
+                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
 
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
@@ -447,8 +483,8 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
                     else:
-                    	# test case was lost
-                    	continue
+                        # test case was lost
+                        continue
 
                     # for core baseline_render_time initialize via compareByJson script
                     if report_type != 'ec':
@@ -481,6 +517,8 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
 
 
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
+    rc = 0
+
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
         rmtree(os.path.join(work_dir, 'report_resources'), True)
 
@@ -517,7 +555,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template.html')
 
-        summary_report, common_info = build_summary_report(work_dir)
+        summary_report, common_info = build_summary_report(work_dir, node_retry_info)
 
         add_retry_info(summary_report, node_retry_info, work_dir)
 
@@ -546,6 +584,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         main_logger.error(summary_html) #FIXME: referenced before assignment
         save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                          replace_pathsep=True)
+        rc = -1
 
     main_logger.info("Saving performance report...")
     try:
@@ -574,6 +613,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         traceback.print_exc()
         main_logger.error(performance_html) #local variable 'performance_html' referenced before assignment
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+        rc = -1
 
     main_logger.info("Saving compare report...")
     try:
@@ -593,8 +633,16 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         traceback.print_exc()
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+        rc = -1
 
-    build_local_reports(work_dir, summary_report, common_info, env)
+    try:
+        build_local_reports(work_dir, summary_report, common_info, env)
+    except Exception as err:
+        traceback.print_exc()
+        main_logger.error(str(err))
+        rc = -1
+
+    exit(rc)
 
 
 def setup_time_report(work_dir):
@@ -677,7 +725,10 @@ def add_retry_info(summary_report, retry_info, work_dir):
     try:
         for config in summary_report:
             for test_package in summary_report[config]['results']:
-                node = summary_report[config]['results'][test_package]['']['machine_info']['host']
+                if summary_report[config]['results'][test_package]['']['machine_info']:
+                    node = summary_report[config]['results'][test_package]['']['machine_info']['host']
+                else:
+                    node = summary_report[config]['results'][test_package]['']['recovered_info']['host']
                 for retry in retry_info:
                     for tester in retry['Testers']:
                         if str(node).upper() in tester:
@@ -688,8 +739,7 @@ def add_retry_info(summary_report, retry_info, work_dir):
                                     for retry in retry['Tries']:
                                         for group in retry.keys():
                                             if group.endswith('.json'):
-                                                groupOrJson = retry[str(
-                                                    next(iter(retry['Tries'][0].keys())))]
+                                                groupOrJson = retry[group]
                                             else:
                                                 groupOrJson = retry.get(
                                                     test_package, [])
@@ -700,7 +750,7 @@ def add_retry_info(summary_report, retry_info, work_dir):
                                         if not os.path.exists(os.path.join(work_dir, retry['link'])):
                                             retry['link'] = ''
 
-                                    summary_report[config]['results'][test_package]['']['machine_info']['retries'] = retries_list
+                                    summary_report[config]['results'][test_package]['']['retries'] = retries_list
     except Exception as e:
         main_logger.error(
             'Error "{}" while adding retry info'.format(str(e)))

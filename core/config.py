@@ -3,6 +3,8 @@ from . import engine_logger
 
 main_logger = engine_logger.create_main_logger()
 
+TIMEOUT = 2400
+
 RENDER_REPORT_BASE = {
     "file_name": "",
     "date_time": "",
@@ -22,7 +24,11 @@ RENDER_REPORT_BASE = {
     "difference_time": -0.0,
     "core_version": "",
     "render_device": "",
-    "difference_color_2": -0
+    "difference_color_2": -0,
+    "testcase_timeout": 0,
+    "message": [],
+    "testcase_timeout_exceeded": False,
+    "group_timeout_exceeded": True
 }
 
 RENDER_REPORT_DEFAULT_PACK = {
@@ -54,7 +60,6 @@ RENDER_REPORT_CT_PACK = {
 RENDER_REPORT_BASE_USEFUL_KEYS = ['tool', 'render_version', 'test_group', 'core_version', 'render_device']
 
 SIMPLE_RENDER_TIMEOUT = 10
-TIMEOUT = 2400
 TIMEOUT_PAR = 3
 
 PIX_DIFF_MAX = 15

@@ -116,14 +116,10 @@
         <th data-filed="info" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Info</th>
     {%- else -%}
         {%- if report_type == 'default' -%}
-            <td class="infoColumn
-            {%- if item.difference_time > 5 -%}
-               {{ ' ' }}timeDiffFailedStatus
-            {%- endif -%} {{ ' ' }} {{ item.test_status }}Status">
+            <td class="infoColumn">
                 <b>Scene:</b> {{ item.scene_name }}<br/>
                 <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                 <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
-                <b>Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
                 <b>Test info:</b><br/>
                 {%- for param in item.script_info -%}
                     {{ param }}<br/>
@@ -161,6 +157,62 @@
             {%- for param in item.script_info -%}
             {{ param }}<br>
             {%- endfor -%}
+        </td>
+    {%- endif -%}
+{%- endif -%}
+
+{#- ------------------------------ TEST STATUS NEW ------------------------------ -#}
+{%- if column.name == 'test_status_new' -%}
+    {%- if is_head -%}
+        <th data-field="test_status_new" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case status</th>
+    {%- else -%}
+        <td class="infoColumn {{ item.test_status }}Status">
+            <b>
+            {%- if report_type == 'default' -%}
+                {%- if item.difference_color_2 != 0 -%}
+                    &times; 
+                {%- else -%}
+                    &check; 
+                {%- endif %}
+                Pixel difference status
+                <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
+[0] - equals images.
+[-1] - images has diff resolution, so couldn't be compared."></span> :
+                </b> {{ item.difference_color_2 }}<br/>
+            {%- else -%}
+                {%- if item.test_status == 'failed' -%}
+                    &times; 
+                {%- else -%}
+                    &check; 
+                {%- endif %}
+                Pixel difference:</b> {{ item.difference_color }} %<br/>
+            {%- endif -%}
+
+
+            {%- if item.testcase_timeout != 0 -%}
+                <b>
+                {%- if not item.testcase_timeout_exceeded -%}
+                    &check;
+                {%- else -%}
+                    &times;
+                {%- endif %}
+                Testcase timeout:</b> {{ item.testcase_timeout }}<br/>
+            {%- endif -%}
+
+
+            <b>
+            {%- if not item.group_timeout_exceeded -%}
+                &check; 
+            {%- else -%}
+                &times; 
+            {%- endif %}
+            Test case finished</b><br/>
+
+
+            <b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} sec<br/>
+            {%- if item.message -%}
+                <b>Message:</b> {{ item.message | join('. ') }}<br/>
+            {%- endif -%}
         </td>
     {%- endif -%}
 {%- endif -%}

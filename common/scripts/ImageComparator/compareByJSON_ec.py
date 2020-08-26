@@ -22,10 +22,17 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
         if key in img.keys():
 
             baseline_img_path = os.path.join(base_dir, baseline_item.get('render_color_path', 'not.exist'))
+
+            if img['testcase_timeout_exceeded']:
+                img['message'].append('Testcase timeout exceeded')
+            elif img['group_timeout_exceeded']:
+                img['message'].append('Test group timeout exceeded')
+            
             # if baseline image not found - return
             if not os.path.exists(baseline_img_path):
                 core.config.main_logger.warning("Baseline image not found by path: {}".format(baseline_img_path))
                 img.update({'baseline_color_path': os.path.relpath(os.path.join(base_dir, 'baseline.png'), work_dir)})
+                img['message'].append('Baseline not found')
                 if img['test_status'] != core.config.TEST_CRASH_STATUS:
                     img.update({'test_status': core.config.TEST_DIFF_STATUS})
                 return img
@@ -47,6 +54,7 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
                     if os.path.exists(os.path.join(work_dir, "Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)):
                         img['render_color_path'] = os.path.join("Color", core.config.TEST_CRASH_STATUS + "." + possible_extension)
                         break
+                img['message'].append('Rendered image not found')
                 img['test_status'] = core.config.TEST_CRASH_STATUS
                 return img
 
@@ -60,6 +68,7 @@ def check_pixel_difference(work_dir, base_dir, img, baseline_item, tolerance, pi
             pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
             img.update({'difference_color': pix_difference})
             if type(pix_difference) is str or pix_difference > pix_diff_max:
+                img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
             
 
@@ -148,6 +157,7 @@ def main(args):
         else:
             core.config.main_logger.error("Found invalid count of test_cases in baseline json")
             img.update({'baseline_color_path': os.path.relpath(os.path.join(args.base_dir, 'baseline.png'), args.work_dir)})
+            img['message'].append('Found invalid count of test_cases in baseline json')
             if img['test_status'] != core.config.TEST_CRASH_STATUS:
                 img.update({'test_status': core.config.TEST_DIFF_STATUS})
             continue
