@@ -20,8 +20,7 @@ def create_args_parser():
     args.add_argument('--remove_old', default=False)
     args.add_argument('--results_root', default='Work\Results\Core')
     args.add_argument('--baseline_root', default='Work\Baseline')
-    if report_type == 'ct':
-        args.add_argument('--case_suffix', required=False, default=core.config.CASE_REPORT_SUFFIX)
+    args.add_argument('--case_suffix', required=False, default=core.config.CASE_REPORT_SUFFIX)
     return args
 
 
