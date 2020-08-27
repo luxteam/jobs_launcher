@@ -66,7 +66,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(
                     base_dir, img['test_group'], baseline_json[thumb + 'render_color_path']), work_dir)})
             else:
-                core.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], thumb + baseline_json['render_color_path'])))
+                core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], thumb + baseline_json['render_color_path'])))
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:

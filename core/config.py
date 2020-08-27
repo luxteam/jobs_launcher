@@ -146,7 +146,6 @@ ODD_FOR_BASELINES = [
     'difference_color_2',
     'difference_color',
     'difference_time',
-    'test_status',
     'render_log',
     'baseline_system_memory_usage',
     'baseline_gpu_memory_usage',
