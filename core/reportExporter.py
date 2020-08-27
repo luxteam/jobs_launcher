@@ -499,7 +499,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
 
                     render_report = []
-                    main_logger.debug(report_dir)
+                    # main_logger.debug(report_dir)
                     if os.getenv('JL_ENGINES_COMPARE', False):
                         report_name = BASELINE_REPORT_NAME
                     else:
@@ -645,10 +645,18 @@ def build_summary_reports(work_dir, major_title='', commit_sha='undefined', bran
                                 for test_conf in temp_report['results'][test_package]:
                                     temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
                             if basename in copy_summary_report.keys():
-                                copy_summary_report[basename + temp_report['machine_info']['render_engine']] = {}
-                                copy_summary_report[basename + temp_report['machine_info']['render_engine']].update({'results': temp_report['results']})
-                                copy_summary_report[basename + temp_report['machine_info']['render_engine']].update({'summary': temp_report['summary']})
+                                basename_ext_engine = basename + temp_report['machine_info']['render_engine']
+                                if basename_ext_engine not in copy_summary_report.keys():
+                                    copy_summary_report[basename_ext_engine] = {}
+                                    copy_summary_report[basename_ext_engine].update({'results': temp_report['results']})
+                                    copy_summary_report[basename_ext_engine].update({'summary': temp_report['summary']})
+                                else:
+                                    copy_summary_report[basename_ext_engine].update({'results': temp_report['results']})
+                                    # copy_summary_report[basename_ext_engine]['results'].append(temp_report['results'])
+                                    for key in copy_summary_report[basename_ext_engine]['summary']:
+                                        copy_summary_report[basename_ext_engine]['summary'][key] += temp_report['summary'][key]
 
+            save_json_report(copy_summary_report, work_dir, 'copy_summay.json')
             performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report_engine(copy_summary_report)
         else:
             performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
