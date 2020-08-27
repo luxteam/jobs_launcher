@@ -827,7 +827,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                             current_test_report = json.loads(file.read())
                         current_session_report = copy.deepcopy(report_base)
                         current_session_report['machine_info'].update({'os': session_os,
-                                                                       'render_engine': 'RPR Tahoe'})
+                                                                       'render_engine': 'Tahoe'})
                         current_session_report['results'].update(
                             {current_test_report[0]['test_group']: {"": {
                                 "render_results": current_test_report,
@@ -866,7 +866,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                             current_session_report['machine_info'].update({'tool': jtem['tool']})
                             current_session_report['machine_info'].update({'render_version': jtem['render_version']})
                             current_session_report['machine_info'].update({'core_version': jtem['core_version']})
-                            current_session_report['machine_info'].update({'render_engine': 'RPR Tahoe'})
+                            current_session_report['machine_info'].update({'render_engine': 'Tahoe'})
                         except Exception as err:
                             print("Exception while updating machine_info in session_report")
                             print(str(err))
