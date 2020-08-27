@@ -118,7 +118,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
         except IndexError:
             baseline_time = -0.0
 
-        time_diff = render_time - baseline_time
+        time_diff = get_diff(render_time, baseline_time)
 
         for threshold in time_diff_max:
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:

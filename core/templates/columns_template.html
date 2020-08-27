@@ -123,7 +123,7 @@
                 <b>Scene:</b> {{ item.scene_name }}<br/>
                 <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                 <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
-                <b>Difference render time:</b> {{ item.difference_time | round(3) }} sec<br/>
+                <b>Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
                 <b>Test info:</b><br/>
                 {%- for param in item.script_info -%}
                     {{ param }}<br/>
@@ -168,7 +168,7 @@
 {#- ------------------------------ RENDER TIME DIFFERENCE ------------------------------ -#}
 {%- if column.name == 'time_diff' -%}
     {%- if is_head -%}
-        <th data-field="time_diff" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Render time diff, sec</th>
+        <th data-field="time_diff" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Render time diff, %</th>
     {%- else -%}
         {%- if report_type == 'default' -%}
             <td {% if config.TIME_DIFF_MAX < item.difference_time -%}
