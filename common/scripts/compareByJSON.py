@@ -43,9 +43,9 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             return img
         baseline_img_path = os.path.join(
             base_dir, img['test_group'], baseline_json['render_color_path'])
-        if img['testcase_timeout_exceeded']:
+        if img.get('testcase_timeout_exceeded', False):
             img['message'].append('Testcase timeout exceeded')
-        elif img['group_timeout_exceeded']:
+        elif img.get('group_timeout_exceeded', False):
             img['message'].append('Test group timeout exceeded')
         # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
