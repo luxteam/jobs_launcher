@@ -49,7 +49,11 @@
     {%- if is_head -%}
         <th data-field="baseline_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">
             {%- if report_type == 'default' or report_type == 'ec' -%}
-                Baseline Color
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    Tahoe
+                {%- else -%}
+                    Baseline Color
+                {%- endif -%}
             {%- elif report_type == 'ct' -%}
                 {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
                     NorthStar Baseline
@@ -88,7 +92,11 @@
     {%- if is_head -%}
         <th data-field="rendered_img" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-events="openFullImgSize" data-formatter="metaAJAX">
             {%- if report_type == 'default' or report_type == 'ec' -%}
-                Rendered color
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    NorthStar
+                {%- else -%}
+                    Rendered color
+                {%- endif -%}
             {%- elif report_type == 'ct' -%}
                 {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
                     NorthStar
@@ -124,13 +132,10 @@
         <th data-filed="info" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Info</th>
     {%- else -%}
         {%- if report_type == 'default' -%}
-            <td class="infoColumn
-            {%- if item.difference_time > 5 -%}
-               {{ ' ' }}timeDiffFailedStatus
-            {%- endif -%} {{ ' ' }} {{ item.test_status }}Status">
+            <td class="infoColumn">
                 <b>Scene:</b> {{ item.scene_name }}<br/>
-                <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
-                <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
+                <b>Tahoe Render time:</b> {{ item.render_time | round(3) }}<br/>
+                <b>NorthStar Render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
                 <b>Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
                 <b>Test info:</b><br/>
                 {%- for param in item.script_info -%}
@@ -179,13 +184,7 @@
         <th data-field="time_diff" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Render time diff, sec</th>
     {%- else -%}
         {%- if report_type == 'default' -%}
-            <td {% if config.TIME_DIFF_MAX < item.difference_time -%}
-                class="timeWorseStatus"
-            {% elif item.difference_time < -config.TIME_DIFF_MAX -%}
-                class="timeBetterStatus"
-            {% endif -%}
-            >
-            {{ item.difference_time | round (3) }}</td>
+            <td>{{ item.difference_time | round (3) }}</td>
         {%- elif report_type == 'ec' or report_type == 'ct' -%}
             <td
                 {% if item.time_diff_status is defined and item.time_diff_status == config.TEST_DIFF_STATUS -%}
@@ -247,7 +246,11 @@
     {%- if is_head -%}
         <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">
             {%- if report_type == 'default' or report_type == 'ec' -%}
-                Render time
+                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+                    Tahoe render time
+                {%- else -%}
+                    RPR render time
+                {%- endif -%}
             {%- elif report_type == 'ct' -%}
                 {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
                     NorthStar render time

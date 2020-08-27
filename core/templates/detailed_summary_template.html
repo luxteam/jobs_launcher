@@ -11,21 +11,41 @@
 {% include "images_compare_block.html" %}
 
 {% if report_type == 'default' %}
-    {%
-    set template_columns = [
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false', 'name': 'test_case'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'test_case_copy'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'parameters'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'test_status'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'render_time'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'baseline_render_time'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'time_diff'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'baseline_img'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'rendered_img'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'pix_diff_2'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'false', 'data_visible': 'true',  'name': 'render_log'}
-    ] 
-    %}
+
+    {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
+        {%
+        set template_columns = [
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false', 'name': 'test_case'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'test_case_copy'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'parameters'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false',  'name': 'test_status'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'render_time'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'baseline_render_time'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'time_diff'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'baseline_img'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'rendered_img'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false',  'name': 'pix_diff_2'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'false', 'data_visible': 'false',  'name': 'render_log'}
+        ]
+        %}
+    {%- else -%}
+        {%
+        set template_columns = [
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false', 'name': 'test_case'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'test_case_copy'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'parameters'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'test_status'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'render_time'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'baseline_render_time'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'time_diff'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'baseline_img'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'rendered_img'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'true',  'name': 'pix_diff_2'},
+            {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'false', 'data_visible': 'true',  'name': 'render_log'}
+        ]
+        %}
+    {%- endif -%}
+
 {% elif report_type == 'ec' %}
     {%
     set template_columns = [
@@ -64,7 +84,7 @@
 {% endif %}
 
 <div class="jsTableWrapper">
-    <div id="toolbar">
+    <div id="toolbar" style="display: none;">
         <button class="commonButton" type="button" name="showOnlyPassedCases" onclick="searchTextInBootstrapTable('passed');">Show passed [{{ report[i].summary.passed }}]</button>
         <button class="commonButton" type="button" name="showOnlyFailedCases" onclick="searchTextInBootstrapTable('failed');">
             Show failed [{{ report[i].summary.failed }}]
