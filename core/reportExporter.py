@@ -358,7 +358,7 @@ def build_summary_report(work_dir, node_retry_info):
     return summary_report, common_info
 
 
-def build_performance_report(summary_report):
+def build_performance_report(summary_report, major_title):
     performance_report = AutoDict()
     performance_report_detail = AutoDict()
     hardware = {}
@@ -373,13 +373,13 @@ def build_performance_report(summary_report):
             # if machine info is empty it's blank data for lost test cases
             continue
 
+        temp_report = platform['results'][group][conf]
+        tool = temp_report['machine_info'].get('tool', major_title)
+
         hw = platform['results'][group][conf]['machine_info']['render_device'] + ' ' + platform['results'][group][conf]['machine_info']['os'].split()[0]
-        render_info.append([platform['results'][group][conf]['machine_info']['tool'], hw, platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
+        render_info.append([tool, hw, platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
         if hw not in hardware:
             hardware[hw] = platform['summary']['render_duration']
-
-        temp_report = platform['results'][group][conf]
-        tool = temp_report['machine_info']['tool']
 
         results = platform.pop('results', None)
         info = temp_report
@@ -592,7 +592,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         copy_summary_report = copy.deepcopy(summary_report)
         performance_template = env.get_template('performance_template.html')
 
-        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
+        performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report, major_title)
 
         setup_sum, setup_details = setup_time_report(work_dir)
 
