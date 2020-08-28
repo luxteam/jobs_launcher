@@ -251,7 +251,7 @@ def main(args):
         img.update(get_rendertime_difference(
             args.base_dir, img, args.time_diff_max))
 
-        if args.vram_diff_max:
+        if hasattr(args, 'vram_diff_max'):
             path_to_baseline_json = os.path.join(
                 args.base_dir, img['test_group'], img['test_case'] + core.config.CASE_REPORT_SUFFIX)
             if os.path.exists(path_to_baseline_json):
