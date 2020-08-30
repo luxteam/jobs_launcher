@@ -290,13 +290,19 @@
             </thead>
                 <tbody>
                 {% for setup_step in setupTimeSum['steps'] %}
-                <tr>
-                    <td>{{ setup_step }}</td>
+                    <tr>
+                        <td>{{ setup_step }}</td>
+                        {% for hw in hardware %}
+                            <td>{{ setupTimeSum[hw[0]][setup_step] | replace("-0.00","-") }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                <tr class="summary_tr">
+                    <td>Summary</td>
                     {% for hw in hardware %}
-                        <td>{{ setupTimeSum[hw[0]][setup_step] | replace("-0.00","-") }}</td>
+                        <td>{{ setupTimeSum['Summary'][hw[0]] | replace("-0.00","-") }}</td>
                     {% endfor %}
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
     </div>
