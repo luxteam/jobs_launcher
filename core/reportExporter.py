@@ -868,7 +868,16 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                                 else:
                                                     baseline_time = 0
                                                 jtem.update({'baseline_render_time': baseline_time})
-                                                jtem.update({'difference_time': jtem['render_time'] - baseline_time})
+
+                                                def get_diff(current, previous):
+                                                    if current == previous:
+                                                        return 0.0
+                                                    try:
+                                                        return (current - previous) / previous * 100.0
+                                                    except ZeroDivisionError:
+                                                        return 0
+
+                                                jtem.update({'difference_time': get_diff(jtem['render_time'], baseline_time)})
                                         except Exception as err:
                                             main_logger.error(str(err))
 
