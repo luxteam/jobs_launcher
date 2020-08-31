@@ -516,7 +516,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', node_retry_info=''):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
     rc = 0
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
@@ -546,8 +546,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     common_info = {}
     summary_report = None
 
-    if node_retry_info:
-        node_retry_info = json.loads(bytes(node_retry_info, "utf-8").decode("unicode_escape"))
+    with open(os.path.join(work_dir, RETRY_INFO_NAME), "r") as file:
+        node_retry_info = json.load(file)
 
     main_logger.info("Saving summary report...")
 
