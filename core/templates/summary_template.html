@@ -17,7 +17,6 @@
                 {% if synchronization_time %}
                     <th data-formatter="timeFormatterFull">Synchronization time</th>
                 {% endif %}
-                <th data-formatter="timeFormatterFull" data-visible="false" data-field="setupTime">Setup time</th>
             </tr>
         </thead>
         <tbody>
@@ -41,7 +40,6 @@
                 {% if synchronization_time %}
                     <td>{{ report[i].summary.synchronization_duration }}</td>
                 {% endif %}
-                <td>{{ report[i].summary.setup_duration }}</td>
             </tr>
     {% endfor %}
         </tbody>
@@ -75,7 +73,6 @@
                 {% if synchronization_time %}
                     <th data-formatter="timeFormatterFull">Synchronization time</th>
                 {% endif %}
-                <th data-formatter="timeFormatterFull" data-visible="false" data-field="setupTime">Setup time</th>
             </tr>
         </thead>
         <tbody>
@@ -102,7 +99,6 @@
                 {% if synchronization_time %}
                     <td>{{ report[i].results[test_package][test_conf].synchronization_duration }}</td>
                 {% endif %}
-                <td>{{ report[i].results[test_package][test_conf].setup_duration }}</td>
             </tr>
             {% endfor %}
         {% endfor %}
@@ -121,7 +117,6 @@
                 {% if synchronization_time %}
                     <td>{{ report[i].summary.synchronization_duration }}</td>
                 {% endif %}
-                <td>{{ report[i].summary.setup_duration }}</td>
             </tr>
         </tbody>
     </table>

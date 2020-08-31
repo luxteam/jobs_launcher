@@ -20,8 +20,8 @@
                 <td>{{ common_info.minor_version }}</td>
             {% else %}
                 {# Default and converters #}
-                <td>2.9.42</td>
-                <td>1.35.4</td>
+                <td>{{ "-" | env_override("PLUGIN_VERSION") }}</td>
+                <td>{{ "-" | env_override("CORE_VERSION") }}</td>
             {% endif %}
         </tr>
     </table>
@@ -51,8 +51,8 @@
                 <td>{{ common_info.minor_version }}</td>
             {% else %}
                 {# Default and converters #}
-                <td>2.9.42</td>
-                <td>1.35.4</td>
+                <td>{{ "-" | env_override("PLUGIN_VERSION") }}</td>
+                <td>{{ "-" | env_override("CORE_VERSION") }}</td>
             {% endif %}
         </tr>
     </table>

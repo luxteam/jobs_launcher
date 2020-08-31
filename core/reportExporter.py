@@ -260,6 +260,7 @@ def build_summary_report(work_dir):
                                     else:
                                         common_info.update({'minor_version': [temp_report['machine_info']['minor_version']]})
                                     common_info.update({'core_version': [temp_report['machine_info']['core_version']]})
+                                    common_info.update({'tool': [temp_report['machine_info']['tool']]})
 
                                 for jtem in temp_report['results'][test_package][test_conf]['render_results']:
                                     for group_report_file in REPORT_FILES:
@@ -498,8 +499,6 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                 for config in summary_report[execution]['results'][test]:
                     report_dir = summary_report[execution]['results'][test][config]['result_path']
 
-                    render_report = []
-                    # main_logger.debug(report_dir)
                     if os.getenv('JL_ENGINES_COMPARE', False):
                         report_name = BASELINE_REPORT_NAME
                     else:
@@ -513,11 +512,11 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                     common_info.update({key_upd: render_report[0][key_upd]})
 
                             for render_item in render_report:
-                                render_item.update({'difference_time': 0})
-                                render_item.update({'baseline_render_time': 0})
+                                item_from_summary = [x for x in summary_report[execution]['results'][test][config]['render_results'] if x['test_case'] == render_item['test_case']][0]
+                                render_item.update({'difference_time': item_from_summary['difference_time']})
+                                render_item.update({'baseline_render_time': item_from_summary['baseline_render_time']})
                                 manual_baseline_northstar_path = os.path.join(work_dir, report_dir.replace('RPR', 'NorthStar'), render_item['render_color_path'])
                                 render_item.update({'baseline_color_path': os.path.relpath(manual_baseline_northstar_path, os.path.join(work_dir, report_dir))})
-
                     else:
                         # test case was lost
                         continue
@@ -703,7 +702,7 @@ def build_summary_reports(work_dir, major_title='', commit_sha='undefined', bran
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
 
     main_logger.info("building locals...")
-    build_local_reports(work_dir, summary_report, common_info, env)
+    build_local_reports(work_dir, copy_summary_report, common_info, env)
 
 
 def setup_time_report(work_dir):
@@ -864,7 +863,10 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                         try:
                                             with open(os.path.join(path, json_report).replace('RPR', 'NorthStar'), 'r') as north_report:
                                                 nort_json = json.loads(north_report.read())
-                                                baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
+                                                if len([x for x in nort_json if x['test_case'] == jtem['test_case']]):
+                                                    baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
+                                                else:
+                                                    baseline_time = 0
                                                 jtem.update({'baseline_render_time': baseline_time})
                                                 jtem.update({'difference_time': jtem['render_time'] - baseline_time})
                                         except Exception as err:
