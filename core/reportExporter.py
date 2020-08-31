@@ -861,11 +861,14 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                     manual_baseline_northstar_path = os.path.join(path.replace('RPR', 'NorthStar'), jtem['render_color_path'])
                                     jtem.update({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)})
                                     if os.path.exists(os.path.join(path, json_report).replace('RPR', 'NorthStar')):
-                                        with open(os.path.join(path, json_report).replace('RPR', 'NorthStar'), 'r') as north_report:
-                                            nort_json = json.loads(north_report.read())
-                                            baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
-                                            jtem.update({'baseline_render_time': baseline_time})
-                                            jtem.update({'difference_time': jtem['render_time'] - baseline_time})
+                                        try:
+                                            with open(os.path.join(path, json_report).replace('RPR', 'NorthStar'), 'r') as north_report:
+                                                nort_json = json.loads(north_report.read())
+                                                baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
+                                                jtem.update({'baseline_render_time': baseline_time})
+                                                jtem.update({'difference_time': jtem['render_time'] - baseline_time})
+                                        except Exception as err:
+                                            main_logger.error(str(err))
 
                             render_duration += jtem['render_time']
                             synchronization_duration += jtem.get('sync_time', 0.0)
