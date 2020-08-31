@@ -647,7 +647,7 @@ def build_summary_reports(work_dir, major_title='', commit_sha='undefined', bran
                             if basename in copy_summary_report.keys():
                                 basename_ext_engine = basename + temp_report['machine_info']['render_engine']
                                 if basename_ext_engine not in copy_summary_report.keys():
-                                    copy_summary_report[basename_ext_engine] = {}
+                                    copy_summary_report[basename_ext_engine]  = {}
                                     copy_summary_report[basename_ext_engine].update({'results': temp_report['results']})
                                     copy_summary_report[basename_ext_engine].update({'summary': temp_report['summary']})
                                 else:
@@ -860,7 +860,12 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                     # update paths
                                     manual_baseline_northstar_path = os.path.join(path.replace('RPR', 'NorthStar'), jtem['render_color_path'])
                                     jtem.update({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)})
-
+                                    if os.path.exists(os.path.join(path, json_report).replace('RPR', 'NorthStar')):
+                                        with open(os.path.join(path, json_report).replace('RPR', 'NorthStar'), 'r') as north_report:
+                                            nort_json = json.loads(north_report.read())
+                                            baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
+                                            jtem.update({'baseline_render_time': baseline_time})
+                                            jtem.update({'difference_time': jtem['render_time'] - baseline_time})
 
                             render_duration += jtem['render_time']
                             synchronization_duration += jtem.get('sync_time', 0.0)
@@ -992,88 +997,3 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
 
     return summary_report_gen, common_info_gen
 
-    # if os.path.exists(os.path.join(work_dir, 'report_resources')):
-    #     rmtree(os.path.join(work_dir, 'report_resources'), True)
-    # try:
-    #     copytree(os.path.join(os.path.split(__file__)[0], REPORT_RESOURCES_PATH),
-    #              os.path.join(work_dir, 'report_resources'))
-    # except Exception as err:
-    #     main_logger.error("Failed to copy report resources: {}".format(str(err)))
-    #
-    # env = jinja2.Environment(
-    #     loader=jinja2.PackageLoader('core.reportExporter', 'templates'),
-    #     autoescape=True
-    # )
-    # env.globals.update({'original_render': '',
-    #                     'report_type': report_type,
-    #                     'pre_path': '.',
-    #                     'config': config})
-    # env.filters['env_override'] = env_override
-    # env.filters['get_jobs_launcher_version'] = get_jobs_launcher_version
-    #
-    # common_info = common_info_gen
-    # summary_report = summary_report_gen
-    #
-    # main_logger.info("Saving performance report...")
-    # try:
-    #     # setup_time_count(work_dir)
-    #     copy_summary_report = copy.deepcopy(summary_report)
-    #
-    #     performance_template = env.get_template('performance_template_engine.html')
-    #
-    #     for path, dirs, files in os.walk(os.path.abspath(northstar_dir)):
-    #         for file in files:
-    #             # build summary report
-    #             if file.endswith('session_report_ENGINE.json'):
-    #                 with open(os.path.join(path, file), 'r') as engine_report_file:
-    #                     temp_report = json.loads(engine_report_file.read())
-    #
-    #                     basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
-    #                     for test_package in temp_report['results']:
-    #                         for test_conf in temp_report['results'][test_package]:
-    #                             temp_report['results'][test_package][test_conf].update(
-    #                                 {'machine_info': temp_report['machine_info']})
-    #                     if basename in copy_summary_report.keys():
-    #                         copy_summary_report[basename + temp_report['machine_info']['render_engine']] = {}
-    #                         copy_summary_report[basename + temp_report['machine_info']['render_engine']].update(
-    #                             {'results': temp_report['results']})
-    #                         copy_summary_report[basename + temp_report['machine_info']['render_engine']].update(
-    #                             {'summary': temp_report['summary']})
-    #
-    #     performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report_engine(copy_summary_report)
-    #
-    #     setup_sum, setup_details = setup_time_report(work_dir)
-    #
-    #     save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
-    #     save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
-    #     save_json_report(summary_info_for_report, work_dir, 'summary_info_for_report.json')
-    #     save_json_report(hardware, work_dir, 'hardware.json')
-    #     performance_html = performance_template.render(title="RPR NorthStar" + " Performance",
-    #                                                    performance_report=performance_report,
-    #                                                    hardware=hardware,
-    #                                                    performance_report_detail=performance_report_detail,
-    #                                                    pageID="performanceA",
-    #                                                    common_info=common_info,
-    #                                                    test_info=summary_info_for_report,
-    #                                                    setupTimeSum=setup_sum,
-    #                                                    setupTimeDetails=setup_details,
-    #                                                    synchronization_time=sync_time(summary_report))
-    #     save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-    #
-    #     summary_template = env.get_template('summary_template.html')
-    #     save_json_report(summary_report, work_dir, SUMMARY_REPORT)
-    #     summary_html = summary_template.render(title=" Summary",
-    #                                            report=summary_report,
-    #                                            pageID="summaryA",
-    #                                            PIX_DIFF_MAX=PIX_DIFF_MAX,
-    #                                            common_info=common_info,
-    #                                            node_retry_info='',
-    #                                            synchronization_time=sync_time(summary_report))
-    #     save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
-    # except Exception as err:
-    #     traceback.print_exc()
-    #     main_logger.error(performance_html)  # local variable 'performance_html' referenced before assignment
-    #     save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-    #
-    # # build_performance_report_engine()
-    # pass

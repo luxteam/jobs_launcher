@@ -406,7 +406,7 @@
       scales: {yAxes: [
           {ticks: {beginAtZero: true,
           callback: function(value, index, values) {
-                                return (value/60).toFixed(2) + " min";
+                                return (value/60).toFixed(0) + " min";
                             }}}]}
     }
 
@@ -418,7 +418,7 @@
         yAxes: [{stacked: true,
                 ticks: {beginAtZero: true,
                 callback: function(value, index, values) {
-                                return (value/60).toFixed(2) + " min";
+                                return (value/60).toFixed(0) + " min";
                             }}}]
       }
     }
@@ -482,7 +482,7 @@
       scales: {yAxes: [
           {ticks: {beginAtZero: true,
           callback: function(value, index, values) {
-                                return (value/60).toFixed(2) + " min";
+                                return (value/60).toFixed(0) + " min";
                             }}}]}
   }
 
@@ -494,7 +494,7 @@
       yAxes: [{stacked: true,
                 ticks: {beginAtZero: true,
                 callback: function(value, index, values) {
-                                return (value/60).toFixed(2) + " min";
+                                return (value/60).toFixed(0) + " min";
                             }}}]
     }
   }
