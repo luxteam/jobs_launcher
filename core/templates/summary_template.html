@@ -25,8 +25,16 @@
                     <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
                         title="[Skipped] status means case wasn't launched by QA team decision."></span>
                 </th>
-                <th data-formatter="timeFormatterFull" data-switchable="false" data-visible="false" data-field="fullTimeTaken">Time taken</th>
-                <th data-formatter="timeFormatterFull" data-field="syncTimeTaken" data-switchable="false">Time taken</th>
+                <th data-formatter="timeFormatterFull" data-switchable="false" data-visible="false" data-field="fullTimeTaken">
+                    Time taken
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                        title="[Failed] status means that pixel difference with baseline image is too large."></span>
+                </th>
+                <th data-formatter="timeFormatterFull" data-field="syncTimeTaken" data-switchable="false">
+                    Time taken
+                    <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top"
+                        title="[Failed] status means that pixel difference with baseline image is too large."></span>
+                </th>
                 <th data-formatter="timeFormatterFull">Render time</th>
                 {% if synchronization_time %}
                     <th data-formatter="timeFormatterFull">Synchronization time</th>
