@@ -515,7 +515,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                 item_from_summary = [x for x in summary_report[execution]['results'][test][config]['render_results'] if x['test_case'] == render_item['test_case']][0]
                                 render_item.update({'difference_time': item_from_summary['difference_time']})
                                 render_item.update({'baseline_render_time': item_from_summary['baseline_render_time']})
-                                manual_baseline_northstar_path = os.path.join(work_dir, report_dir.replace('RPR', 'NorthStar'), render_item['render_color_path'])
+                                manual_baseline_northstar_path = os.path.join(work_dir, os.path.split(report_dir)[0].replace('RPR', 'NorthStar'), os.path.split(report_dir)[1], render_item['render_color_path'])
                                 render_item.update({'baseline_color_path': os.path.relpath(manual_baseline_northstar_path, os.path.join(work_dir, report_dir))})
                     else:
                         # test case was lost
@@ -861,7 +861,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                     jtem.update({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)})
                                     if os.path.exists(os.path.join(path, json_report).replace('RPR', 'NorthStar')):
                                         try:
-                                            with open(os.path.join(path, json_report).replace('RPR', 'NorthStar'), 'r') as north_report:
+                                            with open(os.path.join(path, json_report).replace(rpr_dir, northstar_dir), 'r') as north_report:
                                                 nort_json = json.loads(north_report.read())
                                                 if len([x for x in nort_json if x['test_case'] == jtem['test_case']]):
                                                     baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
