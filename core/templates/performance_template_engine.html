@@ -48,7 +48,7 @@
             data-pagination="false"
             data-page-list="[5, 10, 20, 45, ALL]"
             data-sort-order="desc"
-            data-sort-name="test_status"
+            data-sort-name="test"
             data-show-multi-sort="true"
             data-toolbar="#toolbar_render"
         >
@@ -57,9 +57,9 @@
             </div>
             <thead>
             <tr>
-                <th data-halign="center" data-sortable="true">Test</th>
+                <th data-halign="center" data-sortable="true" data-field="test">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" >{{ hw[0] }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -70,12 +70,13 @@
                         {% for hw in hardware %}
                             <td>
                                 {% if performance_report_detail[test_package][hw[0]].render is not number %}
-                                    Error
+                                    0
                                 {% elif performance_report_detail[test_package][hw[0]].render == 0 %}
                                     Skipped
                                 {% else %}
                                     {{ performance_report_detail[test_package][hw[0]].render | round(3) | replace("-0.0","-") }}
                                 {% endif %}
+
                             </td>
                         {% endfor %}
                     </tr>
@@ -96,7 +97,7 @@
             data-pagination="false"
             data-page-list="[5, 10, 20, 45, ALL]"
             data-sort-order="desc"
-            data-sort-name="test_status"
+            data-sort-name="test"
             data-show-multi-sort="true"
             data-toolbar="#toolbar_render_norm"
         >
@@ -105,9 +106,9 @@
             </div>
             <thead>
             <tr>
-                <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+                <th data-field="test_case" data-halign="center" data-sortable="true" data-field="test">Test</th>
                 {% for hw in hardware %}
-                <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                <th data-field="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -180,7 +181,7 @@
                 data-pagination="false"
                 data-page-list="[5, 10, 20, 45, ALL]"
                 data-sort-order="desc"
-                data-sort-name="test_status"
+                data-sort-name="test"
                 data-show-multi-sort="true"
                 data-toolbar="#toolbar_sync"
             >
@@ -189,7 +190,7 @@
                 </div>
                 <thead>
                 <tr>
-                    <th data-halign="center" data-sortable="true">Test</th>
+                    <th data-halign="center" data-sortable="true" data-field="test">Test</th>
                     {% for hw in hardware %}
                         <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
@@ -228,7 +229,7 @@
                 data-pagination="false"
                 data-page-list="[5, 10, 20, 45, ALL]"
                 data-sort-order="desc"
-                data-sort-name="test_status"
+                data-sort-name="test"
                 data-show-multi-sort="true"
                 data-toolbar="#toolbar_sync_norm"
             >
@@ -237,9 +238,9 @@
                 </div>
                 <thead>
                 <tr>
-                    <th data-filed="test_case" data-halign="center" data-sortable="true">Test</th>
+                    <th data-field="test_case" data-halign="center" data-sortable="true" data-field="test">Test</th>
                     {% for hw in hardware %}
-                    <th data-filed="{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-field="{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -305,7 +306,7 @@
                     data-pagination="false"
                     data-page-list="[5, 10, 20, 45, ALL]"
                     data-sort-order="desc"
-                    data-sort-name="test_status"
+                    data-sort-name="test"
                     data-show-multi-sort="true"
                     data-toolbar="#toolbar_setup_{{ test_package }}"
                 >
@@ -314,7 +315,7 @@
                     </div>
                     <thead>
                     <tr>
-                        <th data-halign="center" data-sortable="true">Step</th>
+                        <th data-halign="center" data-sortable="true" data-field="test">Step</th>
                         {% for hw in hardware %}
                             <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                         {% endfor %}

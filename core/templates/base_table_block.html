@@ -14,7 +14,7 @@
             {% endif %}
         </tr>
         <tr>
-            <th>{{ "undefined" | env_override("REPORT_TOOL") }}</th>
+            <td>{{ "undefined" | env_override("REPORT_TOOL") }}</td>
             <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
             {% if report_type == 'ec' %}
                 {# Core #}

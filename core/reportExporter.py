@@ -368,7 +368,7 @@ def build_performance_report_engine(summary_report):
                              'total': results[test_package][test_config]['duration'],
                              'render_engine': render_engine}
 
-                performance_report_detail[test_package + " " + render_engine].update({hw: test_info})
+                performance_report_detail[render_engine + " " + test_package].update({hw: test_info})
 
     tools = set([render_engine for tool, device, render, sync, render_engine in render_info])
     # tools = {render_engine}
@@ -640,17 +640,20 @@ def build_summary_reports(work_dir, major_title='', commit_sha='undefined', bran
                             temp_report = json.loads(engine_report_file.read())
 
                             basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
+                            main_logger.debug("basen" + basename)
                             for test_package in temp_report['results']:
                                 for test_conf in temp_report['results'][test_package]:
                                     temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
                             if basename in copy_summary_report.keys():
-                                basename_ext_engine = basename + temp_report['machine_info']['render_engine']
+                                basename_ext_engine = basename + " " + temp_report['machine_info']['render_engine']
+                                main_logger.debug("basen ext" + basename_ext_engine)
+
                                 if basename_ext_engine not in copy_summary_report.keys():
-                                    copy_summary_report[basename_ext_engine]  = {}
+                                    copy_summary_report[basename_ext_engine] = {}
                                     copy_summary_report[basename_ext_engine].update({'results': temp_report['results']})
                                     copy_summary_report[basename_ext_engine].update({'summary': temp_report['summary']})
                                 else:
-                                    copy_summary_report[basename_ext_engine].update({'results': temp_report['results']})
+                                    copy_summary_report[basename_ext_engine]['results'].update(temp_report['results'])
                                     # copy_summary_report[basename_ext_engine]['results'].append(temp_report['results'])
                                     for key in copy_summary_report[basename_ext_engine]['summary']:
                                         copy_summary_report[basename_ext_engine]['summary'][key] += temp_report['summary'][key]
@@ -995,7 +998,6 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                         # except Exception as err:
                         #     print(str(err))
 
-                        # get summary results
                         total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0,
                                  'render_duration': 0,
                                  'synchronization_duration': 0}
