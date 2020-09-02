@@ -860,9 +860,9 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                             for group_report_file in POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL:
                                 if group_report_file in jtem.keys():
                                     # update paths
-                                    manual_baseline_northstar_path = os.path.join(path.replace('RPR', 'NorthStar'), jtem['render_color_path'])
+                                    manual_baseline_northstar_path = os.path.join(path.replace(rpr_dir, northstar_dir), jtem['render_color_path'])
                                     jtem.update({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)})
-                                    if os.path.exists(os.path.join(path, json_report).replace('RPR', 'NorthStar')):
+                                    if os.path.exists(os.path.join(path, json_report).replace(rpr_dir, northstar_dir)):
                                         try:
                                             with open(os.path.join(path, json_report).replace(rpr_dir, northstar_dir), 'r') as north_report:
                                                 nort_json = json.loads(north_report.read())
