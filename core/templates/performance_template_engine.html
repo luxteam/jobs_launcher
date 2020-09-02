@@ -47,19 +47,19 @@
             data-show-pagination-switch="true"
             data-pagination="false"
             data-page-list="[5, 10, 20, 45, ALL]"
-            data-sort-order="desc"
+            data-sort-order="acs"
             data-sort-name="test"
             data-show-multi-sort="true"
             data-toolbar="#toolbar_render"
         >
             <div id="toolbar_render">
-                <h2 style="margin: auto;">render duration by test groups<h2>
+                <h2 style="margin: auto;">render duration by test groups</h2>
             </div>
             <thead>
             <tr>
                 <th data-halign="center" data-sortable="true" data-field="test">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" >{{ hw[0] }}</th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -70,7 +70,7 @@
                         {% for hw in hardware %}
                             <td>
                                 {% if performance_report_detail[test_package][hw[0]].render is not number %}
-                                    0
+                                    Error
                                 {% elif performance_report_detail[test_package][hw[0]].render == 0 %}
                                     Skipped
                                 {% else %}
@@ -96,8 +96,8 @@
             data-show-pagination-switch="true"
             data-pagination="false"
             data-page-list="[5, 10, 20, 45, ALL]"
-            data-sort-order="desc"
-            data-sort-name="test"
+            data-sort-order="asc"
+            data-sort-name="test_case"
             data-show-multi-sort="true"
             data-toolbar="#toolbar_render_norm"
         >
@@ -106,9 +106,9 @@
             </div>
             <thead>
             <tr>
-                <th data-field="test_case" data-halign="center" data-sortable="true" data-field="test">Test</th>
+                <th data-field="test_case" data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-                <th data-field="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
+<th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -180,7 +180,7 @@
                 data-show-pagination-switch="true"
                 data-pagination="false"
                 data-page-list="[5, 10, 20, 45, ALL]"
-                data-sort-order="desc"
+                data-sort-order="asc"
                 data-sort-name="test"
                 data-show-multi-sort="true"
                 data-toolbar="#toolbar_sync"
@@ -228,8 +228,8 @@
                 data-show-pagination-switch="true"
                 data-pagination="false"
                 data-page-list="[5, 10, 20, 45, ALL]"
-                data-sort-order="desc"
-                data-sort-name="test"
+                data-sort-order="asc"
+                data-sort-name="test_case"
                 data-show-multi-sort="true"
                 data-toolbar="#toolbar_sync_norm"
             >
@@ -238,9 +238,9 @@
                 </div>
                 <thead>
                 <tr>
-                    <th data-field="test_case" data-halign="center" data-sortable="true" data-field="test">Test</th>
+                    <th data-field="test_case" data-halign="center" data-sortable="true">Test</th>
                     {% for hw in hardware %}
-                    <th data-field="{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-filed="{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -270,10 +270,10 @@
     <h1>setup time steps</h1>
     <h2>total setup time duration</h2>
     <div class="jsTableWrapper">
-        <table class="baseTable" data-toggle="table">
+        <table class="baseTable" data-toggle="table" data-sort-order="asc" data-sort-name="test">
             <thead>
                 <tr>
-                    <th>Step</th>
+                    <th data-field="test" data-sortable="true">Step</th>
                     {% for hw in hardware %}
                     <th data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
                     {% endfor %}
@@ -305,7 +305,7 @@
                     data-show-pagination-switch="true"
                     data-pagination="false"
                     data-page-list="[5, 10, 20, 45, ALL]"
-                    data-sort-order="desc"
+                    data-sort-order="asc"
                     data-sort-name="test"
                     data-show-multi-sort="true"
                     data-toolbar="#toolbar_setup_{{ test_package }}"
