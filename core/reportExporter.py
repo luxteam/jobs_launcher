@@ -226,6 +226,9 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
             for group in retry_info['Tries']:
                 if lost_test_package in group.keys():
                     host_name = group[lost_test_package][-1]['host']
+                #all non splitTestsExecution and non regression builds (e.g. any build of core)
+                elif 'DefaultExecution' in group.keys():
+                    host_name = group['DefaultExecution'][-1]['host']
                 else:
                     for key in group.keys():
                         if key.endswith('.json'):
@@ -739,12 +742,13 @@ def add_retry_info(summary_report, retry_info, work_dir):
                     for tester in retry['Testers']:
                         if str(node).upper() in tester:
                             for group in retry['Tries']:
-                                if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json')]:
+                                if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json') or 'DefaultExecution' in g]:
                                     retries_list = []
 
                                     for retry in retry['Tries']:
                                         for group in retry.keys():
-                                            if group.endswith('.json'):
+                                            #all non splitTestsExecution and non regression builds (e.g. any build of core)
+                                            if group.endswith('.json') or 'DefaultExecution' in group:
                                                 groupOrJson = retry[group]
                                             else:
                                                 groupOrJson = retry.get(
