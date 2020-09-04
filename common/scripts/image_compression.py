@@ -6,6 +6,7 @@ FILE_EXTENSIONS = {'JPEG': ('.jpg', '.jpeg')}
 
 
 def main(args):
+    print('Launch compression script')
     for path, dirs, files in os.walk(args.work_dir):
         for f in files:
             for extension in FILE_EXTENSIONS:
@@ -17,7 +18,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--work_dir', required=False, default='../Work')
+    parser.add_argument('--work_dir', required=False, default='../../../Work')
     parser.add_argument('--quality', required=False, default=50)
     args = parser.parse_args()
 
