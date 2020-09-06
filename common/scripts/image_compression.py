@@ -19,7 +19,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--work_dir', required=False, default='../../../Work')
-    parser.add_argument('--quality', required=False, default=75)
+    parser.add_argument('--quality', required=False, default=75, type=int)
     args = parser.parse_args()
 
     args.work_dir = os.path.realpath(
