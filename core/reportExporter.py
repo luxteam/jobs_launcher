@@ -594,7 +594,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
 
         performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report, major_title)
 
-        setup_sum, setup_details = setup_time_report(work_dir)
+        setup_sum, setup_details = setup_time_report(work_dir, performance_report_detail)
 
         save_json_report(performance_report, work_dir, PERFORMANCE_REPORT)
         save_json_report(performance_report_detail, work_dir, 'performance_report_detailed.json')
@@ -645,7 +645,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
     exit(rc)
 
 
-def setup_time_report(work_dir):
+def setup_time_report(work_dir, performance_report):
     setup_sum_list = config.SETUP_STEPS_RPR_PLUGIN
     setup_steps_dict = {}
     for step in setup_sum_list:
@@ -664,10 +664,16 @@ def setup_time_report(work_dir):
     if setup_details.keys():
         for confing in setup_details.keys():
             setup_sum[confing] = setup_steps_dict.copy()
+            sum_steps = 0
             for group in setup_details[confing]:
                 for key in list(set().union(setup_sum_list, setup_details[confing][group].keys())):
                     setup_details[confing][group][key] = round(setup_details[confing][group].get(key, -0.0), 3) # jinja don't want to round these data
                     setup_sum[confing][key] = round(setup_sum[confing].get(key, -0.0) + setup_details[confing][group][key], 3)
+
+                    sum_steps = setup_details[confing][group].get(key, -0.0)
+
+                setup_details[confing][group]['Other'] = round(performance_report[group][config]['total'] - sum_steps, 3)
+                setup_sum[confing]['Other'] = round(setup_sum[confing].get('Other', -0.0) + setup_details[confing][group]['Other'], 3)
 
             setup_sum['Summary'][confing] = 0.0
             for step in setup_sum[confing]:
