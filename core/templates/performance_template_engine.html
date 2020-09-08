@@ -59,7 +59,7 @@
             <tr>
                 <th data-halign="center" data-sortable="true" data-field="test">Test</th>
                 {% for hw in hardware %}
-                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -108,7 +108,7 @@
             <tr>
                 <th data-field="test_case" data-halign="center" data-sortable="true">Test</th>
                 {% for hw in hardware %}
-<th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+<th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
                 {% endfor %}
             </tr>
             </thead>
@@ -192,7 +192,7 @@
                 <tr>
                     <th data-halign="center" data-sortable="true" data-field="test">Test</th>
                     {% for hw in hardware %}
-                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                        <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -240,7 +240,7 @@
                 <tr>
                     <th data-field="test_case" data-halign="center" data-sortable="true">Test</th>
                     {% for hw in hardware %}
-                    <th data-filed="{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-filed="{{ hw[0] }}" data-halign="center" data-sortable="true" data-formatter="performanceNormalizeFormatter" data-cell-style="performanceNormalizeStyleFormatter">{{ hw[0] }}</th>
                     {% endfor %}
                 </tr>
                 </thead>
@@ -275,7 +275,7 @@
                 <tr>
                     <th data-field="test" data-sortable="true">Step</th>
                     {% for hw in hardware %}
-                    <th data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                    <th data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -317,7 +317,7 @@
                     <tr>
                         <th data-halign="center" data-sortable="true" data-field="test">Step</th>
                         {% for hw in hardware %}
-                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}</th>
+                            <th data-halign="center" data-sortable="true" data-cell-style="performanceNormalizeStyleFormatter" data-formatter="timeFormatterFull">{{ hw[0] }}</th>
                         {% endfor %}
                     </tr>
                     </thead>
@@ -470,7 +470,7 @@
   var renderToolData = {
     labels: [
         {% for hw in hardware %}
-          '{{ hw[0] | replace('Darwin', '') | replace('Windows', '') }}'{{ "," if not loop.last }}
+          '{{ hw[0] }}'{{ "," if not loop.last }}
         {% endfor %}
       ],
 

@@ -640,13 +640,13 @@ def build_summary_reports(work_dir, major_title='', commit_sha='undefined', bran
                             temp_report = json.loads(engine_report_file.read())
 
                             basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
-                            main_logger.debug("basen" + basename)
+                            # main_logger.debug("basen" + basename)
                             for test_package in temp_report['results']:
                                 for test_conf in temp_report['results'][test_package]:
                                     temp_report['results'][test_package][test_conf].update({'machine_info': temp_report['machine_info']})
                             if basename in copy_summary_report.keys():
                                 basename_ext_engine = basename + " " + temp_report['machine_info']['render_engine']
-                                main_logger.debug("basen ext" + basename_ext_engine)
+                                # main_logger.debug("basen ext" + basename_ext_engine)
 
                                 if basename_ext_engine not in copy_summary_report.keys():
                                     copy_summary_report[basename_ext_engine] = {}
