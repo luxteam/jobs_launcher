@@ -69,6 +69,8 @@ TIME_DIFF_TOLERANCE = {'10': float('inf'), '30': float('inf'), '60': float('inf'
 TIME_DIFF_MAX = 5
 VRAM_DIFF_MAX = 5
 
+CASE_EXPECTS_BLACK = 'Black image expected'
+
 """
 # Possible test case statuses
   passed - status means case was executed without errors and difference with baseline is permissible.

@@ -74,7 +74,10 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
 
             # pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
             # img.update({'difference_color': pix_difference})
-            pix_difference_2 = metrics.getPrediction()
+
+            # if 'Black image expected' in script_info - allow black img
+            mark_failed_if_black = core.config.CASE_EXPECTS_BLACK not in img.get('script_info', '')
+            pix_difference_2 = metrics.getPrediction(mark_failed_if_black=mark_failed_if_black)
             img.update({'difference_color_2': pix_difference_2})
             # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
             if pix_difference_2 != 0:
