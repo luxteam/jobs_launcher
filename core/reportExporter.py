@@ -673,7 +673,7 @@ def setup_time_report(work_dir, report):
                     setup_details[conf][group][key] = round(setup_details[conf][group].get(key, -0.0), 3) # jinja don't want to round these data
                     setup_sum[conf][key] = round(setup_sum[conf].get(key, -0.0) + setup_details[conf][group][key], 3)
 
-                    sum_steps = setup_details[conf][group].get(key, -0.0)
+                    sum_steps += setup_details[conf][group].get(key, -0.0)
 
                 setup_details[conf][group]['Other'] = round(report[group][conf]['total'] - sum_steps, 3)
                 setup_sum[conf]['Other'] = round(setup_sum[conf].get('Other', -0.0) + setup_details[conf][group]['Other'], 3)
