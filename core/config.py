@@ -153,5 +153,8 @@ ODD_FOR_BASELINES = [
     'difference_vram',
     'difference_ram',
     'tahoe_log',
-    'render_mode'
+    'render_mode',
+    'testcase_timeout',
+    'group_timeout_exceeded',
+    'testcase_timeout_exceeded'
 ]
