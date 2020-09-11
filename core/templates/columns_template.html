@@ -177,7 +177,8 @@
                 Pixel difference status
                 <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
-[-1] - images has diff resolution, so couldn't be compared."></span> :
+[-1] - images has diff resolution, so couldn't be compared.
+[2] - rendered unexpected full black image."></span> :
                 </b> {{ item.difference_color_2 }}<br/>
             {%- else -%}
                 {%- if item.test_status == 'failed' -%}
@@ -255,7 +256,8 @@
             Diff new
             <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="[1] - diff images.
 [0] - equals images.
-[-1] - images has diff resolution, so couldn't be compared."></span>
+[-1] - images has diff resolution, so couldn't be compared.
+[2] - rendered unexpected full black image."></span>
         </th>
     {%- else -%}
         <td
