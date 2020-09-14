@@ -83,6 +83,9 @@ def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_
             if pix_difference_2 != 0:
                 img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
+                if pix_difference_2 == 2:
+                    img['message'].append('Render is unexpected full black image.')
+                    img['test_status'] = core.config.TEST_CRASH_STATUS
 
     return img
 
