@@ -135,7 +135,7 @@ def main():
                 # exclude some tests from non-splitted tests package
                 if not file_content['split']:
                     excluded_tests = args.file_filter.split(':')[1].split(';')
-                    args.test_filter.extend([x for x in json.loads(file.read()).keys() if x not in excluded_tests])
+                    args.test_filter.extend([x for x in file_content['groups'].keys() if x not in excluded_tests])
         except Exception as e:
             main_logger.error(str(e))
 
