@@ -127,7 +127,7 @@ def main():
     # extend test_filter by values in file_filter
     if args.file_filter and args.file_filter != 'none':
         try:
-            file_name = args.file_filter.split(':')[0] + '.json'
+            file_name = args.file_filter.split(':')[0]
             with open(os.path.join(args.tests_root, file_name), 'r') as file:
                 file_content = json.load(file)
                 # save path to tests package
