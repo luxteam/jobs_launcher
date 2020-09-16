@@ -4,6 +4,7 @@ import os
 import json
 from shutil import copyfile
 from PIL import Image
+import hashlib
 from CompareMetrics import CompareMetrics
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
@@ -106,7 +107,8 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
                 img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
-            else:
+
+            if hashlib.md5(file_as_bytes(open(render_img_path, 'rb'))).hexdigest() != hashlib.md5(file_as_bytes(open(baseline_img_path, 'rb'))).hexdigest():
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
                     baseline = os.path.join(base_dir, img['test_group'], 'Color', img.get('baseline_color_path', 'None'))
                     baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + os.path.basename(baseline))
