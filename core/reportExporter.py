@@ -202,7 +202,7 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info):
+def generate_empty_render_result(work_dir, summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info):
     summary_report[gpu_os_case]['results'][lost_test_package] = {}
     # add empty conf
     summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
@@ -223,17 +223,26 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
         retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
         retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
         if retry_gpu_name in gpu_os_case and retry_os_name in gpu_os_case:
-            for group in retry_info['Tries']:
-                if lost_test_package in group.keys():
-                    host_name = group[lost_test_package][-1]['host']
-                #all non splitTestsExecution and non regression builds (e.g. any build of core)
-                elif 'DefaultExecution' in group.keys():
-                    host_name = group['DefaultExecution'][-1]['host']
-                else:
-                    for key in group.keys():
-                        if key.endswith('.json'):
-                            host_name = group[key][-1]['host']
-
+            for groups in retry_info['Tries']:
+                package_or_default_execution = None
+                for group in groups.keys():
+                    parsed_group_name = group.split(':')[0]
+                    #all non splitTestsExecution and non regression builds (e.g. any build of core)
+                    if 'DefaultExecution' in group:
+                        package_or_default_execution = group
+                        break
+                    elif parsed_group_name.endswith('.json') and lost_test_package not in group.split(':')[1]:
+                        with open(os.path.abspath(os.path.join(work_dir, '..', 'jobs', parsed_group_name))) as f:
+                            if lost_test_package in json.load(f)['groups']:
+                                package_or_default_execution = group
+                                break
+                if lost_test_package in groups.keys() or package_or_default_execution:
+                    for test_tries in retry_info['Tries']:
+                        if lost_test_package in test_tries:
+                            host_name = groups[lost_test_package][-1]['host']
+                            break
+                    if not host_name and package_or_default_execution:
+                        host_name = groups[package_or_default_execution][-1]['host']
 
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
 
@@ -338,7 +347,7 @@ def build_summary_report(work_dir, node_retry_info):
             for gpu_os_case in summary_report:
                 if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                     for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
+                        generate_empty_render_result(work_dir, summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
                     test_case_found = True
                     break
             # if all data for GPU + OS was lost (it can be regression.json execution)
@@ -355,7 +364,7 @@ def build_summary_report(work_dir, node_retry_info):
                 summary_report[gpu_os_case]['summary']['skipped'] = 0
                 summary_report[gpu_os_case]['summary']['total'] = 0
                 for lost_test_package in lost_tests_count[lost_test_result]:
-                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
+                    generate_empty_render_result(work_dir, summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
 
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
@@ -754,26 +763,37 @@ def add_retry_info(summary_report, retry_info, work_dir):
                 for retry in retry_info:
                     for tester in retry['Testers']:
                         if str(node).upper() in tester:
-                            for group in retry['Tries']:
-                                if test_package in group.keys() or [g for g in group.keys() if g.endswith('.json') or 'DefaultExecution' in g]:
+                            for groups in retry['Tries']:
+                                package_or_default_execution = None
+                                for group in groups.keys():
+                                    parsed_group_name = group.split(':')[0]
+                                    #all non splitTestsExecution and non regression builds (e.g. any build of core)
+                                    if 'DefaultExecution' in group:
+                                        package_or_default_execution = group
+                                        break
+                                    elif parsed_group_name.endswith('.json') and test_package not in group.split(':')[1]:
+                                        with open(os.path.abspath(os.path.join(work_dir, '..', 'jobs', parsed_group_name))) as f:
+                                            if test_package in json.load(f)['groups']:
+                                                package_or_default_execution = group
+                                                break
+                                if test_package in groups.keys() or package_or_default_execution:
                                     retries_list = []
+                                    groupOrJson = []
+                                    for test_tries in retry['Tries']:
+                                        if test_package in test_tries:
+                                            groupOrJson = test_tries[test_package]
+                                            break
+                                    if not groupOrJson and package_or_default_execution:
+                                        groupOrJson = test_tries[package_or_default_execution]
+                                    if groupOrJson:
+                                        for test_try in groupOrJson:
+                                            retries_list.append(test_try)
 
-                                    for retry in retry['Tries']:
-                                        for group in retry.keys():
-                                            #all non splitTestsExecution and non regression builds (e.g. any build of core)
-                                            if group.endswith('.json') or 'DefaultExecution' in group:
-                                                groupOrJson = retry[group]
-                                            else:
-                                                groupOrJson = retry.get(
-                                                    test_package, [])
-                                        for retry in groupOrJson:
-                                            retries_list.append(retry)
+                                        for test_try in retries_list:
+                                            if not os.path.exists(os.path.join(work_dir, test_try['link'])):
+                                                test_try['link'] = ''
 
-                                    for retry in retries_list:
-                                        if not os.path.exists(os.path.join(work_dir, retry['link'])):
-                                            retry['link'] = ''
-
-                                    summary_report[config]['results'][test_package]['']['retries'] = retries_list
+                                        summary_report[config]['results'][test_package]['']['retries'] = retries_list
     except Exception as e:
         main_logger.error(
             'Error "{}" while adding retry info'.format(str(e)))

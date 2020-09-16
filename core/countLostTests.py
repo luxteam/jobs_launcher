@@ -144,13 +144,9 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 				gpu_name = lost_test_result.split('-')[0]
 				os_name = lost_test_result.split('-')[1]
 				test_package_name = lost_test_result.split('-')[2]
-				# if only part of test is specified in package which is splitted - read number of tests from it
-				if tests_package_data and tests_package_data["split"] and tests_package_data["groups"][test_package_name]:
-					lost_tests_count = len(set(tests_package_data["groups"][test_package_name].split(',')))
-				else:
-					with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
-						data = json.load(file)
-					lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
+				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
+					data = json.load(file)
+				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
 				# join converted gpu name and os name
 				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 				if joined_gpu_os_names not in lost_tests_data:
