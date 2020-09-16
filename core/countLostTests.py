@@ -110,14 +110,15 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 	if split_tests_execution == "true":
 		tests_package_data = {}
 		if tests_package != "none":
-			with open(os.path.join(tests_dir, "jobs", tests_package.split(":")[0]), "r") as file:
+			tests_package_name = tests_package.split(":")[0]
+			with open(os.path.join(tests_dir, "jobs", tests_package_name), "r") as file:
 				tests_package_data = json.load(file)
 			if not tests_package_data["split"]:
 				# e.g. regression
 				lost_package_stach = ""
 				for lost_test_result in lost_tests_results:
-					if lost_tests_results.endswith(tests_package):
-						lost_package_stach = lost_tests_results
+					if lost_test_result.endswith(tests_package_name):
+						lost_package_stach = lost_test_result
 						break
 				if lost_package_stach:
 					lost_tests_results.remove(lost_package_stach)
