@@ -62,12 +62,11 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
         # else add baseline images paths to json
         img.update({'baseline_color_path': os.path.relpath(
             baseline_img_path, work_dir)})
-        for thumb in core.config.THUMBNAIL_PREFIXES:
-            if os.path.exists(os.path.join(base_dir, img['test_group'], baseline_json.get(thumb + 'render_color_path', 'Null'))):
-                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(
-                    base_dir, img['test_group'], baseline_json[thumb + 'render_color_path']), work_dir)})
-            else:
-                core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], thumb + baseline_json['render_color_path'])))
+        if os.path.exists(os.path.join(base_dir, img['test_group'], baseline_json.get('render_color_path', 'Null'))):
+            img.update({'baseline_color_path': os.path.relpath(os.path.join(
+                base_dir, img['test_group'], baseline_json['render_color_path']), work_dir)})
+        else:
+            core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], baseline_json['render_color_path'])))
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
@@ -98,21 +97,20 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             pix_difference_2 = metrics.getPrediction()
             img.update({'difference_color_2': pix_difference_2})
 
-            for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
-                for field in ['render_color_path', 'baseline_color_path']:
-                    image_path = os.path.join(base_dir, img['test_group'], img.get(thumb + field, 'None'))
-                    if image_path.endswith('.jpg') and os.path.exists(image_path):
-                        image = Image.open(image_path)
-                        image.save(image_path, quality=75)
+            for field in ['render_color_path', 'baseline_color_path']:
+                image_path = os.path.join(base_dir, img['test_group'], img.get(field, 'None'))
+                if image_path.endswith('.jpg') and os.path.exists(image_path):
+                    image = Image.open(image_path)
+                    image.save(image_path, quality=75)
 
             if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
                 img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
             else:
-                for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
-                    if os.path.exists(os.path.join(base_dir, img['test_group'], img.get(thumb + 'render_color_path', 'None'))):
-                        os.remove(os.path.join(base_dir, img['test_group'], img[thumb + 'render_color_path']))
-                        img.update({thumb + 'baseline_color_path': img[thumb + 'render_color_path']})
+                if os.path.exists(os.path.join(base_dir, img['test_group'], img.get('baseline_color_path', 'None'))):
+                    os.remove(os.path.join(base_dir, img['test_group'], img['baseline_color_path']))
+                if img.get('render_color_path', False):
+                    img.update({'baseline_color_path': img['render_color_path']})
 
     return img
 
