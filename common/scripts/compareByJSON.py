@@ -107,8 +107,11 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
             else:
-                if os.path.exists(os.path.join(base_dir, img['test_group'], img.get('baseline_color_path', 'None'))):
-                    os.remove(os.path.join(base_dir, img['test_group'], img['baseline_color_path']))
+                for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
+                    baseline = os.path.join(base_dir, img['test_group'], 'Color', img.get('baseline_color_path', 'None'))
+                    baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + os.path.basename(baseline))
+                    if os.path.exists(baseline):
+                        os.remove(baseline)
                 if img.get('render_color_path', False):
                     img.update({'baseline_color_path': img['render_color_path']})
 
