@@ -82,7 +82,7 @@ class CompareMetrics(object):
             # print("Max:", max(a))
 
             # 1 - there is a difference. 0 - there isn't a difference
-            return 0 if max(a) <= 1000 and median[0][0] != 255 else 1
+            return 0 if max(a) <= 500 and median[0][0] != 255 else 1
 
         except ValueError:
 
