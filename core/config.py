@@ -110,9 +110,9 @@ POSSIBLE_JSON_IMG_BASELINE_KEYS = ['render_color_path', 'render_opacity_path']
 POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_BASELINE_KEYS]
 POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_BASELINE_KEYS]
 
-BASELINE_MANIFEST = 'baseline_manifest.json'
-BASELINE_SESSION_REPORT = 'session_baseline_report.json'
-BASELINE_REPORT_NAME = 'render_copied_report.json'
+BASELINE_MANIFEST = 'baseline_manifest.json'  #TODO: remove when new baselines structure is merged
+BASELINE_SESSION_REPORT = 'session_baseline_report.json'  #TODO: remove when new baselines structure is merged
+BASELINE_REPORT_NAME = 'render_copied_report.json'  #TODO: remove when new baselines structure is merged
 
 SUMMARY_REPORT = 'summary_report.json'
 SUMMARY_REPORT_EMBED_IMG = 'summary_report_embed_img.json'
@@ -145,3 +145,22 @@ DONT_COMPARE = "Do not compare"
 POSSIBLE_BASELINE_EXTENSIONS = ['jpg', 'png', 'gif', 'bmp']
 
 SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Load rpr", "Open scene", "Prerender", "Postrender", "Close tool", "Make report json", "Compare"]
+
+ODD_FOR_BASELINES = [
+    'baseline_render_time',
+    'baseline_color_path',
+    'difference_color_2',
+    'difference_color',
+    'difference_time',
+    'render_log',
+    'baseline_system_memory_usage',
+    'baseline_gpu_memory_usage',
+    'baseline_render_device',
+    'difference_vram',
+    'difference_ram',
+    'tahoe_log',
+    'render_mode',
+    'testcase_timeout',
+    'group_timeout_exceeded',
+    'testcase_timeout_exceeded'
+]
