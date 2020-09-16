@@ -104,8 +104,9 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
                     for field in ['render_color_path', 'baseline_color_path']:
                         image_path = os.path.join(base_dir, img['test_group'], img[thumb + 'render_color_path'])
-                        image = Image.open(image_path)
-                        image.save(image_path, '.jpg', quality=75)
+                        if image_path.endswith('.jpg'):
+                            image = Image.open(image_path)
+                            image.save(image_path, '.jpg', quality=75)
             else:
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
                     os.remove(os.path.join(base_dir, img['test_group'], img[thumb + 'render_color_path']))
