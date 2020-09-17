@@ -23,6 +23,14 @@ except ImportError:
     from core.defaults_local_config import *
 
 
+def md5(file_name):
+    hash_md5 = hashlib.md5()
+    with open(file_name, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+
 def get_diff(current, previous):
     if current == previous:
         return 0.0
@@ -108,7 +116,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
 
-            if hashlib.md5(file_as_bytes(open(render_img_path, 'rb'))).hexdigest() != hashlib.md5(file_as_bytes(open(baseline_img_path, 'rb'))).hexdigest():
+            if md5(render_img_path) != md5(baseline_img_path):
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
                     baseline = os.path.join(base_dir, img['test_group'], 'Color', img.get('baseline_color_path', 'None'))
                     baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + os.path.basename(baseline))
