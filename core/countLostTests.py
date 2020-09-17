@@ -128,14 +128,13 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 							continue
 						try:
 							lost_tests_count = len(set(tests_package_data["groups"][test_package_name].split(',')))
-							for lost_test_result in lost_tests_results:
-								gpu_name = lost_test_result.split('-')[0]
-								os_name = lost_test_result.split('-')[1]
-								# join converted gpu name and os name
-								joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
-								if joined_gpu_os_names not in lost_tests_data:
-									lost_tests_data[joined_gpu_os_names] = {}
-								lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
+							gpu_name = lost_test_result.split('-')[0]
+							os_name = lost_test_result.split('-')[1]
+							# join converted gpu name and os name
+							joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
+							if joined_gpu_os_names not in lost_tests_data:
+								lost_tests_data[joined_gpu_os_names] = {}
+							lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
 						except Exception as e:
 							print("Failed to count lost tests for test group {}. Reason: {}".format(test_package_name, str(e)))
 

@@ -382,34 +382,37 @@ def build_performance_report(summary_report, major_title):
 
     for key in summary_report:
         platform = summary_report[key]
-        group = next(iter(platform['results']))
-        conf = list(platform['results'][group].keys())[0]
+        for group in platform['results']:
+            if 'results' not in platform:
+                break
 
-        if platform['results'][group][conf]['machine_info'] == "":
-            # if machine info is empty it's blank data for lost test cases
-            continue
+            conf = list(platform['results'][group].keys())[0]
 
-        temp_report = platform['results'][group][conf]
-        tool = temp_report['machine_info'].get('tool', major_title)
+            if platform['results'][group][conf]['machine_info'] == "":
+                # if machine info is empty it's blank data for lost test cases
+                continue
 
-        hw = platform['results'][group][conf]['machine_info']['render_device'] + ' ' + platform['results'][group][conf]['machine_info']['os'].split()[0]
-        render_info.append([tool, hw, platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
-        if hw not in hardware:
-            hardware[hw] = platform['summary']['render_duration']
+            temp_report = platform['results'][group][conf]
+            tool = temp_report['machine_info'].get('tool', major_title)
 
-        results = platform.pop('results', None)
-        info = temp_report
-        for test_package in results:
-            for test_config in results[test_package]:
-                results[test_package][test_config].pop('render_results', None)
+            hw = platform['results'][group][conf]['machine_info']['render_device'] + ' ' + platform['results'][group][conf]['machine_info']['os'].split()[0]
+            render_info.append([tool, hw, platform['summary']['render_duration'], platform['summary'].get('synchronization_duration', -0.0)])
+            if hw not in hardware:
+                hardware[hw] = platform['summary']['render_duration']
 
-        performance_report[tool].update({hw: info})
+            results = platform.pop('results', None)
+            info = temp_report
+            for test_package in results:
+                for test_config in results[test_package]:
+                    results[test_package][test_config].pop('render_results', None)
 
-        for test_package in results:
-            for test_config in results[test_package]:
-                test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config].get('synchronization_duration', -0.0), 'total': results[test_package][test_config]['duration']}
-                performance_report_detail[test_package].update(
-                    {hw: test_info})
+            performance_report[tool].update({hw: info})
+
+            for test_package in results:
+                for test_config in results[test_package]:
+                    test_info = {'render': results[test_package][test_config]['render_duration'], 'sync': results[test_package][test_config].get('synchronization_duration', -0.0), 'total': results[test_package][test_config]['duration']}
+                    performance_report_detail[test_package].update(
+                        {hw: test_info})
 
     tools = set([tool for tool, device, render, sync in render_info])
     devices = set([device for tool, device, render, sync in render_info])
