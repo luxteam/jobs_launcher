@@ -22,10 +22,14 @@ PLATFORM_CONVERTATIONS = {
 			"AMD_RXVEGA": "Radeon RX Vega",
 			"AMD_RX5700XT": "AMD Radeon RX 5700 XT",
 			"AMD_RadeonVII": "AMD Radeon VII",
+			"AMD_RadeonVII.Default": "AMD Radeon VII Default",
+			"AMD_RadeonVII.Beta": "AMD Radeon VII Beta",
 			"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
 			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
 			"NVIDIA_RTX2080TI": "GeForce RTX 2080 Ti",
+			"NVIDIA_RTX2080TI.Default": "GeForce RTX 2080 Ti Default",
+			"NVIDIA_RTX2080TI.Beta": "GeForce RTX 2080 Ti Beta",
 			"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080"
 		}
 	},
@@ -114,7 +118,7 @@ def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 			try:
 				lost_tests_count = len(set(test_packages[test_package_name].split(',')))
 				for lost_test_result in lost_tests_results:
-					gpu_name = lost_test_result.split('-')[0].split('.')[0]
+					gpu_name = lost_test_result.split('-')[0]
 					os_name = lost_test_result.split('-')[1]
 					# join converted gpu name and os name
 					joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
@@ -126,7 +130,7 @@ def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 	elif execution_type == 'split_execution':
 		for lost_test_result in lost_tests_results:
 			try:
-				gpu_name = lost_test_result.split('-')[0].split('.')[0]
+				gpu_name = lost_test_result.split('-')[0]
 				os_name = lost_test_result.split('-')[1]
 				test_package_name = lost_test_result.split('-')[2]
 				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
@@ -146,7 +150,7 @@ def main(lost_tests_results, tests_dir, output_dir, execution_type, tests_list):
 					data = json.load(file)
 				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
 				for lost_test_result in lost_tests_results:
-					gpu_name = lost_test_result.split('-')[0].split('.')[0]
+					gpu_name = lost_test_result.split('-')[0]
 					os_name = lost_test_result.split('-')[1]
 					# join converted gpu name and os name
 					joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]

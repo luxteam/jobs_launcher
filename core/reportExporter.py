@@ -220,7 +220,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
 
     host_name = ''
     for retry_info in node_retry_info:
-        retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName'].split('.')[0]]
+        retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
         retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
         if retry_gpu_name in gpu_os_case and retry_os_name in gpu_os_case:
             for group in retry_info['Tries']:

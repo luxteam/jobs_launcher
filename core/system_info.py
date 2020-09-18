@@ -28,7 +28,7 @@ def get_gpu():
         raw_gpu_name = os.getenv('RAW_GPU_NAME')
         driver_postfix = None
         if raw_gpu_name:
-            driver_postfix = raw_gpu_name.split('.')
+            driver_postfix = " " + raw_gpu_name.split('.')
         if render_device:
             if driver_postfix:
                 render_device += driver_postfix
