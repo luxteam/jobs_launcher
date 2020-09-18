@@ -3,6 +3,8 @@ import argparse
 import os
 import json
 from shutil import copyfile
+from PIL import Image
+import hashlib
 from CompareMetrics import CompareMetrics
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
@@ -19,6 +21,14 @@ except ImportError:
     core.config.main_logger.critical(
         "Correct report building isn't guaranteed")
     from core.defaults_local_config import *
+
+
+def md5(file_name):
+    hash_md5 = hashlib.md5()
+    with open(file_name, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def get_diff(current, previous):
@@ -61,12 +71,11 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
         # else add baseline images paths to json
         img.update({'baseline_color_path': os.path.relpath(
             baseline_img_path, work_dir)})
-        for thumb in core.config.THUMBNAIL_PREFIXES:
-            if thumb + 'render_color_path' and os.path.exists(os.path.join(base_dir, img['test_group'], baseline_json.get(thumb + 'render_color_path', 'Null'))):
-                img.update({thumb + 'baseline_color_path': os.path.relpath(os.path.join(
-                    base_dir, img['test_group'], baseline_json[thumb + 'render_color_path']), work_dir)})
-            else:
-                core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], thumb + baseline_json['render_color_path'])))
+        if os.path.exists(os.path.join(base_dir, img['test_group'], baseline_json.get('render_color_path', 'Null'))):
+            img.update({'baseline_color_path': os.path.relpath(os.path.join(
+                base_dir, img['test_group'], baseline_json['render_color_path']), work_dir)})
+        else:
+            core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], baseline_json['render_color_path'])))
 
         # for crushed and non-executed cases only set baseline img src
         if img['test_status'] != core.config.TEST_SUCCESS_STATUS:
@@ -94,14 +103,27 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                     "Error during metrics calculation: {}".format(str(err)))
                 return img
 
-            # pix_difference = metrics.getDiffPixeles(tolerance=tolerance)
-            # img.update({'difference_color': pix_difference})
             pix_difference_2 = metrics.getPrediction()
             img.update({'difference_color_2': pix_difference_2})
-            # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
+
+            for field in ['render_color_path', 'baseline_color_path']:
+                image_path = os.path.join(base_dir, img['test_group'], img.get(field, 'None'))
+                if image_path.endswith('.jpg') and os.path.exists(image_path):
+                    image = Image.open(image_path)
+                    image.save(image_path, quality=75)
+
             if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
                 img['message'].append('Unacceptable pixel difference')
                 img['test_status'] = core.config.TEST_DIFF_STATUS
+
+            if md5(render_img_path) == md5(baseline_img_path):
+                for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
+                    baseline = os.path.join(base_dir, img['test_group'], 'Color', img.get('baseline_color_path', 'None'))
+                    baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + os.path.basename(baseline))
+                    if os.path.exists(baseline):
+                        os.remove(baseline)
+                if img.get('render_color_path', False):
+                    img.update({'baseline_color_path': img['render_color_path']})
 
     return img
 

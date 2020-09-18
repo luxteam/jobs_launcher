@@ -110,8 +110,8 @@ def generate_thumbnails(session_dir):
                                 thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])),
                                                           Image.ANTIALIAS)
 
-                                thumb64.save(thumb64_path)
-                                thumb256.save(thumb256_path)
+                                thumb64.save(thumb64_path, quality=75)
+                                thumb256.save(thumb256_path, quality=75)
                             except Exception as err:
                                 print("Thumbnail didn't created: json_report - {}, test - {}, img_key - {}".format(json_report, test, img_key))
                                 main_logger.error("Thumbnail didn't created: {}".format(str(err)))
