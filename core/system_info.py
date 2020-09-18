@@ -25,7 +25,13 @@ def get_gpu():
     """
     try:
         render_device = os.getenv('CIS_RENDER_DEVICE')
+        raw_gpu_name = os.getenv('RAW_GPU_NAME')
+        driver_postfix = None
+        if raw_gpu_name:
+            driver_postfix = raw_gpu_name.split('.')
         if render_device:
+            if driver_postfix:
+                render_device += driver_postfix
             return render_device
         operation_sys = platform.system()
         if operation_sys == "Windows":
@@ -44,6 +50,8 @@ def get_gpu():
             stdout = s.communicate()
             # FIXME: hot fix for eGPU
             render_device = [x for x in stdout[0].decode("utf-8").split('\n') if "Intel" not in x and x][0].replace('\r', '').strip(' ')
+        if driver_postfix:
+            render_device += driver_postfix
     except Exception as err:
         print("ERROR during GPU detecting: {}".format(str(err)))
         return False
