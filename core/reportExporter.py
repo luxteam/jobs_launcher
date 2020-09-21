@@ -358,7 +358,7 @@ def build_summary_report(work_dir, node_retry_info):
                     generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
 
     for config in summary_report:
-        summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
+        summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration'] - summary_report[config]['summary'].get('synchronization_duration', -0.0)
         for test_package in summary_report[config]['results']:
             summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
 
@@ -683,9 +683,8 @@ def setup_time_report(work_dir, report):
 
                     sum_steps += setup_details[conf][group][key]
 
-                setup_details[conf][group]['Other'] = round(report[group][conf]['total'] - sum_steps - report[group][conf]['render'] - report[group][conf]['sync'], 3)
-                setup_sum[conf]['Other'] = round(setup_sum[conf].get('Other', -0.0) + setup_details[conf][group]['Other'], 3)
-
+                setup_details[conf][group]['Refactor logs'] = round(report[group][conf]['total'] - sum_steps - report[group][conf]['render'] - report[group][conf]['sync'], 3)
+                setup_sum[conf]['Refactor logs'] = round(setup_sum[conf].get('Refactor logs', -0.0) + setup_details[conf][group]['Refactor logs'], 3)
             setup_sum['Summary'][conf] = 0.0
             for step in setup_sum[conf]:
                 setup_sum['Summary'][conf] += setup_sum[conf][step]
