@@ -110,8 +110,8 @@ def generate_thumbnails(session_dir):
                                 thumb256 = cur_img.resize((256, int(256 * cur_img.size[1] / cur_img.size[0])),
                                                           Image.ANTIALIAS)
 
-                                thumb64.save(thumb64_path)
-                                thumb256.save(thumb256_path)
+                                thumb64.save(thumb64_path, quality=75)
+                                thumb256.save(thumb256_path, quality=75)
                             except Exception as err:
                                 print("Thumbnail didn't created: json_report - {}, test - {}, img_key - {}".format(json_report, test, img_key))
                                 main_logger.error("Thumbnail didn't created: {}".format(str(err)))
@@ -535,7 +535,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined'):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', engine=''):
     rc = 0
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
@@ -584,6 +584,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         common_info.update({'commit_sha': commit_sha})
         common_info.update({'branch_name': branch_name})
         common_info.update({'commit_message': commit_message})
+        common_info.update({'engine': engine})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
