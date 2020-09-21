@@ -202,7 +202,7 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(work_dir, summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info):
+def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info):
     summary_report[gpu_os_case]['results'][lost_test_package] = {}
     # add empty conf
     summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
@@ -232,7 +232,7 @@ def generate_empty_render_result(work_dir, summary_report, lost_test_package, gp
                         package_or_default_execution = group
                         break
                     elif parsed_group_name.endswith('.json') and lost_test_package not in group.split(':')[1]:
-                        with open(os.path.abspath(os.path.join(work_dir, '..', 'jobs', parsed_group_name))) as f:
+                        with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
                             if lost_test_package in json.load(f)['groups']:
                                 package_or_default_execution = group
                                 break
@@ -347,7 +347,7 @@ def build_summary_report(work_dir, node_retry_info):
             for gpu_os_case in summary_report:
                 if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                     for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(work_dir, summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
+                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
                     test_case_found = True
                     break
             # if all data for GPU + OS was lost (it can be regression.json execution)
@@ -364,7 +364,7 @@ def build_summary_report(work_dir, node_retry_info):
                 summary_report[gpu_os_case]['summary']['skipped'] = 0
                 summary_report[gpu_os_case]['summary']['total'] = 0
                 for lost_test_package in lost_tests_count[lost_test_result]:
-                    generate_empty_render_result(work_dir, summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
+                    generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info)
 
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration']
