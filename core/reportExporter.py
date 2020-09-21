@@ -360,7 +360,7 @@ def build_summary_report(work_dir, node_retry_info):
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration'] - summary_report[config]['summary'].get('synchronization_duration', -0.0)
         for test_package in summary_report[config]['results']:
-            summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration']
+            summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration'] - summary_report[config]['results'][test_package][''].get('synchronization_duration', -0.0)
 
     return summary_report, common_info
 
@@ -675,8 +675,8 @@ def setup_time_report(work_dir, report):
     if setup_details.keys():
         for conf in setup_details.keys():
             setup_sum[conf] = setup_steps_dict.copy()
-            sum_steps = 0
             for group in setup_details[conf]:
+                sum_steps = 0
                 for key in list(set().union(setup_sum_list, setup_details[conf][group].keys())):
                     setup_details[conf][group][key] = round(setup_details[conf][group].get(key, -0.0), 3) # jinja don't want to round these data
                     setup_sum[conf][key] = round(setup_sum[conf].get(key, -0.0) + setup_details[conf][group][key], 3)
