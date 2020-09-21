@@ -776,7 +776,7 @@ def add_retry_info(summary_report, retry_info, work_dir):
                                         package_or_default_execution = group
                                         break
                                     elif parsed_group_name.endswith('.json') and test_package not in group.split(':')[1]:
-                                        with open(os.path.abspath(os.path.join(work_dir, '..', 'jobs', parsed_group_name))) as f:
+                                        with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
                                             if test_package in json.load(f)['groups']:
                                                 package_or_default_execution = group
                                                 break
