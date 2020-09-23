@@ -523,6 +523,11 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
+# Expected error return codes
+# -1 - Summary report can't be built
+# -2 - Performance report can't be built
+# -3 - Compare report can't be built
+# -4 - Local reports can't be built
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', engine=''):
     rc = 0
 
@@ -624,7 +629,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         traceback.print_exc()
         main_logger.error(performance_html) #local variable 'performance_html' referenced before assignment
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-        rc = -1
+        rc = -2
 
     main_logger.info("Saving compare report...")
     try:
@@ -644,14 +649,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         traceback.print_exc()
         main_logger.error(compare_html)
         save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
-        rc = -1
+        rc = -3
 
     try:
         build_local_reports(work_dir, summary_report, common_info, env)
     except Exception as err:
         traceback.print_exc()
         main_logger.error(str(err))
-        rc = -1
+        rc = -4
 
     exit(rc)
 
