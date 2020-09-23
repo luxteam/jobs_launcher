@@ -27,8 +27,7 @@ PLATFORM_CONVERTATIONS = {
 			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
 			"NVIDIA_RTX2080TI": "GeForce RTX 2080 Ti",
-			"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080",
-			"RadeonPro560": "Radeon Pro 560"
+			"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080"
 		}
 	},
 	"Ubuntu18": {
@@ -41,7 +40,8 @@ PLATFORM_CONVERTATIONS = {
 	"OSX": {
 		"os_name": "Darwin 10.14.6(64bit)",
 		"cards": {
-			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)"
+			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)",
+			"RadeonPro560": "Radeon Pro 560"
 		}
 	}
 }
