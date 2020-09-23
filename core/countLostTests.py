@@ -22,6 +22,7 @@ PLATFORM_CONVERTATIONS = {
 			"AMD_RXVEGA": "Radeon RX Vega",
 			"AMD_RX5700XT": "AMD Radeon RX 5700 XT",
 			"AMD_RadeonVII": "AMD Radeon VII",
+			"AMD_RadeonVII_Beta": "AMD Radeon VII Beta",
 			"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
 			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
@@ -39,7 +40,8 @@ PLATFORM_CONVERTATIONS = {
 	"OSX": {
 		"os_name": "Darwin 10.14.6(64bit)",
 		"cards": {
-			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)"
+			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)",
+			"RadeonPro560": "Radeon Pro 560"
 		}
 	}
 }
