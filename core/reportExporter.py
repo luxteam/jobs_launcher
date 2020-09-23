@@ -829,6 +829,13 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
     for root_dir in os.listdir(rpr_dir):
         if os.path.isdir(os.path.join(rpr_dir, root_dir)):
             session_gpu, session_os = os.path.basename(root_dir).split('-')
+            main_logger.debug("Generate for RPR: {}".format(session_gpu + session_os))
+            for group_dir in os.listdir(os.path.join(rpr_dir, root_dir)):
+                group_dir_path = os.path.join(rpr_dir, root_dir, group_dir)
+                if os.path.isdir(group_dir_path):
+                    sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
+                    with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
+                        json.dump(sr, write_sum_report)
 
             for path, dirs, files in os.walk(os.path.join(rpr_dir, root_dir)):
                 for json_report in files:
@@ -853,10 +860,11 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                             })
                         render_duration = 0.0
                         synchronization_duration = 0.0
-                        # try:
+
                         for jtem in current_test_report:
                             jtem.update({'baseline_render_time': 0})
                             jtem.update({'difference_time': 0})
+                            jtem.setdefault('test_status', 'passed')
                             for group_report_file in POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL:
                                 if group_report_file in jtem.keys():
                                     # update paths
@@ -900,7 +908,8 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                         except Exception as err:
                             print("Exception while updating machine_info in session_report")
                             print(str(err))
-                            main_logger.warning(str(err))
+                            main_logger.warning("Exception while updating machine_info in session_report")
+                            main_logger.error(str(err))
 
                         current_session_report['results'][current_test_report[0]['test_group']]['']['synchronization_duration'] = synchronization_duration
                         current_session_report['results'][current_test_report[0]['test_group']]['']['render_duration'] = render_duration
@@ -909,10 +918,6 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                                                     current_session_report['results'][current_test_report[0]['test_group']]['']['skipped'] + \
                                                                     current_session_report['results'][current_test_report[0]['test_group']]['']['error']
 
-                        # except Exception as err:
-                        #     print(str(err))
-
-                        # get summary results
                         total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0,
                                  'render_duration': 0,
                                  'synchronization_duration': 0}
@@ -935,6 +940,14 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
         if os.path.isdir(os.path.join(northstar_dir, root_dir)):
             session_gpu, session_os = os.path.basename(root_dir).split('-')
             engine_postf = 'NorthStar'
+
+            main_logger.debug("Generate for NorthStar: {}".format(session_gpu + session_os))
+            for group_dir in os.listdir(os.path.join(northstar_dir, root_dir)):
+                group_dir_path = os.path.join(northstar_dir, root_dir, group_dir)
+                if os.path.isdir(group_dir_path):
+                    sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
+                    with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
+                        json.dump(sr, write_sum_report)
 
             for path, dirs, files in os.walk(os.path.join(northstar_dir, root_dir)):
                 for json_report in files:
@@ -959,15 +972,13 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                             })
                         render_duration = 0.0
                         synchronization_duration = 0.0
-                        # try:
+
                         for jtem in current_test_report:
+                            jtem.setdefault('test_status', 'passed')
                             for group_report_file in REPORT_FILES:
                                 if group_report_file in jtem.keys():
                                     # update paths
-                                    cur_img_path = os.path.abspath(
-                                        os.path.join(northstar_dir, root_dir, current_session_report['results'][current_test_report[0]['test_group']]['']['result_path'],
-                                                     jtem[group_report_file]))
-
+                                    cur_img_path = os.path.abspath(os.path.join(northstar_dir, root_dir, current_session_report['results'][current_test_report[0]['test_group']]['']['result_path'], jtem[group_report_file]))
                                     jtem.update({group_report_file: os.path.relpath(cur_img_path, work_dir)})
 
                             render_duration += jtem['render_time']
