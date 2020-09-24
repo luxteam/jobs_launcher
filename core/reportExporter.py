@@ -226,12 +226,12 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
             for groups in retry_info['Tries']:
                 package_or_default_execution = None
                 for group in groups.keys():
-                    parsed_group_name = group.split(':')[0]
+                    parsed_group_name = group.split('~')[0]
                     #all non splitTestsExecution and non regression builds (e.g. any build of core)
                     if 'DefaultExecution' in group:
                         package_or_default_execution = group
                         break
-                    elif parsed_group_name.endswith('.json') and lost_test_package not in group.split(':')[1]:
+                    elif parsed_group_name.endswith('.json') and lost_test_package not in group.split('~')[1]:
                         with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
                             if lost_test_package in json.load(f)['groups']:
                                 package_or_default_execution = group
@@ -769,12 +769,12 @@ def add_retry_info(summary_report, retry_info, work_dir):
                             for groups in retry['Tries']:
                                 package_or_default_execution = None
                                 for group in groups.keys():
-                                    parsed_group_name = group.split(':')[0]
+                                    parsed_group_name = group.split('~')[0]
                                     #all non splitTestsExecution and non regression builds (e.g. any build of core)
                                     if 'DefaultExecution' in group:
                                         package_or_default_execution = group
                                         break
-                                    elif parsed_group_name.endswith('.json') and test_package not in group.split(':')[1]:
+                                    elif parsed_group_name.endswith('.json') and test_package not in group.split('~')[1]:
                                         with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
                                             if test_package in json.load(f)['groups']:
                                                 package_or_default_execution = group
