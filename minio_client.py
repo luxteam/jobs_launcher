@@ -1,5 +1,6 @@
 import os
 from minio import Minio
+from core.config import main_logger
 
 """ UMS Minio client module
 
@@ -37,13 +38,22 @@ class UMS_Minio:
         args - (build_id, tsr_id, tcr_id)
         """
         
-        file_size = os.stat(fname).st_size
         # generate artefact name PATH/TO/FILE.EXT
         artefac_name = "/".join(args) + "/" + fname
-        with open(fname, 'rb') as data:
-            self.mc.put_object(
-                bucket_name=self.bucket_name,
-                object_name=artefac_name,
-                data=data,
-                length=file_size
-            )
+        try:
+            file_size = os.stat(fname).st_size
+            with open(fname, 'rb') as data:
+                self.mc.put_object(
+                    bucket_name=self.bucket_name,
+                    object_name=artefac_name,
+                    data=data,
+                    length=file_size
+                )
+        except FileNotFoundError as e:
+            print(e)
+            main_logger.error(str(e))
+
+mc = UMS_Minio(product_id='1793')
+mc.upload_file('render_log.txt', '8253', '9152', '3071')
+mc.upload_file('overall_log_suite.txt', '8253', '9152')
+mc.upload_file('build.dmg', '8253')
