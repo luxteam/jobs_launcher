@@ -190,6 +190,7 @@ def createArgParser():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--work_dir')
     argparser.add_argument('--base_dir')
+    argparser.add_argument('--update_refs')
     argparser.add_argument('--case_suffix', default='')
     argparser.add_argument(
         '--pix_diff_tolerance', required=False, default=core.config.PIX_DIFF_TOLERANCE)
@@ -229,6 +230,13 @@ def main(args):
     except (OSError, FileNotFoundError) as err:
         core.config.main_logger.error(
             "Couldn't copy baseline stub: {}".format(str(err)))
+    try:
+        if not os.path.exists(os.path.join(args.base_dir, 'updating.png')):
+            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, 'img', 'updating.png'),
+                     os.path.join(args.base_dir, 'updating.png'))
+    except (OSError, FileNotFoundError) as err:
+        core.config.main_logger.error(
+            "Couldn't copy 'updating baselines' stub: {}".format(str(err)))
 
     # create report_compared.json before calculation to provide stability
     try:
@@ -268,8 +276,14 @@ def main(args):
 
     core.config.main_logger.info("Began metrics calculation")
     for img in render_json:
-        img.update(get_pixel_difference(args.work_dir, args.base_dir, img, args.pix_diff_tolerance,
-                                        args.pix_diff_max))
+        # if update baselines - skip comparision of images and set stub as a baseline image
+        if 'update' in args.update_refs:
+            img.update({'baseline_color_path': os.path.relpath(
+                os.path.join(args.base_dir, 'updating.png'), args.work_dir)})
+        else:
+            img.update(get_pixel_difference(args.work_dir, args.base_dir, img, args.pix_diff_tolerance,
+                                            args.pix_diff_max))
+
         img.update(get_rendertime_difference(
             args.base_dir, img, args.time_diff_max))
 
