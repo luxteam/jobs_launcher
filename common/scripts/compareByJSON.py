@@ -277,7 +277,7 @@ def main(args):
     core.config.main_logger.info("Began metrics calculation")
     for img in render_json:
         # if update baselines - skip comparision of images and set stub as a baseline image
-        if 'update' in args.update_refs:
+        if 'Update' in args.update_refs:
             img.update({'baseline_color_path': os.path.relpath(
                 os.path.join(args.base_dir, 'updating.png'), args.work_dir)})
         else:
