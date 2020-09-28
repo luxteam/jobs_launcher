@@ -23,6 +23,7 @@ import jobs_launcher.job_launcher
 
 from ums_client import UMS_Client, str2bool
 from image_service_client import ISClient
+from minio_client import UMS_Minio
 
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
@@ -210,6 +211,7 @@ def main():
     if ums_client:
         main_logger.info("Try to send results to UMS")
         is_client = None
+        # init image service
         try:
             is_client = ISClient(url=os.getenv("IS_URL"),
                                  login=os.getenv("IS_LOGIN"),
@@ -218,6 +220,11 @@ def main():
         except Exception as e:
             main_logger.error("Image Service client creation error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+        try:
+            mc = UMS_Minio(product_id=ums_client.job_id)
+        except Exception as e:
+            print(e)
 
         res = []
         try:
@@ -231,6 +238,7 @@ def main():
 
             for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
+                ums_client.get_suite_id_by_name(suite_name)
                 for case in cases:
                     image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
                     res.append({
@@ -243,8 +251,17 @@ def main():
                             "rendered_image": str(image_id)
                         }
                     })
-
-                ums_client.get_suite_id_by_name(suite_name)
+                    
+                    path_to_test_case_log = os.path.join(args.work_dir, 'render_tool_logs', case["test_case"] + ".log")
+                    mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"], 'renderTool.log')
+                #TODO: send logs for each test cases
+                
+                # logs from work dir
+                test_suite_artefacts = ("renderTool.log", "script.bat", "test_cases.json")
+                for l in test_suite_artefacts:
+                    path_to_test_suite_render_log = os.path.join(args.work_dir, l)
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id, l)
+   
                 # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
@@ -255,6 +272,19 @@ def main():
                 response = ums_client.send_test_suite(res=res, env=env)
                 main_logger.info('Test suite results sent with code {}'.format(response.status_code))
                 main_logger.info('Response from UMS: \n{}'.format(response.content))
+
+
+
+            test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
+
+            for l in test_suite_artefacts:
+                path_to_test_suite_render_log = os.path.join(args.work_dir, l)
+                mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, l)
+
+            for file in os.listdir("../"):
+                if file.endswith(".log"):
+                    mc.upload_file("../" + file, ums_client.build_id, l)
+
 
         except Exception as e:
             main_logger.error("Test case result creation error: {}".format(str(e)))
