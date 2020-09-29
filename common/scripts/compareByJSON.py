@@ -186,6 +186,16 @@ def check_ram_difference(img, baseline_item, ram_diff_max):
     return img
 
 
+def copy_stub(base_dir, destination_dir, stub_name):
+    try:
+        if not os.path.exists(os.path.join(base_dir, stub_name)):
+            copyfile(os.path.join(destination_dir, stub_name),
+                     os.path.join(base_dir, stub_name))
+    except (OSError, FileNotFoundError) as err:
+        core.config.main_logger.error(
+            "Couldn't copy \"{}\" stub: {}".format(stub_name, str(err)))
+
+
 def createArgParser():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--work_dir')
@@ -223,20 +233,9 @@ def main(args):
             "Baseline folder doesn't exist. It will be created with baseline stub img.")
         os.makedirs(args.base_dir)
 
-    try:
-        if not os.path.exists(os.path.join(args.base_dir, 'baseline.png')):
-            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, 'img', 'baseline.png'),
-                     os.path.join(args.base_dir, 'baseline.png'))
-    except (OSError, FileNotFoundError) as err:
-        core.config.main_logger.error(
-            "Couldn't copy baseline stub: {}".format(str(err)))
-    try:
-        if not os.path.exists(os.path.join(args.base_dir, 'updating.png')):
-            copyfile(os.path.join(os.path.dirname(__file__), os.path.pardir, 'img', 'updating.png'),
-                     os.path.join(args.base_dir, 'updating.png'))
-    except (OSError, FileNotFoundError) as err:
-        core.config.main_logger.error(
-            "Couldn't copy 'updating baselines' stub: {}".format(str(err)))
+    stub_destination_dir = os.path.join(os.path.dirname(__file__), os.path.pardir, 'img')
+    copy_stub(args.base_dir, stub_destination_dir, 'baseline.png')
+    copy_stub(args.base_dir, stub_destination_dir, 'updating.png')
 
     # create report_compared.json before calculation to provide stability
     try:
