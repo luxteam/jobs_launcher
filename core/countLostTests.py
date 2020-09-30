@@ -123,7 +123,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 						break
 				if lost_package_stach:
 					lost_tests_results.remove(lost_package_stach)
-					excluded_groups = tests_package.split("~")[1].split(";")
+					excluded_groups = tests_package.split("~")[1].split(",")
 					for test_package_name in tests_package_data["groups"]:
 						if test_package_name in excluded_groups:
 							continue
