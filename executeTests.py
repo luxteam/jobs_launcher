@@ -134,7 +134,7 @@ def main():
                 if not file_content['split']:
                     # save path to tests package
                     args.cmd_variables['TestCases'] = os.path.abspath(os.path.join(args.tests_root, file_name))
-                    excluded_tests = args.file_filter.split('~')[1].split(';')
+                    excluded_tests = args.file_filter.split('~')[1].split(',')
                     args.test_filter.extend([x for x in file_content['groups'].keys() if x not in excluded_tests])
         except Exception as e:
             main_logger.error(str(e))
