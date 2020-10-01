@@ -17,6 +17,15 @@ except ImportError:
     from core.defaults_local_config import *
 
 
+def get_diff(current, previous):
+    if current == previous:
+        return 0.0
+    try:
+        return (current - previous) / previous * 100.0
+    except ZeroDivisionError:
+        return 0
+
+
 def get_pixel_difference(work_dir, base_dir, img, baseline_json, tolerance, pix_diff_max):
     if 'render_color_path' in img.keys():
         baseline_name = 'not.exist'
@@ -100,7 +109,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
             except IndexError:
                 baseline_time = -0.0
 
-        time_diff = render_time - baseline_time
+        time_diff = get_diff(render_time, baseline_time)
 
         for threshold in time_diff_max:
             if baseline_time < float(threshold) and time_diff > time_diff_max[threshold]:
