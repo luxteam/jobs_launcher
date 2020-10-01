@@ -52,8 +52,3 @@ class UMS_Minio:
         except FileNotFoundError as e:
             print(e)
             main_logger.error(str(e))
-
-mc = UMS_Minio(product_id='1793')
-mc.upload_file('render_log.txt', '8253', '9152', '3071')
-mc.upload_file('overall_log_suite.txt', '8253', '9152')
-mc.upload_file('build.dmg', '8253')
