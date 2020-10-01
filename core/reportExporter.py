@@ -226,13 +226,13 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['summary']['total'] += lost_tests_count
 
 
-def build_summary_report(work_dir):
+def build_summary_report(work_dir, session_report_name=SESSION_REPORT):
     summary_report = {}
     common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             # build summary report
-            if file.endswith(SESSION_REPORT):
+            if file.endswith(session_report_name):
                 basepath = os.path.relpath(path, work_dir)
                 with open(os.path.join(path, file), 'r') as report_file:
                     temp_report = json.loads(report_file.read())
@@ -840,6 +840,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
             for path, dirs, files in os.walk(os.path.join(rpr_dir, root_dir)):
                 for json_report in files:
                     if json_report == BASELINE_REPORT_NAME:
+                        main_logger.debug("OLD baseline report: {}".format(os.path.join(path, json_report)))
                         with open(os.path.join(path, json_report), 'r') as file:
                             current_test_report = json.loads(file.read())
                         current_session_report = copy.deepcopy(report_base)
@@ -928,6 +929,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                         current_session_report.update({'summary': total})
                         current_session_report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
 
+                        main_logger.debug("Save session report")
                         with open(os.path.join(path, SESSION_REPORT), 'w') as file:
                             json.dump(current_session_report, file, indent=4)
 
@@ -1006,9 +1008,6 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                                                     current_session_report['results'][current_test_report[0]['test_group']]['']['skipped'] + \
                                                                     current_session_report['results'][current_test_report[0]['test_group']]['']['error']
 
-                        # except Exception as err:
-                        #     print(str(err))
-
                         total = {'total': 0, 'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'duration': 0,
                                  'render_duration': 0,
                                  'synchronization_duration': 0}
@@ -1021,6 +1020,39 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
 
                         with open(os.path.join(path, 'session_report_ENGINE.json'), 'w') as file:
                             json.dump(current_session_report, file, indent=4)
+
+    summary_report_north, null = build_summary_report(os.path.join(northstar_dir), 'session_report_ENGINE.json')
+
+    for configuration, report in summary_report_gen.items():
+        for test_group in report['results']:
+            for test_config in report['results'][test_group]:
+                try:
+                    report['results'][test_group][test_config].update({'render_duration_north': 0})
+                    report['results'][test_group][test_config].update({'setup_duration_north': 0})
+                    report['results'][test_group][test_config].update({'synchronization_duration_north': 0})
+
+                    report['results'][test_group][test_config].update({'render_duration_north':
+                                                                       summary_report_north[configuration]['results'][test_group][test_config]['render_duration']})
+                    report['results'][test_group][test_config].update({'setup_duration_north':
+                                                                       summary_report_north[configuration]['results'][test_group][test_config]['setup_duration']})
+                    report['results'][test_group][test_config].update({'synchronization_duration_north':
+                                                                       summary_report_north[configuration]['results'][test_group][test_config]['synchronization_duration']})
+                except:pass
+        try:
+            summary_report_gen[configuration]['summary'].update({'render_duration_north': 0})
+            summary_report_gen[configuration]['summary'].update({'setup_duration_north': 0})
+            summary_report_gen[configuration]['summary'].update({'synchronization_duration_north': 0})
+
+            summary_report_gen[configuration]['summary'].update({'render_duration_north':
+                                                               summary_report_north[configuration]['summary']['render_duration']})
+            summary_report_gen[configuration]['summary'].update({'setup_duration_north':
+                                                               summary_report_north[configuration]['summary']['setup_duration']})
+            summary_report_gen[configuration]['summary'].update({'synchronization_duration_north':
+                                                               summary_report_north[configuration]['summary']['synchronization_duration']})
+        except:pass
+
+    with open(os.path.join(work_dir, SUMMARY_REPORT), 'w') as file:
+        json.dump(summary_report_gen, file, indent=4)
 
     return summary_report_gen, common_info_gen
 
