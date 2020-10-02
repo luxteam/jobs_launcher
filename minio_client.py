@@ -39,13 +39,13 @@ class UMS_Minio:
         """
         
         # generate artefact name PATH/TO/FILE.EXT
-        artefac_name = "/".join(args) + "/" + fname
+        artefact_name = "/".join(args) + "/" + os.path.split(fname)[1]
         try:
             file_size = os.stat(fname).st_size
             with open(fname, 'rb') as data:
                 self.mc.put_object(
                     bucket_name=self.bucket_name,
-                    object_name=artefac_name,
+                    object_name=artefact_name,
                     data=data,
                     length=file_size
                 )
