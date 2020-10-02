@@ -279,7 +279,10 @@ def main():
 
             for artefact in test_suite_artefacts:
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
-                mc.upload_file(path_to_test_suite_render_log, ums_client.build_id)
+                if len(suites.items()) > 1:
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id)
+                else:
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.get_suite_id_by_name(suites.keys()[0]))
 
 
         except Exception as e:
