@@ -16,7 +16,7 @@ class UMS_Minio:
     # TODO: access + secret + url to env
     def __init__(self,
             product_id,
-            enpoint='172.31.27.8:9000',
+            enpoint='172.26.157.233:9000',
             access_key='123456789',
             secret_key='123456789'
         ):
