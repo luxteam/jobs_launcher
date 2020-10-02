@@ -262,7 +262,7 @@ def main():
                 test_suite_artefacts = ("renderTool.log", "test_cases.json")
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
-                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id, artefact)
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
    
                 # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
@@ -279,7 +279,7 @@ def main():
 
             for artefact in test_suite_artefacts:
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
-                mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, artefact)
+                mc.upload_file(path_to_test_suite_render_log, ums_client.build_id)
 
 
         except Exception as e:
