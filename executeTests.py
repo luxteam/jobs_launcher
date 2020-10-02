@@ -284,10 +284,10 @@ def main():
             for artefact in test_suite_artefacts:
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
                 if len(suites.items()) > 1:
-                	# in case of non-splitted package or non split execution build - send logs to build dir
+                    # in case of non-splitted package or non split execution build - send logs to build dir
                     mc.upload_file(path_to_test_suite_render_log, ums_client.build_id)
                 else:
-                	# in split execution build - send logs to suite dir
+                    # in split execution build - send logs to suite dir
                     ums_client.get_suite_id_by_name(list(suites.keys())[0])
                     mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
 
