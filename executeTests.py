@@ -275,7 +275,7 @@ def main():
 
 
 
-            test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
+            test_suite_artefacts = ("found_jobs.json")
 
             for artefact in test_suite_artefacts:
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
