@@ -121,6 +121,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                     baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + img.get('baseline_color_path', 'None'))
                     if os.path.exists(baseline):
                         os.remove(baseline)
+                        img[thumb + 'baseline_color_path'] = img[thumb + 'render_color_path']
                 if img.get('render_color_path', False):
                     img.update({'baseline_color_path': img['render_color_path']})
 
