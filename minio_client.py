@@ -30,19 +30,19 @@ class UMS_Minio:
         if not self.mc.bucket_exists(self.bucket_name):
             self.mc.make_bucket(self.bucket_name)
 
-    def upload_file(self, fname, *args):
+    def upload_file(self, file_path, *args):
         """ Method for upload file to storage
         
         @Arguments:
-        fname - file name (log.txt)
+        file_path - file path (log.txt)
         args - (build_id, tsr_id, tcr_id)
         """
         
         # generate artefact name PATH/TO/FILE.EXT
-        artefact_name = "/".join(args) + "/" + os.path.split(fname)[1]
+        artefact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
         try:
-            file_size = os.stat(fname).st_size
-            with open(fname, 'rb') as data:
+            file_size = os.stat(file_path).st_size
+            with open(file_path, 'rb') as data:
                 self.mc.put_object(
                     bucket_name=self.bucket_name,
                     object_name=artefact_name,
