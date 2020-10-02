@@ -252,15 +252,15 @@ def main():
                         }
                     })
                     
-                    path_to_test_case_log = os.path.join(args.work_dir, 'render_tool_logs', case["test_case"] + ".log")
+                    path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
                     mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"], 'renderTool.log')
                 #TODO: send logs for each test cases
                 
-                # logs from work dir
-                test_suite_artefacts = ("renderTool.log", "script.bat", "test_cases.json")
-                for l in test_suite_artefacts:
-                    path_to_test_suite_render_log = os.path.join(args.work_dir, l)
-                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id, l)
+                # logs from suite dir
+                test_suite_artefacts = ("renderTool.log", "test_cases.json")
+                for artefact in test_suite_artefacts:
+                    path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id, artefact)
    
                 # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
@@ -277,13 +277,9 @@ def main():
 
             test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
 
-            for l in test_suite_artefacts:
-                path_to_test_suite_render_log = os.path.join(args.work_dir, l)
-                mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, l)
-
-            for file in os.listdir("../"):
-                if file.endswith(".log"):
-                    mc.upload_file("../" + file, ums_client.build_id, l)
+            for artefact in test_suite_artefacts:
+                path_to_test_suite_render_log = os.path.join(session_dir, artefact)
+                mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, artefact)
 
 
         except Exception as e:
