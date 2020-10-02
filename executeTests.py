@@ -208,6 +208,8 @@ def main():
     core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report\n\n')
 
+    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+
     if ums_client:
         main_logger.info("Try to send results to UMS")
         is_client = None
@@ -273,9 +275,7 @@ def main():
                 main_logger.info('Test suite results sent with code {}'.format(response.status_code))
                 main_logger.info('Response from UMS: \n{}'.format(response.content))
 
-
-
-            test_suite_artefacts = ("found_jobs.json",)
+            test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
 
             for artefact in test_suite_artefacts:
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
@@ -287,8 +287,6 @@ def main():
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
     else:
         main_logger.info("UMS client did not set. Result won't be sent to UMS")
-
-    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
