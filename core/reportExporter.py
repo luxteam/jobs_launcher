@@ -226,12 +226,12 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
             for groups in retry_info['Tries']:
                 package_or_default_execution = None
                 for group in groups.keys():
-                    parsed_group_name = group.split(':')[0]
+                    parsed_group_name = group.split('~')[0]
                     #all non splitTestsExecution and non regression builds (e.g. any build of core)
                     if 'DefaultExecution' in group:
                         package_or_default_execution = group
                         break
-                    elif parsed_group_name.endswith('.json') and lost_test_package not in group.split(':')[1]:
+                    elif parsed_group_name.endswith('.json') and lost_test_package not in group.split('~')[1]:
                         with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
                             if lost_test_package in json.load(f)['groups']:
                                 package_or_default_execution = group
@@ -535,6 +535,11 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
         main_logger.error(str(err))
 
 
+# Expected error return codes
+# -1 - Summary report can't be built
+# -2 - Performance report can't be built
+# -3 - Compare report can't be built
+# -4 - Local reports can't be built
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', engine=''):
     rc = 0
 
@@ -603,10 +608,13 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                                      i=execution)
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
-        traceback.print_exc()
-        main_logger.error(summary_html) #FIXME: referenced before assignment
-        save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
-                         replace_pathsep=True)
+        try:
+            traceback.print_exc()
+            main_logger.error(summary_html)
+            save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
+                             replace_pathsep=True)
+        except Exception as err:
+            traceback.print_exc()
         rc = -1
 
     main_logger.info("Saving performance report...")
@@ -633,10 +641,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        synchronization_time=sync_time(summary_report))
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
-        traceback.print_exc()
-        main_logger.error(performance_html) #local variable 'performance_html' referenced before assignment
-        save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-        rc = -1
+        try:
+            traceback.print_exc()
+            main_logger.error(performance_html)
+            save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
+        except Exception as err:
+            traceback.print_exc()
+        # TODO: make building of performance tab more stable
+        # rc = -2
 
     main_logger.info("Saving compare report...")
     try:
@@ -653,17 +665,20 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                common_info=common_info)
         save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
-        traceback.print_exc()
-        main_logger.error(compare_html)
-        save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
-        rc = -1
+        try:
+            traceback.print_exc()
+            main_logger.error(compare_html)
+            save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
+        except Exception as err:
+            traceback.print_exc()
+        rc = -3
 
     try:
         build_local_reports(work_dir, summary_report, common_info, env)
     except Exception as err:
         traceback.print_exc()
         main_logger.error(str(err))
-        rc = -1
+        rc = -4
 
     exit(rc)
 
@@ -769,12 +784,12 @@ def add_retry_info(summary_report, retry_info, work_dir):
                             for groups in retry['Tries']:
                                 package_or_default_execution = None
                                 for group in groups.keys():
-                                    parsed_group_name = group.split(':')[0]
+                                    parsed_group_name = group.split('~')[0]
                                     #all non splitTestsExecution and non regression builds (e.g. any build of core)
                                     if 'DefaultExecution' in group:
                                         package_or_default_execution = group
                                         break
-                                    elif parsed_group_name.endswith('.json') and test_package not in group.split(':')[1]:
+                                    elif parsed_group_name.endswith('.json') and test_package not in group.split('~')[1]:
                                         with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
                                             if test_package in json.load(f)['groups']:
                                                 package_or_default_execution = group
