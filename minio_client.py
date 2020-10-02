@@ -16,9 +16,9 @@ class UMS_Minio:
     # TODO: access + secret + url to env
     def __init__(self,
             product_id,
-            enpoint='172.26.157.233:9000',
-            access_key='123456789',
-            secret_key='123456789'
+            enpoint,
+            access_key,
+            secret_key
         ):
         self.mc = Minio(enpoint, access_key, secret_key, secure=False)
         self.bucket_name = str(product_id).lower()

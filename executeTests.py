@@ -222,7 +222,11 @@ def main():
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
         try:
-            mc = UMS_Minio(product_id=ums_client.job_id)
+            mc = UMS_Minio(
+            	product_id=ums_client.job_id,
+            	enpoint=os.getenv("MINIO_ENDPOINT"),
+            	access_key=os.getenv("MINIO_ACCESS_KEY"),
+            	secret_key=os.getenv("MINIO_SECRET_KEY"))
         except Exception as e:
             print(e)
 
