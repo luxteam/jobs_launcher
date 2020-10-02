@@ -43,7 +43,7 @@ def main():
     use_ums = None
     try:
         main_logger.info("Try to get environment variable UMS_USE")
-        use_ums = str2bool(os.getenv('UMS_USE'))
+        use_ums = os.getenv('UMS_USE')
     except Exception as e:
         main_logger.error('Exception when getenv UMS USE: {}'.format(str(e)))
     if use_ums:
