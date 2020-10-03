@@ -24,6 +24,7 @@ import jobs_launcher.job_launcher
 
 from ums_client import UMS_Client, str2bool
 from image_service_client import ISClient
+from minio_client import UMS_Minio
 
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
@@ -223,6 +224,16 @@ def main():
 
     if ums_client:
         main_logger.info("Try to send results to UMS")
+
+        try:
+            mc = UMS_Minio(
+            	product_id=ums_client.job_id,
+            	enpoint=os.getenv("MINIO_ENDPOINT"),
+            	access_key=os.getenv("MINIO_ACCESS_KEY"),
+            	secret_key=os.getenv("MINIO_SECRET_KEY"))
+        except Exception as e:
+            print(e)
+        
         res = []
         
         while True:
@@ -241,6 +252,7 @@ def main():
 
             for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
+                ums_client.get_suite_id_by_name(suite_name)
                 for case in cases:
                     res.append({
                         'name': case['test_case'],
@@ -252,8 +264,17 @@ def main():
                             "rendered_image": str(case['image_service_id'])
                         }
                     })
-
-                ums_client.get_suite_id_by_name(suite_name)
+                    
+                    path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
+                    mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"], 'renderTool.log')
+                #TODO: send logs for each test cases
+                
+                # logs from suite dir
+                test_suite_artefacts = ("renderTool.log", "test_cases.json")
+                for artefact in test_suite_artefacts:
+                    path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+   
                 # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
@@ -265,13 +286,27 @@ def main():
                 main_logger.info('Test suite results sent with code {}'.format(response.status_code))
                 main_logger.info('Response from UMS: \n{}'.format(response.content))
 
+            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+
+            test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
+
+            for artefact in test_suite_artefacts:
+                path_to_test_suite_render_log = os.path.join(session_dir, artefact)
+                if len(suites.items()) > 1:
+                    # in case of non-splitted package or non split execution build - send logs to build dir
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id)
+                else:
+                    # in split execution build - send logs to suite dir
+                    ums_client.get_suite_id_by_name(list(suites.keys())[0])
+                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+
+
         except Exception as e:
             main_logger.error("Test case result creation error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
     else:
         main_logger.info("UMS client did not set. Result won't be sent to UMS")
-
-    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+        shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
