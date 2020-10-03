@@ -5,6 +5,7 @@ import shutil
 import json
 import uuid
 import traceback
+import subprocess
 
 import core.reportExporter
 import core.system_info
@@ -183,6 +184,19 @@ def main():
 
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
+        
+        # TODO: Open folder
+        progress_file = 'test_cases.json'
+        interval = 5
+        main_logger.info('Started monitoring: {}'.format(progress_file))
+        subprocess.Popen([
+            "python3",
+            "progress_monitor.py",
+            "--progress_file",
+            progress_file,
+            "--interval",
+            interval
+        ])
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
         main_logger.info("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
