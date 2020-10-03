@@ -235,7 +235,7 @@ def main():
             	secret_key=os.getenv("MINIO_SECRET_KEY"))
         except Exception as e:
             print(e)
-        
+
         res = []
         
         while True:
