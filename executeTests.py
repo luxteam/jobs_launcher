@@ -185,11 +185,11 @@ def main():
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
         
-        # TODO: Open folder
+        # TODO: Monitoring start
         progress_file = 'test_cases.json'
         interval = 5
         main_logger.info('Started monitoring: {}'.format(progress_file))
-        subprocess.Popen([
+        monitor = subprocess.Popen([
             "python3",
             "progress_monitor.py",
             "--progress_file",
@@ -223,17 +223,13 @@ def main():
 
     if ums_client:
         main_logger.info("Try to send results to UMS")
-        is_client = None
-        try:
-            is_client = ISClient(url=os.getenv("IS_URL"),
-                                 login=os.getenv("IS_LOGIN"),
-                                 password=os.getenv("IS_PASSWORD"))
-            main_logger.info("Image Service client created with url {}".format(is_client.url))
-        except Exception as e:
-            main_logger.error("Image Service client creation error: {}".format(str(e)))
-            main_logger.error("Traceback: {}".format(traceback.format_exc()))
-
         res = []
+        
+        while True:
+            poll = monitor.poll()
+            if poll == None:
+                break
+
         try:
             main_logger.info('Start preparing results')
             cases = []
@@ -246,7 +242,6 @@ def main():
             for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
                 for case in cases:
-                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
                     res.append({
                         'name': case['test_case'],
                         'status': case['test_status'],
@@ -254,7 +249,7 @@ def main():
                             'render_time': case['render_time']
                         },
                         "artefacts": {
-                            "rendered_image": str(image_id)
+                            "rendered_image": str(case['image_service_id'])
                         }
                     })
 
