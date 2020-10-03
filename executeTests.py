@@ -195,7 +195,9 @@ def main():
             "--progress_file",
             progress_file,
             "--interval",
-            interval
+            interval,
+            "--session_dir",
+            session_dir
         ])
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
