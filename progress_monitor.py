@@ -3,6 +3,7 @@ import json
 import time
 import argparse
 from image_service_client import ISClient
+from ums_client import UMS_Client
 from minio_client import UMS_Minio
 from core.config import *
 
@@ -43,25 +44,24 @@ except Exception as e:
     main_logger.error("Can't create MINIO client")
 
 
-def check_results(test_cases_path, session_dir):
+def check_results(session_dir, suite_name):
+    test_cases_path = os.path.join(session_dir, suite_name, 'test_cases.json')
+    ums_client.get_suite_id_by_name(suite_name)
     minio_client.upload_file(test_cases_path, ums_client.build_id, ums_client.suite_id)
-    with open(test_cases_path) as f:
+    with open(test_cases_path) as test_cases_file:
         global transferred_test_cases
-        test_cases = json.loads(f.read())
+        test_cases = json.load(test_cases_file)
         new_test_cases = {tc['case']: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done') and not tc['case'] in transferred_test_cases}
 
-
         for test_case in new_test_cases:
-            image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, test_case['render_color_path']))) if is_client else -1
-            with open(os.path.realpath(os.path.join('..', session_dir, test_case['name'] + '_RPR.json'))) as f:
-                report = json.loads(f.read())
-            
-            report['image_service_id'] = image_id
-            with open(os.path.realpath(os.path.join('..', session_dir, test_case['name'] + '_RPR.json'))) as f:
-                json.dump(f, report)
-
-            # TODO: sending artefacts
-            print('Senfing artefacts & images for: {}'.format(test_case))
+            print('Sending artefacts & images for: {}'.format(test_case))
+            with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json')) as case_file:
+                case_file_data = json.load(case_file)[0]
+                image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, suite_name, case_file_data['render_color_path']))) if is_client else -1
+                case_file_data['image_service_id'] = image_id
+                
+            with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json'), 'w') as case_file:
+                json.dump([case_file_data], case_file)
 
         transferred_test_cases += list(new_test_cases.keys())
         diff = len(test_cases) - len(transferred_test_cases)
@@ -72,8 +72,8 @@ def check_results(test_cases_path, session_dir):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--interval', required=False, default=5, type=int, help="time interval")
-    parser.add_argument('--progress_file', required=True, type=str, help='progress file')
     parser.add_argument('--session_dir', required=True, type=str, help='session dir')
+    parser.add_argument('--suite_name', required=True, type=str, help='suite name')
 
     args = parser.parse_args()
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     while True:
         print('Check number {}'.format(check))
         check += 1
-        result = check_results(args.progress_file, args.session_dir)
+        result = check_results(args.session_dir, args.suite_name)
         if result:
             break
         time.sleep(args.interval)

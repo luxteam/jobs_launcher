@@ -186,20 +186,20 @@ def main():
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
         
-        # TODO: Monitoring start
-        progress_file = 'test_cases.json'
-        interval = 5
-        main_logger.info('Started monitoring: {}'.format(progress_file))
-        monitor = subprocess.Popen([
-            "python3",
-            os.path.join("..", "jobs_launcher", "progress_monitor.py"),
-            "--progress_file",
-            progress_file,
-            "--interval",
-            str(interval),
-            "--session_dir",
-            session_dir
-        ])
+        if ums_client:
+            # TODO: Monitoring start
+            interval = 5
+            main_logger.info('Started monitoring: {}'.format(found_job[0]))
+            monitor = subprocess.Popen([
+                "python3",
+                os.path.join("..", "jobs_launcher", "progress_monitor.py"),
+                "--interval",
+                str(interval),
+                "--session_dir",
+                session_dir,
+                "--suite_name",
+                found_job[0]
+            ])
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
         main_logger.info("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
@@ -215,6 +215,12 @@ def main():
                 report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
                     jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
+
+            if i == 0 and ums_client:
+                try:
+                    monitor.wait()
+                except Exception as e:
+                    main_logger.error(str(e))
         main_logger.newline()
 
     # json_report = json.dumps(report, indent = 4)
@@ -237,11 +243,6 @@ def main():
             main_logger.error(e)
 
         res = []
-        
-        while True:
-            poll = monitor.poll()
-            if poll == None:
-                break
 
         try:
             main_logger.info('Start preparing results')
