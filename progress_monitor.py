@@ -3,11 +3,15 @@ import json
 import time
 import argparse
 from image_service_client import ISClient
+from minio_client import UMS_Minio
+from core.config import *
 
 res = []
 transferred_test_cases = []
 
 is_client = None
+ums_client = None
+minio_client = None
 try:
     is_client = ISClient(
         url=os.getenv("IS_URL"),
@@ -15,10 +19,32 @@ try:
         password=os.getenv("IS_PASSWORD")
     )
 except Exception as e:
-    print("Can't create Image Service")
+    main_logger.error("Can't create Image Service client")
+try:
+    ums_client = UMS_Client(
+        job_id=os.getenv("UMS_JOB_ID"),
+        url=os.getenv("UMS_URL"),
+        build_id=os.getenv("UMS_BUILD_ID"),
+        env_label=os.getenv("UMS_ENV_LABEL"),
+        suite_id=None,
+        login=os.getenv("UMS_LOGIN"),
+        password=os.getenv("UMS_PASSWORD")
+    )
+except Exception as e:
+    main_logger.error("Can't create UMS client")
+try:
+    minio_client = UMS_Minio(
+        product_id=ums_client.job_id,
+        enpoint=os.getenv("MINIO_ENDPOINT"),
+        access_key=os.getenv("MINIO_ACCESS_KEY"),
+        secret_key=os.getenv("MINIO_SECRET_KEY")
+    )
+except Exception as e:
+    main_logger.error("Can't create MINIO client")
 
 
 def check_results(test_cases_path, session_dir):
+    mc.upload_file(test_cases_path, ums_client.build_id, ums_client.suite_id)
     with open(test_cases_path) as f:
         global transferred_test_cases
         test_cases = json.loads(f.read())

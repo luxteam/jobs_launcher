@@ -229,12 +229,12 @@ def main():
 
         try:
             mc = UMS_Minio(
-            	product_id=ums_client.job_id,
-            	enpoint=os.getenv("MINIO_ENDPOINT"),
-            	access_key=os.getenv("MINIO_ACCESS_KEY"),
-            	secret_key=os.getenv("MINIO_SECRET_KEY"))
+                product_id=ums_client.job_id,
+                enpoint=os.getenv("MINIO_ENDPOINT"),
+                access_key=os.getenv("MINIO_ACCESS_KEY"),
+                secret_key=os.getenv("MINIO_SECRET_KEY"))
         except Exception as e:
-            print(e)
+            main_logger.error(e)
 
         res = []
         
@@ -268,7 +268,7 @@ def main():
                     })
                     
                     path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
-                    mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"], 'renderTool.log')
+                    mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"])
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
