@@ -196,7 +196,7 @@ def main():
             "--progress_file",
             progress_file,
             "--interval",
-            interval,
+            str(interval),
             "--session_dir",
             session_dir
         ])
