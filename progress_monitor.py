@@ -44,7 +44,7 @@ except Exception as e:
 
 
 def check_results(test_cases_path, session_dir):
-    mc.upload_file(test_cases_path, ums_client.build_id, ums_client.suite_id)
+    minio_client.upload_file(test_cases_path, ums_client.build_id, ums_client.suite_id)
     with open(test_cases_path) as f:
         global transferred_test_cases
         test_cases = json.loads(f.read())
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     while True:
         print('Check number {}'.format(check))
         check += 1
-        result = check_results(args.progress_file, args.image_folder)
+        result = check_results(args.progress_file, args.session_dir)
         if result:
             break
         time.sleep(args.interval)

@@ -192,7 +192,7 @@ def main():
         main_logger.info('Started monitoring: {}'.format(progress_file))
         monitor = subprocess.Popen([
             "python3",
-            "progress_monitor.py",
+            os.path.join("..", "jobs_launcher", "progress_monitor.py"),
             "--progress_file",
             progress_file,
             "--interval",
