@@ -103,8 +103,17 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                     "Error during metrics calculation: {}".format(str(err)))
                 return img
 
-            pix_difference_2 = metrics.getPrediction()
+            # if 'Black image expected' in script_info - allow black img
+            mark_failed_if_black = core.config.CASE_EXPECTS_BLACK not in img.get('script_info', '')
+            pix_difference_2 = metrics.getPrediction(mark_failed_if_black=mark_failed_if_black)
             img.update({'difference_color_2': pix_difference_2})
+            # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
+            if pix_difference_2 != 0:
+                img['message'].append('Unacceptable pixel difference')
+                img['test_status'] = core.config.TEST_DIFF_STATUS
+                if pix_difference_2 == 2:
+                    img['message'].append('Render is unexpected full black image.')
+                    img['test_status'] = core.config.TEST_CRASH_STATUS
 
             for field in ['render_color_path', 'baseline_color_path']:
                 image_path = os.path.join(base_dir, img['test_group'], img.get(field, 'None'))

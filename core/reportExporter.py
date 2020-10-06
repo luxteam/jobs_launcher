@@ -647,7 +647,8 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
         except Exception as err:
             traceback.print_exc()
-        rc = -2
+        # TODO: make building of performance tab more stable
+        # rc = -2
 
     main_logger.info("Saving compare report...")
     try:
