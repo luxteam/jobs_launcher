@@ -20,7 +20,7 @@ def launch_job(cmd_line, job_timeout=None):
             child.terminate()
         p.terminate()
 
-    proc_time = int(time.time() - started)
+    proc_time = float(time.time() - started)
 
     report['duration'] = proc_time
 

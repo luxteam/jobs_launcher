@@ -127,12 +127,15 @@ def main():
     # extend test_filter by values in file_filter
     if args.file_filter and args.file_filter != 'none':
         try:
-            with open(os.path.join(args.tests_root, args.file_filter), 'r') as file:
-                if args.file_filter.endswith('json'):
-                    args.cmd_variables['TestCases'] = os.path.abspath(os.path.join(args.tests_root, args.file_filter))
-                    args.test_filter.extend([x for x in json.loads(file.read()).keys()])
-                else:
-                    args.test_filter.extend(file.read().splitlines())
+            file_name = args.file_filter.split('~')[0]
+            with open(os.path.join(args.tests_root, file_name), 'r') as file:
+                file_content = json.load(file)
+                # exclude some tests from non-splitted tests package
+                if not file_content['split']:
+                    # save path to tests package
+                    args.cmd_variables['TestCases'] = os.path.abspath(os.path.join(args.tests_root, file_name))
+                    excluded_tests = args.file_filter.split('~')[1].split(',')
+                    args.test_filter.extend([x for x in file_content['groups'].keys() if x not in excluded_tests])
         except Exception as e:
             main_logger.error(str(e))
 
