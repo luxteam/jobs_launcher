@@ -511,30 +511,15 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
 
-                            for render_item in render_report:
-                                item_from_summary = [x for x in summary_report[execution]['results'][test][config]['render_results'] if x['test_case'] == render_item['test_case']][0]
-                                render_item.update({'difference_time': item_from_summary['difference_time']})
-                                render_item.update({'baseline_render_time': item_from_summary['baseline_render_time']})
-                                manual_baseline_northstar_path = os.path.join(work_dir, os.path.split(report_dir)[0].replace('RPR', 'NorthStar'), os.path.split(report_dir)[1], render_item['render_color_path'])
-                                render_item.update({'baseline_color_path': os.path.relpath(manual_baseline_northstar_path, os.path.join(work_dir, report_dir))})
+                            # for render_item in render_report:
+                            #     item_from_summary = [x for x in summary_report[execution]['results'][test][config]['render_results'] if x['test_case'] == render_item['test_case']][0]
+                                # render_item.update({'difference_time': item_from_summary['difference_time']})
+                                # render_item.update({'baseline_render_time': item_from_summary['baseline_render_time']})
+                                # manual_baseline_northstar_path = os.path.join(work_dir, os.path.split(report_dir)[0].replace('RPR', 'NorthStar'), os.path.split(report_dir)[1], render_item['render_color_path'])
+                                # render_item.update({'baseline_color_path': os.path.relpath(manual_baseline_northstar_path, os.path.join(work_dir, report_dir))})
                     else:
                         # test case was lost
                         continue
-
-                    # for core baseline_render_time initialize via compareByJson script
-                    if report_type != 'ec':
-                        baseline_report_path = os.path.abspath(os.path.join(work_dir, execution, 'Baseline', test, BASELINE_REPORT_NAME))
-                        baseline_report = []
-
-                        if os.path.exists(baseline_report_path):
-                            with open(baseline_report_path, 'r') as file:
-                                baseline_report = json.loads(file.read())
-                                for render_item in render_report:
-                                    try:
-                                        baseline_item = list(filter(lambda item: item['test_case'] == render_item['test_case'], baseline_report))[0]
-                                        render_item.update({'baseline_render_time': baseline_item['render_time']})
-                                    except IndexError:
-                                        pass
 
                     # choose right plugin version based on building report type
                     if report_type != 'ec':
@@ -826,6 +811,22 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                    'results': {},
                    'summary': {}}
 
+    #######################
+
+    for root_dir in os.listdir(northstar_dir):
+        if os.path.isdir(os.path.join(northstar_dir, root_dir)):
+            session_gpu, session_os = os.path.basename(root_dir).split('-')
+            engine_postf = 'NorthStar'
+
+            main_logger.debug("Generate for NorthStar: {}".format(session_gpu + session_os))
+            for group_dir in os.listdir(os.path.join(northstar_dir, root_dir)):
+                group_dir_path = os.path.join(northstar_dir, root_dir, group_dir)
+                if os.path.isdir(group_dir_path):
+                    sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
+                    with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
+                        json.dump(sr, write_sum_report, indent=4)
+    ###############
+
     for root_dir in os.listdir(rpr_dir):
         if os.path.isdir(os.path.join(rpr_dir, root_dir)):
             session_gpu, session_os = os.path.basename(root_dir).split('-')
@@ -835,12 +836,12 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                 if os.path.isdir(group_dir_path):
                     sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
                     with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
-                        json.dump(sr, write_sum_report)
+                        json.dump(sr, write_sum_report, indent=4)
 
             for path, dirs, files in os.walk(os.path.join(rpr_dir, root_dir)):
                 for json_report in files:
                     if json_report == BASELINE_REPORT_NAME:
-                        main_logger.debug("OLD baseline report: {}".format(os.path.join(path, json_report)))
+                        # main_logger.debug("OLD baseline report: {}".format(os.path.join(path, json_report)))
                         with open(os.path.join(path, json_report), 'r') as file:
                             current_test_report = json.loads(file.read())
                         current_session_report = copy.deepcopy(report_base)
@@ -863,35 +864,40 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                         synchronization_duration = 0.0
 
                         for jtem in current_test_report:
-                            jtem.update({'baseline_render_time': 0})
-                            jtem.update({'difference_time': 0})
+                            jtem.setdefault('baseline_render_time', 0)
+                            jtem.setdefault('difference_time', 0)
                             jtem.setdefault('test_status', 'passed')
+                            # main_logger.debug("keys: {}".format(POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL))
                             for group_report_file in POSSIBLE_JSON_IMG_BASELINE_KEYS + POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL:
-                                if group_report_file in jtem.keys():
-                                    # update paths
-                                    manual_baseline_northstar_path = os.path.join(path.replace(rpr_dir, northstar_dir), jtem['render_color_path'])
-                                    jtem.update({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)})
-                                    if os.path.exists(os.path.join(path, json_report).replace(rpr_dir, northstar_dir)):
-                                        try:
-                                            with open(os.path.join(path, json_report).replace(rpr_dir, northstar_dir), 'r') as north_report:
-                                                nort_json = json.loads(north_report.read())
-                                                if len([x for x in nort_json if x['test_case'] == jtem['test_case']]):
-                                                    baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
-                                                else:
-                                                    baseline_time = 0
-                                                jtem.update({'baseline_render_time': baseline_time})
+                                # if group_report_file in jtem.keys():
+                                # update paths
+                                manual_baseline_northstar_path = os.path.join(path.replace(rpr_dir, northstar_dir), jtem['render_color_path'])
+                                # main_logger.debug("file repath: {}".format({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)}))
+                                jtem.update({group_report_file: os.path.relpath(manual_baseline_northstar_path, path)})
+                                if os.path.exists(os.path.join(path, json_report).replace(rpr_dir, northstar_dir)):
+                                    try:
+                                        with open(os.path.join(path, json_report).replace(rpr_dir, northstar_dir), 'r') as north_report:
+                                            nort_json = json.loads(north_report.read())
+                                            if len([x for x in nort_json if x['test_case'] == jtem['test_case']]):
+                                                baseline_time = [x for x in nort_json if x['test_case'] == jtem['test_case']][0]['render_time']
+                                            else:
+                                                baseline_time = 0
+                                                main_logger.debug("baseline time: 0")
+                                            jtem.update({'baseline_render_time': baseline_time})
 
-                                                def get_diff(current, previous):
-                                                    if current == previous:
-                                                        return 0.0
-                                                    try:
-                                                        return (current - previous) / previous * 100.0
-                                                    except ZeroDivisionError:
-                                                        return 0
+                                            def get_diff(current, previous):
+                                                if current == previous:
+                                                    return 0.0
+                                                try:
+                                                    return (current - previous) / previous * 100.0
+                                                except ZeroDivisionError:
+                                                    return 0
 
-                                                jtem.update({'difference_time': get_diff(jtem['render_time'], baseline_time)})
-                                        except Exception as err:
-                                            main_logger.error(str(err))
+                                            jtem.update({'difference_time': get_diff(jtem['render_time'], baseline_time)})
+                                    except Exception as err:
+                                        main_logger.error(str(err))
+                                else:
+                                    main_logger.warning("baseline report not found: {}".format(os.path.join(path, json_report).replace(rpr_dir, northstar_dir)))
 
                             render_duration += jtem['render_time']
                             synchronization_duration += jtem.get('sync_time', 0.0)
@@ -901,6 +907,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                 current_session_report['results'][current_test_report[0]['test_group']][''][jtem['test_status']] += 1
 
                         try:
+                            current_session_report['results'][current_test_report[0]['test_group']][""]["render_results"] = current_test_report
                             current_session_report['machine_info'].update({'render_device': jtem['render_device']})
                             current_session_report['machine_info'].update({'tool': jtem['tool']})
                             current_session_report['machine_info'].update({'render_version': jtem['render_version']})
@@ -933,10 +940,15 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                         with open(os.path.join(path, SESSION_REPORT), 'w') as file:
                             json.dump(current_session_report, file, indent=4)
 
+                        with open(os.path.join(path, json_report), 'w') as file:
+                            json.dump(current_test_report, file, indent=4)
+
     summary_report_gen, common_info_gen = build_summary_report(os.path.join(work_dir))
 
     with open(os.path.join(work_dir, SUMMARY_REPORT), 'w') as file:
         json.dump(summary_report_gen, file, indent=4)
+
+    summary_report_gen_2 = copy.deepcopy(summary_report_gen)
 
     for root_dir in os.listdir(northstar_dir):
         if os.path.isdir(os.path.join(northstar_dir, root_dir)):
@@ -949,7 +961,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                 if os.path.isdir(group_dir_path):
                     sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
                     with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
-                        json.dump(sr, write_sum_report)
+                        json.dump(sr, write_sum_report, indent=4)
 
             for path, dirs, files in os.walk(os.path.join(northstar_dir, root_dir)):
                 for json_report in files:
@@ -1023,7 +1035,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
 
     summary_report_north, null = build_summary_report(os.path.join(northstar_dir), 'session_report_ENGINE.json')
 
-    for configuration, report in summary_report_gen.items():
+    for configuration, report in summary_report_gen_2.items():
         for test_group in report['results']:
             for test_config in report['results'][test_group]:
                 try:
@@ -1039,20 +1051,20 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                                                        summary_report_north[configuration]['results'][test_group][test_config]['synchronization_duration']})
                 except:pass
         try:
-            summary_report_gen[configuration]['summary'].update({'render_duration_north': 0})
-            summary_report_gen[configuration]['summary'].update({'setup_duration_north': 0})
-            summary_report_gen[configuration]['summary'].update({'synchronization_duration_north': 0})
+            summary_report_gen_2[configuration]['summary'].update({'render_duration_north': 0})
+            summary_report_gen_2[configuration]['summary'].update({'setup_duration_north': 0})
+            summary_report_gen_2[configuration]['summary'].update({'synchronization_duration_north': 0})
 
-            summary_report_gen[configuration]['summary'].update({'render_duration_north':
+            summary_report_gen_2[configuration]['summary'].update({'render_duration_north':
                                                                summary_report_north[configuration]['summary']['render_duration']})
-            summary_report_gen[configuration]['summary'].update({'setup_duration_north':
+            summary_report_gen_2[configuration]['summary'].update({'setup_duration_north':
                                                                summary_report_north[configuration]['summary']['setup_duration']})
-            summary_report_gen[configuration]['summary'].update({'synchronization_duration_north':
+            summary_report_gen_2[configuration]['summary'].update({'synchronization_duration_north':
                                                                summary_report_north[configuration]['summary']['synchronization_duration']})
         except:pass
 
-    with open(os.path.join(work_dir, SUMMARY_REPORT), 'w') as file:
-        json.dump(summary_report_gen, file, indent=4)
+    with open(os.path.join(work_dir, SUMMARY_REPORT+"north.json"), 'w') as file:
+        json.dump(summary_report_gen_2, file, indent=4)
 
-    return summary_report_gen, common_info_gen
+    return summary_report_gen_2, common_info_gen
 

@@ -54,17 +54,11 @@
                 {%- else -%}
                     Baseline Color
                 {%- endif -%}
-            {%- elif report_type == 'ct' -%}
-                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
-                    NorthStar Baseline
-                {%- else -%}
-                    RPR Baseline
-                {%- endif -%}
             {%- endif -%}
         </th>
     {%- else -%}
         <td class="hatching">
-        {%- if item.baseline_color_path -%}
+        {%- if item.render_color_path -%}
 
             {%- if template_name == 'local' -%}
                 {%- if 'thum256_render_color_path' in item -%}
@@ -97,12 +91,6 @@
                     NorthStar
                 {%- else -%}
                     Rendered color
-                {%- endif -%}
-            {%- elif report_type == 'ct' -%}
-                {%- if 0 | env_override("JL_ENGINES_COMPARE") -%}
-                    NorthStar
-                {%- else -%}
-                    RPR
                 {%- endif -%}
             {%- endif -%}
         </th>

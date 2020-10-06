@@ -11,8 +11,8 @@
         <thead>
             <tr>
                 <th>Job Name</th>
-                <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken Tahoe</th>
-                <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken NorthStar</th>
+                <th data-formatter="timeFormatterFull">Time taken Tahoe</th>
+                <th data-formatter="timeFormatterFull">Time taken NorthStar</th>
                 <th data-formatter="timeFormatterFull">Render time Tahoe</th>
                 <th data-formatter="timeFormatterFull">Render time NorthStar</th>
                 <th data-formatter="timeFormatterFull">Synchronization time Tahoe</th>
@@ -38,7 +38,7 @@
                 {% endif -%}
                 >{{ report[i].summary.render_duration | round(3) }}</td>
                 <td
-                {%- if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
+                {%- if report[i].summary.render_duration_north == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif -%}
                 >{{ report[i].summary.render_duration_north | round(3) }}</td>
@@ -72,8 +72,8 @@
             <tr>
                 <th>Test package name</th>
                 <th>Local report</th>
-                <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken Tahoe</th>
-                <th data-formatter="timeFormatterFull" data-field="syncTimeTaken">Time taken NorthStar</th>
+                <th data-formatter="timeFormatterFull">Time taken Tahoe</th>
+                <th data-formatter="timeFormatterFull">Time taken NorthStar</th>
                 <th data-formatter="timeFormatterFull">Render time Tahoe</th>
                 <th data-formatter="timeFormatterFull">Render time NorthStar</th>
                 <th data-formatter="timeFormatterFull">Synchronization time Tahoe</th>
@@ -93,15 +93,18 @@
                 <td>Report</td>
                 {% endif %}
 
-                <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>
+<!--                <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>-->
+                <td>{{ report[i].results[test_package][test_conf].render_duration + report[i].results[test_package][test_conf].synchronization_duration }}</td>
+
                 <td>{{ report[i].results[test_package][test_conf].render_duration_north + report[i].results[test_package][test_conf].synchronization_duration_north }}</td>
 
                 <td
                 {% if report[i].results[test_package][test_conf].render_duration == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
                 class="badResult"
                 {% endif %}
-                >{{ report[i].results[test_package][test_conf].render_duration | round(3) }}</td>                <td
-                {% if report[i].results[test_package][test_conf].render_duration == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
+                >{{ report[i].results[test_package][test_conf].render_duration | round(3) }}</td>
+                <td
+                {% if report[i].results[test_package][test_conf].render_duration_north == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].render_duration_north | round(3) }}</td>
@@ -124,7 +127,7 @@
                 {% endif %}
                 >{{ report[i].summary.render_duration | round(3) }}</td>
                 <td
-                {% if report[i].summary.render_duration == -0.0 and report[i].summary.total != report[i].summary.skipped %}
+                {% if report[i].summary.render_duration_north == -0.0 and report[i].summary.total != report[i].summary.skipped %}
                 class="badResult"
                 {% endif %}
                 >{{ report[i].summary.render_duration_north | round(3) }}</td>
