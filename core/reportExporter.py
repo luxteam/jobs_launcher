@@ -273,7 +273,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
 
-    summary_report[gpu_os_case]['summary']['error'] += lost_tests_count
+    summary_report[gpu_os_case]['summary'][status] += lost_tests_count
     summary_report[gpu_os_case]['summary']['total'] += lost_tests_count
 
 
@@ -343,7 +343,7 @@ def build_summary_report(work_dir, node_retry_info):
 
     missing_tests_jsons = {'error': os.path.join(work_dir, LOST_TESTS_JSON_NAME), 'skipped': os.path.join(work_dir, SKIPPED_TESTS_JSON_NAME)}
     for key in missing_tests_jsons:
-        missing_tests_jsons = missing_tests_jsons[key]
+        missing_tests_json = missing_tests_jsons[key]
         if os.path.exists(missing_tests_json): 
             with open(os.path.join(missing_tests_json), "r") as file:
                 lost_tests_count = json.load(file)
