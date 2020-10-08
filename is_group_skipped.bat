@@ -6,4 +6,4 @@ set OS=%2
 set ENGINE=%3
 set TESTS_PATH=%4
 
-python is_group_skipped.py --gpu %GPU% --os %OS% --engine %ENGINE% --tests_path %TESTS_PATH%
+python core\\isGroupSkipped.py --gpu %GPU% --os %OS% --engine %ENGINE% --tests_path %TESTS_PATH%
