@@ -155,8 +155,6 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 				# join converted gpu name and os name
 				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 				# if test group is skipped
-				print(test_package_name in skipped_groups)
-				print((gpu_name + "-" + os_name) in skipped_groups[test_package_name])
 				if (engine and (test_package_name + "-" + engine) in skipped_groups and (gpu_name + "-" + os_name) in skipped_groups[test_package_name + "-" + engine]) \
 						or (test_package_name in skipped_groups and (gpu_name + "-" + os_name) in skipped_groups[test_package_name]):
 					if joined_gpu_os_names not in skipped_tests_data:
@@ -168,7 +166,6 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 					lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
 			except Exception as e:
 				print("Failed to count lost tests for test group {}. Reason: {}".format(test_package_name, str(e)))
-				raise e
 	else:
 		for test_package_name in tests_list:
 			try:
