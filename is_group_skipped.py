@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--gpu', required=True)
     parser.add_argument('--os', required=True)
-    parser.add_argument('--engine', required=True)
+    parser.add_argument('--engine', required=False)
     parser.add_argument('--tests_path', required=True)
 
     args = parser.parse_args()
@@ -26,6 +26,10 @@ if __name__ == '__main__':
     total_cases_num = len(cases)
 
     for case in cases:
-        if is_case_skipped(case, render_platform, args.engine):
+        if args.engine:	
+            case_skipped = is_case_skipped(case, render_platform, args.engine)
+        else:
+            case_skipped = is_case_skipped(case, render_platform)
+        if case_skipped:
             skipped_cases_num += 1
     print(skipped_cases_num == total_cases_num)
