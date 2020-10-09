@@ -46,12 +46,16 @@ except Exception as e:
     main_logger.error("Can't create MINIO client")
 
 
+def render_color_full_path(session_dir, suite_name, render_color_path):
+    return os.path.realpath(os.path.join(session_dir, suite_name, render_color_path))
+
+
 def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
     cases_hashes_info = {}
     for case in test_cases:
         with open(os.path.join(session_dir, suite_name, case + '_RPR.json')) as case_file:
             case_file_data = json.load(case_file)[0]
-            with open(case_file_data['render_color_path'], 'rb') as img:
+            with open(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path']), 'rb') as img:
                 bytes_data = img.read()
                 case['hash'] = hashlib.md5(bytes_data).hexdigest()
 
@@ -86,9 +90,9 @@ def check_results(session_dir, suite_name):
                 if test_case['case'] in new_cases_existence_hashes_info and new_cases_existence_hashes_info[test_case['case']]:
                     image_id = new_cases_existence_hashes_info[test_case['case']]['id']
                 else:
-                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, suite_name, case_file_data['render_color_path']))) if is_client else -1
+                    image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path'])) if is_client else -1
                 case_file_data['image_service_id'] = image_id
-                
+
             with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json'), 'w') as case_file:
                 json.dump([case_file_data], case_file)
 
