@@ -88,9 +88,13 @@ def check_results(session_dir, suite_name):
             with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json')) as case_file:
                 case_file_data = json.load(case_file)[0]
 
-                if test_case in new_cases_existence_hashes_info and new_cases_existence_hashes_info[test_case]:
+                if test_case in new_cases_existence_hashes_info and \
+                        new_cases_existence_hashes_info[test_case] and \
+                        'id' in new_cases_existence_hashes_info[test_case]:
+                    print("Use id found by hash for case: {}".format(test_case))
                     image_id = new_cases_existence_hashes_info[test_case]['id']
                 else:
+                    print("Upload new image for case: {}".format(test_case))
                     image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path'])) if is_client else -1
                 case_file_data['image_service_id'] = image_id
 
