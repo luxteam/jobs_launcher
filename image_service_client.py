@@ -31,6 +31,9 @@ class ISClient:
 
     def get_existence_info_by_hash(self, hashes_seq):
         try:
+            hashes_seq = list(hashes_seq)
+            if len(hashes_seq) == 0:
+                return {}
             response = get(
                 url="{url}/api/?{query}".format(url=self.url, query="&".join([('hash=' + h) for h in hashes_seq])),
                 headers=self.headers
@@ -39,7 +42,7 @@ class ISClient:
             return {img['hash']: img['image'] for img in json_data}
         except Exception as e:
             main_logger.error("Hash check sending error: {}".format(str(e)))
-            return None
+            return {}
 
     def send_image(self, path2img):
         try:
@@ -56,6 +59,6 @@ class ISClient:
             image_id = json.loads(response.content.decode("utf-8"))["image_id"]
             main_logger.info("Image sent. Got an image_id: {}".format(image_id))
             return image_id
-        except Exception as e:
-            main_logger.error("Image sending error: {}".format(str(e)))
+        except:
+            main_logger.error("Image sending error: {}".format(traceback.format_exc()))
             return -1
