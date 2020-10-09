@@ -76,6 +76,7 @@ def check_results(session_dir, suite_name):
         new_test_cases = {tc['case']: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done') and not tc['case'] in transferred_test_cases}
 
         new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases)
+        print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
 
         for test_case in new_test_cases:
             print('Sending artefacts & images for: {}'.format(test_case))
