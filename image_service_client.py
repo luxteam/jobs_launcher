@@ -29,6 +29,18 @@ class ISClient:
             "Authorization": "Bearer " + token,
         }
 
+    def get_existence_info_by_hash(self, hashes_seq):
+        try:
+            response = get(
+                url="{url}/api/?{query}".format(url=self.url, query="&".join([('hash=' + h) for h in hashes_seq])),
+                headers=self.headers
+            )
+            json_data = json.loads(response.content.decode("utf-8"))
+            return {img['hash']: img['image'] for img in json_data}
+        except Exception as e:
+            main_logger.error("Hash check sending error: {}".format(str(e)))
+            return None
+
     def send_image(self, path2img):
         try:
             main_logger.info("Try to send picture {} to Image Service".format(path2img))
