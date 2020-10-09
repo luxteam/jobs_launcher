@@ -52,20 +52,21 @@ def render_color_full_path(session_dir, suite_name, render_color_path):
 
 def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
     cases_hashes_info = {}
+    cases_hashes = {}
     for case in test_cases:
         with open(os.path.join(session_dir, suite_name, case + '_RPR.json')) as case_file:
             case_file_data = json.load(case_file)[0]
             with open(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path']), 'rb') as img:
                 bytes_data = img.read()
-                case['hash'] = hashlib.md5(bytes_data).hexdigest()
+                cases_hashes[case] = hashlib.md5(bytes_data).hexdigest()
 
     hash_info_from_is = is_client.get_existence_info_by_hash(
-        [case['hash'] for case in test_cases if 'hash' in case and case['hash']]
+        [case_hash for case, case_hash in cases_hashes.items() if case_hash]
     )
     if hash_info_from_is:
         cases_hashes_info = {
-            case['case']: hash_info_from_is[case['hash']]
-            for case in test_cases if 'hash' in case and case['hash'] in hash_info_from_is
+            case: hash_info_from_is[case_hash]
+            for case, case_hash in cases_hashes.items() if case_hash in hash_info_from_is
         }
     return cases_hashes_info
 
