@@ -116,12 +116,11 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 				tests_package_data = json.load(file)
 			if not tests_package_data["split"]:
 				# e.g. regression
-				lost_package_stach = ""
+				lost_package_staches = []
 				for lost_test_result in lost_tests_results:
 					if lost_test_result.endswith(tests_package):
-						lost_package_stach = lost_test_result
-						break
-				if lost_package_stach:
+						lost_package_staches.append(lost_test_result)
+				for lost_package_stach in lost_package_staches:
 					lost_tests_results.remove(lost_package_stach)
 					excluded_groups = tests_package.split("~")[1].split(",")
 					for test_package_name in tests_package_data["groups"]:
@@ -129,8 +128,8 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 							continue
 						try:
 							lost_tests_count = len(set(tests_package_data["groups"][test_package_name].split(',')))
-							gpu_name = lost_test_result.split('-')[0]
-							os_name = lost_test_result.split('-')[1]
+							gpu_name = lost_package_stach.split('-')[0]
+							os_name = lost_package_stach.split('-')[1]
 							# join converted gpu name and os name
 							joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 							if joined_gpu_os_names not in lost_tests_data:
