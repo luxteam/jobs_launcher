@@ -273,9 +273,9 @@ def main():
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if ums_client_prod and mc_prod:
-                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
                     if ums_client_dev and mc_dev:
-                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -306,10 +306,10 @@ def main():
                 for suite in suites:
                     if ums_client_prod and mc_prod:
                         ums_client_prod.get_suite_id_by_name(suite_name)
-                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
                     if ums_client_dev and mc_dev:
                         ums_client_dev.get_suite_id_by_name(suite_name)
-                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
 
 
         except Exception as e:
