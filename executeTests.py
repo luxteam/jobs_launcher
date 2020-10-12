@@ -269,7 +269,7 @@ def main():
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
-                test_suite_artefacts = ("renderTool.log")
+                test_suite_artefacts = {"renderTool.log"}
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if ums_client_prod and mc_prod:
