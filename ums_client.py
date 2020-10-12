@@ -1,3 +1,4 @@
+import os
 import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
