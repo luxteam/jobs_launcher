@@ -22,9 +22,9 @@ except ImportError:
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
-from ums_client import UMS_Client, str2bool
+from ums_client import create_ums_client, str2bool
 from image_service_client import ISClient
-from minio_client import UMS_Minio
+from minio_client import create_mc_client
 
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
@@ -36,51 +36,6 @@ def parse_cmd_variables(tests_root, cmd_variables):
         cmd_variables.update({'TestsFilter': 'full'})
 
     return cmd_variables
-
-
-def create_ums_client(client_postfix=""):
-    try:
-        if client_postfix:
-            client_postfix = "_" + client_postfix
-        ums_client = UMS_Client(
-            job_id=os.getenv("UMS_JOB_ID" + client_postfix),
-            url=os.getenv("UMS_URL" + client_postfix),
-            build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
-            env_label=os.getenv("UMS_ENV_LABEL"),
-            suite_id=None,
-            login=os.getenv("UMS_LOGIN" + client_postfix),
-            password=os.getenv("UMS_PASSWORD" + client_postfix)
-        )
-        main_logger.info("PROD UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
-                 url=ums_client.url,
-                 build_id=ums_client.build_id,
-                 label=ums_client.env_label,
-                 job_id=ums_client.job_id
-            )
-        )
-        return ums_client
-    except Exception as e:
-        main_logger.error("UMS Client creation error: {}".format(e))
-        main_logger.error("Traceback: {}".format(traceback.format_exc()))
-
-
-def create_mc_client(job_id):
-    try:
-        mc = UMS_Minio(
-            product_id=job_id,
-            enpoint=os.getenv("MINIO_ENDPOINT"),
-            access_key=os.getenv("MINIO_ACCESS_KEY"),
-            secret_key=os.getenv("MINIO_SECRET_KEY")
-        )
-        main_logger.info("MINIO Client created with product_id {product_id}\n enpoint: {enpoint}\n".format(
-                product_id=job_id,
-                enpoint=os.getenv("MINIO_ENDPOINT")
-            )
-        )
-        return mc
-    except Exception as e:
-        main_logger.error("MINIO Client creation error: {}".format(e))
-        main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
 def send_machine_info(ums_client, machine_info, args):
@@ -271,8 +226,10 @@ def main():
         main_logger.info("Try to send results to UMS")
 
         if ums_client_prod:
+            main_logger.info("Try to create Production MINIO client")
            mc_prod = create_mc_client(ums_client_prod.job_id)
         if ums_client_dev:
+            main_logger.info("Try to create Develop MINIO client")
             mc_dev = create_mc_client(ums_client_dev.job_id)
 
         res = []
@@ -317,7 +274,7 @@ def main():
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
-                test_suite_artefacts = ("renderTool.log", "test_cases.json")
+                test_suite_artefacts = ("renderTool.log")
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if ums_client_prod and mc_prod:

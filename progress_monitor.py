@@ -3,51 +3,32 @@ import json
 import time
 import argparse
 from image_service_client import ISClient
-from ums_client import UMS_Client
-from minio_client import UMS_Minio
+from ums_client import create_ums_client
+from minio_client import create_mc_client
 from core.config import *
 
 res = []
 transferred_test_cases = []
 
 is_client = None
-ums_client = None
-minio_client = None
-try:
-    is_client = ISClient(
-        url=os.getenv("IS_URL"),
-        login=os.getenv("IS_LOGIN"),
-        password=os.getenv("IS_PASSWORD")
-    )
-except Exception as e:
-    main_logger.error("Can't create Image Service client")
-try:
-    ums_client = UMS_Client(
-        job_id=os.getenv("UMS_JOB_ID"),
-        url=os.getenv("UMS_URL"),
-        build_id=os.getenv("UMS_BUILD_ID"),
-        env_label=os.getenv("UMS_ENV_LABEL"),
-        suite_id=None,
-        login=os.getenv("UMS_LOGIN"),
-        password=os.getenv("UMS_PASSWORD")
-    )
-except Exception as e:
-    main_logger.error("Can't create UMS client")
-try:
-    minio_client = UMS_Minio(
-        product_id=ums_client.job_id,
-        enpoint=os.getenv("MINIO_ENDPOINT"),
-        access_key=os.getenv("MINIO_ACCESS_KEY"),
-        secret_key=os.getenv("MINIO_SECRET_KEY")
-    )
-except Exception as e:
-    main_logger.error("Can't create MINIO client")
+ums_client_prod = create_ums_client("PROD")
+ums_client_dev = create_ums_client("DEV")
+minio_client_prod = None
+minio_client_dev = None
+if ums_client_prod:
+    minio_client_prod = create_mc_client(ums_client_prod.job_id)
+if ums_client_dev:
+    minio_client_dev = create_mc_client(ums_client_dev.job_id)
 
 
 def check_results(session_dir, suite_name):
     test_cases_path = os.path.join(session_dir, suite_name, 'test_cases.json')
-    ums_client.get_suite_id_by_name(suite_name)
-    minio_client.upload_file(test_cases_path, ums_client.build_id, ums_client.suite_id)
+    if ums_client_prod:
+        ums_client_prod.get_suite_id_by_name(suite_name)
+        minio_client_prod.upload_file(test_cases_path, ums_client_prod.build_id, ums_client_prod.suite_id)
+    if ums_client_dev:
+        ums_client_dev.get_suite_id_by_name(suite_name)
+        minio_client_dev.upload_file(test_cases_path, ums_client_dev.build_id, ums_client_dev.suite_id)
     with open(test_cases_path) as test_cases_file:
         global transferred_test_cases
         test_cases = json.load(test_cases_file)

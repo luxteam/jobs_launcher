@@ -12,6 +12,26 @@ mc.upload_file('build.dmg', '8253')
 
 """
 
+
+def create_mc_client(job_id):
+    try:
+        mc = UMS_Minio(
+            product_id=job_id,
+            enpoint=os.getenv("MINIO_ENDPOINT"),
+            access_key=os.getenv("MINIO_ACCESS_KEY"),
+            secret_key=os.getenv("MINIO_SECRET_KEY")
+        )
+        main_logger.info("MINIO Client created with product_id {product_id}\n enpoint: {enpoint}\n".format(
+                product_id=job_id,
+                enpoint=os.getenv("MINIO_ENDPOINT")
+            )
+        )
+        return mc
+    except Exception as e:
+        main_logger.error("MINIO Client creation error: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+
 class UMS_Minio:
     # TODO: access + secret + url to env
     def __init__(self,

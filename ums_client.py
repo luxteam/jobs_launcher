@@ -18,6 +18,32 @@ def str2bool(v):
         raise ValueError('Boolean value expected. Got <{}>'.format(v))
 
 
+def create_ums_client(client_postfix=""):
+    try:
+        if client_postfix:
+            client_postfix = "_" + client_postfix
+        ums_client = UMS_Client(
+            job_id=os.getenv("UMS_JOB_ID" + client_postfix),
+            url=os.getenv("UMS_URL" + client_postfix),
+            build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
+            env_label=os.getenv("UMS_ENV_LABEL"),
+            suite_id=None,
+            login=os.getenv("UMS_LOGIN" + client_postfix),
+            password=os.getenv("UMS_PASSWORD" + client_postfix)
+        )
+        main_logger.info("PROD UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
+                 url=ums_client.url,
+                 build_id=ums_client.build_id,
+                 label=ums_client.env_label,
+                 job_id=ums_client.job_id
+            )
+        )
+        return ums_client
+    except Exception as e:
+        main_logger.error("UMS Client creation error: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+
 class UMS_Client:
     def __init__(
         self,
