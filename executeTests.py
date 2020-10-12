@@ -235,11 +235,6 @@ def main():
         res = []
 
         try:
-            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
-        except Exception as e:
-            main_logger.error("Failed to copy launcher.engine.log: {}".format(str(e)))
-
-        try:
             main_logger.info('Start preparing results')
             cases = []
             suites = []
@@ -301,6 +296,8 @@ def main():
                 main_logger.info('Test suite results sent with code {}'.format(response_dev.status_code))
                 main_logger.info('Response from UMS: \n{}'.format(response_dev.content))
 
+            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+
             test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
 
             for artefact in test_suite_artefacts:
@@ -318,8 +315,10 @@ def main():
         except Exception as e:
             main_logger.error("Test case result creation error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
+            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
     else:
         main_logger.info("UMS client did not set. Result won't be sent to UMS")
+        shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
