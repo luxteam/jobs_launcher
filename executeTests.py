@@ -183,7 +183,7 @@ def main():
             interval = 5
             main_logger.info('Started monitoring: {}'.format(found_job[0]))
             monitor = subprocess.Popen([
-                "python3",
+                "python",
                 os.path.join("..", "jobs_launcher", "progress_monitor.py"),
                 "--interval",
                 str(interval),
