@@ -227,7 +227,7 @@ def main():
 
         if ums_client_prod:
             main_logger.info("Try to create Production MINIO client")
-           mc_prod = create_mc_client(ums_client_prod.job_id)
+            mc_prod = create_mc_client(ums_client_prod.job_id)
         if ums_client_dev:
             main_logger.info("Try to create Develop MINIO client")
             mc_dev = create_mc_client(ums_client_dev.job_id)
