@@ -245,6 +245,11 @@ def main():
         res = []
 
         try:
+            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+        except Exception as e:
+            main_logger.error("Failed to copy launcher.engine.log: {}".format(str(e)))
+
+        try:
             main_logger.info('Start preparing results')
             cases = []
             suites = []
@@ -269,14 +274,16 @@ def main():
                     })
                     
                     path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
-                    mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"])
+                    if mc:
+                        mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"])
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
                 test_suite_artefacts = ("renderTool.log", "test_cases.json")
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
-                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                    if mc:
+                        mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
    
                 # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
@@ -289,19 +296,15 @@ def main():
                 main_logger.info('Test suite results sent with code {}'.format(response.status_code))
                 main_logger.info('Response from UMS: \n{}'.format(response.content))
 
-            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
-
             test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
 
             for artefact in test_suite_artefacts:
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
-                if len(suites.items()) > 1:
-                    # in case of non-splitted package or non split execution build - send logs to build dir
-                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id)
-                else:
-                    # in split execution build - send logs to suite dir
-                    ums_client.get_suite_id_by_name(list(suites.keys())[0])
-                    mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                # send logs to suites dirs
+                for suite in suites:
+                    ums_client.get_suite_id_by_name(suite)
+                    if mc:
+                        mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
 
 
         except Exception as e:
@@ -309,7 +312,6 @@ def main():
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
     else:
         main_logger.info("UMS client did not set. Result won't be sent to UMS")
-        shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
