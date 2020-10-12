@@ -56,11 +56,30 @@ def create_ums_client(client_postfix=""):
                  build_id=ums_client.build_id,
                  label=ums_client.env_label,
                  job_id=ums_client.job_id
-             )
+            )
         )
         return ums_client
     except Exception as e:
         main_logger.error("UMS Client creation error: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+
+def create_mc_client(job_id):
+    try:
+        mc = UMS_Minio(
+            product_id=job_id,
+            enpoint=os.getenv("MINIO_ENDPOINT"),
+            access_key=os.getenv("MINIO_ACCESS_KEY"),
+            secret_key=os.getenv("MINIO_SECRET_KEY")
+        )
+        main_logger.info("MINIO Client created with product_id {product_id}\n enpoint: {enpoint}\n".format(
+                product_id=job_id,
+                enpoint=os.getenv("MINIO_ENDPOINT")
+            )
+        )
+        return mc
+    except Exception as e:
+        main_logger.error("MINIO Client creation error: {}".format(e))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
@@ -83,6 +102,8 @@ def main():
     ums_client_prod = None
     ums_client_dev = None
     use_ums = None
+    mc_prod = None
+    mc_dev = None
     try:
         main_logger.info("Try to get environment variable UMS_USE")
         use_ums = str2bool(os.getenv('UMS_USE'))
@@ -202,7 +223,7 @@ def main():
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
         
-        if ums_client:
+        if ums_client_prod or ums_client_dev:
             # TODO: Monitoring start
             interval = 5
             main_logger.info('Started monitoring: {}'.format(found_job[0]))
@@ -232,7 +253,7 @@ def main():
                     jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
-            if i == 0 and ums_client:
+            if i == 0 and (ums_client_prod or ums_client_dev):
                 try:
                     monitor.wait()
                 except Exception as e:
@@ -249,14 +270,10 @@ def main():
     if ums_client_prod or ums_client_dev:
         main_logger.info("Try to send results to UMS")
 
-        try:
-            mc = UMS_Minio(
-                product_id=ums_client.job_id,
-                enpoint=os.getenv("MINIO_ENDPOINT"),
-                access_key=os.getenv("MINIO_ACCESS_KEY"),
-                secret_key=os.getenv("MINIO_SECRET_KEY"))
-        except Exception as e:
-            main_logger.error(e)
+        if ums_client_prod:
+           mc_prod = create_mc_client(ums_client_prod.job_id)
+        if ums_client_dev:
+            mc_dev = create_mc_client(ums_client_dev.job_id)
 
         res = []
 
@@ -276,7 +293,10 @@ def main():
 
             for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
-                ums_client.get_suite_id_by_name(suite_name)
+                if ums_client_prod:
+                    ums_client_prod.get_suite_id_by_name(suite_name)
+                if ums_client_dev:
+                    ums_client_dev.get_suite_id_by_name(suite_name)
                 for case in cases:
                     res.append({
                         'name': case['test_case'],
@@ -290,16 +310,20 @@ def main():
                     })
                     
                     path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
-                    if mc:
-                        mc.upload_file(path_to_test_case_log, ums_client.build_id, ums_client.suite_id, case["test_case"])
+                    if ums_client_prod and mc_prod:
+                        mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
+                    if ums_client_dev and mc_dev:
+                        mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
                 test_suite_artefacts = ("renderTool.log", "test_cases.json")
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
-                    if mc:
-                        mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                    if ums_client_prod and mc_prod:
+                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                    if ums_client_dev and mc_dev:
+                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -326,9 +350,12 @@ def main():
                 path_to_test_suite_render_log = os.path.join(session_dir, artefact)
                 # send logs to suites dirs
                 for suite in suites:
-                    ums_client.get_suite_id_by_name(suite)
-                    if mc:
-                        mc.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                    if ums_client_prod and mc_prod:
+                        ums_client_prod.get_suite_id_by_name(suite_name)
+                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
+                    if ums_client_dev and mc_dev:
+                        ums_client_dev.get_suite_id_by_name(suite_name)
+                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client.build_id, ums_client.suite_id)
 
 
         except Exception as e:
