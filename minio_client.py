@@ -1,6 +1,18 @@
 import os
-from minio import Minio
 from core.config import main_logger
+import subprocess
+import sys
+try:
+    from minio import Minio
+except Exception as ex:
+    try:
+        subprocess.call([sys.executable, "-m", "pip", "install", "Minio"])
+        from minio import Minio
+    except Exception as e:
+        print(e)
+        print("Failed to install dependency automatically.")
+        print("Run: pip install twill platform shutil requests manually.")
+        sys.exit(-1)
 
 """ UMS Minio client module
 
