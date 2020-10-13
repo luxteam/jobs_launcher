@@ -341,7 +341,9 @@ def build_summary_report(work_dir, node_retry_info):
     for key in common_info:
         common_info[key] = ' '.join(common_info[key])
 
-    missing_tests_jsons = {'error': os.path.join(work_dir, LOST_TESTS_JSON_NAME), 'skipped': os.path.join(work_dir, SKIPPED_TESTS_JSON_NAME)}
+    missing_tests_jsons = {'error': os.path.join(work_dir, LOST_TESTS_JSON_NAME)}
+    if show_skipped_groups
+        missing_tests_jsons['skipped'] = os.path.join(work_dir, SKIPPED_TESTS_JSON_NAME)
     for key in missing_tests_jsons:
         missing_tests_json = missing_tests_jsons[key]
         if os.path.exists(missing_tests_json): 
