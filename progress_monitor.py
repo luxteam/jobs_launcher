@@ -19,6 +19,14 @@ if ums_client_prod:
     minio_client_prod = create_mc_client(ums_client_prod.job_id)
 if ums_client_dev:
     minio_client_dev = create_mc_client(ums_client_dev.job_id)
+try:
+    is_client = ISClient(
+        url=os.getenv("IS_URL"),
+        login=os.getenv("IS_LOGIN"),
+        password=os.getenv("IS_PASSWORD")
+    )
+except Exception as e:
+    main_logger.error("Can't create Image Service client")
 
 
 def check_results(session_dir, suite_name):
