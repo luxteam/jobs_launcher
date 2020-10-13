@@ -18,10 +18,10 @@ if ums_client_dev:
     minio_client_dev = create_mc_client(ums_client_dev.job_id)
 
 
-def send_to_minio(path, pattern):
+def send_to_minio(files_path, pattern):
     files = glob.glob(pattern)
     for file in files:
-        file_path = os.path.join(path, file)
+        file_path = os.path.join(files_path, file)
         if ums_client_prod and minio_client_prod:
             minio_client_prod.upload_file(file_path, ums_client_prod.build_id)
         if minio_client_dev and minio_client_dev:
@@ -30,9 +30,9 @@ def send_to_minio(path, pattern):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--path', required=True, type=str, help='path to files')
+    parser.add_argument('--files_path', required=True, type=str, help='path to files')
     parser.add_argument('--pattern', required=True, type=str, help='pattern for files which must be sent')
 
     args = parser.parse_args()
 
-    send_to_minio(args.path, args.pattern)
+    send_to_minio(args.files_path, args.pattern)
