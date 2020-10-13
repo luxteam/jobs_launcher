@@ -262,10 +262,11 @@ def main():
                     })
                     
                     path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
-                    if ums_client_prod and mc_prod:
-                        mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
-                    if ums_client_dev and mc_dev:
-                        mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
+                    if os.path.exists(path_to_test_case_log):
+                        if ums_client_prod and mc_prod:
+                            mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
+                        if ums_client_dev and mc_dev:
+                            mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
