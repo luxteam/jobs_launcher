@@ -12,7 +12,7 @@ minio_client_dev = create_mc_client(os.getenv("UMS_JOB_ID_DEV"))
 
 
 def send_to_minio(files_path, pattern):
-    files = glob.glob(pattern)
+    files = glob.glob(os.path.join(files_path, pattern))
     for file in files:
         file_path = os.path.join(files_path, file)
         if minio_client_prod:
