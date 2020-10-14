@@ -37,14 +37,16 @@ def check_results(session_dir, suite_name):
         with open(test_cases_path) as test_cases_file:
             global transferred_test_cases
             test_cases = json.load(test_cases_file)
-        new_test_cases = {tc['case']: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done', 'passed') and not tc['case'] in transferred_test_cases}
+        # Core has different case name
+        name_key = 'case' if 'case' in test_cases[0] else 'scene'
     else:
         # case of Max
         test_cases_path = os.path.join(session_dir, suite_name, 'case_list.json')
         with open(test_cases_path) as test_cases_file:
             global transferred_test_cases
             test_cases = json.load(test_cases_file)['cases']
-        new_test_cases = {tc['name']: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done', 'passed') and not tc['name'] in transferred_test_cases}
+        name_key = 'name'
+    new_test_cases = {tc[name_key]: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done', 'passed') and not tc[name_key] in transferred_test_cases}
 
     if ums_client_prod:
         ums_client_prod.get_suite_id_by_name(suite_name)
