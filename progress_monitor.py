@@ -37,8 +37,13 @@ def check_results(session_dir, suite_name):
         with open(test_cases_path) as test_cases_file:
             global transferred_test_cases
             test_cases = json.load(test_cases_file)
-        # Core has different case name
-        name_key = 'case' if 'case' in test_cases[0] else 'scene'
+        # Blender, Maya, Core and Viewer has different case name
+        if 'case' in test_cases[0]:
+            name_key = 'case'
+        if 'scene' in test_cases[0]:
+            name_key = 'scene'
+        else:
+            name_key = 'name'
     else:
         # case of Max
         test_cases_path = os.path.join(session_dir, suite_name, 'case_list.json')
