@@ -251,6 +251,12 @@ def main():
                 if ums_client_dev:
                     ums_client_dev.get_suite_id_by_name(suite_name)
                 for case in cases:
+                    if 'image_service_id' in case:
+                        rendered_image = str(case['image_service_id'])
+                    else:
+                        # FIXME: refactor report building of Core: make reports parallel with render
+                        with open(os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')) as file:
+                            rendered_image = str(json.load(file)['image_service_id'])
                     res.append({
                         'name': case['test_case'],
                         'status': case['test_status'],
@@ -258,7 +264,7 @@ def main():
                             'render_time': case['render_time']
                         },
                         "artefacts": {
-                            "rendered_image": str(case['image_service_id'])
+                            "rendered_image": rendered_image
                         }
                     })
                     
