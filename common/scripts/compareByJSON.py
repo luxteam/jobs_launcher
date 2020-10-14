@@ -52,10 +52,10 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
         if os.path.exists(path_to_baseline_json):
             with open(path_to_baseline_json) as f:
                 baseline_json = json.load(f)
+        else:
             img.update({'baseline_color_path': os.path.relpath(
                 os.path.join(base_dir, 'baseline.png'), work_dir)})
             img['message'].append('Baseline not found')
-        else:
             core.config.main_logger.error(
                 "Baseline json not found by path: {}".format(path_to_baseline_json))
             return img
