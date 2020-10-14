@@ -256,7 +256,7 @@ def main():
                     else:
                         # FIXME: refactor report building of Core: make reports parallel with render
                         with open(os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')) as file:
-                            rendered_image = str(json.load(file)['image_service_id'])
+                            rendered_image = str(json.load(file)[0]['image_service_id'])
                     res.append({
                         'name': case['test_case'],
                         'status': case['test_status'],

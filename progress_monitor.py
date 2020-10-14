@@ -40,10 +40,10 @@ def check_results(session_dir, suite_name):
         # Blender, Maya, Core and Viewer has different case name
         if 'case' in test_cases[0]:
             name_key = 'case'
-        if 'scene' in test_cases[0]:
-            name_key = 'scene'
-        else:
+        elif 'name' in test_cases[0]:
             name_key = 'name'
+        else:
+            name_key = 'scene'
     else:
         # case of Max
         test_cases_path = os.path.join(session_dir, suite_name, 'case_list.json')
