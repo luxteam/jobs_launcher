@@ -78,9 +78,9 @@ if __name__ == '__main__':
 
     check = 1
     while True:
+        time.sleep(args.interval)
         print('Check number {}'.format(check))
         check += 1
         result = check_results(args.session_dir, args.suite_name)
         if result:
             break
-        time.sleep(args.interval)
