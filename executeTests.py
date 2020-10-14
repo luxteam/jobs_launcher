@@ -261,29 +261,33 @@ def main():
                 if ums_client_dev:
                     ums_client_dev.get_suite_id_by_name(suite_name)
                 for case in cases:
-                    if 'image_service_id' in case:
-                        rendered_image = str(case['image_service_id'])
-                    else:
-                        # FIXME: refactor report building of Core: make reports parallel with render
-                        with open(os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')) as file:
-                            rendered_image = str(json.load(file)[0]['image_service_id'])
-                    res.append({
-                        'name': case['test_case'],
-                        'status': case['test_status'],
-                        'metrics': {
-                            'render_time': case['render_time']
-                        },
-                        "artefacts": {
-                            "rendered_image": rendered_image
-                        }
-                    })
-                    
-                    path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
-                    if os.path.exists(path_to_test_case_log):
-                        if ums_client_prod and mc_prod:
-                            mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
-                        if ums_client_dev and mc_dev:
-                            mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
+                    try:
+                        if 'image_service_id' in case:
+                            rendered_image = str(case['image_service_id'])
+                        else:
+                            # FIXME: refactor report building of Core: make reports parallel with render
+                            with open(os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')) as file:
+                                rendered_image = str(json.load(file)[0]['image_service_id'])
+                        res.append({
+                            'name': case['test_case'],
+                            'status': case['test_status'],
+                            'metrics': {
+                                'render_time': case['render_time']
+                            },
+                            "artefacts": {
+                                "rendered_image": rendered_image
+                            }
+                        })
+                        
+                        path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
+                        if os.path.exists(path_to_test_case_log):
+                            if ums_client_prod and mc_prod:
+                                mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
+                            if ums_client_dev and mc_dev:
+                                mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
+                    except Exception as e1:
+                        main_logger.error("Failed to send results for case {}. Error: {}".format(e1, str(e1)))
+                        main_logger.error("Traceback: {}".format(traceback.format_exc()))
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
