@@ -265,9 +265,15 @@ def main():
                         if 'image_service_id' in case:
                             rendered_image = str(case['image_service_id'])
                         else:
+                            rendered_image = ''
                             # FIXME: refactor report building of Core: make reports parallel with render
-                            with open(os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')) as file:
-                                rendered_image = str(json.load(file)[0]['image_service_id'])
+                            test_case_path = os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')
+                            if os.path.exists(test_case_path):
+                                with open(test_case_path) as file:
+                                    data = json.load(file)[0]
+                                    if 'image_service_id' in data:
+                                        rendered_image = str(data['image_service_id'])
+                                    
                         res.append({
                             'name': case['test_case'],
                             'status': case['test_status'],
