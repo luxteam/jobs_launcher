@@ -209,7 +209,7 @@ def main():
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
             # FIXME: refactor report building of Core: make reports parallel with render
-            if ((i == 0 and 'makeReport.py' not in found_job[3][1]) or (i == 1 and 'makeReport.py' in found_job[3][1])) and (ums_client_prod or ums_client_dev):
+            if ((i == 0 and 'Core' not in args.work_dir) or (i == 1 and 'Core' in args.work_dir)) and (ums_client_prod or ums_client_dev):
                 try:
                     monitor.wait()
                 except Exception as e:
