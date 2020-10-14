@@ -6,6 +6,7 @@ import json
 import uuid
 import traceback
 import subprocess
+import time
 
 import core.reportExporter
 import core.system_info
@@ -204,16 +205,25 @@ def main():
             if (args.execute_stages and str(i + 1) in args.execute_stages) or not args.execute_stages:
                 print("  Executing job {}/{}".format(i+1, len(found_job[3])))
                 main_logger.info("  Executing job {}/{}".format(i+1, len(found_job[3])))
-                report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
-                    jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
+                job_launcher_report = jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])
+                report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += job_launcher_report['report']['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
             # FIXME: refactor report building of Core: make reports parallel with render
             if ((i == 0 and 'Core' not in args.work_dir) or (i == 1 and 'Core' in args.work_dir)) and (ums_client_prod or ums_client_dev):
-                try:
-                    monitor.wait()
-                except Exception as e:
-                    main_logger.error(str(e))
+                if job_launcher_report['rc'] != -10:
+                    try:
+                        monitor.wait()
+                    except Exception as e:
+                        main_logger.error(str(e))
+                # job was terminated due to timeout - kill monitor
+                else:
+                    try:
+                        monitor.terminate()
+                        time.sleep(5)
+                        monitor.kill()
+                    except Exception as e:
+                        main_logger.error(str(e))
         main_logger.newline()
 
     # json_report = json.dumps(report, indent = 4)

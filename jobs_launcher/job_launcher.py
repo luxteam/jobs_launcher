@@ -33,4 +33,4 @@ def launch_job(cmd_line, job_timeout=None):
     else:
         core.config.main_logger.warning('Job has returned exit code: {}'.format(rc))
 
-    return report
+    return {'report': report, 'rc': rc}
