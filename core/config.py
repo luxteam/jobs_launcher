@@ -140,6 +140,7 @@ TEST_CASES_JSON_NAME = {
         'rprviewer': 'test.cases.json'
     }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
+SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
 
 DONT_COMPARE = "Do not compare"
