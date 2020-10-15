@@ -220,29 +220,32 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
 
     host_name = ''
     for retry_info in node_retry_info:
-        retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
-        retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
-        if retry_gpu_name in gpu_os_case and retry_os_name in gpu_os_case:
-            for groups in retry_info['Tries']:
-                package_or_default_execution = None
-                for group in groups.keys():
-                    parsed_group_name = group.split('~')[0]
-                    #all non splitTestsExecution and non regression builds (e.g. any build of core)
-                    if 'DefaultExecution' in group:
-                        package_or_default_execution = group
-                        break
-                    elif parsed_group_name.endswith('.json') and lost_test_package not in group.split('~')[1]:
-                        with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
-                            if lost_test_package in json.load(f)['groups']:
-                                package_or_default_execution = group
-                                break
-                if lost_test_package in groups.keys() or package_or_default_execution:
-                    for test_tries in retry_info['Tries']:
-                        if lost_test_package in test_tries:
-                            host_name = groups[lost_test_package][-1]['host']
+        try:
+            retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["cards"][retry_info['gpuName']]
+            retry_os_name = PLATFORM_CONVERTATIONS[retry_info['osName']]["os_name"]
+            if retry_gpu_name in gpu_os_case and retry_os_name in gpu_os_case:
+                for groups in retry_info['Tries']:
+                    package_or_default_execution = None
+                    for group in groups.keys():
+                        parsed_group_name = group.split('~')[0]
+                        #all non splitTestsExecution and non regression builds (e.g. any build of core)
+                        if 'DefaultExecution' in group:
+                            package_or_default_execution = group
                             break
-                    if not host_name and package_or_default_execution:
-                        host_name = groups[package_or_default_execution][-1]['host']
+                        elif parsed_group_name.endswith('.json') and lost_test_package not in group.split('~')[1]:
+                            with open(os.path.abspath(os.path.join('..', 'jobs', parsed_group_name))) as f:
+                                if lost_test_package in json.load(f)['groups']:
+                                    package_or_default_execution = group
+                                    break
+                    if lost_test_package in groups.keys() or package_or_default_execution:
+                        for test_tries in retry_info['Tries']:
+                            if lost_test_package in test_tries:
+                                host_name = groups[lost_test_package][-1]['host']
+                                break
+                        if not host_name and package_or_default_execution:
+                            host_name = groups[package_or_default_execution][-1]['host']
+        except Exception as e:
+            print("Failed to process retry info. Reason: {}".format(str(e)))
 
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
 
