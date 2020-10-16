@@ -150,12 +150,12 @@
     {% for test_package, value in report[i].results | dictsort %}
         {% set resultsloop = loop %}
             <tr>
-                <td
+                <td class="
                     {% if report[i].results[test_package]['']['machine_info'].status == 'timeout' %}
-                        style="background-color: #f79232;"
+                        perf_leak
                     {% endif %}
                     {% if report[i].results[test_package][''].retries is defined %}
-                        class="skippedStatus">
+                        skippedStatus">
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{i}}.{{test_package}}');return false;">
                             {{test_package}}
                         </button>
@@ -195,7 +195,7 @@
                             </div>
                         </div>
                     {% else %}
-                        >{{ test_package }}
+                        ">{{ test_package }}
                     {% endif %}
                 </td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
