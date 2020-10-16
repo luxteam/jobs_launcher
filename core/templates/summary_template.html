@@ -150,8 +150,12 @@
     {% for test_package, value in report[i].results | dictsort %}
         {% set resultsloop = loop %}
             <tr>
-                {% if report[i].results[test_package][''].retries is defined %}
-                    <td class="skippedStatus">
+                <td
+                    {% if report[i].results[test_package]['']['machine_info'].status == 'timeout' %}
+                        style="background-color: #f79232;"
+                    {% endif %}
+                    {% if report[i].results[test_package][''].retries is defined %}
+                        class="skippedStatus">
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{i}}.{{test_package}}');return false;">
                             {{test_package}}
                         </button>
@@ -190,10 +194,10 @@
                                 </table>
                             </div>
                         </div>
-                    </td>
-                {% else %}
-                    <td>{{ test_package }}</td>
-                {% endif %}
+                    {% else %}
+                        >{{ test_package }}
+                    {% endif %}
+                </td>
             {% for test_conf, value in report[i].results[test_package] | dictsort %}
                 <td>
                     <button class="commonButton popupButton" type="button" onclick="openModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">

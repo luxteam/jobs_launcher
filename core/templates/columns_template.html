@@ -166,7 +166,11 @@
     {%- if is_head -%}
         <th data-field="test_status_new" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case status</th>
     {%- else -%}
-        <td class="infoColumn {{ item.test_status }}Status">
+        <td class="infoColumn {{ item.test_status }}Status"
+            {%- if is in('Unacceptable time difference', item.message) -%}
+                style="background-color: #f79232;"
+            {%- endif %}
+            >
             <b>
             {%- if report_type == 'default' -%}
                 {%- if item.difference_color_2 != 0 -%}
