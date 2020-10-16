@@ -43,11 +43,12 @@ class ISClient:
                         headers=self.headers
                     )
                     img.close()
-                main_logger.info('Image sent with code {} (try #{})'.format(response_prod.status_code, send_try))
+                main_logger.info('Image sent with code {} (try #{})'.format(response.status_code, send_try))
                 image_id = json.loads(response.content.decode("utf-8"))["image_id"]
                 main_logger.info("Image sent. Got an image_id: {} (try #{})".format(image_id, send_try))
                 return image_id
             except Exception as e:
                 main_logger.error("Image sending error: {} (try #{})".format(str(e), send_try))
+            send_try += 1
         else:
             return -1

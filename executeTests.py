@@ -278,6 +278,7 @@ def main():
                     main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
                     if response_prod.status_code < 300:
                         break
+                    send_try += 1
 
                 send_try = 0
                 while send_try < MAX_UMS_SEND_RETRIES:
@@ -286,6 +287,7 @@ def main():
                     main_logger.info('Response from UMS DEV: \n{}'.format(response_prod.content))
                     if response_prod.status_code < 300:
                         break
+                    send_try += 1
 
                 response_dev = ums_client_dev.send_test_suite(res=res, env=env)
                 main_logger.info('Test suite results sent with code {}'.format(response_dev.status_code))
