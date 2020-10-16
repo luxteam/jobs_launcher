@@ -29,7 +29,7 @@ except Exception as e:
     main_logger.error("Can't create Image Service client")
 
 
-def check_results(session_dir, suite_name):
+def send_finished_cases(session_dir, suite_name):
     
 
     if os.path.exists(os.path.join(session_dir, suite_name, 'test_cases.json')):
@@ -88,6 +88,6 @@ if __name__ == '__main__':
         time.sleep(args.interval)
         print('Check number {}'.format(check))
         check += 1
-        result = check_results(args.session_dir, args.suite_name)
+        result = send_finished_cases(args.session_dir, args.suite_name)
         if result:
             break
