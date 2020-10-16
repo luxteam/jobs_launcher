@@ -167,3 +167,5 @@ ODD_FOR_BASELINES = [
     'group_timeout_exceeded',
     'testcase_timeout_exceeded'
 ]
+
+MAX_UMS_SEND_RETRIES = 3
