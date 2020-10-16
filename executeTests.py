@@ -5,6 +5,7 @@ import shutil
 import json
 import uuid
 import traceback
+import time
 
 import core.reportExporter
 import core.system_info
@@ -279,6 +280,7 @@ def main():
                     if response_prod.status_code < 300:
                         break
                     send_try += 1
+                    time.sleep(UMS_SEND_RETRY_INTERVAL)
 
                 send_try = 0
                 while send_try < MAX_UMS_SEND_RETRIES:
@@ -288,10 +290,7 @@ def main():
                     if response_prod.status_code < 300:
                         break
                     send_try += 1
-
-                response_dev = ums_client_dev.send_test_suite(res=res, env=env)
-                main_logger.info('Test suite results sent with code {}'.format(response_dev.status_code))
-                main_logger.info('Response from UMS: \n{}'.format(response_dev.content))
+                    time.sleep(UMS_SEND_RETRY_INTERVAL)
 
         except Exception as e:
             main_logger.error("Test case result creation error: {}".format(str(e)))

@@ -4,6 +4,7 @@ from requests import get, post, put
 from requests.exceptions import RequestException
 from core.config import main_logger, MAX_UMS_SEND_RETRIES
 import traceback
+import time
 
 
 class ISClient:
@@ -50,5 +51,6 @@ class ISClient:
             except Exception as e:
                 main_logger.error("Image sending error: {} (try #{})".format(str(e), send_try))
             send_try += 1
+            time.sleep(UMS_SEND_RETRY_INTERVAL)
         else:
             return -1
