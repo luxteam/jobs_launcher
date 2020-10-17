@@ -57,7 +57,7 @@ class UMS_Minio:
         self.__save_bucket_if_not_exits()
 
     def __save_bucket_if_not_exits(self):
-        """ Provat method for check bucket existance by name
+        """ Private method for check bucket existence by name
         """
         if not self.mc.bucket_exists(self.bucket_name):
             self.mc.make_bucket(self.bucket_name)
@@ -70,17 +70,17 @@ class UMS_Minio:
         args - (build_id, tsr_id, tcr_id)
         """
         
-        # generate artefact name PATH/TO/FILE.EXT
-        artefact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
+        # generate artifact name PATH/TO/FILE.EXT
+        artifact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
         try:
             file_size = os.stat(file_path).st_size
             with open(file_path, 'rb') as data:
                 self.mc.put_object(
                     bucket_name=self.bucket_name,
-                    object_name=artefact_name,
+                    object_name=artifact_name,
                     data=data,
                     length=file_size
                 )
-        except FileNotFoundError as e:
-            print(e)
+            main_logger.info("Artifact '{}' sent to MINIO".format(artifact_name))
+        except Exception as e:
             main_logger.error(str(e))
