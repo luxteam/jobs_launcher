@@ -41,6 +41,11 @@ def get_diff(current, previous):
 
 
 def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
+    if img.get('testcase_timeout_exceeded', False):
+        img['message'].append('Testcase timeout exceeded')
+    elif img.get('group_timeout_exceeded', False):
+        img['message'].append('Test group timeout exceeded')
+
     if 'render_color_path' in img.keys():
         path_to_baseline_json = os.path.join(
             base_dir, img['test_group'], img['test_case'] + core.config.CASE_REPORT_SUFFIX)
@@ -48,16 +53,17 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             with open(path_to_baseline_json) as f:
                 baseline_json = json.load(f)
         else:
+            img.update({'baseline_color_path': os.path.relpath(
+                os.path.join(base_dir, 'baseline.png'), work_dir)})
+            img['message'].append('Baseline not found')
+            img.update({'test_status': core.config.TEST_DIFF_STATUS})
             core.config.main_logger.error(
-                '{} not exist'.format(path_to_baseline_json))
+                "Baseline json not found by path: {}".format(path_to_baseline_json))
             return img
+
+        # if baseline image not found - return
         baseline_img_path = os.path.join(
             base_dir, img['test_group'], baseline_json['render_color_path'])
-        if img.get('testcase_timeout_exceeded', False):
-            img['message'].append('Testcase timeout exceeded')
-        elif img.get('group_timeout_exceeded', False):
-            img['message'].append('Test group timeout exceeded')
-        # if baseline image not found - return
         if not os.path.exists(baseline_img_path):
             core.config.main_logger.warning(
                 "Baseline image not found by path: {}".format(baseline_img_path))
@@ -123,10 +129,10 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
 
             if md5(render_img_path) == md5(baseline_img_path):
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
-                    baseline = os.path.join(base_dir, img['test_group'], 'Color', img.get('baseline_color_path', 'None'))
-                    baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + os.path.basename(baseline))
+                    baseline = os.path.join(base_dir, img['test_group'], 'Color', thumb + img.get('baseline_color_path', 'None'))
                     if os.path.exists(baseline):
                         os.remove(baseline)
+                        img[thumb + 'baseline_color_path'] = img[thumb + 'render_color_path']
                 if img.get('render_color_path', False):
                     img.update({'baseline_color_path': img['render_color_path']})
 
