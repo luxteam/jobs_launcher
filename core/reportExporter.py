@@ -195,7 +195,7 @@ def build_session_report(report, session_dir):
             for key in total:
                 total[key] += report['results'][result][item][key]
     report.update({'summary': total})
-    report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y')})
+    report['machine_info'].update({'reporting_date': datetime.date.today().strftime('%m/%d/%Y %H:%M:%S')})
 
     save_json_report(report, session_dir, SESSION_REPORT)
 
