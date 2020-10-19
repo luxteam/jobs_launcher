@@ -46,7 +46,7 @@ PLATFORM_CONVERTATIONS = {
 	}
 }
 
-def get_lost_tests_count(data, tool_name, test_package_name):
+def get_tests_count(data, tool_name, test_package_name):
 	# number of lost tests = number of tests in test package
 	if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'rprviewer':
 		lost_tests_count = len(data)
@@ -92,7 +92,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 								if case_results["total"] == 0:
 									with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as tests_conf:
 										data = json.load(tests_conf)
-									number_of_cases = get_lost_tests_count(data, tool_name, test_package_name)
+									number_of_cases = get_tests_count(data, tool_name, test_package_name)
 									case_results["error"] = number_of_cases
 									case_results["total"] = number_of_cases
 									session_report["summary"]["error"] += number_of_cases
@@ -150,7 +150,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 
 				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 					data = json.load(file)
-				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
+				lost_tests_count = get_tests_count(data, tool_name, test_package_name)
 				# join converted gpu name and os name
 				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 				# if test group is skipped
@@ -170,7 +170,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 			try:
 				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 					data = json.load(file)
-				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
+				lost_tests_count = get_tests_count(data, tool_name, test_package_name)
 				for lost_test_result in lost_tests_results:
 					gpu_name = lost_test_result.split('-')[0]
 					os_name = lost_test_result.split('-')[1]

@@ -17,6 +17,7 @@ except ImportError:
     main_logger.critical("Correct report building isn't guaranteed")
     from core.defaults_local_config import *
 
+from jobs.Scripts.utils import get_number_of_cases
 
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
@@ -147,6 +148,8 @@ def main():
     if '' in args.package_filter:
         args.package_filter = []
 
+    timeout_multipliers = None
+
     # extend test_filter by values in file_filter
     if args.file_filter and args.file_filter != 'none':
         try:
@@ -159,6 +162,12 @@ def main():
                     args.cmd_variables['TestCases'] = os.path.abspath(os.path.join(args.tests_root, file_name))
                     excluded_tests = args.file_filter.split('~')[1].split(',')
                     args.test_filter.extend([x for x in file_content['groups'].keys() if x not in excluded_tests])
+                    timeout_multipliers = {}
+                    try:
+                        for group in file_content['groups']:
+                            cases_in_package = len(file_content['groups'][group].split(','))
+                            cases_total = get_number_of_cases(group)
+                            timeout_multipliers[group] = cases_in_package / cases_total
         except Exception as e:
             main_logger.error(str(e))
 
@@ -194,7 +203,7 @@ def main():
         main_logger.error(str(e))
 
     jobs_launcher.jobs_parser.parse_folder(level, tests_path, '', session_dir, found_jobs, args.cmd_variables,
-                                           test_filter=args.test_filter, package_filter=args.package_filter)
+                                           test_filter=args.test_filter, package_filter=args.package_filter, timeout_multipliers=timeout_multipliers)
     core.reportExporter.save_json_report(found_jobs, session_dir, 'found_jobs.json')
 
     for found_job in found_jobs:

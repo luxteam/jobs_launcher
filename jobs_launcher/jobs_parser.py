@@ -3,6 +3,7 @@ import copy
 import collections
 import itertools
 import re
+import math
 
 from xml.etree import ElementTree as ET
 
@@ -72,7 +73,7 @@ def parse_package_manifest(level, filename, cmd_variables, package_options=copy.
                         package_options['options'][option_name][config_name][configuration_param_name] = configuration_param_value
 
 
-def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_jobs, package_options):
+def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_jobs, package_options, timeout_multipliers):
     delim = ' ' * level
     job_file_path = os.path.join(job_root_dir, job_rel_path)
     job_rel_dir = os.path.dirname(job_rel_path)
@@ -141,8 +142,12 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
             for arguments_elem in elem:
                 command_parts.append(arguments_elem.text)
 
+            if timeout_multipliers and job_name in timeout_multipliers:
+                timeout_multiplier = timeout_multipliers[job_name]
+            else:
+                timeout_multiplier = 1
             if timeout:
-                job_timeout.append(int(timeout))
+                job_timeout.append(math.cell(int(timeout) * timeout_multiplier))
             else:
                 job_timeout.append(0)
 
@@ -236,7 +241,7 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
 
 
 def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd_variables,
-                 package_options=copy.deepcopy(default_package_options), test_filter=None, package_filter=None):
+                 package_options=copy.deepcopy(default_package_options), test_filter=None, package_filter=None, timeout_multipliers=None):
     delim = ' '*level
     current_job_dir = os.path.join(job_root_dir, job_sub_path)
     dir_items = os.listdir(path=current_job_dir)
@@ -256,10 +261,10 @@ def parse_folder(level, job_root_dir, job_sub_path, session_dir, found_jobs, cmd
             if test_filter:
                 if os.path.basename(os.path.dirname(dir_item_path)) in test_filter:
                     parse_job_manifest(level, job_root_dir, os.path.join(job_sub_path, dir_item),
-                                                    session_dir, found_jobs, package_options)
+                                                    session_dir, found_jobs, package_options, timeout_multipliers)
             else:
                 parse_job_manifest(level, job_root_dir, os.path.join(job_sub_path, dir_item),
-                                   session_dir, found_jobs, package_options)
+                                   session_dir, found_jobs, package_options, timeout_multipliers)
 
     for dir_item in dir_items:
         dir_item_path = os.path.join(current_job_dir, dir_item)
