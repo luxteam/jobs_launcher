@@ -34,7 +34,8 @@ PLATFORM_CONVERTATIONS = {
 		"os_name": "Ubuntu 18.04(64bit)",
 		"cards": {
 			"AMD_RadeonVII": "AMD Radeon VII",
-			"NVIDIA_GTX980": "GeForce GTX 980"
+			"NVIDIA_GTX980": "GeForce GTX 980",
+			"NVIDIA_RTX2070": "GeForce RTX 2070"
 		}
 	},
 	"OSX": {
