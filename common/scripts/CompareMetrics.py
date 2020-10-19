@@ -9,7 +9,8 @@ class CompareMetrics(object):
         self.file1 = file1
         self.file2 = file2
         self.diff_pixels = 0
-
+        self.img1 = 0
+        self.img2 = 0
         self.readImages()
 
     def readImages(self):
@@ -47,10 +48,14 @@ class CompareMetrics(object):
 
         return round(self.diff_pixels, 2)
 
-    def getPrediction(self, max_size=1000, div_image_path=False):
+    def getPrediction(self, max_size=1000, div_image_path=False, mark_failed_if_black=True):
 
         if self.img1.shape != self.img2.shape:
             return -1
+
+        # if img1 is full black - mark as different
+        if not np.any(self.img1) and mark_failed_if_black:
+            return 2
 
         img_1 = cv2.GaussianBlur(self.img1, (5, 5), 0)
         img_2 = cv2.GaussianBlur(self.img2, (5, 5), 0)

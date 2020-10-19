@@ -69,6 +69,8 @@ TIME_DIFF_TOLERANCE = {'10': float('inf'), '30': float('inf'), '60': float('inf'
 TIME_DIFF_MAX = 5
 VRAM_DIFF_MAX = 5
 
+CASE_EXPECTS_BLACK = 'Black image expected'
+
 """
 # Possible test case statuses
   passed - status means case was executed without errors and difference with baseline is permissible.
@@ -138,6 +140,7 @@ TEST_CASES_JSON_NAME = {
         'rprviewer': 'test.cases.json'
     }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
+SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
 
 DONT_COMPARE = "Do not compare"
@@ -164,3 +167,6 @@ ODD_FOR_BASELINES = [
     'group_timeout_exceeded',
     'testcase_timeout_exceeded'
 ]
+
+MAX_UMS_SEND_RETRIES = 3
+UMS_SEND_RETRY_INTERVAL = 5

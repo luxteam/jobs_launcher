@@ -5,6 +5,7 @@ import shutil
 import json
 import uuid
 import traceback
+import time
 
 import core.reportExporter
 import core.system_info
@@ -36,10 +37,50 @@ def parse_cmd_variables(tests_root, cmd_variables):
     return cmd_variables
 
 
+def create_ums_client(client_postfix=""):
+    try:
+        if client_postfix:
+            client_postfix = "_" + client_postfix
+        ums_client = UMS_Client(
+            job_id=os.getenv("UMS_JOB_ID" + client_postfix),
+            url=os.getenv("UMS_URL" + client_postfix),
+            build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
+            env_label=os.getenv("UMS_ENV_LABEL"),
+            suite_id=None,
+            login=os.getenv("UMS_LOGIN" + client_postfix),
+            password=os.getenv("UMS_PASSWORD" + client_postfix)
+        )
+        main_logger.info("PROD UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
+                 url=ums_client.url,
+                 build_id=ums_client.build_id,
+                 label=ums_client.env_label,
+                 job_id=ums_client.job_id
+             )
+        )
+        return ums_client
+    except Exception as e:
+        main_logger.error("UMS Client creation error: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+
+def send_machine_info(ums_client, machine_info, args):
+    print('Tests filter: ' + str(args.test_filter))
+    for group in args.test_filter:
+        delete_chars = ' ,[]"'
+        group = group.translate(str.maketrans("", "", delete_chars))
+        ums_client.get_suite_id_by_name(group)
+        # send machine info to ums
+        env = {"gpu": core.system_info.get_gpu(), **machine_info}
+        env.pop('os')
+        env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
+        ums_client.define_environment(env)
+
+
 def main():
 
     # create UMS client
-    ums_client = None
+    ums_client_prod = None
+    ums_client_dev = None
     use_ums = None
     try:
         main_logger.info("Try to get environment variable UMS_USE")
@@ -47,27 +88,10 @@ def main():
     except Exception as e:
         main_logger.error('Exception when getenv UMS USE: {}'.format(str(e)))
     if use_ums:
-        try:
-            main_logger.info("Try to create UMS client")
-            ums_client = UMS_Client(
-                job_id=os.getenv("UMS_JOB_ID"),
-                url=os.getenv("UMS_URL"),
-                build_id=os.getenv("UMS_BUILD_ID"),
-                env_label=os.getenv("UMS_ENV_LABEL"),
-                suite_id=None,
-                login=os.getenv("UMS_LOGIN"),
-                password=os.getenv("UMS_PASSWORD")
-            )
-            main_logger.info("UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
-                     url=ums_client.url,
-                     build_id=ums_client.build_id,
-                     label=ums_client.env_label,
-                     job_id=ums_client.job_id
-                 )
-            )
-        except Exception as e:
-            main_logger.error("UMS Client creation error: {}".format(e))
-            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+        main_logger.info("Try to create Production UMS client")
+        ums_client_prod = create_ums_client("PROD")
+        main_logger.info("Try to create Develop UMS client")
+        ums_client_dev = create_ums_client("DEV")
     else:
         main_logger.info("UMS_USE set as false")
 
@@ -151,17 +175,10 @@ def main():
 
 
     # send machine info to ums
-    if ums_client:
-        print('Tests filter: ' + str(args.test_filter))
-        for group in args.test_filter:
-            delete_chars = ' ,[]"'
-            group = group.translate(str.maketrans("", "", delete_chars))
-            ums_client.get_suite_id_by_name(group)
-            # send machine info to ums
-            env = {"gpu": core.system_info.get_gpu(), **machine_info}
-            env.pop('os')
-            env.update({'hostname': env.pop('host'), 'cpu_count': int(env['cpu_count'])})
-            ums_client.define_environment(env)
+    if ums_client_prod:
+        send_machine_info(ums_client_prod, machine_info, args)
+    if ums_client_dev:
+        send_machine_info(ums_client_dev, machine_info, args)
 
     found_jobs = []
     report = AutoDict()
@@ -207,7 +224,7 @@ def main():
     core.reportExporter.build_session_report(report, session_dir)
     main_logger.info('Saved session report\n\n')
 
-    if ums_client:
+    if ums_client_prod or ums_client_dev:
         main_logger.info("Try to send results to UMS")
         is_client = None
         try:
@@ -244,7 +261,10 @@ def main():
                         }
                     })
 
-                ums_client.get_suite_id_by_name(suite_name)
+                if ums_client_prod:
+                    ums_client_prod.get_suite_id_by_name(suite_name)
+                if ums_client_dev:
+                    ums_client_dev.get_suite_id_by_name(suite_name)
                 # send machine info to ums
                 env = {"gpu": core.system_info.get_gpu(), **core.system_info.get_machine_info()}
                 env.pop('os')
@@ -252,9 +272,25 @@ def main():
                 main_logger.info("Generated results:\n{}".format(json.dumps(res, indent=2)))
                 main_logger.info("Environment: {}".format(env))
 
-                response = ums_client.send_test_suite(res=res, env=env)
-                main_logger.info('Test suite results sent with code {}'.format(response.status_code))
-                main_logger.info('Response from UMS: \n{}'.format(response.content))
+                send_try = 0
+                while send_try < MAX_UMS_SEND_RETRIES:
+                    response_prod = ums_client_prod.send_test_suite(res=res, env=env)
+                    main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
+                    main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
+                    if response_prod.status_code < 300:
+                        break
+                    send_try += 1
+                    time.sleep(UMS_SEND_RETRY_INTERVAL)
+
+                send_try = 0
+                while send_try < MAX_UMS_SEND_RETRIES:
+                    response_prod = ums_client_prod.send_test_suite(res=res, env=env)
+                    main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_prod.status_code, send_try))
+                    main_logger.info('Response from UMS DEV: \n{}'.format(response_prod.content))
+                    if response_prod.status_code < 300:
+                        break
+                    send_try += 1
+                    time.sleep(UMS_SEND_RETRY_INTERVAL)
 
         except Exception as e:
             main_logger.error("Test case result creation error: {}".format(str(e)))
