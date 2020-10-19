@@ -162,12 +162,14 @@ def main():
                     excluded_tests = args.file_filter.split('~')[1].split(',')
                     args.test_filter.extend([x for x in file_content['groups'].keys() if x not in excluded_tests])
                     timeout_multipliers = {}
-                    try:
-                        for group in file_content['groups']:
+                    for group in file_content['groups']:
+                        try:
                             cases_in_package = len(file_content['groups'][group].split(','))
                             with open(os.path.join(tests_root, 'Tests', group, TEST_CASES_JSON_NAME[tool_name]), 'r') as file:
                                 cases_total = get_tests_count(json.load(file), tool_name, group)
                             timeout_multipliers[group] = cases_in_package / cases_total
+                        except Exception as e1:
+                            main_logger.error("Failed to calculate timeout_multiplier for group {}. Reason: {}".format(group, str(e)))
         except Exception as e:
             main_logger.error(str(e))
 
