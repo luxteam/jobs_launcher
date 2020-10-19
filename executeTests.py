@@ -9,6 +9,7 @@ import traceback
 import core.reportExporter
 import core.system_info
 from core.auto_dict import AutoDict
+from core.countLostTests import get_tests_count
 from core.config import *
 try:
     from local_config import *
@@ -16,8 +17,6 @@ except ImportError:
     main_logger.critical("local config file not found. Default values will be used.")
     main_logger.critical("Correct report building isn't guaranteed")
     from core.defaults_local_config import *
-
-from jobs.Scripts.utils import get_number_of_cases
 
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
@@ -166,7 +165,8 @@ def main():
                     try:
                         for group in file_content['groups']:
                             cases_in_package = len(file_content['groups'][group].split(','))
-                            cases_total = get_number_of_cases(group)
+                            with open(os.path.join(tests_root, 'Tests', group, TEST_CASES_JSON_NAME[tool_name]), 'r') as file:
+                                cases_total = get_tests_count(json.load(file), tool_name, group)
                             timeout_multipliers[group] = cases_in_package / cases_total
         except Exception as e:
             main_logger.error(str(e))
