@@ -397,6 +397,6 @@ a {
   content: "\25B8";
 }
 
-.perf_leak{
+.perf_leak, .skippedStatus.perf_leak{
   background: #f79232 !important;
 }
