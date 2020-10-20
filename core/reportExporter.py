@@ -353,7 +353,7 @@ def build_summary_report(work_dir, node_retry_info):
         missing_tests_jsons['skipped'] = os.path.join(work_dir, SKIPPED_TESTS_JSON_NAME)
     for key in missing_tests_jsons:
         missing_tests_json = missing_tests_jsons[key]
-        if os.path.exists(missing_tests_json): 
+        if os.path.exists(missing_tests_json):
             with open(os.path.join(missing_tests_json), "r") as file:
                 lost_tests_count = json.load(file)
             for lost_test_result in lost_tests_count:
