@@ -151,9 +151,9 @@
         {% set resultsloop = loop %}
             <tr>
                 <td class="
-                    {% if report[i].results[test_package]['']['machine_info'].status == 'timeout' %}
+                    {%- if report[i].results[test_package][''].status == 'timeout' -%}
                         perf_leak
-                    {% endif %}
+                    {%- endif %}
                     {% if report[i].results[test_package][''].retries is defined %}
                         skippedStatus">
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{i}}.{{test_package}}');return false;">

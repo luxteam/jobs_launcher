@@ -318,7 +318,8 @@ def build_summary_report(work_dir, node_retry_info):
                                             jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
                                     for message in jtem.get('message', []):
                                         if 'Unacceptable time difference' in message:
-                                            temp_report['results'][test_package][test_conf]['machine_info'].update(
+                                            main_logger.error(test_package)
+                                            temp_report['results'][test_package][test_conf].update(
                                                 {'status': GROUP_TIMEOUT})
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
@@ -341,7 +342,7 @@ def build_summary_report(work_dir, node_retry_info):
     for key in common_info:
         common_info[key] = ' '.join(common_info[key])
 
-    if os.path.exists(os.path.join(work_dir, LOST_TESTS_JSON_NAME)): 
+    if os.path.exists(os.path.join(work_dir, LOST_TESTS_JSON_NAME)):
         with open(os.path.join(work_dir, LOST_TESTS_JSON_NAME), "r") as file:
             lost_tests_count = json.load(file)
         for lost_test_result in lost_tests_count:
