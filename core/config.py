@@ -167,3 +167,5 @@ ODD_FOR_BASELINES = [
     'group_timeout_exceeded',
     'testcase_timeout_exceeded'
 ]
+
+ADDITIONAL_PACKAGE_TIMEOUT = 5

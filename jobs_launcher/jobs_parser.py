@@ -142,12 +142,15 @@ def parse_job_manifest(level, job_root_dir, job_rel_path, session_dir, found_job
             for arguments_elem in elem:
                 command_parts.append(arguments_elem.text)
 
+            additional_timeout = 0
             if timeout_multipliers and job_name in timeout_multipliers:
                 timeout_multiplier = timeout_multipliers[job_name]
+                # additional timeout for large test cases
+                additional_timeout = core.config.ADDITIONAL_PACKAGE_TIMEOUT
             else:
                 timeout_multiplier = 1
             if timeout:
-                job_timeout.append(math.ceil(int(timeout) * timeout_multiplier))
+                job_timeout.append(math.ceil(int(timeout) * timeout_multiplier) + additional_timeout)
             else:
                 job_timeout.append(0)
 
