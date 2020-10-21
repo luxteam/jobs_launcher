@@ -281,6 +281,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
 
 
 def build_summary_report(work_dir, node_retry_info):
+    rc = 0
     summary_report = {}
     common_info = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
@@ -308,6 +309,9 @@ def build_summary_report(work_dir, node_retry_info):
                                             if key == 'reporting_date':
                                                 if common_info.get(key, [''])[0] > temp_report['machine_info'][key]:
                                                     common_info[key] = [temp_report['machine_info'][key]]
+                                            elif key == 'render_version':
+                                                common_info[key].append(temp_report['machine_info'][key])
+                                                rc = -5
                                             else:
                                                 common_info[key].append(temp_report['machine_info'][key])
                                 else:
@@ -349,7 +353,7 @@ def build_summary_report(work_dir, node_retry_info):
         missing_tests_jsons['skipped'] = os.path.join(work_dir, SKIPPED_TESTS_JSON_NAME)
     for key in missing_tests_jsons:
         missing_tests_json = missing_tests_jsons[key]
-        if os.path.exists(missing_tests_json): 
+        if os.path.exists(missing_tests_json):
             with open(os.path.join(missing_tests_json), "r") as file:
                 lost_tests_count = json.load(file)
             for lost_test_result in lost_tests_count:
@@ -383,7 +387,7 @@ def build_summary_report(work_dir, node_retry_info):
         for test_package in summary_report[config]['results']:
             summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration'] - summary_report[config]['results'][test_package][''].get('synchronization_duration', -0.0)
 
-    return summary_report, common_info
+    return summary_report, common_info, rc
 
 
 def build_performance_report(summary_report, major_title):
@@ -552,6 +556,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
 # -2 - Performance report can't be built
 # -3 - Compare report can't be built
 # -4 - Local reports can't be built
+# -5 - More than one plugin versions
 def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', engine=''):
     rc = 0
 
@@ -594,7 +599,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template.html')
 
-        summary_report, common_info = build_summary_report(work_dir, node_retry_info)
+        summary_report, common_info, rc = build_summary_report(work_dir, node_retry_info)
 
         add_retry_info(summary_report, node_retry_info, work_dir)
 
