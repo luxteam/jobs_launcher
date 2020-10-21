@@ -50,7 +50,7 @@ if __name__ == '__main__':
                     for field in core.config.ODD_FOR_BASELINES:
                         case.pop(field, None)
 
-                    if case.get('status', TEST_IGNORE_STATUS) != TEST_CRASH_STATUS:
+                    if case.get('status', core.config.TEST_IGNORE_STATUS) != core.config.TEST_CRASH_STATUS:
                         with open(os.path.join(args.baseline_root, os.path.relpath(path, args.results_root), case['test_case'] + core.config.CASE_REPORT_SUFFIX), 'w') as f:
                             f.write(json.dumps(case, indent=4))
 
