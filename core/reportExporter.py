@@ -284,6 +284,7 @@ def build_summary_report(work_dir, node_retry_info):
     rc = 0
     summary_report = {}
     common_info = {}
+    tracked_metrics_data = {}
     for path, dirs, files in os.walk(os.path.abspath(work_dir)):
         for file in files:
             # build summary report
@@ -327,11 +328,35 @@ def build_summary_report(work_dir, node_retry_info):
                                     for group_report_file in REPORT_FILES:
                                         if group_report_file in jtem.keys():
                                             jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
+                                    # collect tracked metrics for test cases
+                                    for tracked_metric in tracked_metrics:
+                                        if tracked_metric in jtem:
+                                            test_case = jtem['test_case']
+                                            if basename not in tracked_metrics_data:
+                                                tracked_metrics_data[basename] = {}
+                                            if test_package not in tracked_metrics_data[basename]:
+                                                tracked_metrics_data[basename][test_package] = {}
+                                            if test_case not in tracked_metrics_data[basename][test_package]:
+                                                tracked_metrics_data[basename][test_package][test_case] = {}
+                                            tracked_metrics_data[basename][test_package][test_case][tracked_metric] = jitem[tracked_metric]
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
                                         os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
                                         work_dir)}
                                 )
+
+                            # aggregate tracked metrics for test groups
+                            if basename in tracked_metrics_data and test_package in tracked_metrics_data[basename]:
+                                for tracked_metric in tracked_metrics:
+                                    tracked_metrics_data[basename][test_package]['summary'] = {}
+                                    metric_summary = 0
+                                    number = 0
+                                    for test_case in tracked_metrics_data[basename][test_package]:
+                                        if tracked_metric in tracked_metrics_data[basename][test_package][test_case]:
+                                            metric_summary += tracked_metrics_data[basename][test_package][test_case][tracked_metric]
+                                            number +=1
+                                    if number:
+                                        tracked_metrics_data[basename][test_package]['summary'][tracked_metric] = metric_summary / number
                     except Exception as err:
                         traceback.print_exc()
                         main_logger.error("Processing of {} has produced error: {}".format(basepath.split(os.path.sep)[-1], str(err)))
@@ -344,6 +369,19 @@ def build_summary_report(work_dir, node_retry_info):
                         summary_report[basename] = {}
                         summary_report[basename].update({'results': temp_report['results']})
                         summary_report[basename].update({'summary': temp_report['summary']})
+
+    # aggregate tracked metrics for platforms
+    for platform in tracked_metrics_data:
+        for tracked_metric in tracked_metrics:
+            tracked_metrics_data[platform]['summary'] = {}
+            metric_summary = 0
+            number = 0
+            for test_group in tracked_metrics_data[platform]:
+                if tracked_metric in tracked_metrics_data[platform][test_group]['summary']:
+                    metric_summary += tracked_metrics_data[platform][test_group]['summary'][tracked_metric]
+                    number +=1
+            if number:
+                tracked_metrics_data[platform]['summary'][tracked_metric] = metric_summary / number
 
     for key in common_info:
         common_info[key] = ' '.join(common_info[key])
@@ -387,7 +425,7 @@ def build_summary_report(work_dir, node_retry_info):
         for test_package in summary_report[config]['results']:
             summary_report[config]['results'][test_package]['']['setup_duration'] = summary_report[config]['results'][test_package]['']['duration'] - summary_report[config]['results'][test_package]['']['render_duration'] - summary_report[config]['results'][test_package][''].get('synchronization_duration', -0.0)
 
-    return summary_report, common_info, rc
+    return summary_report, common_info, tracked_metrics_data, rc
 
 
 def build_performance_report(summary_report, major_title):
@@ -599,7 +637,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template.html')
 
-        summary_report, common_info, rc = build_summary_report(work_dir, node_retry_info)
+        summary_report, common_info, tracked_metrics_data, rc = build_summary_report(work_dir, node_retry_info)
 
         add_retry_info(summary_report, node_retry_info, work_dir)
 
@@ -608,6 +646,13 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         common_info.update({'commit_message': commit_message})
         common_info.update({'engine': engine})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
+        try:
+            if not os.path.exists(TRACKED_METRICS_LOCATION_NAME):
+                os.makedirs(TRACKED_METRICS_LOCATION_NAME)
+            save_json_report(tracked_metrics_data, TRACKED_METRICS_LOCATION_NAME, TRACKED_METRICS_JSON_NAME)
+        except Exception as e:
+            main_logger.error("Can't save tracked metrics data: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",

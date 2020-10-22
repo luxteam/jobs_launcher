@@ -142,6 +142,8 @@ TEST_CASES_JSON_NAME = {
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
+TRACKED_METRICS_JSON_NAME = 'tracked_metrics_{}.json'
+TRACKED_METRICS_LOCATION_NAME = 'tracked_metrics'
 
 DONT_COMPARE = "Do not compare"
 
