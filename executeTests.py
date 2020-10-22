@@ -5,6 +5,7 @@ import shutil
 import json
 import uuid
 import traceback
+import subprocess
 import time
 
 import core.reportExporter
@@ -22,8 +23,9 @@ except ImportError:
 import jobs_launcher.jobs_parser
 import jobs_launcher.job_launcher
 
-from ums_client import UMS_Client, str2bool
+from ums_client import create_ums_client, str2bool
 from image_service_client import ISClient
+from minio_client import create_mc_client
 
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
@@ -35,35 +37,6 @@ def parse_cmd_variables(tests_root, cmd_variables):
         cmd_variables.update({'TestsFilter': 'full'})
 
     return cmd_variables
-
-
-def create_ums_client(client_postfix_raw=""):
-    try:
-        if client_postfix_raw:
-            client_postfix = "_" + client_postfix_raw
-        else:
-            client_postfix = ""
-        ums_client = UMS_Client(
-            job_id=os.getenv("UMS_JOB_ID" + client_postfix),
-            url=os.getenv("UMS_URL" + client_postfix),
-            build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
-            env_label=os.getenv("UMS_ENV_LABEL"),
-            suite_id=None,
-            login=os.getenv("UMS_LOGIN" + client_postfix),
-            password=os.getenv("UMS_PASSWORD" + client_postfix)
-        )
-        main_logger.info("{instance} UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
-                 instance=client_postfix_raw,
-                 url=ums_client.url,
-                 build_id=ums_client.build_id,
-                 label=ums_client.env_label,
-                 job_id=ums_client.job_id
-             )
-        )
-        return ums_client
-    except Exception as e:
-        main_logger.error("UMS Client creation error: {}".format(e))
-        main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
 def send_machine_info(ums_client, machine_info, args):
@@ -85,6 +58,8 @@ def main():
     ums_client_prod = None
     ums_client_dev = None
     use_ums = None
+    mc_prod = None
+    mc_dev = None
     try:
         main_logger.info("Try to get environment variable UMS_USE")
         use_ums = str2bool(os.getenv('UMS_USE'))
@@ -203,6 +178,21 @@ def main():
 
     for found_job in found_jobs:
         main_logger.info('Started job: {}'.format(found_job[0]))
+        
+        if ums_client_prod or ums_client_dev:
+            # TODO: Monitoring start
+            interval = 5
+            main_logger.info('Started monitoring: {}'.format(found_job[0]))
+            monitor = subprocess.Popen([
+                "python",
+                os.path.join("..", "jobs_launcher", "progress_monitor.py"),
+                "--interval",
+                str(interval),
+                "--session_dir",
+                session_dir,
+                "--suite_name",
+                found_job[0]
+            ])
 
         print("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
         main_logger.info("Processing {}  {}/{}".format(found_job[0], found_jobs.index(found_job)+1, len(found_jobs)))
@@ -215,9 +205,25 @@ def main():
             if (args.execute_stages and str(i + 1) in args.execute_stages) or not args.execute_stages:
                 print("  Executing job {}/{}".format(i+1, len(found_job[3])))
                 main_logger.info("  Executing job {}/{}".format(i+1, len(found_job[3])))
-                report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += \
-                    jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])['duration']
+                job_launcher_report = jobs_launcher.job_launcher.launch_job(found_job[3][i].format(SessionDir=session_dir), found_job[6][i])
+                report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += job_launcher_report['report']['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
+
+            # FIXME: refactor report building of Core: make reports parallel with render
+            if ((i == 0 and 'Core' not in args.work_dir) or (i == 1 and 'Core' in args.work_dir)) and (ums_client_prod or ums_client_dev):
+                if job_launcher_report['rc'] != -10:
+                    try:
+                        monitor.wait()
+                    except Exception as e:
+                        main_logger.error(str(e))
+                # job was terminated due to timeout - kill monitor
+                else:
+                    try:
+                        monitor.terminate()
+                        time.sleep(5)
+                        monitor.kill()
+                    except Exception as e:
+                        main_logger.error(str(e))
         main_logger.newline()
 
     # json_report = json.dumps(report, indent = 4)
@@ -229,17 +235,16 @@ def main():
 
     if ums_client_prod or ums_client_dev:
         main_logger.info("Try to send results to UMS")
-        is_client = None
-        try:
-            is_client = ISClient(url=os.getenv("IS_URL"),
-                                 login=os.getenv("IS_LOGIN"),
-                                 password=os.getenv("IS_PASSWORD"))
-            main_logger.info("Image Service client created with url {}".format(is_client.url))
-        except Exception as e:
-            main_logger.error("Image Service client creation error: {}".format(str(e)))
-            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+        if ums_client_prod:
+            main_logger.info("Try to create Production MINIO client")
+            mc_prod = create_mc_client(ums_client_prod.job_id)
+        if ums_client_dev:
+            main_logger.info("Try to create Develop MINIO client")
+            mc_dev = create_mc_client(ums_client_dev.job_id)
 
         res = []
+
         try:
             main_logger.info('Start preparing results')
             cases = []
@@ -251,18 +256,55 @@ def main():
 
             for suite_name, suite_result in suites.items():
                 cases = suite_result[""]["render_results"]
+                if ums_client_prod:
+                    ums_client_prod.get_suite_id_by_name(suite_name)
+                if ums_client_dev:
+                    ums_client_dev.get_suite_id_by_name(suite_name)
                 for case in cases:
-                    image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, case['render_color_path']))) if is_client else -1
-                    res.append({
-                        'name': case['test_case'],
-                        'status': case['test_status'],
-                        'metrics': {
-                            'render_time': case['render_time']
-                        },
-                        "artefacts": {
-                            "rendered_image": str(image_id)
-                        }
-                    })
+                    try:
+                        if 'image_service_id' in case:
+                            rendered_image = str(case['image_service_id'])
+                        else:
+                            rendered_image = ''
+                            # FIXME: refactor report building of Core: make reports parallel with render
+                            test_case_path = os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')
+                            if os.path.exists(test_case_path):
+                                with open(test_case_path) as file:
+                                    data = json.load(file)[0]
+                                    if 'image_service_id' in data:
+                                        rendered_image = str(data['image_service_id'])
+                                    
+                        res.append({
+                            'name': case['test_case'],
+                            'status': case['test_status'],
+                            'metrics': {
+                                'render_time': case['render_time']
+                            },
+                            "artefacts": {
+                                "rendered_image": rendered_image
+                            }
+                        })
+                        
+                        path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
+                        if os.path.exists(path_to_test_case_log):
+                            if ums_client_prod and mc_prod:
+                                mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
+                            if ums_client_dev and mc_dev:
+                                mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
+                    except Exception as e1:
+                        main_logger.error("Failed to send results for case {}. Error: {}".format(e1, str(e1)))
+                        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+                #TODO: send logs for each test cases
+                
+                # logs from suite dir
+                test_suite_artefacts = {"renderTool.log", "render_log.txt"}
+                for artefact in test_suite_artefacts:
+                    path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
+                    if os.path.exists(path_to_test_suite_render_log):
+                        if ums_client_prod and mc_prod:
+                            mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
+                        if ums_client_dev and mc_dev:
+                            mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -295,13 +337,29 @@ def main():
                     send_try += 1
                     time.sleep(UMS_SEND_RETRY_INTERVAL)
 
+            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+
+            test_suite_artefacts = ("launcher.engine.log", "found_jobs.json")
+
+            for artefact in test_suite_artefacts:
+                path_to_test_suite_render_log = os.path.join(session_dir, artefact)
+                # send logs to suites dirs
+                for suite in suites:
+                    if ums_client_prod and mc_prod:
+                        ums_client_prod.get_suite_id_by_name(suite_name)
+                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
+                    if ums_client_dev and mc_dev:
+                        ums_client_dev.get_suite_id_by_name(suite_name)
+                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
+
+
         except Exception as e:
             main_logger.error("Test case result creation error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
+            shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
     else:
         main_logger.info("UMS client did not set. Result won't be sent to UMS")
-
-    shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
+        shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
 
 if __name__ == "__main__":
