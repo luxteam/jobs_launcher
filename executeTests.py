@@ -37,10 +37,10 @@ def parse_cmd_variables(tests_root, cmd_variables):
     return cmd_variables
 
 
-def create_ums_client(client_postfix_row=""):
+def create_ums_client(client_postfix_raw=""):
     try:
-        if client_postfix_row:
-            client_postfix = "_" + client_postfix_row
+        if client_postfix_raw:
+            client_postfix = "_" + client_postfix_raw
         else:
             client_postfix = ""
         ums_client = UMS_Client(
@@ -53,7 +53,7 @@ def create_ums_client(client_postfix_row=""):
             password=os.getenv("UMS_PASSWORD" + client_postfix)
         )
         main_logger.info("{instance} UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
-                 instance=client_postfix_row,
+                 instance=client_postfix_raw,
                  url=ums_client.url,
                  build_id=ums_client.build_id,
                  label=ums_client.env_label,
