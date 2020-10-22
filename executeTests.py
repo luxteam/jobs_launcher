@@ -307,7 +307,7 @@ def main():
                             mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
 
                 if ums_client_prod:
-                    ums_clien_tprod.get_suite_id_by_name(suite_name)
+                    ums_client_prod.get_suite_id_by_name(suite_name)
                 if ums_client_dev:
                     ums_client_dev.get_suite_id_by_name(suite_name)
                 # send machine info to ums
