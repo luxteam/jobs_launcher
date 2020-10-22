@@ -297,13 +297,14 @@ def main():
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
-                test_suite_artefacts = {"renderTool.log"}
+                test_suite_artefacts = {"renderTool.log", "render_log.txt"}
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
-                    if ums_client_prod and mc_prod:
-                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
-                    if ums_client_dev and mc_dev:
-                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
+                        if os.path.exists(path_to_test_suite_render_log):
+                        if ums_client_prod and mc_prod:
+                            mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
+                        if ums_client_dev and mc_dev:
+                            mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
