@@ -334,11 +334,14 @@ def build_summary_report(work_dir, node_retry_info):
                                             test_case = jtem['test_case']
                                             if basename not in tracked_metrics_data:
                                                 tracked_metrics_data[basename] = {}
-                                            if test_package not in tracked_metrics_data[basename]:
-                                                tracked_metrics_data[basename][test_package] = {}
-                                            if test_case not in tracked_metrics_data[basename][test_package]:
-                                                tracked_metrics_data[basename][test_package][test_case] = {}
-                                            tracked_metrics_data[basename][test_package][test_case][tracked_metric] = jtem[tracked_metric]
+                                                tracked_metrics_data[basename]['groups'] = {}
+                                            groups = tracked_metrics_data[basename]['groups']
+                                            if test_package not in groups:
+                                                groups[test_package] = {}
+                                                groups[test_package]['metrics'] = {}
+                                            if test_case not in groups[test_package]['metrics']:
+                                                groups[test_package]['metrics'][test_case] = {}
+                                            groups[test_package]['metrics'][test_case][tracked_metric] = jtem[tracked_metric]
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
                                         os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
@@ -346,18 +349,19 @@ def build_summary_report(work_dir, node_retry_info):
                                 )
 
                             # aggregate tracked metrics for test groups
-                            if basename in tracked_metrics_data and test_package in tracked_metrics_data[basename]:
+                            if basename in tracked_metrics_data and test_package in tracked_metrics_data[basename]['groups']:
                                 tracked_metrics_summary = {}
                                 for tracked_metric in tracked_metrics:
+                                    groups = tracked_metrics_data[basename]['groups']
                                     metric_summary = 0
                                     number = 0
-                                    for test_case in tracked_metrics_data[basename][test_package]:
-                                        if tracked_metric in tracked_metrics_data[basename][test_package][test_case]:
-                                            metric_summary += tracked_metrics_data[basename][test_package][test_case][tracked_metric]
+                                    for test_case in groups[test_package]['metrics']:
+                                        if tracked_metric in groups[test_package]['metrics'][test_case]:
+                                            metric_summary += groups[test_package]['metrics'][test_case][tracked_metric]
                                             number +=1
                                     if number:
                                         tracked_metrics_summary[tracked_metric] = metric_summary / number
-                                tracked_metrics_data[basename][test_package]['summary'] = tracked_metrics_summary
+                                groups[test_package]['summary'] = tracked_metrics_summary
                     except Exception as err:
                         traceback.print_exc()
                         main_logger.error("Processing of {} has produced error: {}".format(basepath.split(os.path.sep)[-1], str(err)))
@@ -375,11 +379,12 @@ def build_summary_report(work_dir, node_retry_info):
     for platform in tracked_metrics_data:
         tracked_metrics_summary = {}
         for tracked_metric in tracked_metrics:
+            groups = tracked_metrics_data[basename]['groups']
             metric_summary = 0
             number = 0
-            for test_group in tracked_metrics_data[platform]:
-                if tracked_metric in tracked_metrics_data[platform][test_group]['summary']:
-                    metric_summary += tracked_metrics_data[platform][test_group]['summary'][tracked_metric]
+            for test_group in groups:
+                if tracked_metric in groups[test_group]['summary']:
+                    metric_summary += groups[test_group]['summary'][tracked_metric]
                     number +=1
             if number:
                 tracked_metrics_summary[tracked_metric] = metric_summary / number
