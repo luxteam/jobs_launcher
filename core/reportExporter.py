@@ -338,7 +338,7 @@ def build_summary_report(work_dir, node_retry_info):
                                                 tracked_metrics_data[basename][test_package] = {}
                                             if test_case not in tracked_metrics_data[basename][test_package]:
                                                 tracked_metrics_data[basename][test_package][test_case] = {}
-                                            tracked_metrics_data[basename][test_package][test_case][tracked_metric] = jitem[tracked_metric]
+                                            tracked_metrics_data[basename][test_package][test_case][tracked_metric] = jtem[tracked_metric]
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
                                         os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
