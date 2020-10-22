@@ -316,13 +316,25 @@ def main():
                 main_logger.info("Generated results:\n{}".format(json.dumps(res, indent=2)))
                 main_logger.info("Environment: {}".format(env))
 
-                response_prod = ums_client_prod.send_test_suite(res=res, env=env)
-                main_logger.info('Test suite results sent with code {}'.format(response_prod.status_code))
-                main_logger.info('Response from UMS: \n{}'.format(response_prod.content))
+                send_try = 0
+                while send_try < MAX_UMS_SEND_RETRIES:
+                    response_prod = ums_client_prod.send_test_suite(res=res, env=env)
+                    main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
+                    main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
+                    if response_prod.status_code < 300:
+                        break
+                    send_try += 1
+                    time.sleep(UMS_SEND_RETRY_INTERVAL)
 
-                response_dev = ums_client_dev.send_test_suite(res=res, env=env)
-                main_logger.info('Test suite results sent with code {}'.format(response_dev.status_code))
-                main_logger.info('Response from UMS: \n{}'.format(response_dev.content))
+                send_try = 0
+                while send_try < MAX_UMS_SEND_RETRIES:
+                    response_prod = ums_client_dev.send_test_suite(res=res, env=env)
+                    main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_prod.status_code, send_try))
+                    main_logger.info('Response from UMS DEV: \n{}'.format(response_prod.content))
+                    if response_prod.status_code < 300:
+                        break
+                    send_try += 1
+                    time.sleep(UMS_SEND_RETRY_INTERVAL)
 
             shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
