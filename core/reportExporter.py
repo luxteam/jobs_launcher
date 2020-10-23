@@ -14,6 +14,8 @@ from core.auto_dict import AutoDict
 import copy
 import sys
 import traceback
+import re
+from glob import glob
 from core.countLostTests import PLATFORM_CONVERTATIONS
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
@@ -280,7 +282,7 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     summary_report[gpu_os_case]['summary']['total'] += lost_tests_count
 
 
-def build_summary_report(work_dir, node_retry_info):
+def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
     rc = 0
     summary_report = {}
     common_info = {}
@@ -329,19 +331,20 @@ def build_summary_report(work_dir, node_retry_info):
                                         if group_report_file in jtem.keys():
                                             jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
                                     # collect tracked metrics for test cases
-                                    for tracked_metric in tracked_metrics:
-                                        if tracked_metric in jtem:
-                                            test_case = jtem['test_case']
-                                            if basename not in tracked_metrics_data:
-                                                tracked_metrics_data[basename] = {}
-                                                tracked_metrics_data[basename]['groups'] = {}
-                                            groups = tracked_metrics_data[basename]['groups']
-                                            if test_package not in groups:
-                                                groups[test_package] = {}
-                                                groups[test_package]['metrics'] = {}
-                                            if test_case not in groups[test_package]['metrics']:
-                                                groups[test_package]['metrics'][test_case] = {}
-                                            groups[test_package]['metrics'][test_case][tracked_metric] = jtem[tracked_metric]
+                                    if collect_tracked_metrics:
+                                        for tracked_metric in tracked_metrics:
+                                            if tracked_metric in jtem:
+                                                test_case = jtem['test_case']
+                                                if basename not in tracked_metrics_data:
+                                                    tracked_metrics_data[basename] = {}
+                                                    tracked_metrics_data[basename]['groups'] = {}
+                                                groups = tracked_metrics_data[basename]['groups']
+                                                if test_package not in groups:
+                                                    groups[test_package] = {}
+                                                    groups[test_package]['metrics'] = {}
+                                                if test_case not in groups[test_package]['metrics']:
+                                                    groups[test_package]['metrics'][test_case] = {}
+                                                groups[test_package]['metrics'][test_case][tracked_metric] = jtem[tracked_metric]
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
                                         os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
@@ -349,7 +352,7 @@ def build_summary_report(work_dir, node_retry_info):
                                 )
 
                             # aggregate tracked metrics for test groups
-                            if basename in tracked_metrics_data and test_package in tracked_metrics_data[basename]['groups']:
+                            if collect_tracked_metrics and basename in tracked_metrics_data and test_package in tracked_metrics_data[basename]['groups']:
                                 tracked_metrics_summary = {}
                                 for tracked_metric in tracked_metrics:
                                     groups = tracked_metrics_data[basename]['groups']
@@ -376,19 +379,20 @@ def build_summary_report(work_dir, node_retry_info):
                         summary_report[basename].update({'summary': temp_report['summary']})
 
     # aggregate tracked metrics for platforms
-    for platform in tracked_metrics_data:
-        tracked_metrics_summary = {}
-        for tracked_metric in tracked_metrics:
-            groups = tracked_metrics_data[basename]['groups']
-            metric_summary = 0
-            number = 0
-            for test_group in groups:
-                if tracked_metric in groups[test_group]['summary']:
-                    metric_summary += groups[test_group]['summary'][tracked_metric]
-                    number +=1
-            if number:
-                tracked_metrics_summary[tracked_metric] = metric_summary / number
-        tracked_metrics_data[platform]['summary'] = tracked_metrics_summary
+    if collect_tracked_metrics:
+        for platform in tracked_metrics_data:
+            tracked_metrics_summary = {}
+            for tracked_metric in tracked_metrics:
+                groups = tracked_metrics_data[basename]['groups']
+                metric_summary = 0
+                number = 0
+                for test_group in groups:
+                    if tracked_metric in groups[test_group]['summary']:
+                        metric_summary += groups[test_group]['summary'][tracked_metric]
+                        number +=1
+                if number:
+                    tracked_metrics_summary[tracked_metric] = metric_summary / number
+            tracked_metrics_data[platform]['summary'] = tracked_metrics_summary
 
     for key in common_info:
         common_info[key] = ' '.join(common_info[key])
@@ -602,7 +606,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
 # -3 - Compare report can't be built
 # -4 - Local reports can't be built
 # -5 - More than one plugin versions
-def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', engine=''):
+def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_name='undefined', commit_message='undefined', engine='', build_number=''):
     rc = 0
 
     if os.path.exists(os.path.join(work_dir, 'report_resources')):
@@ -644,7 +648,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         summary_template = env.get_template('summary_template.html')
         detailed_summary_template = env.get_template('detailed_summary_template.html')
 
-        summary_report, common_info, tracked_metrics_data, rc = build_summary_report(work_dir, node_retry_info)
+        summary_report, common_info, tracked_metrics_data, rc = build_summary_report(work_dir, node_retry_info, bool(build_number))
 
         add_retry_info(summary_report, node_retry_info, work_dir)
 
@@ -653,20 +657,36 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         common_info.update({'commit_message': commit_message})
         common_info.update({'engine': engine})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
-        try:
-            tracked_metrics_file_path = os.path.join(work_dir, TRACKED_METRICS_LOCATION_NAME)
-            if not os.path.exists(tracked_metrics_file_path):
-                os.makedirs(tracked_metrics_file_path)
-            save_json_report(tracked_metrics_data, tracked_metrics_file_path, TRACKED_METRICS_JSON_NAME)
-        except Exception as e:
-            main_logger.error("Can't save tracked metrics data: {}".format(str(e)))
-            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+        tracked_metrics_history = {}
+        if build_number:
+            try:
+                tracked_metrics_file_path = os.path.join(work_dir, TRACKED_METRICS_LOCATION_NAME)
+                if not os.path.exists(tracked_metrics_file_path):
+                    os.makedirs(tracked_metrics_file_path)
+                save_json_report(tracked_metrics_data, tracked_metrics_file_path, TRACKED_METRICS_JSON_NAME.format(build_number))
+            except Exception as e:
+                main_logger.error("Can't save tracked metrics data: {}".format(str(e)))
+                main_logger.error("Traceback: {}".format(traceback.format_exc()))
+            try:
+                tracked_metrics_files = sorted(glob(os.path.join(tracked_metrics_file_path ,'*.json')), reverse=True)
+                for i in range(tracked_metrics_files_number):
+                    if i == len(tracked_metrics_files):
+                        break
+                    with open(tracked_metrics_files[i], 'r') as tracked_metrics_file:
+                        tracked_metrics_file_data = json.load(tracked_metrics_file) 
+                    file_build_number = re.search(r'\d+', tracked_metrics_files[i].split(os.path.sep)[-1]).group(0)
+                    tracked_metrics_history[file_build_number] = tracked_metrics_file_data
+            except Exception as e:
+                main_logger.error("Can't collect history of tracked metrics: {}".format(str(e)))
+                main_logger.error("Traceback: {}".format(traceback.format_exc()))
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
-                                               synchronization_time=sync_time(summary_report))
+                                               synchronization_time=sync_time(summary_report),
+                                               tracked_metrics=tracked_metrics,
+                                               tracked_metrics_history=tracked_metrics_history)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
         for execution in summary_report.keys():
