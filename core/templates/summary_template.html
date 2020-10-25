@@ -3,6 +3,7 @@
 {% block report_body %}
 {% if tracked_metrics_history %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="{{ pre_path }}/report_resources/js/performance-history.js"></script>
 {% endif %}
 <h1>info</h1>
 
@@ -89,8 +90,15 @@
                     <td>{{ report[i].summary.synchronization_duration }}</td>
                 {% endif %}
                 <td>{{ report[i].summary.setup_duration }}</td>
-                {% if tracked_metrics_history %}
-                    <td>{{ report[i].summary.setup_duration }}</td>
+                {% if tracked_metrics and tracked_metrics_history %}
+                    <td>
+                        {%- set performance_window_name = "performanceWindow-" + loop.index | string -%}
+                        {%- set performance_chart_name = "performanceChart-" + loop.index | string -%}
+                        <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        {% with performance_window_scope="platform" -%}
+                            {%- include 'performance_history_tab.html' -%}
+                        {%- endwith %}
+                    </td>
                 {% endif %}
             </tr>
     {% endfor %}
@@ -263,48 +271,14 @@
                 <td>Render Log</td>
                 <td>Engine log</td>
                 {% endif %}
-                {% if tracked_metrics_history %}
+                {% if tracked_metrics and tracked_metrics_history %}
                     <td>
-                        <button class="commonButton popupButton" type="button" onclick="openModalWindow('test_group_performance{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;">
-                        {% if report[i].results[test_package][test_conf].machine_info %}
-                        {{ report[i].results[test_package][test_conf].machine_info.host }}
-                        {% else %}
-                        {{ report[i].results[test_package][test_conf].recovered_info.host }}
-                        {% endif %}
-                        </button>
-                        <div class="popup" id="test_group_performance{{ loop.index }}_{{ resultsloop.index }}_{{ i }}">
-                            <div class="popupContent popupHalfWidth">
-                                <form class="popupForm">
-                                    <button class="commonButton closePopup" type="button" onclick="closeModalWindow('machineInfo{{ loop.index }}_{{ resultsloop.index }}_{{ i }}');return false;"><img src="report_resources/img/close-button.png"/></button>
-                                </form>
-                                <div class="performance_tab" style="position: relative; height:500px; width:1000px; margin:auto;">
-                                    <script type="text/javascript">
-                                        {% for tracked_metric in tracked_metrics %}
-                                            var options = { title: { text: "{{ tracked_metric }}" }}
-                                            var labels = []
-                                            var dataset = {}
-                                            dataset.data = []
-                                            dataset.label = "{{ tracked_metric }} per build"
-                                            dataset.borderColor = "#82438CFF"
-                                            {% for build_number in tracked_metrics_history %}
-                                                labels.push("{{ build_number }}")
-                                                {% set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] %}
-                                                {% if tracked_metric in test_group['summary'] %}
-                                                    dataset.data.push("{{ test_group['summary'][tracked_metric] }}")
-                                                {% else %}
-                                                    dataset.data.push(null)
-                                                {% endif %}
-                                            {% endfor %}
-                                            labels.reverse()
-                                            dataset.data.reverse()
-                                            console.log(dataset)
-                                            new Chart(document.getElementById("chartRender"), { "type": "line", "data": { "labels": labels, "datasets": [ dataset ] }, "options": options});
-                                        {% endfor %}
-                                    </script>                                    
-                                    <canvas id="chartRender"></canvas>
-                                </div>
-                            </div>
-                        </div>
+                        {%- set performance_window_name = "performanceWindow-" + resultsloop.index | string + "-" + test_package -%}
+                        {%- set performance_chart_name = "performanceChart-" + resultsloop.index | string + "-" + test_package -%}
+                        <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        {% with performance_window_scope="test_group" -%}
+                            {%- include 'performance_history_tab.html' -%}
+                        {%- endwith %}
                     </td>
                 {% endif %}
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>

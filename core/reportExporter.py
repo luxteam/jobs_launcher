@@ -363,7 +363,10 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                                             metric_summary += groups[test_package]['metrics'][test_case][tracked_metric]
                                             number +=1
                                     if number:
-                                        tracked_metrics_summary[tracked_metric] = metric_summary / number
+                                        if tracked_metrics[tracked_metric]['function'] == 'avrg':
+                                            tracked_metrics_summary[tracked_metric] = metric_summary / number
+                                        else:
+                                            tracked_metrics_summary[tracked_metric] = metric_summary
                                 groups[test_package]['summary'] = tracked_metrics_summary
                     except Exception as err:
                         traceback.print_exc()
@@ -391,7 +394,10 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                         metric_summary += groups[test_group]['summary'][tracked_metric]
                         number +=1
                 if number:
-                    tracked_metrics_summary[tracked_metric] = metric_summary / number
+                    if tracked_metrics[tracked_metric]['function'] == 'avrg':
+                        tracked_metrics_summary[tracked_metric] = metric_summary / number
+                    else:
+                        tracked_metrics_summary[tracked_metric] = metric_summary
             tracked_metrics_data[platform]['summary'] = tracked_metrics_summary
 
     for key in common_info:
@@ -545,7 +551,7 @@ def build_compare_report(summary_report):
     return compare_report, hardware
 
 
-def build_local_reports(work_dir, summary_report, common_info, jinja_env):
+def build_local_reports(work_dir, summary_report, common_info, jinja_env, tracked_metrics, tracked_metrics_history):
     work_dir = os.path.abspath(work_dir)
 
     template = jinja_env.get_template('local_template.html')
@@ -593,7 +599,10 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env):
                     html = template.render(title="{} {} plugin version: {}".format(common_info['tool'], test, version_in_title),
                                            common_info=common_info,
                                            render_report=render_report,
-                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)))
+                                           pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
+                                           platform=execution,
+                                           tracked_metrics=tracked_metrics,
+                                           tracked_metrics_history=tracked_metrics_history)
                     save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
     except Exception as err:
         traceback.print_exc()
@@ -764,7 +773,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         rc = -3
 
     try:
-        build_local_reports(work_dir, summary_report, common_info, env)
+        build_local_reports(work_dir, summary_report, common_info, env, tracked_metrics, tracked_metrics_history)
     except Exception as err:
         traceback.print_exc()
         main_logger.error(str(err))

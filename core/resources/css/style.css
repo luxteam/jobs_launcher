@@ -263,6 +263,10 @@ a {
   width: 300px;
 }
 
+.localReportTable .closePopup img {
+    width: 1vw;
+}
+
 .infoColumn {
   text-align: left;
 // white-space: nowrap;
