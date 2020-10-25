@@ -22,7 +22,7 @@ PLATFORM_CONVERTATIONS = {
 			"AMD_RXVEGA": "Radeon RX Vega",
 			"AMD_RX5700XT": "AMD Radeon RX 5700 XT",
 			"AMD_RadeonVII": "AMD Radeon VII",
-			"AMD_RadeonVII_Beta": "AMD Radeon VII Beta",
+			"AMD_RadeonVII_Beta": "AMD Radeon VII Beta Driver",
 			"NVIDIA_GF1080TI": "GeForce GTX 1080 Ti",
 			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
@@ -34,7 +34,8 @@ PLATFORM_CONVERTATIONS = {
 		"os_name": "Ubuntu 18.04(64bit)",
 		"cards": {
 			"AMD_RadeonVII": "AMD Radeon VII",
-			"NVIDIA_GTX980": "GeForce GTX 980"
+			"NVIDIA_GTX980": "GeForce GTX 980",
+			"NVIDIA_RTX2070": "GeForce RTX 2070"
 		}
 	},
 	"OSX": {
@@ -65,11 +66,15 @@ def get_lost_tests_count(data, tool_name, test_package_name):
 	return lost_tests_count
 
 
-def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests_package, tests_list):
+def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests_package, tests_list, engine, skipped_groups):
 	lost_tests_data = {}
+	skipped_tests_data = {}
 	lost_tests_results = ast.literal_eval(lost_tests_results)
 
 	tests_list = tests_list.split(' ')
+
+	if skipped_groups:
+		skipped_groups = json.loads(bytes(skipped_groups, "utf-8").decode("unicode_escape"))
 
 	# check that session_reports is in each results directory
 	try:
@@ -116,12 +121,11 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 				tests_package_data = json.load(file)
 			if not tests_package_data["split"]:
 				# e.g. regression
-				lost_package_stach = ""
+				lost_package_staches = []
 				for lost_test_result in lost_tests_results:
 					if lost_test_result.endswith(tests_package):
-						lost_package_stach = lost_test_result
-						break
-				if lost_package_stach:
+						lost_package_staches.append(lost_test_result)
+				for lost_package_stach in lost_package_staches:
 					lost_tests_results.remove(lost_package_stach)
 					excluded_groups = tests_package.split("~")[1].split(",")
 					for test_package_name in tests_package_data["groups"]:
@@ -129,8 +133,8 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 							continue
 						try:
 							lost_tests_count = len(set(tests_package_data["groups"][test_package_name].split(',')))
-							gpu_name = lost_test_result.split('-')[0]
-							os_name = lost_test_result.split('-')[1]
+							gpu_name = lost_package_stach.split('-')[0]
+							os_name = lost_package_stach.split('-')[1]
 							# join converted gpu name and os name
 							joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 							if joined_gpu_os_names not in lost_tests_data:
@@ -144,14 +148,22 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 				gpu_name = lost_test_result.split('-')[0]
 				os_name = lost_test_result.split('-')[1]
 				test_package_name = lost_test_result.split('-')[2]
+
 				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 					data = json.load(file)
 				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
 				# join converted gpu name and os name
 				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
-				if joined_gpu_os_names not in lost_tests_data:
-					lost_tests_data[joined_gpu_os_names] = {}
-				lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
+				# if test group is skipped
+				if (engine and (test_package_name + "-" + engine) in skipped_groups and (gpu_name + "-" + os_name) in skipped_groups[test_package_name + "-" + engine]) \
+						or (test_package_name in skipped_groups and (gpu_name + "-" + os_name) in skipped_groups[test_package_name]):
+					if joined_gpu_os_names not in skipped_tests_data:
+						skipped_tests_data[joined_gpu_os_names] = {}
+					skipped_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
+				else:
+					if joined_gpu_os_names not in lost_tests_data:
+						lost_tests_data[joined_gpu_os_names] = {}
+					lost_tests_data[joined_gpu_os_names][test_package_name] = lost_tests_count
 			except Exception as e:
 				print("Failed to count lost tests for test group {}. Reason: {}".format(test_package_name, str(e)))
 	else:
@@ -174,3 +186,5 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 	os.makedirs(output_dir, exist_ok=True)
 	with open(os.path.join(output_dir, LOST_TESTS_JSON_NAME), "w") as file:
 		json.dump(lost_tests_data, file, indent=4, sort_keys=True)
+	with open(os.path.join(output_dir, SKIPPED_TESTS_JSON_NAME), "w") as file:
+		json.dump(skipped_tests_data, file, indent=4, sort_keys=True)

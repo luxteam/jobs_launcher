@@ -1,6 +1,18 @@
 import os
-from minio import Minio
 from core.config import main_logger
+import subprocess
+import sys
+try:
+    from minio import Minio
+except Exception as ex:
+    try:
+        subprocess.call([sys.executable, "-m", "pip", "install", "Minio"])
+        from minio import Minio
+    except Exception as e:
+        print(e)
+        print("Failed to install dependency automatically.")
+        print("Run: pip install twill platform shutil requests manually.")
+        sys.exit(-1)
 
 """ UMS Minio client module
 
@@ -11,6 +23,26 @@ mc.upload_file('overall_log_suite.txt', '8253', '9152')
 mc.upload_file('build.dmg', '8253')
 
 """
+
+
+def create_mc_client(job_id):
+    try:
+        mc = UMS_Minio(
+            product_id=job_id,
+            enpoint=os.getenv("MINIO_ENDPOINT"),
+            access_key=os.getenv("MINIO_ACCESS_KEY"),
+            secret_key=os.getenv("MINIO_SECRET_KEY")
+        )
+        main_logger.info("MINIO Client created with product_id {product_id}\n enpoint: {enpoint}\n".format(
+                product_id=job_id,
+                enpoint=os.getenv("MINIO_ENDPOINT")
+            )
+        )
+        return mc
+    except Exception as e:
+        main_logger.error("MINIO Client creation error: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
 
 class UMS_Minio:
     # TODO: access + secret + url to env
@@ -25,7 +57,7 @@ class UMS_Minio:
         self.__save_bucket_if_not_exits()
 
     def __save_bucket_if_not_exits(self):
-        """ Provat method for check bucket existance by name
+        """ Private method for check bucket existence by name
         """
         if not self.mc.bucket_exists(self.bucket_name):
             self.mc.make_bucket(self.bucket_name)
@@ -38,17 +70,17 @@ class UMS_Minio:
         args - (build_id, tsr_id, tcr_id)
         """
         
-        # generate artefact name PATH/TO/FILE.EXT
-        artefact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
+        # generate artifact name PATH/TO/FILE.EXT
+        artifact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
         try:
             file_size = os.stat(file_path).st_size
             with open(file_path, 'rb') as data:
                 self.mc.put_object(
                     bucket_name=self.bucket_name,
-                    object_name=artefact_name,
+                    object_name=artifact_name,
                     data=data,
                     length=file_size
                 )
-        except FileNotFoundError as e:
-            print(e)
+            main_logger.info("Artifact '{}' sent to MINIO".format(artifact_name))
+        except Exception as e:
             main_logger.error(str(e))
