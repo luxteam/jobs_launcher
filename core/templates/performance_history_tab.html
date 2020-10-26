@@ -6,6 +6,7 @@
         <div class="performance_tab" style="position: relative; height:720px; width:1280px; margin:auto;">
             <div class="performance_tab" style="height:50px; width:1280px;">
                 <form class="popupForm">
+                    {#- Generate button for each metric -#}
                     {% for tracked_metric in tracked_metrics | reverse %}
                         <button class="commonButton closePopup" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ tracked_metric }}');return false;">{{ tracked_metrics[tracked_metric]['name'] }}</button>
                     {% endfor %}
@@ -13,70 +14,74 @@
             </div>
             <div class="performance_tab" style="height:670px; width:1280px;">
                 <script type="text/javascript">
-                    var currentChart = "{{ performance_chart_name }}"
-                    if (!performanceCharts[currentChart]) {
-                        performanceCharts[currentChart] = {}
-                    }
-                    if (!performanceCharts[currentChart].renderData) {
-                        performanceCharts[currentChart].renderData = {}
-                    }
-                    if (!performanceCharts[currentChart].optionsData) {
-                        performanceCharts[currentChart].optionsData = {}
-                    }
-                    var nextColorIndex = 0
-                    {% for tracked_metric in tracked_metrics %}
-                        var options = { "title": { "display": true, "text": "{{ tracked_metrics[tracked_metric]['name'] }} per build ({{ tracked_metrics[tracked_metric]['displaying_unit'] }})" }}
-                        var labels = []
-                        {% for build_number in tracked_metrics_history %}
-                            labels.push("Build #{{ build_number }}")
+                    {
+                        let currentChart = "{{ performance_chart_name }}"
+                        if (!performanceCharts[currentChart]) {
+                            performanceCharts[currentChart] = {}
+                        }
+                        if (!performanceCharts[currentChart].renderData) {
+                            performanceCharts[currentChart].renderData = {}
+                        }
+                        if (!performanceCharts[currentChart].optionsData) {
+                            performanceCharts[currentChart].optionsData = {}
+                        }
+                        let nextColorIndex = 0
+                        let options
+                        let labels
+                        let dataset
+                        {% for tracked_metric in tracked_metrics %}
+                            options = { "title": { "display": true, "text": "{{ tracked_metrics[tracked_metric]['name'] }} per build ({{ tracked_metrics[tracked_metric]['displaying_unit'] }})" }}
+                            labels = []
+                            {% for build_number in tracked_metrics_history %}
+                                labels.push("Build #{{ build_number }}")
+                            {% endfor %}
+                            dataset = {}
+                            dataset.label = "{{ test_package }}"
+                            dataset.borderColor = colors[nextColorIndex]
+                            nextColorIndex = (nextColorIndex + 1) % colors.length
+
+                            dataset.data = [
+                            {%- for build_number in tracked_metrics_history -%}
+                                {%- if performance_window_scope == "platform" -%}
+                                    {% if i in tracked_metrics_history[build_number] -%}
+                                        {%- set platform = tracked_metrics_history[build_number][i] -%}
+                                        {%- if tracked_metric in platform['summary'] -%}
+                                            "{{ platform['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
+                                        {%- else -%}
+                                            null{{ "," if not loop.last }}
+                                        {%- endif -%}
+                                    {%- endif %}
+                                {%- elif performance_window_scope == "test_group" -%}
+                                    {% if i in tracked_metrics_history[build_number] and test_package in tracked_metrics_history[build_number][i]['groups'] -%}
+                                        {%- set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] -%}
+                                        {%- if tracked_metric in test_group['summary'] -%}
+                                            "{{ test_group['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
+                                        {%- else -%}
+                                            null{{ "," if not loop.last }}
+                                        {%- endif -%}
+                                    {%- endif %}
+                                {%- elif performance_window_scope == "test_case" -%}
+                                    {% if platform in tracked_metrics_history[build_number] and test_group in tracked_metrics_history[build_number][platform]['groups'] and test_case in tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'] -%}
+                                        {%- set test_case_data = tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'][test_case] -%}
+                                        {%- if tracked_metric in test_case_data -%}
+                                            "{{ test_case_data[tracked_metric] | round(3) }}"{{ "," if not loop.last }}
+                                        {%- else -%}
+                                            null{{ "," if not loop.last }}
+                                        {%- endif -%}
+                                    {%- endif %}
+                                {%- endif -%}
+                            {%- endfor -%}
+                            ]
+
+                            labels.reverse()
+                            dataset.data.reverse()
+                            performanceCharts[currentChart].renderData["{{ tracked_metric }}"] = { "labels": labels, "datasets": [ dataset ] }
+                            performanceCharts[currentChart].optionsData["{{ tracked_metric }}"] = options
                         {% endfor %}
-                        var dataset = {}
-                        dataset.label = "{{ test_package }}"
-                        dataset.borderColor = colors[nextColorIndex]
-                        nextColorIndex = (nextColorIndex + 1) % colors.length
 
-                        dataset.data = [
-                        {%- for build_number in tracked_metrics_history -%}
-                            {%- if performance_window_scope == "platform" -%}
-                                {% if i in tracked_metrics_history[build_number] -%}
-                                    {%- set platform = tracked_metrics_history[build_number][i] -%}
-                                    {%- if tracked_metric in platform['summary'] -%}
-                                        "{{ platform['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
-                                    {%- else -%}
-                                        null{{ "," if not loop.last }}
-                                    {%- endif -%}
-                                {%- endif %}
-                            {%- elif performance_window_scope == "test_group" -%}
-                                {% if i in tracked_metrics_history[build_number] and test_package in tracked_metrics_history[build_number][i]['groups'] -%}
-                                    {%- set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] -%}
-                                    {%- if tracked_metric in test_group['summary'] -%}
-                                        "{{ test_group['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
-                                    {%- else -%}
-                                        null{{ "," if not loop.last }}
-                                    {%- endif -%}
-                                {%- endif %}
-                            {%- elif performance_window_scope == "test_case" -%}
-                                {% if platform in tracked_metrics_history[build_number] and test_group in tracked_metrics_history[build_number][platform]['groups'] and test_case in tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'] -%}
-                                    {%- set test_case_data = tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'][test_case] -%}
-                                    {%- if tracked_metric in test_case_data -%}
-                                        "{{ test_case_data[tracked_metric] | round(3) }}"{{ "," if not loop.last }}
-                                    {%- else -%}
-                                        null{{ "," if not loop.last }}
-                                    {%- endif -%}
-                                {%- endif %}
-                            {%- endif -%}
-                        {%- endfor -%}
-                        ]
-
-                        labels.reverse()
-                        dataset.data.reverse()
-                        performanceCharts[currentChart].renderData["{{ tracked_metric }}"] = { "labels": labels, "datasets": [ dataset ] }
-                        performanceCharts[currentChart].optionsData["{{ tracked_metric }}"] = options
-                    {% endfor %}
-
-                    // initialize chart with data from the last iteration
-                    performanceCharts[currentChart].chart = new Chart(document.getElementById(currentChart), { "type": "line", "data": { "labels": labels, "datasets": [ dataset ] }, "options": options });
-
+                        // initialize chart with data from the last iteration
+                        performanceCharts[currentChart].chart = new Chart(document.getElementById(currentChart), { "type": "line", "data": { "labels": labels, "datasets": [ dataset ] }, "options": options });
+                    }
                 </script>                                    
                 <canvas id="{{ performance_chart_name }}"></canvas>
             </div>
