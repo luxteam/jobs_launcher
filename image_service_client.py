@@ -2,7 +2,7 @@ import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
 from requests.exceptions import RequestException
-from core.config import main_logger, MAX_UMS_SEND_RETRIES
+from core.config import main_logger, MAX_UMS_SEND_RETRIES, UMS_SEND_RETRY_INTERVAL
 import traceback
 import time
 
