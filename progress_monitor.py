@@ -6,6 +6,7 @@ from image_service_client import ISClient
 from ums_client import create_ums_client
 from minio_client import create_mc_client
 from core.config import *
+import traceback
 
 res = []
 transferred_test_cases = []
@@ -85,9 +86,13 @@ if __name__ == '__main__':
 
     check = 1
     while True:
-        time.sleep(args.interval)
-        print('Check number {}'.format(check))
-        check += 1
-        result = send_finished_cases(args.session_dir, args.suite_name)
-        if result:
-            break
+        try:
+            time.sleep(args.interval)
+            print('Check number {}'.format(check))
+            check += 1
+            result = send_finished_cases(args.session_dir, args.suite_name)
+            if result:
+                break
+        except Exception as e:
+            main_logger.error("MINIO Client creation error: {}".format(e))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
