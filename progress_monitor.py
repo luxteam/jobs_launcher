@@ -80,7 +80,7 @@ def send_finished_cases(session_dir, suite_name):
         name_key = 'name'
     new_test_cases = {tc[name_key]: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done', 'passed') and not tc[name_key] in transferred_test_cases}
 
-    new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases)
+    new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
     print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
 
     if ums_client_prod:
