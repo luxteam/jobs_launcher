@@ -67,7 +67,7 @@ def send_finished_cases(session_dir, suite_name):
             case_file_data['image_service_id'] = image_id
             
         with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json'), 'w') as case_file:
-            json.dump([case_file_data], case_file)
+            json.dump([case_file_data], case_file, indent=4, sort_keys=True)
 
     transferred_test_cases += list(new_test_cases.keys())
     diff = len(test_cases) - len(transferred_test_cases)
