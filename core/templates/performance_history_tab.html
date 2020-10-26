@@ -32,7 +32,7 @@
                         {% for tracked_metric in tracked_metrics %}
                             options = { "title": { "display": true, "text": "{{ tracked_metrics[tracked_metric]['name'] }} per build ({{ tracked_metrics[tracked_metric]['displaying_unit'] }})" }}
                             labels = []
-                            {% for build_number in tracked_metrics_history %}
+                            {% for build_number, value in tracked_metrics_history | dictsort %}
                                 labels.push("Build #{{ build_number }}")
                             {% endfor %}
                             dataset = {}
@@ -41,7 +41,7 @@
                             nextColorIndex = (nextColorIndex + 1) % colors.length
 
                             dataset.data = [
-                            {%- for build_number in tracked_metrics_history -%}
+                            {%- for build_number, value in tracked_metrics_history | dictsort -%}
                                 {%- if performance_window_scope == "platform" -%}
                                     {% if i in tracked_metrics_history[build_number] -%}
                                         {%- set platform = tracked_metrics_history[build_number][i] -%}
@@ -50,7 +50,9 @@
                                         {%- else -%}
                                             null{{ "," if not loop.last }}
                                         {%- endif -%}
-                                    {%- endif %}
+                                    {%- else -%}
+                                        null{{ "," if not loop.last }}
+                                    {%- endif -%}
                                 {%- elif performance_window_scope == "test_group" -%}
                                     {% if i in tracked_metrics_history[build_number] and test_package in tracked_metrics_history[build_number][i]['groups'] -%}
                                         {%- set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] -%}
@@ -59,7 +61,9 @@
                                         {%- else -%}
                                             null{{ "," if not loop.last }}
                                         {%- endif -%}
-                                    {%- endif %}
+                                    {%- else -%}
+                                        null{{ "," if not loop.last }}
+                                    {%- endif -%}
                                 {%- elif performance_window_scope == "test_case" -%}
                                     {% if platform in tracked_metrics_history[build_number] and test_group in tracked_metrics_history[build_number][platform]['groups'] and test_case in tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'] -%}
                                         {%- set test_case_data = tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'][test_case] -%}
@@ -68,13 +72,13 @@
                                         {%- else -%}
                                             null{{ "," if not loop.last }}
                                         {%- endif -%}
-                                    {%- endif %}
+                                    {%- else -%}
+                                        null{{ "," if not loop.last }}
+                                    {%- endif -%}
                                 {%- endif -%}
                             {%- endfor -%}
                             ]
 
-                            labels.reverse()
-                            dataset.data.reverse()
                             performanceCharts[currentChart].renderData["{{ tracked_metric }}"] = { "labels": labels, "datasets": [ dataset ] }
                             performanceCharts[currentChart].optionsData["{{ tracked_metric }}"] = options
                         {% endfor %}
