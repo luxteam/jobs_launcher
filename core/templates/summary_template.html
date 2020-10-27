@@ -15,6 +15,9 @@
         <thead>
             <tr>
                 <th>Job Name</th>
+                {% if tracked_metrics_history %}
+                    <th>Performance</th>
+                {% endif %}
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed
@@ -44,9 +47,6 @@
                     <th data-formatter="timeFormatterFull">Synchronization time</th>
                 {% endif %}
                 <th data-formatter="timeFormatterFull" data-visible="false" data-field="setupTime">Setup time</th>
-                {% if tracked_metrics_history %}
-                    <th>Performance</th>
-                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -58,6 +58,16 @@
                     "Job name"
                     {% endif %}
                 </td>
+                {% if tracked_metrics and tracked_metrics_history %}
+                    <td>
+                        {%- set performance_window_name = "performanceWindow-" + loop.index | string -%}
+                        {%- set performance_chart_name = "performanceChart-" + loop.index | string -%}
+                        <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        {% with performance_window_scope="platform" -%}
+                            {%- include 'performance_history_tab.html' -%}
+                        {%- endwith %}
+                    </td>
+                {% endif %}
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -90,16 +100,6 @@
                     <td>{{ report[i].summary.synchronization_duration }}</td>
                 {% endif %}
                 <td>{{ report[i].summary.setup_duration }}</td>
-                {% if tracked_metrics and tracked_metrics_history %}
-                    <td>
-                        {%- set performance_window_name = "performanceWindow-" + loop.index | string -%}
-                        {%- set performance_chart_name = "performanceChart-" + loop.index | string -%}
-                        <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
-                        {% with performance_window_scope="platform" -%}
-                            {%- include 'performance_history_tab.html' -%}
-                        {%- endwith %}
-                    </td>
-                {% endif %}
             </tr>
     {% endfor %}
         </tbody>
