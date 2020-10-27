@@ -134,6 +134,27 @@ class UMS_Client:
             main_logger.error("Test suite result send error: {}".format(str(e)))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
+
+    def send_test_suite_performance(self, data):
+        try:
+            response = post(
+                headers=self.headers,
+                json=data,
+                url="{url}/api/testSuitePerformance?id={suite_id}&productId={product_id}".format(
+                    url=self.url,
+                    suite_id=self.suite_id,
+                    product_id=self.job_id
+                )
+            )
+            main_logger.info('Test suite performance sent with code {}'.format(response.status_code))
+
+            return response
+
+        except Exception as e:
+            main_logger.error("Test suite performance send error: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+
     def define_environment(self, env):
         try:
             data = {
