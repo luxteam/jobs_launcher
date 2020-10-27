@@ -29,7 +29,7 @@ try:
     )
     main_logger.info("Image Service client created for url: {}".format(is_client.url))
 except Exception as e:
-    main_logger.error("Can't create Image Service client. Error: {}".format(str(e)))
+    main_logger.error("Can't create Image Service client for url: {}. Error: {}".format(is_client.url, str(e)))
 
 
 def render_color_full_path(session_dir, suite_name, render_color_path):
