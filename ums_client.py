@@ -137,7 +137,7 @@ class UMS_Client:
 
     def send_test_suite_performance(self, data):
         try:
-            response = post(
+            response = put(
                 headers=self.headers,
                 json=data,
                 url="{url}/api/testSuitePerformance?id={suite_id}&productId={product_id}".format(
