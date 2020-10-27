@@ -142,6 +142,7 @@ TEST_CASES_JSON_NAME = {
         'rprviewer': 'test.cases.json'
     }
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
+SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
 
 DONT_COMPARE = "Do not compare"
@@ -168,3 +169,6 @@ ODD_FOR_BASELINES = [
     'group_timeout_exceeded',
     'testcase_timeout_exceeded'
 ]
+
+MAX_UMS_SEND_RETRIES = 3
+UMS_SEND_RETRY_INTERVAL = 5

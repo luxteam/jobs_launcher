@@ -276,19 +276,37 @@
                 {% endif %}
                 >{{ report[i].results[test_package][test_conf].skipped }}</td>
 
-                <td>{{ report[i].results[test_package][test_conf].duration }}</td>
-                <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>
-
-                <td
-                {% if report[i].results[test_package][test_conf].render_duration == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
-                class="badResult"
+                {% if report[i].results[test_package][test_conf].duration %}
+                    <td>{{ report[i].results[test_package][test_conf].duration }}</td>
+                {% else %}
+                    <td></td>
                 {% endif %}
-                >{{ report[i].results[test_package][test_conf].render_duration | round(3) }}</td>
+
+                {% if report[i].results[test_package][test_conf].duration_sync %}
+                    <td>{{ report[i].results[test_package][test_conf].duration_sync }}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+
+                {% if report[i].results[test_package][test_conf].duration %}
+                    <td
+                    {% if report[i].results[test_package][test_conf].render_duration == -0.0 and report[i].results[test_package][test_conf].total != report[i].results[test_package][test_conf].skipped %}
+                    class="badResult"
+                    {% endif %}
+                    >{{ report[i].results[test_package][test_conf].render_duration | round(3) }}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
 
                 {% if synchronization_time %}
                     <td>{{ report[i].results[test_package][test_conf].synchronization_duration }}</td>
                 {% endif %}
-                <td>{{ report[i].results[test_package][test_conf].setup_duration }}</td>
+
+                {% if report[i].results[test_package][test_conf].setup_duration %}
+                    <td>{{ report[i].results[test_package][test_conf].setup_duration }}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
             </tr>
             {% endfor %}
         {% endfor %}

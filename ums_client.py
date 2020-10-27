@@ -1,3 +1,4 @@
+import os
 import json
 from requests.auth import HTTPBasicAuth
 from requests import get, post, put
@@ -16,6 +17,35 @@ def str2bool(v):
         return False
     else:
         raise ValueError('Boolean value expected. Got <{}>'.format(v))
+
+
+def create_ums_client(client_postfix_raw=""):
+    try:
+        if client_postfix_raw:
+            client_postfix = "_" + client_postfix_raw
+        else:
+            client_postfix = ""
+        ums_client = UMS_Client(
+            job_id=os.getenv("UMS_JOB_ID" + client_postfix),
+            url=os.getenv("UMS_URL" + client_postfix),
+            build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
+            env_label=os.getenv("UMS_ENV_LABEL"),
+            suite_id=None,
+            login=os.getenv("UMS_LOGIN" + client_postfix),
+            password=os.getenv("UMS_PASSWORD" + client_postfix)
+        )
+        main_logger.info("{instance} UMS Client created with url {url}\n build_id: {build_id}\n env_label: {label} \n job_id: {job_id}".format(
+                 instance=client_postfix_raw,
+                 url=ums_client.url,
+                 build_id=ums_client.build_id,
+                 label=ums_client.env_label,
+                 job_id=ums_client.job_id
+             )
+        )
+        return ums_client
+    except Exception as e:
+        main_logger.error("UMS Client creation error: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
 class UMS_Client:
