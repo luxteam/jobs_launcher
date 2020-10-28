@@ -60,8 +60,8 @@
                 </td>
                 {% if tracked_metrics and tracked_metrics_history %}
                     <td>
-                        {%- set performance_window_name = "performanceWindow-" + loop.index | string -%}
-                        {%- set performance_chart_name = "performanceChart-" + loop.index | string -%}
+                        {%- set performance_window_name = "performanceWindow-" + i | string -%}
+                        {%- set performance_chart_name = "performanceChart-" + i | string -%}
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                         {% with performance_window_scope="platform" -%}
                             {%- include 'performance_history_tab.html' -%}
@@ -273,8 +273,8 @@
                 {% endif %}
                 {% if tracked_metrics and tracked_metrics_history %}
                     <td>
-                        {%- set performance_window_name = "performanceWindow-" + resultsloop.index | string + "-" + test_package -%}
-                        {%- set performance_chart_name = "performanceChart-" + resultsloop.index | string + "-" + test_package -%}
+                        {%- set performance_window_name = "performanceWindow-" + i + "-" + test_package -%}
+                        {%- set performance_chart_name = "performanceChart-" + i + "-" + test_package -%}
                         <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                         {% with performance_window_scope="test_group" -%}
                             {%- include 'performance_history_tab.html' -%}

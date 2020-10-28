@@ -31,10 +31,12 @@
                         let dataset
                         {% for tracked_metric in tracked_metrics %}
                             options = { "title": { "display": true, "text": "{{ tracked_metrics[tracked_metric]['name'] }} per build ({{ tracked_metrics[tracked_metric]['displaying_unit'] }})" }}
-                            labels = []
-                            {% for build_number, value in tracked_metrics_history | dictsort %}
-                                labels.push("Build #{{ build_number }}")
-                            {% endfor %}
+                            labels = [
+                                {% for build_number, value in tracked_metrics_history | dictsort %}
+                                    "Build #{{ build_number }}"{{ "," if not loop.last }}
+                                {% endfor %}
+                            ]
+
                             dataset = {}
                             dataset.label = "{{ test_package }}"
                             dataset.borderColor = colors[nextColorIndex]

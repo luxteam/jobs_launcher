@@ -386,7 +386,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
         for platform in tracked_metrics_data:
             tracked_metrics_summary = {}
             for tracked_metric in tracked_metrics:
-                groups = tracked_metrics_data[basename]['groups']
+                groups = tracked_metrics_data[platform]['groups']
                 metric_summary = 0
                 number = 0
                 for test_group in groups:
