@@ -94,5 +94,5 @@ if __name__ == '__main__':
             if result:
                 break
         except Exception as e:
-            main_logger.error("MINIO Client creation error: {}".format(e))
+            main_logger.error("Failed iteration of progress monitor: {}".format(e))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
