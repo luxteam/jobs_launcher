@@ -2,6 +2,8 @@ import os
 import json
 import time
 import argparse
+import hashlib
+
 from image_service_client import ISClient
 from ums_client import create_ums_client
 from minio_client import create_mc_client
@@ -26,12 +28,38 @@ try:
         login=os.getenv("IS_LOGIN"),
         password=os.getenv("IS_PASSWORD")
     )
+    main_logger.info("Image Service client created for url: {}".format(is_client.url))
 except Exception as e:
-    main_logger.error("Can't create Image Service client")
+    main_logger.error("Can't create Image Service client for url: {}. Error: {}".format(is_client.url, str(e)))
+
+
+def render_color_full_path(session_dir, suite_name, render_color_path):
+    return os.path.realpath(os.path.join(session_dir, suite_name, render_color_path))
+
+
+def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
+    cases_hashes_info = {}
+    cases_hashes = {}
+    for case in test_cases:
+        with open(os.path.join(session_dir, suite_name, case + '_RPR.json')) as case_file:
+            case_file_data = json.load(case_file)[0]
+            with open(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path']), 'rb') as img:
+                bytes_data = img.read()
+                cases_hashes[case] = hashlib.md5(bytes_data).hexdigest()
+
+    hash_info_from_is = is_client.get_existence_info_by_hash(
+        [case_hash for case, case_hash in cases_hashes.items() if case_hash]
+    )
+    if hash_info_from_is:
+        cases_hashes_info = {
+            case: hash_info_from_is[case_hash]
+            for case, case_hash in cases_hashes.items() if case_hash in hash_info_from_is
+        }
+    return cases_hashes_info
 
 
 def send_finished_cases(session_dir, suite_name):
-    
+
 
     if os.path.exists(os.path.join(session_dir, suite_name, 'test_cases.json')):
         test_cases_path = os.path.join(session_dir, suite_name, 'test_cases.json')
@@ -54,6 +82,9 @@ def send_finished_cases(session_dir, suite_name):
         name_key = 'name'
     new_test_cases = {tc[name_key]: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done', 'passed') and not tc[name_key] in transferred_test_cases}
 
+    new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
+    print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
+
     if ums_client_prod:
         ums_client_prod.get_suite_id_by_name(suite_name)
         minio_client_prod.upload_file(test_cases_path, ums_client_prod.build_id, ums_client_prod.suite_id)
@@ -64,9 +95,18 @@ def send_finished_cases(session_dir, suite_name):
         print('Sending artefacts & images for: {}'.format(test_case))
         with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json')) as case_file:
             case_file_data = json.load(case_file)[0]
-            image_id = is_client.send_image(os.path.realpath(os.path.join(session_dir, suite_name, case_file_data['render_color_path']))) if is_client else -1
+
+            if test_case in new_cases_existence_hashes_info and \
+                    new_cases_existence_hashes_info[test_case] and \
+                    'id' in new_cases_existence_hashes_info[test_case]:
+                image_id = new_cases_existence_hashes_info[test_case]['id']
+                print("Use id found by hash for case: {} id: {}".format(test_case, image_id))
+            else:
+                image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
+                    'render_color_path'])) if is_client else -1
+                print("Upload new image for case: {} and get image id: {}".format(test_case, image_id))
             case_file_data['image_service_id'] = image_id
-            
+
         with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json'), 'w') as case_file:
             json.dump([case_file_data], case_file, indent=4, sort_keys=True)
 
