@@ -292,7 +292,7 @@
             <td>
                 {%- set performance_window_name = "performanceWindow-" + platform + "-" + common_info.test_group + "-" + item.test_case -%}
                 {%- set performance_chart_name = "performanceChart-" + platform + "-" + common_info.test_group + "-" + item.test_case -%}
-                <button class="commonButton popupButton" type="button" onclick="openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                 {% with performance_window_scope="test_case", test_group=common_info.test_group, test_case=item.test_case -%}
                     {%- include 'performance_history_tab.html' -%}
                 {%- endwith %}

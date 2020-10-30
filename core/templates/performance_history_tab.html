@@ -3,13 +3,24 @@
         <form class="popupForm">
             <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{{ performance_window_name }}');return false;"><img src="{{ pre_path }}/report_resources/img/close-button.png"/></button>
         </form>
-        <div class="performance_tab" style="position: relative; height:720px; width:1280px; margin:auto;">
+        <div class="performance_tab" style="position: relative; width:1280px; margin:auto;">
+            {% if tracked_metrics | length > 1 %}
+                <div class="performance_tab" style="height:50px; width:1280px;">
+                    <form class="popupForm">
+                        {#- Generate button for each metric -#}
+                            {% for tracked_metric in tracked_metrics | reverse %}
+                                <button class="commonButton closePopup" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ tracked_metric }}');return false;">{{ tracked_metrics[tracked_metric]['name'] }}</button>
+                            {% endfor %}
+                    </form>
+                </div>
+            {% endif %}
             <div class="performance_tab" style="height:50px; width:1280px;">
                 <form class="popupForm">
-                    {#- Generate button for each metric -#}
-                    {% for tracked_metric in tracked_metrics | reverse %}
-                        <button class="commonButton closePopup" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ tracked_metric }}');return false;">{{ tracked_metrics[tracked_metric]['name'] }}</button>
-                    {% endfor %}
+                    <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 10);return false;">Show last 10</button>
+                    <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 50);return false;">Show last 50</button>
+                    <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 100);return false;">Show last 100</button>
+                    <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 200);return false;">Show last 200</button>
+                    <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', -1);return false;">Show all</button>
                 </form>
             </div>
             <div class="performance_tab" style="height:670px; width:1280px;">
