@@ -7,7 +7,7 @@ try:
     from minio import Minio
 except Exception as ex:
     try:
-        subprocess.call([sys.executable, "-m", "pip", "install", "Minio"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "--user", "Minio"])
         from minio import Minio
     except Exception as e:
         print(e)
