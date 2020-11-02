@@ -309,16 +309,20 @@ def build_summary_report(work_dir, node_retry_info):
                                             if key == 'reporting_date':
                                                 if common_info.get(key, [''])[0] > temp_report['machine_info'][key]:
                                                     common_info[key] = [temp_report['machine_info'][key]]
-                                            elif key == 'render_version':
+                                            elif key == 'render_version' and temp_report['machine_info'][key]:
                                                 common_info[key].append(temp_report['machine_info'][key])
-                                                rc = -5
+                                                if len(common_info[key]) > 1:
+                                                    rc = -5
                                             else:
                                                 common_info[key].append(temp_report['machine_info'][key])
                                 else:
                                     common_info.update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
 
                                     if report_type != 'ec':
-                                        common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
+                                        if temp_report['machine_info']['render_version']:
+                                            common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
+                                        else:
+                                            common_info.update({'render_version': []})
                                     else:
                                         common_info.update({'minor_version': [temp_report['machine_info']['minor_version']]})
                                     common_info.update({'core_version': [temp_report['machine_info']['core_version']]})
