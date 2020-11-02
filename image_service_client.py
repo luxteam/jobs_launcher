@@ -24,6 +24,7 @@ class ISClient:
         if response.status_code == 404:
             raise RequestException("Cant connect image service. Check url")
         content = response.content.decode("utf-8")
+        main_logger.info("Content: {}".format(content))
         if 'error' in content:
             raise RequestException('Check login and password')
         token = json.loads(content)["token"]
