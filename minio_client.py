@@ -2,6 +2,7 @@ import os
 from core.config import main_logger
 import subprocess
 import sys
+import traceback
 try:
     from minio import Minio
 except Exception as ex:

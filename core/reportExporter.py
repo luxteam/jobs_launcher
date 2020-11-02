@@ -327,6 +327,11 @@ def build_summary_report(work_dir, node_retry_info):
                                     for group_report_file in REPORT_FILES:
                                         if group_report_file in jtem.keys():
                                             jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
+                                    for message in jtem.get('message', []):
+                                        if 'Unacceptable time difference' in message:
+                                            main_logger.error(test_package)
+                                            temp_report['results'][test_package][test_conf].update(
+                                                {'status': GROUP_TIMEOUT})
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
                                         os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
