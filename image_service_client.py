@@ -15,6 +15,8 @@ class ISClient:
         self.get_token()
 
     def get_token(self):
+        main_logger.info("Login: {}".format(self.login))
+        main_logger.info("Password: {}".format(self.password))
         response = post(
             url="{url}/api/login".format(url=self.url),
             auth=HTTPBasicAuth(self.login, self.password),
