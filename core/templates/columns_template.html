@@ -445,7 +445,7 @@
             <td>
                 {%- if item.core_scene_configuration != 'not.exist' -%}
                     {%- if template_name == 'local' -%}
-                        <a href="cfg_{{ item.core_scene_configuration }}.json" download>Scene configuration</a>
+                        <a href="cfg_{{ item.core_scene_configuration }}" download>Scene configuration</a>
                     {%- elif template_name == 'detailed' -%}
                         <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.core_scene_configuration }}" download>Scene configuration</a>
                     {%- endif -%}
