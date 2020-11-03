@@ -126,10 +126,7 @@
                 {%- endfor -%}
             </td>
         {%- elif report_type == 'ec' -%}
-            <td class="infoColumn
-            {%- if item.difference_time > 5 -%}
-               {{ ' ' }}timeDiffFailedStatus
-            {%- endif -%} {{ ' ' }} {{ item.test_status }}Status">
+            <td class="infoColumn {{ item.test_status }}Status">
                 <b>Test status:</b> {{ item.test_status }}<br/>
                 <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
                 <b>Scene:</b> {{ item.scene_name }}<br/>
@@ -166,7 +163,11 @@
     {%- if is_head -%}
         <th data-field="test_status_new" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Test case status</th>
     {%- else -%}
-        <td class="infoColumn {{ item.test_status }}Status">
+        <td class="infoColumn {{ item.test_status }}Status
+            {% if 'Unacceptable time difference' in item.message -%}
+                perf_leak
+            {%- endif -%}
+            ">
             <b>
             {%- if report_type == 'default' -%}
                 {%- if item.difference_color_2 != 0 -%}

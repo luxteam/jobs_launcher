@@ -312,16 +312,20 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                                             if key == 'reporting_date':
                                                 if common_info.get(key, [''])[0] > temp_report['machine_info'][key]:
                                                     common_info[key] = [temp_report['machine_info'][key]]
-                                            elif key == 'render_version':
+                                            elif key == 'render_version' and temp_report['machine_info'][key]:
                                                 common_info[key].append(temp_report['machine_info'][key])
-                                                rc = -5
+                                                if len(common_info[key]) > 1:
+                                                    rc = -5
                                             else:
                                                 common_info[key].append(temp_report['machine_info'][key])
                                 else:
                                     common_info.update({'reporting_date': [temp_report['machine_info']['reporting_date']]})
 
                                     if report_type != 'ec':
-                                        common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
+                                        if temp_report['machine_info']['render_version']:
+                                            common_info.update({'render_version': [temp_report['machine_info']['render_version']]})
+                                        else:
+                                            common_info.update({'render_version': []})
                                     else:
                                         common_info.update({'minor_version': [temp_report['machine_info']['minor_version']]})
                                     common_info.update({'core_version': [temp_report['machine_info']['core_version']]})
@@ -330,6 +334,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                                     for group_report_file in REPORT_FILES:
                                         if group_report_file in jtem.keys():
                                             jtem.update({group_report_file: os.path.relpath(os.path.join(work_dir, basepath, jtem[group_report_file]), work_dir)})
+
                                     # collect tracked metrics for test cases
                                     if collect_tracked_metrics:
                                         for tracked_metric in tracked_metrics:
@@ -345,6 +350,13 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                                                 if test_case not in groups[test_package]['metrics']:
                                                     groups[test_package]['metrics'][test_case] = {}
                                                 groups[test_package]['metrics'][test_case][tracked_metric] = jtem[tracked_metric]
+
+                                    for message in jtem.get('message', []):
+                                        if 'Unacceptable time difference' in message:
+                                            main_logger.error(test_package)
+                                            temp_report['results'][test_package][test_conf].update(
+                                                {'status': GROUP_TIMEOUT})
+
                                 temp_report['results'][test_package][test_conf].update(
                                     {'result_path': os.path.relpath(
                                         os.path.join(work_dir, basepath, temp_report['results'][test_package][test_conf]['result_path']),
