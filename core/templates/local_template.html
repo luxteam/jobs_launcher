@@ -8,6 +8,12 @@
 
 {% include "images_compare_block.html" %}
 
+{% if tracked_metrics_history %}
+    {% set show_tracked_metrics_column = 'true' %}
+{% else %}
+    {% set show_tracked_metrics_column = 'false' %}
+{% endif %}
+
 {% if report_type == 'default' %}
     {%
     set template_columns = [
@@ -43,7 +49,7 @@
         {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false', 'name': 'render_time'},
         {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'true',  'data_visible': 'false', 'name': 'baseline_render_time'},
         {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'false', 'data_visible': 'false', 'name': 'render_log'},
-        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'false', 'data_visible': 'true',  'name': 'performance_history'}
+        {'data_halign': 'center', 'data_valign': 'middle', 'data_sortable': 'false', 'data_visible': show_tracked_metrics_column,  'name': 'performance_history'}
     ] 
     %}
 {% elif report_type == 'ct' %}
