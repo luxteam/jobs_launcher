@@ -449,6 +449,8 @@
                     {%- elif template_name == 'detailed' -%}
                         <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.core_scene_configuration }}" download>Scene configuration</a>
                     {%- endif -%}
+                {%- else -%}
+                    None
                 {%- endif -%}
             </td>
         {%- endif -%}
