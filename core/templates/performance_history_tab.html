@@ -21,6 +21,7 @@
                     <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 100);return false;">Show last 100</button>
                     <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 200);return false;">Show last 200</button>
                     <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', -1);return false;">Show all</button>
+                    <button class="commonButton closePopup" style="margin-left: 40px" type="button" onclick="downloadCSV('{{ performance_chart_name }}');return false;">Download CSV</button>
                 </form>
             </div>
             <div class="performance_tab" style="height:670px; width:1280px;">
