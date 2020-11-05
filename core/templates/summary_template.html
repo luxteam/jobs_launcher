@@ -1,6 +1,10 @@
 {% extends "base_template.html"%}
 
 {% block report_body %}
+{% if tracked_metrics_history %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="{{ pre_path }}/report_resources/js/performance-history.js"></script>
+{% endif %}
 <h1>info</h1>
 
 <div class="jsTableWrapper">
@@ -11,6 +15,9 @@
         <thead>
             <tr>
                 <th>Job Name</th>
+                {% if tracked_metrics_history %}
+                    <th>Performance</th>
+                {% endif %}
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed
@@ -51,6 +58,16 @@
                     "Job name"
                     {% endif %}
                 </td>
+                {% if tracked_metrics and tracked_metrics_history %}
+                    <td>
+                        {%- set performance_window_name = "performanceWindow-" + i | string -%}
+                        {%- set performance_chart_name = "performanceChart-" + i | string -%}
+                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        {% with performance_window_scope="platform" -%}
+                            {%- include 'performance_history_tab.html' -%}
+                        {%- endwith %}
+                    </td>
+                {% endif %}
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>
                 <td
@@ -115,6 +132,9 @@
                     <th>Tool's log</th>
                 {% endif %}
                 <th>Engine log</th>
+                {% if tracked_metrics_history %}
+                    <th>Performance</th>
+                {% endif %}
                 <th>Total</th>
                 <th>Passed</th>
                 <th>Failed
@@ -255,6 +275,16 @@
                 <td>Render Log</td>
                 <td>Engine log</td>
                 {% endif %}
+                {% if tracked_metrics and tracked_metrics_history %}
+                    <td>
+                        {%- set performance_window_name = "performanceWindow-" + i + "-" + test_package -%}
+                        {%- set performance_chart_name = "performanceChart-" + i + "-" + test_package -%}
+                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        {% with performance_window_scope="test_group" -%}
+                            {%- include 'performance_history_tab.html' -%}
+                        {%- endwith %}
+                    </td>
+                {% endif %}
                 <td>{{ report[i].results[test_package][test_conf].total }}</td>
                 <td>{{ report[i].results[test_package][test_conf].passed }}</td>
 
@@ -312,12 +342,15 @@
         {% endfor %}
 
             <tr class="summary_tr">
-                <td
-                {% if report_type == 'ct' %}
-                    colspan="4"
-                {% else %}
-                    colspan="5"
+                {% set colspan = 4 %}
+                {% if report_type != 'ct' %}
+                    {% set colspan = colspan + 1 %}
                 {% endif %}
+                {% if tracked_metrics_history %}
+                    {% set colspan = colspan + 1 %}
+                {% endif %}
+                <td
+                    colspan="{{ colspan }}"
                 >Sum</td>
                 <td>{{ report[i].summary.total }}</td>
                 <td>{{ report[i].summary.passed }}</td>

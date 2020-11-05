@@ -99,7 +99,7 @@ table.baseTable {
   border: 1px solid #949494;
   text-align: center;
 }
-.summary_tr td {
+.summary_tr td, .performance_tab {
   background-color: rgba(222, 222, 222, 1);
 }
 
@@ -261,6 +261,10 @@ a {
 
 .localReportTable img{
   width: 300px;
+}
+
+.localReportTable .closePopup img {
+    width: 1vw;
 }
 
 .infoColumn {
