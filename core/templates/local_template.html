@@ -1,8 +1,18 @@
 {% extends "base_template.html"%}
 
 {% block report_body %}
+{% if tracked_metrics_history %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="{{ pre_path }}/report_resources/js/performance-history.js"></script>
+{% endif %}
 
 {% include "images_compare_block.html" %}
+
+{% if tracked_metrics_history %}
+    {% set show_tracked_metrics_column = 'true' %}
+{% else %}
+    {% set show_tracked_metrics_column = 'false' %}
+{% endif %}
 
 {% if report_type == 'default' %}
     {%
