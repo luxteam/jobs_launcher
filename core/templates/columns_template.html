@@ -130,6 +130,9 @@
                 <b>Test status:</b> {{ item.test_status }}<br/>
                 <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
                 <b>Scene:</b> {{ item.scene_name }}<br/>
+                {%- if item.core_scene_configuration != 'not.exist' -%}
+                    <b>Scene conf.:</b> <a class="highlightedLink" href="{{ item.core_scene_configuration }}">OPEN</a> <a class="highlightedLink" href="{{ item.core_scene_configuration }}" download>DOWNLOAD</a><br/>
+                {%- endif -%}
                 <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                 <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
                 <b>GPU memory usage:</b> {{ item.gpu_memory_usage }}<br/>
@@ -140,14 +143,6 @@
                 <b>Width:</b> {{ item.width }}<br/>
                 <b>Height:</b> {{ item.height }}<br/>
                 <b>Iterations:</b> {{ item.iterations }}
-                {%- if item.core_scene_configuration != 'not.exist' -%}
-                    <br/>
-                    {%- if template_name == 'local' -%}
-                        <b>Scene configuration:</b> <a href="{{ item.core_scene_configuration }}" download>click to download</a><br/>
-                    {%- elif template_name == 'detailed' -%}
-                        <b>Scene configuration:</b> <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.core_scene_configuration }}" download>click to download</a><br/>
-                    {%- endif -%}
-                {%- endif -%}
             </td>
         {%- endif -%}
     {%- endif -%}
