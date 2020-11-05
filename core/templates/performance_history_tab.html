@@ -92,7 +92,6 @@
                                 {%- endif -%}
                             {%- endfor -%}
                             ]
-                            console.log(labels)
 
                             performanceCharts[currentChart].renderData["{{ tracked_metric }}"] = { "labels": labels, "datasets": [ dataset ] }
                             performanceCharts[currentChart].optionsData["{{ tracked_metric }}"] = options

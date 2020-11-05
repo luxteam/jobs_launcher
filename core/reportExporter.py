@@ -16,6 +16,7 @@ import sys
 import traceback
 import re
 from glob import glob
+from collections import OrderedDict
 from core.countLostTests import PLATFORM_CONVERTATIONS
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 
@@ -681,7 +682,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         common_info.update({'commit_message': commit_message})
         common_info.update({'engine': engine})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
-        tracked_metrics_history = {}
+        tracked_metrics_history = OrderedDict()
         if build_number:
             try:
                 tracked_metrics_file_path = os.path.join(work_dir, TRACKED_METRICS_LOCATION_NAME)
@@ -692,7 +693,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                 main_logger.error("Can't save tracked metrics data: {}".format(str(e)))
                 main_logger.error("Traceback: {}".format(traceback.format_exc()))
             try:
-                tracked_metrics_files = sorted(glob(os.path.join(tracked_metrics_file_path ,'*.json')), key=lambda x: int(os.path.splitext(x)[0].split('_')[-1]))
+                tracked_metrics_files = sorted(glob(os.path.join(tracked_metrics_file_path ,'*.json')), key=lambda x: int(os.path.splitext(x)[0].split('_')[-1]), reverse=True)
                 for i in range(tracked_metrics_files_number):
                     if i == len(tracked_metrics_files):
                         break
@@ -700,10 +701,10 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                         tracked_metrics_file_data = json.load(tracked_metrics_file) 
                     file_build_number = re.search(r'\d+', tracked_metrics_files[i].split(os.path.sep)[-1]).group(0)
                     tracked_metrics_history[file_build_number] = tracked_metrics_file_data
+                tracked_metrics_history = OrderedDict(reversed(list(tracked_metrics_history.items())))
             except Exception as e:
                 main_logger.error("Can't collect history of tracked metrics: {}".format(str(e)))
                 main_logger.error("Traceback: {}".format(traceback.format_exc()))
-                raise e
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",
