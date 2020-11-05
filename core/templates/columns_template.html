@@ -141,6 +141,7 @@
                 <b>Height:</b> {{ item.height }}<br/>
                 <b>Iterations:</b> {{ item.iterations }}
                 {%- if item.core_scene_configuration != 'not.exist' -%}
+                    <br/>
                     {%- if template_name == 'local' -%}
                         <b>Scene configuration:</b> <a href="{{ item.core_scene_configuration }}" download>click to download</a><br/>
                     {%- elif template_name == 'detailed' -%}
