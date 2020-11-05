@@ -140,6 +140,13 @@
                 <b>Width:</b> {{ item.width }}<br/>
                 <b>Height:</b> {{ item.height }}<br/>
                 <b>Iterations:</b> {{ item.iterations }}
+                {%- if item.core_scene_configuration != 'not.exist' -%}
+                    {%- if template_name == 'local' -%}
+                        <b>Scene configuration:</b> <a href="{{ item.core_scene_configuration }}" download>click to download</a><br/>
+                    {%- elif template_name == 'detailed' -%}
+                        <b>Scene configuration:</b> <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.core_scene_configuration }}" download>click to download</a><br/>
+                    {%- endif -%}
+                {%- endif -%}
             </td>
         {%- endif -%}
     {%- endif -%}
@@ -424,34 +431,6 @@
                     <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ config.REPORT_RPR_LOG }}">RPR Log</a>
                 {%- endif -%}
 
-            </td>
-        {%- endif -%}
-    {%- endif -%}
-{%- endif -%}
-
-
-
-
-{#- ****************************** FILES ****************************** -#}
-{#- ------------------------------ SCRIPTS AND CONFIGURATION ------------------------------ -#}
-{%- if column.name == 'scripts_and_configuration' -%}
-    {%- if is_head -%}
-        <th data-field="render_log" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Scripts and configuration</th>
-    {%- else -%}
-        {%- if report_type == 'default' -%}
-            <td>
-            </td>
-        {%- elif report_type == 'ec' -%}
-            <td>
-                {%- if item.core_scene_configuration != 'not.exist' -%}
-                    {%- if template_name == 'local' -%}
-                        <a href="{{ item.core_scene_configuration }}" download>Scene configuration</a>
-                    {%- elif template_name == 'detailed' -%}
-                        <a href="{{ report[i].results[test_package][test_conf].result_path }}/{{ item.core_scene_configuration }}" download>Scene configuration</a>
-                    {%- endif -%}
-                {%- else -%}
-                    None
-                {%- endif -%}
             </td>
         {%- endif -%}
     {%- endif -%}
