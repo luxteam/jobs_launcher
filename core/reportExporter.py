@@ -692,7 +692,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                 main_logger.error("Can't save tracked metrics data: {}".format(str(e)))
                 main_logger.error("Traceback: {}".format(traceback.format_exc()))
             try:
-                tracked_metrics_files = sorted(glob(os.path.join(tracked_metrics_file_path ,'*.json')), reverse=True)
+                tracked_metrics_files = sorted(glob(os.path.join(tracked_metrics_file_path ,'*.json')), key=lambda x: int(os.path.splitext(x)[0].split('_')[-1]))
                 for i in range(tracked_metrics_files_number):
                     if i == len(tracked_metrics_files):
                         break
@@ -703,6 +703,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             except Exception as e:
                 main_logger.error("Can't collect history of tracked metrics: {}".format(str(e)))
                 main_logger.error("Traceback: {}".format(traceback.format_exc()))
+                raise e
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",

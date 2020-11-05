@@ -44,7 +44,7 @@
                         {% for tracked_metric in tracked_metrics %}
                             options = { "title": { "display": true, "text": "{{ tracked_metrics[tracked_metric]['name'] }} per build ({{ tracked_metrics[tracked_metric]['displaying_unit'] }})" }}
                             labels = [
-                                {% for build_number, value in tracked_metrics_history | dictsort %}
+                                {% for build_number in tracked_metrics_history %}
                                     "Build #{{ build_number }}"{{ "," if not loop.last }}
                                 {% endfor %}
                             ]
@@ -55,7 +55,7 @@
                             nextColorIndex = (nextColorIndex + 1) % colors.length
 
                             dataset.data = [
-                            {%- for build_number, value in tracked_metrics_history | dictsort -%}
+                            {%- for build_number in tracked_metrics_history -%}
                                 {%- if performance_window_scope == "platform" -%}
                                     {% if i in tracked_metrics_history[build_number] -%}
                                         {%- set platform = tracked_metrics_history[build_number][i] -%}
@@ -92,6 +92,7 @@
                                 {%- endif -%}
                             {%- endfor -%}
                             ]
+                            console.log(labels)
 
                             performanceCharts[currentChart].renderData["{{ tracked_metric }}"] = { "labels": labels, "datasets": [ dataset ] }
                             performanceCharts[currentChart].optionsData["{{ tracked_metric }}"] = options
