@@ -352,7 +352,7 @@ def main():
                     send_try = 0
                     while send_try < MAX_UMS_SEND_RETRIES:
                         response_prod = ums_client_prod.send_test_suite_performance(data=performance_data, test_suite_result_id=test_suite_result_id_prod)
-                        main_logger.info('Test suite performance sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
+                        main_logger.info('Test suite performance sent for {} to UMS PROD with code {} (try #{})'.format(test_suite_result_id_prod, response_prod.status_code, send_try))
                         main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
                         if response_prod and response_prod.status_code < 300:
                             break
@@ -378,7 +378,7 @@ def main():
                     send_try = 0
                     while send_try < MAX_UMS_SEND_RETRIES:
                         response_dev = ums_client_dev.send_test_suite_performance(data=performance_data, test_suite_result_id=test_suite_result_id_dev)
-                        main_logger.info('Test suite performance sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
+                        main_logger.info('Test suite performance sent for {} to UMS DEV with code {} (try #{})'.format(test_suite_result_id_dev, response_dev.status_code, send_try))
                         main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
                         if response_dev and response_dev.status_code < 300:
                             break
