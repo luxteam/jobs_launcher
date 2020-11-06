@@ -331,6 +331,7 @@ def main():
 
                 #  collect performance data
                 performance_data = {'setup_time': events_data, 'sync_time': summary_sync_time}
+                main_logger.info("Generated performance data:\n{}".format(json.dumps(performance_data, indent=2)))
 
 
                 send_try = 0
