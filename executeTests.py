@@ -333,26 +333,33 @@ def main():
                 performance_data = {'setup_time': events_data, 'sync_time': summary_sync_time}
                 main_logger.info("Generated performance data:\n{}".format(json.dumps(performance_data, indent=2)))
 
-
+                test_suite_result_id_prod = None
+                test_suite_result_id_dev = None
                 send_try = 0
                 while send_try < MAX_UMS_SEND_RETRIES:
                     response_prod = ums_client_prod.send_test_suite(res=res, env=env)
                     main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
                     main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
                     if response_prod and response_prod.status_code < 300:
+                        response_data = json.loads(response.content.decode("utf-8"))
+                        if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
+                            test_suite_result_id_prod = response_data['data']['test_suite_result_id']
                         break
                     send_try += 1
                     time.sleep(UMS_SEND_RETRY_INTERVAL)
 
-                send_try = 0
-                while send_try < MAX_UMS_SEND_RETRIES:
-                    response_prod = ums_client_prod.send_test_suite_performance(data=performance_data)
-                    main_logger.info('Test suite performance sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
-                    main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
-                    if response_prod and response_prod.status_code < 300:
-                        break
-                    send_try += 1
-                    time.sleep(UMS_SEND_RETRY_INTERVAL)
+                if test_suite_result_id_prod:
+                    send_try = 0
+                    while send_try < MAX_UMS_SEND_RETRIES:
+                        response_prod = ums_client_prod.send_test_suite_performance(data=performance_data, test_suite_result_id=test_suite_result_id_prod)
+                        main_logger.info('Test suite performance sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
+                        main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
+                        if response_prod and response_prod.status_code < 300:
+                            break
+                        send_try += 1
+                        time.sleep(UMS_SEND_RETRY_INTERVAL)
+                else:
+                    main_logger.info("UMS client did not set. Result won't be sent to UMS PROD")
 
                 send_try = 0
                 while send_try < MAX_UMS_SEND_RETRIES:
@@ -360,19 +367,25 @@ def main():
                     main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
                     main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
                     if response_dev and response_dev.status_code < 300:
+                        response_data = json.loads(response.content.decode("utf-8"))
+                        if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
+                            test_suite_result_id_dev = response_data['data']['test_suite_result_id']
                         break
                     send_try += 1
                     time.sleep(UMS_SEND_RETRY_INTERVAL)
 
-                send_try = 0
-                while send_try < MAX_UMS_SEND_RETRIES:
-                    response_dev = ums_client_dev.send_test_suite_performance(data=performance_data)
-                    main_logger.info('Test suite performance sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
-                    main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
-                    if response_dev and response_dev.status_code < 300:
-                        break
-                    send_try += 1
-                    time.sleep(UMS_SEND_RETRY_INTERVAL)
+                if test_suite_result_id_dev:
+                    send_try = 0
+                    while send_try < MAX_UMS_SEND_RETRIES:
+                        response_dev = ums_client_dev.send_test_suite_performance(data=performance_data, test_suite_result_id=test_suite_result_id_dev)
+                        main_logger.info('Test suite performance sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
+                        main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
+                        if response_dev and response_dev.status_code < 300:
+                            break
+                        send_try += 1
+                        time.sleep(UMS_SEND_RETRY_INTERVAL)
+                else:
+                    main_logger.info("UMS client did not set. Result won't be sent to UMS DEV")
 
             shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 

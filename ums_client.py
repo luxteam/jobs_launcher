@@ -135,14 +135,14 @@ class UMS_Client:
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
-    def send_test_suite_performance(self, data):
+    def send_test_suite_performance(self, data, test_suite_result_id):
         try:
             response = put(
                 headers=self.headers,
                 json=data,
-                url="{url}/api/testSuitePerformance?id={suite_id}&productId={product_id}".format(
+                url="{url}/api/testSuitePerformance?id={id}&productId={product_id}".format(
                     url=self.url,
-                    suite_id=self.suite_id,
+                    id=test_suite_result_id,
                     product_id=self.job_id
                 )
             )
