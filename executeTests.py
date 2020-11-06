@@ -341,7 +341,7 @@ def main():
                     main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
                     main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
                     if response_prod and response_prod.status_code < 300:
-                        response_data = json.loads(response.content.decode("utf-8"))
+                        response_data = json.loads(response_prod.content.decode("utf-8"))
                         if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
                             test_suite_result_id_prod = response_data['data']['test_suite_result_id']
                         break
@@ -367,7 +367,7 @@ def main():
                     main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
                     main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
                     if response_dev and response_dev.status_code < 300:
-                        response_data = json.loads(response.content.decode("utf-8"))
+                        response_data = json.loads(response_dev.content.decode("utf-8"))
                         if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
                             test_suite_result_id_dev = response_data['data']['test_suite_result_id']
                         break
