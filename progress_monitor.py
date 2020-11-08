@@ -125,14 +125,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     check = 1
+    fails_in_succession = 0
     while True:
         try:
             time.sleep(args.interval)
             print('Check number {}'.format(check))
             check += 1
             result = send_finished_cases(args.session_dir, args.suite_name)
+            fails_in_succession = 0
             if result:
                 break
         except Exception as e:
+            fails_in_succession += 1
             main_logger.error("Failed iteration of progress monitor: {}".format(e))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
+        if MAX_UMS_SEND_RETRIES == fails_in_succession:
+            break
