@@ -84,14 +84,14 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
         else:
             core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], baseline_json['render_color_path'])))
 
-        if 'thumb256_render_color_path' in baseline_json
+        if 'thumb256_render_color_path' in baseline_json:
             thumb256_baseline_img_path = os.path.join(
                 base_dir, img['test_group'], baseline_json['thumb256_render_color_path'])
             if os.path.exists(thumb256_baseline_img_path):
                 img.update({'thumb256_render_color_path': os.path.relpath(thumb256_baseline_img_path, work_dir)})
             else:
                 core.config.main_logger.warning("Can't find {}".format(os.path.join(base_dir, img['test_group'], baseline_json['thumb256_render_color_path'])))
-        if 'thumb64_render_color_path' in baseline_json
+        if 'thumb64_render_color_path' in baseline_json:
             thumb64_baseline_img_path = os.path.join(
                 base_dir, img['test_group'], baseline_json['thumb64_render_color_path'])
             if os.path.exists(thumb64_baseline_img_path):
