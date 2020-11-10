@@ -243,8 +243,6 @@ def main():
             main_logger.info("Try to create Develop MINIO client")
             mc_dev = create_mc_client(ums_client_dev.job_id)
 
-        res = []
-
         try:
             main_logger.info('Start preparing results')
             cases = []
@@ -255,6 +253,7 @@ def main():
                 suites = data["results"]
 
             for suite_name, suite_result in suites.items():
+                res = []
                 cases = suite_result[""]["render_results"]
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
