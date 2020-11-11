@@ -59,7 +59,7 @@
                                 {%- if performance_window_scope == "platform" -%}
                                     {% if i in tracked_metrics_history[build_number] -%}
                                         {%- set platform = tracked_metrics_history[build_number][i] -%}
-                                        {%- if tracked_metric in platform['summary'] -%}
+                                        {%- if tracked_metric in platform['summary'] and platform['summary'][tracked_metric] != 0 -%}
                                             "{{ platform['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
                                         {%- else -%}
                                             null{{ "," if not loop.last }}
@@ -70,7 +70,7 @@
                                 {%- elif performance_window_scope == "test_group" -%}
                                     {% if i in tracked_metrics_history[build_number] and test_package in tracked_metrics_history[build_number][i]['groups'] -%}
                                         {%- set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] -%}
-                                        {%- if tracked_metric in test_group['summary'] -%}
+                                        {%- if tracked_metric in test_group['summary'] and test_group['summary'][tracked_metric] != 0 -%}
                                             "{{ test_group['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
                                         {%- else -%}
                                             null{{ "," if not loop.last }}
@@ -81,7 +81,7 @@
                                 {%- elif performance_window_scope == "test_case" -%}
                                     {% if platform in tracked_metrics_history[build_number] and test_group in tracked_metrics_history[build_number][platform]['groups'] and test_case in tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'] -%}
                                         {%- set test_case_data = tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'][test_case] -%}
-                                        {%- if tracked_metric in test_case_data -%}
+                                        {%- if tracked_metric in test_case_data and test_case_data[tracked_metric] != 0 -%}
                                             "{{ test_case_data[tracked_metric] | round(3) }}"{{ "," if not loop.last }}
                                         {%- else -%}
                                             null{{ "," if not loop.last }}
