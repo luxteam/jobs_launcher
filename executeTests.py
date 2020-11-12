@@ -272,6 +272,11 @@ def main():
                                     data = json.load(file)[0]
                                     if 'image_service_id' in data:
                                         rendered_image = str(data['image_service_id'])
+
+                        case_info = {}
+                        for key in case:
+                            if key in UMS_POSSIBLE_INFO_FIELD:
+                                case_info[key] = case[key]
                                     
                         res.append({
                             'name': case['test_case'],
@@ -281,7 +286,8 @@ def main():
                             },
                             "artefacts": {
                                 "rendered_image": rendered_image
-                            }
+                            },
+                            "info": case_info
                         })
                         
                         path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
