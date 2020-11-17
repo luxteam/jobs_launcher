@@ -125,6 +125,19 @@
                     {{ param }}<br/>
                 {%- endfor -%}
             </td>
+        {%- elif report_type == 'perf' and tool_name == 'ml' -%}
+            <td class="infoColumn">
+                {%- if item.onnx -%}
+                    <b>ONNX file:</b> {{ item.onnx }}<br/>
+                {%- endif -%}
+                {%- if item.csv -%}
+                    <b>CSV file:</b> {{ item.csv }}<br/>
+                {%- endif -%}
+                {%- if item.bin -%}
+                    <b>BIN file:</b> {{ item.bin }}<br/>
+                {%- endif -%}
+                <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
+            </td>
         {%- elif report_type == 'ec' -%}
             <td class="infoColumn {{ item.test_status }}Status">
                 <b>Test status:</b> {{ item.test_status }}<br/>
@@ -314,14 +327,14 @@
 {%- if column.name == 'render_time' -%}
     {%- if is_head -%}
         <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">
-            {%- if report_type == 'default' or report_type == 'ec' -%}
+            {%- if report_type == 'default' or report_type == 'ec' or report_type == 'perf' -%}
                 Render time
             {%- elif report_type == 'ct' -%}
                 RPR render time
             {%- endif -%}
         </th>
     {%- else -%}
-        {%- if report_type == 'default' or report_type == 'ec' -%}
+        {%- if report_type == 'default' or report_type == 'ec' or report_type == 'perf' -%}
             <td>{{ item.render_time | round(3) }}</td>
         {%- elif report_type == 'ct' -%}
             <td>{{ item.render_time }}</td>
@@ -405,7 +418,7 @@
     {%- if is_head -%}
         <th data-field="render_log" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Log files</th>
     {%- else -%}
-        {%- if report_type == 'default' -%}
+        {%- if report_type == 'default' or report_type == 'perf' -%}
             <td>
                 {%- if 'render_log' in item -%}
                 <a href="{{ item.render_log }}">Render log</a>

@@ -64,6 +64,12 @@ body {
   color: #000;
   background: #fff;
 }
+#header .logo{
+  font-size:96px;
+}
+#header .logo:hover{
+  background-color: rgba(242, 242, 242, 1);
+}
 
 #footer{
   text-align: center;
