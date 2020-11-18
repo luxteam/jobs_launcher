@@ -15,12 +15,15 @@ class MetricsCollector:
         self.tracked_metrics_data = {}
         # list of all metrics which are tracked
         self.found_metrics = {}
+        # grouped lists of metrics (how they should be grouped on charts)
+        self.groupped_metrics = {}
 
     def collect_metrics_test_case(self, platform, test_package, item):
         try:
             tracked_metrics_config = self.tracked_metrics_config
             tracked_metrics_data = self.tracked_metrics_data
             found_metrics = self.found_metrics
+            groupped_metrics = self.groupped_metrics
             for tracked_metric in tracked_metrics_config:
                 if tracked_metric in item:
                     test_case = item['test_case']
@@ -46,6 +49,7 @@ class MetricsCollector:
                             tracked_metric_name = '{}_{}'.format(tracked_metrics_config[tracked_metric]['metric_name'], item[separation_field])
                         else:
                             tracked_metric_name = '{}_{}'.format(tracked_metric, item[separation_field])
+                        displaying_name = '{} ({})'.format(tracked_metrics_config[tracked_metric]['displaying_name'], item[separation_field])
                         if tracked_metric_name not in found_metrics:
                             # save metric name and its configuration for use it during calculation of summary of groups and platforms
                             found_metrics[tracked_metric_name] = {'name_in_config': tracked_metric, 'config': tracked_metrics_config[tracked_metric]}
@@ -54,11 +58,21 @@ class MetricsCollector:
                             tracked_metric_name = tracked_metrics_config[tracked_metric]['metric_name']
                         else:
                             tracked_metric_name = tracked_metric
+                    # add metric in groupped_metrics dict
+                    if tracked_metric not in groupped_metrics:
+                        groupped_metrics[tracked_metric] = {}
+                        groupped_metrics[tracked_metric]['metrics'] = {}
+                        groupped_metrics[tracked_metric]['config'] = tracked_metrics_config[tracked_metric]
+                    if tracked_metric_name not in groupped_metrics[tracked_metric]['metrics']:
+                        groupped_metrics[tracked_metric]['metrics'][tracked_metric_name] = {}
+                        groupped_metrics[tracked_metric]['metrics'][tracked_metric_name]['displaying_name'] = displaying_name
                     # get name of function which should be used for calculate value of tracked metric
                     fuction_name = tracked_metrics_config[tracked_metric]['function']
                     if fuction_name == 'match':
                         if re.match(tracked_metrics_config[tracked_metric]['pattern'], item[tracked_metric]):
                             groups[test_package]['metrics'][test_case][tracked_metric_name] = 1
+                        else:
+                            groups[test_package]['metrics'][test_case][tracked_metric_name] = 0
                     elif fuction_name == 'avrg' or fuction_name == 'sum':
                         groups[test_package]['metrics'][test_case][tracked_metric_name] = item[tracked_metric]
         except Exception as e:

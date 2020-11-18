@@ -530,7 +530,7 @@ def build_compare_report(summary_report):
     return compare_report, hardware
 
 
-def build_local_reports(work_dir, summary_report, common_info, jinja_env, tracked_metrics, tracked_metrics_history):
+def build_local_reports(work_dir, summary_report, common_info, jinja_env, groupped_tracked_metrics, tracked_metrics_history):
     work_dir = os.path.abspath(work_dir)
 
     template = jinja_env.get_template('local_template.html')
@@ -584,7 +584,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env, tracke
                                            render_report=render_report,
                                            pre_path=os.path.relpath(work_dir, os.path.join(work_dir, report_dir)),
                                            platform=execution,
-                                           tracked_metrics=tracked_metrics,
+                                           groupped_tracked_metrics=groupped_tracked_metrics,
                                            tracked_metrics_history=tracked_metrics_history)
                     save_html_report(html, os.path.join(work_dir, report_dir), 'report.html', replace_pathsep=True)
     except Exception as err:
@@ -792,16 +792,18 @@ def build_performance_reports(work_dir, major_title, commit_sha='undefined', bra
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
 
         tracked_metrics_history = OrderedDict()
+        groupped_tracked_metrics = {}
         if metrics_collector:
             metrics_collector.update_tracked_metrics_history(work_dir, build_number)
             tracked_metrics_history = MetricsCollector.load_tracked_metrics_history(work_dir, tracked_metrics_files_number)
+            groupped_tracked_metrics = metrics_collector.groupped_metrics
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
                                                synchronization_time=sync_time(summary_report),
-                                               tracked_metrics=tracked_metrics,
+                                               groupped_tracked_metrics=groupped_tracked_metrics,
                                                tracked_metrics_history=tracked_metrics_history)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
@@ -824,7 +826,7 @@ def build_performance_reports(work_dir, major_title, commit_sha='undefined', bra
         rc = -1
 
     try:
-        build_local_reports(work_dir, summary_report, common_info, env, tracked_metrics, tracked_metrics_history)
+        build_local_reports(work_dir, summary_report, common_info, env, groupped_tracked_metrics, tracked_metrics_history)
     except Exception as err:
         traceback.print_exc()
         main_logger.error(str(err))

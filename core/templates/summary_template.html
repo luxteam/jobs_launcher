@@ -58,11 +58,11 @@
                     "Job name"
                     {% endif %}
                 </td>
-                {% if tracked_metrics and tracked_metrics_history %}
+                {% if groupped_tracked_metrics and tracked_metrics_history %}
                     <td>
                         {%- set performance_window_name = "performanceWindow-" + i | string -%}
                         {%- set performance_chart_name = "performanceChart-" + i | string -%}
-                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (groupped_tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                         {% with performance_window_scope="platform" -%}
                             {%- include 'performance_history_tab.html' -%}
                         {%- endwith %}
@@ -275,11 +275,11 @@
                 <td>Render Log</td>
                 <td>Engine log</td>
                 {% endif %}
-                {% if tracked_metrics and tracked_metrics_history %}
+                {% if groupped_tracked_metrics and tracked_metrics_history %}
                     <td>
                         {%- set performance_window_name = "performanceWindow-" + i + "-" + test_package -%}
                         {%- set performance_chart_name = "performanceChart-" + i + "-" + test_package -%}
-                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (groupped_tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                         {% with performance_window_scope="test_group" -%}
                             {%- include 'performance_history_tab.html' -%}
                         {%- endwith %}
