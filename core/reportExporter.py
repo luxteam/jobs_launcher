@@ -655,6 +655,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
         tracked_metrics_history = OrderedDict()
         if metrics_collector:
+            metrics_collector.add_groupped_metrics_in_cases()
             metrics_collector.update_tracked_metrics_history(work_dir, build_number)
             tracked_metrics_history = MetricsCollector.load_tracked_metrics_history(work_dir, tracked_metrics_files_number)
         summary_html = summary_template.render(title=major_title + " Summary",
@@ -794,6 +795,7 @@ def build_performance_reports(work_dir, major_title, commit_sha='undefined', bra
         tracked_metrics_history = OrderedDict()
         groupped_tracked_metrics = {}
         if metrics_collector:
+            metrics_collector.add_groupped_metrics_in_cases()
             metrics_collector.update_tracked_metrics_history(work_dir, build_number)
             tracked_metrics_history = MetricsCollector.load_tracked_metrics_history(work_dir, tracked_metrics_files_number)
             groupped_tracked_metrics = metrics_collector.groupped_metrics

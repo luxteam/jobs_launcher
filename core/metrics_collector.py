@@ -164,6 +164,35 @@ class MetricsCollector:
                 main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
+    # add groupped metrics from relatedtest cases for visualize them on charts
+    def add_groupped_metrics_in_cases(self):
+        try:
+            tracked_metrics_data = self.tracked_metrics_data
+            found_metrics = self.found_metrics
+            for platform in tracked_metrics_data:
+                groups = tracked_metrics_data[platform]['groups']
+                for test_group in groups:
+                    for possible_metric_name in found_metrics:
+                        # check that current metric could be splitted
+                        if 'separation_field' in found_metrics[possible_metric_name]['config']:
+                            separation_field = found_metrics[possible_metric_name]['config']['separation_field']
+                            cases = groups[test_group]['metrics']
+                            for case in cases:
+                                # skip if this metric already exists in case
+                                if possible_metric_name in case:
+                                    continue
+                                else:
+                                    for other_case in cases:
+                                        # try to find related cases cases by replacing of part of name with value from separation field
+                                        if other_case.replace(cases[other_case][separation_field], cases[case][separation_field]) == case:
+                                            if possible_metric_name in cases[other_case]:
+                                                cases[case][possible_metric_name] = cases[other_case][possible_metric_name]
+                                                break
+        except Exception as e:
+            main_logger.error("Can't add groupped metrics in cases: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
+
     def update_tracked_metrics_history(self, work_dir, build_number):
         try:
             tracked_metrics_file_path = os.path.join(work_dir, TRACKED_METRICS_LOCATION_NAME)
