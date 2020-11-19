@@ -46,10 +46,12 @@
                         {% for metric_group_name in groupped_tracked_metrics %}
                             datasets = []
 
-                            {% if groupped_tracked_metrics[metric_group_name]['config']['displaying_unit'] %}
-                                options = { "title": { "display": true, "text": "{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }} per build ({{ groupped_tracked_metrics[metric_group_name]['config']['displaying_unit'] }})" }}
-                            {% else %}
-                                    options = { "title": { "display": true, "text": "{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }} per build" }}
+                            {% if groupped_tracked_metrics[metric_group_name]['config'] %}
+                                {% if groupped_tracked_metrics[metric_group_name]['config']['displaying_unit'] %}
+                                    options = { "title": { "display": true, "text": "{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }} per build ({{ groupped_tracked_metrics[metric_group_name]['config']['displaying_unit'] }})" }}
+                                {% else %}
+                                        options = { "title": { "display": true, "text": "{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }} per build" }}
+                                {% endif %}
                             {% endif %}
 
                             labels = [
@@ -115,8 +117,7 @@
                                     {%- endif -%}
                                 {%- endfor -%}
                                 ]
-                                console.log(currentChart)
-                                console.log(dataset.data)
+
                                 for (i in dataset.data) {
                                     if (dataset.data[i] || dataset.data[i] == 0) {
                                         has_only_nulls = false

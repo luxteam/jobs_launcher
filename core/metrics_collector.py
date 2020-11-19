@@ -50,14 +50,15 @@ class MetricsCollector:
                         else:
                             tracked_metric_name = '{}_{}'.format(tracked_metric, item[separation_field])
                         displaying_name = '{} ({})'.format(tracked_metrics_config[tracked_metric]['displaying_name'], item[separation_field])
-                        if tracked_metric_name not in found_metrics:
-                            # save metric name and its configuration for use it during calculation of summary of groups and platforms
-                            found_metrics[tracked_metric_name] = {'name_in_config': tracked_metric, 'config': tracked_metrics_config[tracked_metric]}
                     else:
                         if 'metric_name' in tracked_metrics_config[tracked_metric]:
                             tracked_metric_name = tracked_metrics_config[tracked_metric]['metric_name']
                         else:
                             tracked_metric_name = tracked_metric
+                        displaying_name = tracked_metrics_config[tracked_metric]['displaying_name']
+                    if tracked_metric_name not in found_metrics:
+                        # save metric name and its configuration for use it during calculation of summary of groups and platforms
+                        found_metrics[tracked_metric_name] = {'name_in_config': tracked_metric, 'config': tracked_metrics_config[tracked_metric]}
                     # add metric in groupped_metrics dict
                     if tracked_metric not in groupped_metrics:
                         groupped_metrics[tracked_metric] = {}
@@ -92,9 +93,9 @@ class MetricsCollector:
             found_metrics = self.found_metrics
             if platform in tracked_metrics_data and test_package in tracked_metrics_data[platform]['groups']:
                 tracked_metrics_summary = {}
+                groups = tracked_metrics_data[platform]['groups']
                 # iterate through named of saved metrics during parsing of data of test cases
-                for possible_metric_name in found_metrics:
-                    groups = tracked_metrics_data[platform]['groups']
+                for possible_metric_name in found_metrics:                    
                     metric_summary = {}
                     number = {}
                     for test_case in groups[test_package]['metrics']:

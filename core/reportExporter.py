@@ -658,13 +658,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
             metrics_collector.add_groupped_metrics_in_cases()
             metrics_collector.update_tracked_metrics_history(work_dir, build_number)
             tracked_metrics_history = MetricsCollector.load_tracked_metrics_history(work_dir, tracked_metrics_files_number)
+            groupped_tracked_metrics = metrics_collector.groupped_metrics 
         summary_html = summary_template.render(title=major_title + " Summary",
                                                report=summary_report,
                                                pageID="summaryA",
                                                PIX_DIFF_MAX=PIX_DIFF_MAX,
                                                common_info=common_info,
                                                synchronization_time=sync_time(summary_report),
-                                               tracked_metrics=tracked_metrics,
+                                               groupped_tracked_metrics=groupped_tracked_metrics,
                                                tracked_metrics_history=tracked_metrics_history)
         save_html_report(summary_html, work_dir, SUMMARY_REPORT_HTML, replace_pathsep=True)
 
