@@ -128,6 +128,9 @@ class UMS_Client:
             )
             main_logger.info('Test suite result sent with code {}'.format(response.status_code))
 
+            if response.status_code == 401:
+                self.get_token()
+
             return response
 
         except Exception as e:
