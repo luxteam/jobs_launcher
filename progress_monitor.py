@@ -119,7 +119,7 @@ def send_finished_cases(session_dir, suite_name):
     transferred_test_cases += list(new_test_cases.keys())
     diff = len(test_cases) - len(transferred_test_cases)
     print('Monitor is waiting {} cases'.format(diff))
-    if not diff:
+    if diff <= 0:
         return True
 
 if __name__ == '__main__':
