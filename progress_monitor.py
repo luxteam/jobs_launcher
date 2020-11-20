@@ -83,10 +83,10 @@ def send_finished_cases(session_dir, suite_name):
     new_test_cases = {}
     for test_case in test_cases:
         if test_case['status'] in ('skipped', 'error', 'done', 'passed') and not test_case[name_key] in transferred_test_cases:
-            new_test_cases[test_case[name_key]]: test_case['status']
+            new_test_cases[test_case[name_key]] = test_case['status']
             if 'aovs' in test_case:
                 for aov in test_case['aovs']:
-                    new_test_cases[test_case[name_key].replace('rpr', aov['aov'])]: aov['status']
+                    new_test_cases[test_case[name_key].replace('rpr', aov['aov'])] = aov['status']
 
     new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
     print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
