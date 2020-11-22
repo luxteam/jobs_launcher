@@ -109,6 +109,8 @@ def generate_thumbnails(session_dir):
                                                                              'thumb256_' + test['test_case'])))
 
                                 if os.path.exists(thumb64_path) and os.path.exists(thumb256_path):
+                                    test.update({'thumb64_' + img_key: os.path.relpath(thumb64_path, path)})
+                                    test.update({'thumb256_' + img_key: os.path.relpath(thumb256_path, path)})
                                     continue
 
                                 cur_img = Image.open(cur_img_path)
