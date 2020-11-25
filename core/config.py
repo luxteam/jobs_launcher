@@ -48,7 +48,8 @@ RENDER_REPORT_EC_PACK = {
     "baseline_system_memory_usage": -0.0,
     "difference_vram": -0.0,
     "difference_ram": -0.0,
-    'tahoe_log': 'not.exist'
+    "tahoe_log": "not.exist",
+    "core_scene_configuration": "not.exist"
 }
 
 RENDER_REPORT_CT_PACK = {
@@ -110,7 +111,7 @@ REPORT_FILES = POSSIBLE_JSON_IMG_KEYS + POSSIBLE_JSON_IMG_KEYS_THUMBNAIL + POSSI
 
 IMG_KEYS_FOR_COMPARE = ['render_color_path']
 
-POSSIBLE_JSON_IMG_BASELINE_KEYS = ['render_color_path', 'render_opacity_path']
+POSSIBLE_JSON_IMG_BASELINE_KEYS = ['baseline_color_path', 'render_opacity_path']
 POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_BASELINE_KEYS]
 POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_BASELINE_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_BASELINE_KEYS]
 
@@ -144,6 +145,8 @@ TEST_CASES_JSON_NAME = {
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
+TRACKED_METRICS_JSON_NAME = 'tracked_metrics_{}.json'
+TRACKED_METRICS_LOCATION_NAME = 'tracked_metrics'
 
 DONT_COMPARE = "Do not compare"
 
@@ -172,3 +175,28 @@ ODD_FOR_BASELINES = [
 
 MAX_UMS_SEND_RETRIES = 3
 UMS_SEND_RETRY_INTERVAL = 5
+UMS_POSSIBLE_INFO_FIELD = [
+    'date_time',
+    'script_info',
+    'render_version',
+    'render_mode',
+    'scene_name',
+    'core_version',
+    'render_device',
+    'testcase_timeout',
+    'message',
+    'testcase_timeout_exceeded',
+    'group_timeout_exceeded',
+    'minor_version',
+    'iterations',
+    'width', 
+    'height', 
+    'system_memory_usage',
+    'gpu_memory_usage'
+    'gpu_memory_total'
+    'gpu_memory_max',
+    'baseline_gpu_memory_usage',
+    'baseline_system_memory_usage',
+    'difference_vram',
+    'difference_ram'
+]

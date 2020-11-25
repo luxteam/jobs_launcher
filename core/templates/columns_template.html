@@ -93,7 +93,7 @@
         <td class="hatching">
 
             {%- if template_name == 'local' -%}
-                {%- if 'thum256_render_color_path' in item -%}
+                {%- if 'thumb256_render_color_path' in item -%}
                 <img data-src="{{ item.thumb256_render_color_path }}"/>
                 {%- else -%}
                 <img data-src="{{ item.render_color_path }}"/>
@@ -130,6 +130,9 @@
                 <b>Test status:</b> {{ item.test_status }}<br/>
                 <b>Baseline GPU:</b> {{ item.baseline_render_device }}<br/>
                 <b>Scene:</b> {{ item.scene_name }}<br/>
+                {%- if item.core_scene_configuration != 'not.exist' -%}
+                    <b>Scene conf.:</b> <a class="highlightedLink" href="{{ item.core_scene_configuration }}">OPEN</a> <a class="highlightedLink" href="{{ item.core_scene_configuration }}" download>DOWNLOAD</a><br/>
+                {%- endif -%}
                 <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                 <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
                 <b>GPU memory usage:</b> {{ item.gpu_memory_usage }}<br/>
@@ -281,6 +284,24 @@
         </th>
     {%- else -%}
         <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+    {%- endif -%}
+{%- endif -%}
+
+{#- ------------------------------ PERFORMANCE HISTORY ------------------------------ -#}
+{%- if column.name == 'performance_history' -%}
+    {%- if is_head -%}
+        <th data-field="performance_history" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Performance history</th>
+    {%- else -%}
+        {% if tracked_metrics and tracked_metrics_history %}
+            <td>
+                {%- set performance_window_name = "performanceWindow-" + platform + "-" + common_info.test_group + "-" + item.test_case -%}
+                {%- set performance_chart_name = "performanceChart-" + platform + "-" + common_info.test_group + "-" + item.test_case -%}
+                <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                {% with performance_window_scope="test_case", test_group=common_info.test_group, test_case=item.test_case -%}
+                    {%- include 'performance_history_tab.html' -%}
+                {%- endwith %}
+            </td>
+        {% endif %}
     {%- endif -%}
 {%- endif -%}
 

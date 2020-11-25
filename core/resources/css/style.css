@@ -99,7 +99,7 @@ table.baseTable {
   border: 1px solid #949494;
   text-align: center;
 }
-.summary_tr td {
+.summary_tr td, .performance_tab {
   background-color: rgba(222, 222, 222, 1);
 }
 
@@ -263,6 +263,10 @@ a {
   width: 300px;
 }
 
+.localReportTable .closePopup img {
+    width: 1vw;
+}
+
 .infoColumn {
   text-align: left;
 // white-space: nowrap;
@@ -304,14 +308,19 @@ a {
     transform: translate(-50%, -50%);
 }
 
-.commonButton {
+a.highlightedLink {
+  padding: 0 8px;
+  color: black;
+}
+
+.commonButton, a.highlightedLink {
     border-radius: 13px;
     border: 0.8px solid #828080;
     background-color: #dedede;
     font-family: "Open Sans Bold";
 }
 
-.commonButton:hover {
+.commonButton:hover, a.highlightedLink:hover {
     border-radius: 13px;
     border: 1px solid #949393;
     background-color: #dededeeb;

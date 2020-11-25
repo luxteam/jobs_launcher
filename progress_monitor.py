@@ -80,7 +80,13 @@ def send_finished_cases(session_dir, suite_name):
             global transferred_test_cases
             test_cases = json.load(test_cases_file)['cases']
         name_key = 'name'
-    new_test_cases = {tc[name_key]: tc['status'] for tc in test_cases if tc['status'] in ('skipped', 'error', 'done', 'passed') and not tc[name_key] in transferred_test_cases}
+    new_test_cases = {}
+    for test_case in test_cases:
+        if test_case['status'] in ('skipped', 'error', 'done', 'passed') and not test_case[name_key] in transferred_test_cases:
+            new_test_cases[test_case[name_key]] = test_case['status']
+            if 'aovs' in test_case:
+                for aov in test_case['aovs']:
+                    new_test_cases[test_case[name_key] + aov['aov']] = aov['status']
 
     new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
     print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
@@ -113,7 +119,7 @@ def send_finished_cases(session_dir, suite_name):
     transferred_test_cases += list(new_test_cases.keys())
     diff = len(test_cases) - len(transferred_test_cases)
     print('Monitor is waiting {} cases'.format(diff))
-    if not diff:
+    if diff <= 0:
         return True
 
 if __name__ == '__main__':
@@ -125,14 +131,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     check = 1
+    fails_in_succession = 0
     while True:
         try:
             time.sleep(args.interval)
             print('Check number {}'.format(check))
             check += 1
             result = send_finished_cases(args.session_dir, args.suite_name)
+            fails_in_succession = 0
             if result:
                 break
         except Exception as e:
+            fails_in_succession += 1
             main_logger.error("Failed iteration of progress monitor: {}".format(e))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
+        if MAX_UMS_SEND_RETRIES == fails_in_succession:
+            break

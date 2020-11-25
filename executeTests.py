@@ -210,7 +210,7 @@ def main():
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
             # FIXME: refactor report building of Core: make reports parallel with render
-            if ((i == 0 and 'Core' not in args.work_dir) or (i == 1 and 'Core' in args.work_dir)) and (ums_client_prod or ums_client_dev):
+            if (i == 0) and (ums_client_prod or ums_client_dev):
                 if job_launcher_report['rc'] != -10:
                     try:
                         monitor.wait()
@@ -243,8 +243,6 @@ def main():
             main_logger.info("Try to create Develop MINIO client")
             mc_dev = create_mc_client(ums_client_dev.job_id)
 
-        res = []
-
         try:
             main_logger.info('Start preparing results')
             cases = []
@@ -265,6 +263,7 @@ def main():
                 except Exception as e:
                     main_logger.error("Can't read performance data: {}".format(str(e)))
                     main_logger.error("Traceback: {}".format(traceback.format_exc()))
+                res = []
                 cases = suite_result[""]["render_results"]
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -285,6 +284,11 @@ def main():
                                     data = json.load(file)[0]
                                     if 'image_service_id' in data:
                                         rendered_image = str(data['image_service_id'])
+
+                        case_info = {}
+                        for key in case:
+                            if key in UMS_POSSIBLE_INFO_FIELD:
+                                case_info[key] = case[key]
                                     
                         res.append({
                             'name': case['test_case'],
@@ -294,7 +298,8 @@ def main():
                             },
                             "artefacts": {
                                 "rendered_image": rendered_image
-                            }
+                            },
+                            "info": case_info
                         })
                         
                         path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")

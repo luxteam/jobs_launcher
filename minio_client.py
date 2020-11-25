@@ -7,7 +7,7 @@ try:
     from minio import Minio
 except Exception as ex:
     try:
-        subprocess.call([sys.executable, "-m", "pip", "install", "Minio"])
+        subprocess.call([sys.executable, "-m", "pip", "install", "--user", "Minio"])
         from minio import Minio
     except Exception as e:
         print(e)
@@ -72,8 +72,8 @@ class UMS_Minio:
         """
         
         # generate artifact name PATH/TO/FILE.EXT
-        artifact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
         try:
+            artifact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
             file_size = os.stat(file_path).st_size
             with open(file_path, 'rb') as data:
                 self.mc.put_object(
