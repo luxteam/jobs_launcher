@@ -39,7 +39,7 @@ PLATFORM_CONVERTATIONS = {
 		}
 	},
 	"OSX": {
-		"os_name": "Darwin 10.14.6(64bit)",
+		"os_name": "Darwin 10.15.7(64bit)",
 		"cards": {
 			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)",
 			"RadeonPro560": "Radeon Pro 560"
