@@ -53,6 +53,8 @@ def get_lost_tests_count(data, tool_name, test_package_name):
 		lost_tests_count = len(data)
 	elif tool_name == 'max':
 		lost_tests_count = len(data['cases'])
+	elif tool_name == 'USD':
+		lost_tests_count = len(data)
 	elif tool_name == 'core':
 		lost_tests_count = len(data)
 		for scene in data:

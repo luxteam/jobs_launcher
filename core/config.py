@@ -140,8 +140,10 @@ TEST_CASES_JSON_NAME = {
         'maya': 'test_cases.json',
         'max': 'case_list.json',
         'core': 'SceneList.json',
-        'rprviewer': 'test.cases.json'
+        'rprviewer': 'test.cases.json',
+        'USD': 'test_cases.json'
     }
+
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
