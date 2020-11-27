@@ -416,7 +416,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
             tracked_metrics_data[platform]['summary'] = tracked_metrics_summary
 
     for key in common_info:
-        common_info[key] = ' '.join(common_info[key])
+        common_info[key] = ' '.join(str(x) for x in common_info[key])
 
     missing_tests_jsons = {'error': os.path.join(work_dir, LOST_TESTS_JSON_NAME)}
     if show_skipped_groups:
