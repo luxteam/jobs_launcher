@@ -135,8 +135,8 @@
                 {%- endif -%}
                 <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
                 <b>Baseline render time:</b> {{ item.baseline_render_time | round(3) }}<br/>
-                <b>GPU memory usage:</b> {{ item.gpu_memory_usage }}<br/>
-                <b>Baseline GPU memory usage:</b> {{ item.baseline_gpu_memory_usage }}<br/>
+                <b>GPU memory usage:</b> {{ item.gpu_memory_usage | round(3) }}<br/>
+                <b>Baseline GPU memory usage:</b> {{ item.baseline_gpu_memory_usage | round(3) }}<br/>
                 <b>GPU memory total:</b> {{ item.gpu_memory_total }}<br/>
                 <b>GPU memory max:</b> {{ item.gpu_memory_max }}<br/>
                 <b>System memory usage:</b> {{ item.system_memory_usage }}<br/>
@@ -358,7 +358,7 @@
     {%- if is_head -%}
         <th data-field="render_vram" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Render GPU RAM, Mb</th>
     {%- else -%}
-        <td>{{ item.gpu_memory_usage }}</td>
+        <td>{{ item.gpu_memory_usage | round(3) }}</td>
     {%- endif -%}
 {%- endif -%}
 
@@ -367,7 +367,7 @@
     {%- if is_head -%}
         <th data-field="baseline_vram" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Baseline GPU RAM, Mb</th>
     {%- else -%}
-        <td>{{ item.baseline_gpu_memory_usage }}</td>
+        <td>{{ item.baseline_gpu_memory_usage | round(3) }}</td>
     {%- endif -%}
 {%- endif -%}
 
@@ -382,7 +382,7 @@
                 class="timeBetterStatus"
             {%- endif -%}
             >
-            {{ item.difference_vram }}</td>
+            {{ item.difference_vram | round(3) }}</td>
     {%- endif -%}
 {%- endif -%}
 
