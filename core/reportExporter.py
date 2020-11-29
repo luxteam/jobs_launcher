@@ -258,8 +258,8 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
     if host_name:
         # replace tester prefix
         host_name = host_name.replace('PC-TESTER-', '').replace('PC-RENDERER-', '')
-        # replace OSX postfix
-        host_name = host_name.replace('-OSX', '')
+        # replace MacOS postfix
+        host_name = host_name.replace('-MacOS', '')
         # Ubuntu1804 -> Ubuntu18
         host_name = host_name.replace('1804', '18')
         # capitalize only first letter of each word of host name

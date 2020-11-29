@@ -38,7 +38,7 @@ PLATFORM_CONVERTATIONS = {
 			"NVIDIA_RTX2070": "GeForce RTX 2070"
 		}
 	},
-	"OSX": {
+	"MacOS": {
 		"os_name": "Darwin 10.15.7(64bit)",
 		"cards": {
 			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)",
