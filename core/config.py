@@ -139,7 +139,7 @@ TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
         'maya': 'test_cases.json',
         'max': 'case_list.json',
-        'core': 'SceneList.json',
+        'core': 'test_cases.json',
         'rprviewer': 'test.cases.json',
         'USD': 'test_cases.json'
     }
