@@ -27,7 +27,8 @@ PLATFORM_CONVERTATIONS = {
 			"AMD_WX7100": "AMD Radeon (TM) Pro WX 7100 Graphics",
 			"AMD_WX9100": "Radeon (TM) Pro WX 9100",
 			"NVIDIA_RTX2080TI": "GeForce RTX 2080 Ti",
-			"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080"
+			"NVIDIA_RTX2080": "NVIDIA GeForce RTX 2080",
+			"NVIDIA_RTX2070S": "GeForce RTX 2070S"
 		}
 	},
 	"Ubuntu18": {
