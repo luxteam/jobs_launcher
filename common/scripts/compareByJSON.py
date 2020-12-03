@@ -135,7 +135,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                         image = Image.open(image_path)
                         image.save(image_path, quality=75)
                     except Exception as e:
-                        core.config.main_logger.warning('Failed to squeeze image')
+                        core.config.main_logger.warning('Failed to squeeze image. Exception: {}'.format(str(e)))
 
             if md5(render_img_path) == md5(baseline_img_path):
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
