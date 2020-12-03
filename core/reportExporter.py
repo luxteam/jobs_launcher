@@ -7,7 +7,7 @@ from shutil import rmtree, copytree
 from codecs import open
 import datetime
 import operator
-from PIL import Image, ImageFile
+from PIL import Image
 import core.config as config
 from core.config import *
 from core.auto_dict import AutoDict
@@ -26,8 +26,6 @@ except ImportError:
     main_logger.critical("local config file not found. Default values will be used.")
     main_logger.critical("Correct report building isn't guaranteed")
     from core.defaults_local_config import *
-
-ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def save_json_report(report, session_dir, file_name, replace_pathsep=False):

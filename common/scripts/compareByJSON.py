@@ -3,15 +3,13 @@ import argparse
 import os
 import json
 from shutil import copyfile
-from PIL import Image, ImageFile
+from PIL import Image
 import hashlib
 from CompareMetrics import CompareMetrics
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
 import core.performance_counter as perf_count
-
-ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 try:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(
@@ -133,8 +131,11 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
             for field in ['render_color_path', 'baseline_color_path']:
                 image_path = os.path.join(base_dir, img['test_group'], img.get(field, 'None'))
                 if image_path.endswith('.jpg') and os.path.exists(image_path):
-                    image = Image.open(image_path)
-                    image.save(image_path, quality=75)
+                    try:
+                        image = Image.open(image_path)
+                        image.save(image_path, quality=75)
+                    except Exception as e:
+                        core.config.main_logger.warning('Failed to squeeze image')
 
             if md5(render_img_path) == md5(baseline_img_path):
                 for thumb in core.config.THUMBNAIL_PREFIXES + ['']:
