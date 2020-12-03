@@ -3,13 +3,15 @@ import argparse
 import os
 import json
 from shutil import copyfile
-from PIL import Image
+from PIL import Image, ImageFile
 import hashlib
 from CompareMetrics import CompareMetrics
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir, os.path.pardir)))
 import core.config
 import core.performance_counter as perf_count
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 try:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(
