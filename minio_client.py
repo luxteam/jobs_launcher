@@ -1,5 +1,5 @@
 import os
-from core.config import main_logger
+from core.config import main_logger, MAX_UMS_SEND_RETRIES, UMS_SEND_RETRY_INTERVAL
 import subprocess
 import sys
 import traceback
@@ -63,7 +63,7 @@ class UMS_Minio:
         if not self.mc.bucket_exists(self.bucket_name):
             self.mc.make_bucket(self.bucket_name)
 
-    def upload_file(self, file_path, *args):
+    def upload_file(self, file_path, ums_name, *args):
         """ Method for upload file to storage
         
         @Arguments:
@@ -72,16 +72,25 @@ class UMS_Minio:
         """
         
         # generate artifact name PATH/TO/FILE.EXT
-        try:
-            artifact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
-            file_size = os.stat(file_path).st_size
-            with open(file_path, 'rb') as data:
-                self.mc.put_object(
-                    bucket_name=self.bucket_name,
-                    object_name=artifact_name,
-                    data=data,
-                    length=file_size
-                )
-            main_logger.info("Artifact '{}' sent to MINIO".format(artifact_name))
-        except Exception as e:
-            main_logger.error(str(e))
+        send_try = 0
+        while send_try < MAX_UMS_SEND_RETRIES:
+            file_sent = False
+            try:
+                artifact_name = "/".join(args) + "/" + os.path.split(file_path)[1]
+                file_size = os.stat(file_path).st_size
+                with open(file_path, 'rb') as data:
+                    self.mc.put_object(
+                        bucket_name=self.bucket_name,
+                        object_name=artifact_name,
+                        data=data,
+                        length=file_size
+                    )
+                main_logger.info("Artifact '{}' sent to MINIO".format(artifact_name))
+                file_sent = True
+            except Exception as e:
+                main_logger.error(str(e))
+            main_logger.info('File sent to MINIO for UMS {} with result {} (try #{})'.format(ums_name, file_sent, send_try))
+            if file_sent:
+                break
+            send_try += 1
+            time.sleep(UMS_SEND_RETRY_INTERVAL)
