@@ -334,7 +334,23 @@ def main():
                 main_logger.info("Generated results:\n{}".format(json.dumps(res, indent=2)))
                 main_logger.info("Environment: {}".format(env))
 
-                #  collect performance data
+                # calculate time of 'Refactor logs' step
+                if events_data:
+                    try:
+                        sum_steps = 0
+                        for event_data in events_data:
+                            sum_steps += event_data['time']
+                        session_report_path = os.path.join(session_dir, "session_report.json")
+                        if os.path.exists(session_report_path):
+                            with open(session_report_path, 'r') as json_file:
+                                data = json.load(json_file)
+                                duration = data['results'][suite_name]['']['duration']
+                                render_duration = data['results'][suite_name]['']['render_duration']
+                                events_data.append({'name': 'Refactor logs', 'time': duration - sum_steps - render_duration - summary_sync_time})
+                    except Exception as e:
+                        main_logger.error("Can't calculate time of 'Refactor logs' step: {}".format(str(e)))
+                        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+                # collect performance data
                 performance_data = {'setup_time': events_data, 'sync_time': summary_sync_time}
                 main_logger.info("Generated performance data:\n{}".format(json.dumps(performance_data, indent=2)))
 
