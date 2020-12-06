@@ -28,7 +28,8 @@ RENDER_REPORT_BASE = {
     "testcase_timeout": 0,
     "message": [],
     "testcase_timeout_exceeded": False,
-    "group_timeout_exceeded": True
+    "group_timeout_exceeded": True,
+    "has_time_diff": False
 }
 
 RENDER_REPORT_DEFAULT_PACK = {
