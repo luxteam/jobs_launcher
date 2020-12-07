@@ -66,12 +66,12 @@ def prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info):
                                 if not host_name and package_or_default_execution:
                                     host_name = groups[package_or_default_execution][-1]["host"]
                 except Exception as e:
-                    main_logger.error("Failed to process retry info. ReasExceptionon: {}".format(str(e)))
+                    main_logger.error("Failed to process retry info. Exception: {}".format(str(e)))
                     main_logger.error("Traceback: {}".format(traceback.format_exc()))
         elif status == "skipped":
             host_name = "Skipped"
 
-        env = {"host": host_name, "os": os_name, "gpu": gpu_name}
+        env = {"host": host_name, "gpu": gpu_name, "cpu_count": 0, "ram": 0.0, "cpu": ""}
 
         env_label = "{}-{}".format(os_label, gpu_label)
         ums_client_prod = create_ums_client("PROD", env_label)
