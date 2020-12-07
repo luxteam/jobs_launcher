@@ -656,6 +656,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         common_info.update({'engine': engine})
         save_json_report(summary_report, work_dir, SUMMARY_REPORT)
         tracked_metrics_history = OrderedDict()
+        groupped_tracked_metrics = {}
         if metrics_collector:
             metrics_collector.add_groupped_metrics_in_cases()
             metrics_collector.update_tracked_metrics_history(work_dir, build_number)
