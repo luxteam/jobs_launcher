@@ -5,6 +5,7 @@ import time
 import traceback
 
 from core.config import *
+from core.reportExporter import recover_hostname
 from ums_client import create_ums_client
 from core.countLostTests import PLATFORM_CONVERTATIONS, LABELS_CONVERTATIONS
 
@@ -29,47 +30,16 @@ def generate_stubs(cases_names, status):
     return cases
 
 
-def prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info):
+def prepare_ums_clients(gpu_os_name, suite_name, node_retry_info, status):
     ums_client_prod = None
     ums_client_dev = None
     env = {}
     try:
-        host_name = "Unknown"
         gpu_name = gpu_os_name.split('-')[0]
         os_name = gpu_os_name.split('-')[1]
         gpu_label = LABELS_CONVERTATIONS[os_name]["cards"][gpu_name]
         os_label = LABELS_CONVERTATIONS[os_name]["os_name"]
-        if status == "error":
-            for retry_info in node_retry_info:
-                try:
-                    retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info["osName"]]["cards"][retry_info["gpuName"]]
-                    retry_os_name = PLATFORM_CONVERTATIONS[retry_info["osName"]]["os_name"]
-                    if retry_gpu_name in gpu_os_name and retry_os_name in gpu_os_name:
-                        for groups in retry_info["Tries"]:
-                            package_or_default_execution = None
-                            for group in groups.keys():
-                                parsed_group_name = group.split('~')[0]
-                                #all non splitTestsExecution and non regression builds (e.g. any build of core)
-                                if "DefaultExecution" in group:
-                                    package_or_default_execution = group
-                                    break
-                                elif parsed_group_name.endswith(".json") and suite_name not in group.split('~')[1]:
-                                    with open(os.path.abspath(os.path.join("..", "jobs", parsed_group_name))) as f:
-                                        if suite_name in json.load(f)["groups"]:
-                                            package_or_default_execution = group
-                                            break
-                            if suite_name in groups.keys() or package_or_default_execution:
-                                for test_tries in retry_info["Tries"]:
-                                    if suite_name in test_tries:
-                                        host_name = groups[suite_name][-1]["host"]
-                                        break
-                                if not host_name and package_or_default_execution:
-                                    host_name = groups[package_or_default_execution][-1]["host"]
-                except Exception as e:
-                    main_logger.error("Failed to process retry info. Exception: {}".format(str(e)))
-                    main_logger.error("Traceback: {}".format(traceback.format_exc()))
-        elif status == "skipped":
-            host_name = "Skipped"
+        host_name = recover_hostname(suite_name, gpu_os_name, node_retry_info, status)
 
         env = {"host": host_name, "gpu": gpu_name, "cpu_count": 0, "ram": 0.0, "cpu": ""}
 
@@ -89,7 +59,7 @@ def prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info):
 
 def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
 
-    ums_client_prod, ums_client_dev, env = prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info)
+    ums_client_prod, ums_client_dev, env = prepare_ums_clients(gpu_os_name, suite_name, node_retry_info, status)
 
     cases = generate_stubs(cases_names, status)
     main_logger.info("Generated stubs:\n{}".format(json.dumps(cases, indent=2)))

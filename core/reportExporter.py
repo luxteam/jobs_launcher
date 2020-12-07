@@ -207,23 +207,7 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info, status):
-    summary_report[gpu_os_case]['results'][lost_test_package] = {}
-    # add empty conf
-    summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
-    # specify data
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = 0.0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['error'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['failed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['machine_info'] = ""
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['passed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = -0.0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_results'] = []
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['result_path'] = ""
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""][status] = lost_tests_count
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
-
+def recover_hostname(lost_test_package, gpu_os_case, node_retry_info, status):
     host_name = ''
     for retry_info in node_retry_info:
         try:
@@ -251,9 +235,8 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
                         if not host_name and package_or_default_execution:
                             host_name = groups[package_or_default_execution][-1]['host']
         except Exception as e:
-            print("Failed to process retry info. Reason: {}".format(str(e)))
-
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
+            main_logger.error("Failed to process retry info. Exception: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     if host_name:
         # replace tester prefix
@@ -276,7 +259,29 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
             host_name = 'Skipped'
         else:
             host_name = 'Unknown'
+    return host_name
 
+
+def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info, status):
+    summary_report[gpu_os_case]['results'][lost_test_package] = {}
+    # add empty conf
+    summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
+    # specify data
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = 0.0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['error'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['failed'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['machine_info'] = ""
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['passed'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = -0.0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_results'] = []
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['result_path'] = ""
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""][status] = lost_tests_count
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
+
+    host_name = recover_hostname(lost_test_package, gpu_os_case, node_retry_info, status)
+
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['host'] = host_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
