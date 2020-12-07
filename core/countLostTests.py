@@ -47,6 +47,39 @@ PLATFORM_CONVERTATIONS = {
 	}
 }
 
+# match platform name which session_report.json contains and gpu and OS labels in Jenkins
+LABELS_CONVERTATIONS = {
+	"Windows 10(64bit)": {
+		"os_name": "Windows",
+		"cards": {
+			"Radeon RX Vega": "AMD_RXVEGA",
+			"AMD Radeon RX 5700 XT": "AMD_RX5700XT",
+			"AMD Radeon VII": "AMD_RadeonVII",
+			"AMD Radeon VII Beta Driver": "AMD_RadeonVII_Beta",
+			"GeForce GTX 1080 Ti": "NVIDIA_GF1080TI",
+			"AMD Radeon (TM) Pro WX 7100 Graphics": "AMD_WX7100",
+			"Radeon (TM) Pro WX 9100": "AMD_WX9100",
+			"GeForce RTX 2080 Ti": "NVIDIA_RTX2080TI",
+			"NVIDIA GeForce RTX 2080": "NVIDIA_RTX2080"
+		}
+	},
+	"Ubuntu 18.04(64bit)": {
+		"os_name": "Ubuntu18",
+		"cards": {
+			"AMD Radeon VII": "AMD_RadeonVII",
+			"GeForce GTX 980": "NVIDIA_GTX980",
+			"GeForce RTX 2070": "NVIDIA_RTX2070"
+		}
+	},
+	"Darwin 10.15.7(64bit)": {
+		"os_name": "OSX",
+		"cards": {
+			"AMD Radeon RX Vega 56 (Metal)": "AMD_RXVEGA",
+			"Radeon Pro 560": "RadeonPro560"
+		}
+	}
+}
+
 def get_lost_tests(data, tool_name, test_package_name):
 	# list of lost tests = tests in test suite taken from configuration
 	lost_tests = []

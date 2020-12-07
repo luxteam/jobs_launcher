@@ -3,11 +3,7 @@ import argparse
 from core.config import *
 import json
 from ums_client import create_ums_client
-from core.countLostTests import PLATFORM_CONVERTATIONS
-
-
-ums_client_prod = create_ums_client("PROD")
-ums_client_dev = create_ums_client("DEV")
+from core.countLostTests import PLATFORM_CONVERTATIONS, LABELS_CONVERTATIONS
 
 
 def generate_stubs(cases_names, status):
@@ -30,7 +26,67 @@ def generate_stubs(cases_names, status):
     return cases
 
 
-def send_stubs(suite, cases_names, status, env):
+def prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info):
+    ums_client_prod = None
+    ums_client_dev = None
+    try:
+        host_name = "Unknown"
+        gpu_name = gpu_os_name.split('-')[0]
+        os_name = gpu_os_name.split('-')[1]
+        gpu_label = LABELS_CONVERTATIONS[os_name]["cards"][gpu_name]
+        os_label = LABELS_CONVERTATIONS[os_name]["os_name"]
+        if status == "error":
+            for retry_info in node_retry_info:
+                try:
+                    retry_gpu_name = PLATFORM_CONVERTATIONS[retry_info["osName"]]["cards"][retry_info["gpuName"]]
+                    retry_os_name = PLATFORM_CONVERTATIONS[retry_info["osName"]]["os_name"]
+                    if retry_gpu_name in gpu_os_name and retry_os_name in gpu_os_name:
+                        for groups in retry_info["Tries"]:
+                            package_or_default_execution = None
+                            for group in groups.keys():
+                                parsed_group_name = group.split('~')[0]
+                                #all non splitTestsExecution and non regression builds (e.g. any build of core)
+                                if "DefaultExecution" in group:
+                                    package_or_default_execution = group
+                                    break
+                                elif parsed_group_name.endswith(".json") and suite_name not in group.split('~')[1]:
+                                    with open(os.path.abspath(os.path.join("..", "jobs", parsed_group_name))) as f:
+                                        if suite_name in json.load(f)["groups"]:
+                                            package_or_default_execution = group
+                                            break
+                            if suite_name in groups.keys() or package_or_default_execution:
+                                for test_tries in retry_info["Tries"]:
+                                    if suite_name in test_tries:
+                                        host_name = groups[suite_name][-1]["host"]
+                                        break
+                                if not host_name and package_or_default_execution:
+                                    host_name = groups[package_or_default_execution][-1]["host"]
+                except Exception as e:
+                    main_logger.error("Failed to process retry info. ReasExceptionon: {}".format(str(e)))
+                    main_logger.error("Traceback: {}".format(traceback.format_exc()))
+        elif status == "skipped":
+            host_name = "Skipped"
+
+        env = {"host": host_name, "os": os_name, "gpu": gpu_name}
+
+        env_label = "{}-{}".format(os_label, gpu_label)
+        ums_client_prod = create_ums_client("PROD", env_label)
+        ums_client_dev = create_ums_client("DEV", env_label)
+
+        if ums_client_prod:
+            ums_client_prod.define_environment(env)
+        if ums_client_dev:
+            ums_client_dev.define_environment(env)
+    except:
+        main_logger.error("Failed to prepare UMS clients. Exception: {}".format(str(e)))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+    return ums_client_prod, ums_client_dev
+
+
+def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
+
+    ums_client_prod, ums_client_dev = prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info)
+
     cases = generate_stubs(cases_names, status)
     try:
         if ums_client_prod:
@@ -73,25 +129,21 @@ def send_stubs(suite, cases_names, status, env):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path_to_skipped_cases", type=str, metavar="<path>", help="path to json with skipped cases")
-    parser.add_argument("--path_to_error_cases", type=str, metavar="<path>", help="path to json with error cases")
-    parser.add_argument("--host", required=True, type=str, help="name of host")
-    parser.add_argument("--os", required=True, type=str, help="name of os")
-    parser.add_argument("--gpu", required=True, type=str, help="name of gpu")
+    parser.add_argument("--path_to_skipped_cases", required=True, type=str, metavar="<path>", help="path to json with skipped cases")
+    parser.add_argument("--path_to_error_cases", required=True, type=str, metavar="<path>", help="path to json with error cases")
+    parser.add_argument("--path_to_retry_info", required=True, type=str, metavar="<path>",help="path to info about retries")
 
     args = parser.parse_args()
 
     data_summary = []
-    env = {}
+    node_retry_info = []
 
     try:
-        env = {'host': args.host, 'os': PLATFORM_CONVERTATIONS[args.os]["os_name"], 'gpu': PLATFORM_CONVERTATIONS[args.os]["cards"][args.gpu]}
-        if ums_client_prod:
-            ums_client_prod.define_environment(env)
-        if ums_client_dev:
-            ums_client_dev.define_environment(env)
+        if os.path.exists(os.path.join(args.path_to_retry_info)):
+            with open(os.path.join(args.path_to_retry_info), "r") as file:
+                node_retry_info = json.load(file)            
     except:
-        main_logger.error("Failed to define environment. Exception: {}".format(str(e)))
+        main_logger.error("Failed to read retry info. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     try:
@@ -112,6 +164,6 @@ if __name__ == "__main__":
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     for data in data_summary:
-        for platform in data['data']:
-            for suite in data['data'][platform]:
-                send_stubs(suite, data['data'][platform][suite], data['status'], env)
+        for gpu_os_name in data['data']:
+            for suite_name in data['data'][gpu_os_name]:
+                send_stubs(gpu_os_name, suite_name, data['data'][gpu_os_name][suite_name], data['status'])

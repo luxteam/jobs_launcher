@@ -19,17 +19,19 @@ def str2bool(v):
         raise ValueError('Boolean value expected. Got <{}>'.format(v))
 
 
-def create_ums_client(client_postfix_raw=""):
+def create_ums_client(client_postfix_raw="", env_label=""):
     try:
         if client_postfix_raw:
             client_postfix = "_" + client_postfix_raw
         else:
             client_postfix = ""
+        if not env_label:
+            env_label = os.getenv("UMS_ENV_LABEL")
         ums_client = UMS_Client(
             job_id=os.getenv("UMS_JOB_ID" + client_postfix),
             url=os.getenv("UMS_URL" + client_postfix),
             build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
-            env_label=os.getenv("UMS_ENV_LABEL"),
+            env_label=env_label,
             suite_id=None,
             login=os.getenv("UMS_LOGIN" + client_postfix),
             password=os.getenv("UMS_PASSWORD" + client_postfix)
