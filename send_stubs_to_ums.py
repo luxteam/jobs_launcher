@@ -92,6 +92,9 @@ def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
     ums_client_prod, ums_client_dev, env = prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info)
 
     cases = generate_stubs(cases_names, status)
+    main_logger.info("Generated stubs:\n{}".format(json.dumps(cases, indent=2)))
+    main_logger.info("Environment: {}".format(env))
+
     try:
         if ums_client_prod:
             ums_client_prod.get_suite_id_by_name(suite_name)
