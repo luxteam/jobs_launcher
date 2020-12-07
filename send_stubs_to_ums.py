@@ -113,5 +113,5 @@ if __name__ == "__main__":
 
     for data in data_summary:
         for platform in data['data']:
-            for suite in data[platform]:
-                send_stubs(suite, data[platform][suite], data['status'], env)
+            for suite in data['data'][platform]:
+                send_stubs(suite, data['data'][platform][suite], data['status'], env)
