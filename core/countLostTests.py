@@ -52,13 +52,13 @@ def get_lost_tests(data, tool_name, test_package_name):
 	lost_tests = []
 	if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'rprviewer' or tool_name == 'USD':
 		for test in data:
-			lost_tests.append(data['case'])
+			lost_tests.append(test['case'])
 	elif tool_name == 'max':
 		for test in data['cases']:
 			lost_tests.append(test['name'])
 	elif tool_name == 'core':
 		for test in data:
-			lost_tests.append(data['case'])
+			lost_tests.append(test['case'])
 			json_name = test['scene'].replace('rpr', 'json')
 			with open(os.path.join("..", "core_tests_configuration", test_package_name, json_name), "r") as file:
 				configuration_data = json.load(file)
