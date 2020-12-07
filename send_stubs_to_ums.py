@@ -166,4 +166,4 @@ if __name__ == "__main__":
     for data in data_summary:
         for gpu_os_name in data['data']:
             for suite_name in data['data'][gpu_os_name]:
-                send_stubs(gpu_os_name, suite_name, data['data'][gpu_os_name][suite_name], data['status'])
+                send_stubs(gpu_os_name, suite_name, data['data'][gpu_os_name][suite_name], data['status'], node_retry_info)
