@@ -47,25 +47,28 @@ PLATFORM_CONVERTATIONS = {
 	}
 }
 
-def get_lost_tests_count(data, tool_name, test_package_name):
-	# number of lost tests = number of tests in test package
-	if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'rprviewer':
-		lost_tests_count = len(data)
+def get_lost_tests(data, tool_name, test_package_name):
+	# list of lost tests = tests in test suite taken from configuration
+	lost_tests = []
+	if tool_name == 'blender' or tool_name == 'maya' or tool_name == 'rprviewer' or tool_name == 'USD':
+		for test in data:
+			lost_tests.append(data['case'])
 	elif tool_name == 'max':
-		lost_tests_count = len(data['cases'])
-	elif tool_name == 'USD':
-		lost_tests_count = len(data)
+		for test in data['cases']:
+			lost_tests.append(test['name'])
 	elif tool_name == 'core':
-		lost_tests_count = len(data)
-		for scene in data:
-			json_name = scene['scene'].replace('rpr', 'json')
+		for test in data:
+			lost_tests.append(data['case'])
+			json_name = test['scene'].replace('rpr', 'json')
 			with open(os.path.join("..", "core_tests_configuration", test_package_name, json_name), "r") as file:
 				configuration_data = json.load(file)
 			if 'aovs' in configuration_data:
-				lost_tests_count += len(configuration_data['aovs'])
+				for aov in configuration_data['aovs']:
+					lost_tests.append()
+				lost_tests.append(data['case'] + configuration_data['aovs'])
 	else:
 		raise Exception('Unexpected tool name: ' + tool_name)
-	return lost_tests_count
+	return lost_tests
 
 
 def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests_package, tests_list, engine, skipped_groups):
@@ -95,7 +98,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 								if case_results["total"] == 0:
 									with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as tests_conf:
 										data = json.load(tests_conf)
-									number_of_cases = get_lost_tests_count(data, tool_name, test_package_name)
+									number_of_cases = get_lost_tests(data, tool_name, test_package_name)
 									case_results["error"] = number_of_cases
 									case_results["total"] = number_of_cases
 									session_report["summary"]["error"] += number_of_cases
@@ -153,7 +156,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 
 				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 					data = json.load(file)
-				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
+				lost_tests_count = get_lost_tests(data, tool_name, test_package_name)
 				# join converted gpu name and os name
 				joined_gpu_os_names = PLATFORM_CONVERTATIONS[os_name]["cards"][gpu_name] + "-" + PLATFORM_CONVERTATIONS[os_name]["os_name"]
 				# if test group is skipped
@@ -173,7 +176,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 			try:
 				with open(os.path.join(tests_dir, "jobs", "Tests", test_package_name, TEST_CASES_JSON_NAME[tool_name]), "r") as file:
 					data = json.load(file)
-				lost_tests_count = get_lost_tests_count(data, tool_name, test_package_name)
+				lost_tests_count = get_lost_tests(data, tool_name, test_package_name)
 				for lost_test_result in lost_tests_results:
 					gpu_name = lost_test_result.split('-')[0]
 					os_name = lost_test_result.split('-')[1]

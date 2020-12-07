@@ -433,7 +433,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                 for gpu_os_case in summary_report:
                     if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                         for lost_test_package in lost_tests_count[lost_test_result]:
-                            generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info, key)
+                            generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, len(lost_tests_count[lost_test_result][lost_test_package]), node_retry_info, key)
                         test_case_found = True
                         break
                 # if all data for GPU + OS was lost (it can be regression.json execution)
@@ -450,7 +450,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                     summary_report[gpu_os_case]['summary']['skipped'] = 0
                     summary_report[gpu_os_case]['summary']['total'] = 0
                     for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info, key)
+                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, len(lost_tests_count[lost_test_result][lost_test_package]) node_retry_info, key)
 
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration'] - summary_report[config]['summary'].get('synchronization_duration', -0.0)
