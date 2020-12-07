@@ -64,8 +64,7 @@ def get_lost_tests(data, tool_name, test_package_name):
 				configuration_data = json.load(file)
 			if 'aovs' in configuration_data:
 				for aov in configuration_data['aovs']:
-					lost_tests.append()
-				lost_tests.append(data['case'] + configuration_data['aovs'])
+					lost_tests.append(test['case'] + aov)
 	else:
 		raise Exception('Unexpected tool name: ' + tool_name)
 	return lost_tests
