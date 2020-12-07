@@ -20,7 +20,7 @@ def generate_stubs(cases_names, status):
                     "rendered_image": status
                 },
             })
-    except:
+    except Exception as e:
         main_logger.error("Failed to generate stubs. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
     return cases
@@ -29,6 +29,7 @@ def generate_stubs(cases_names, status):
 def prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info):
     ums_client_prod = None
     ums_client_dev = None
+    env = {}
     try:
         host_name = "Unknown"
         gpu_name = gpu_os_name.split('-')[0]
@@ -77,15 +78,15 @@ def prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info):
             ums_client_prod.define_environment(env)
         if ums_client_dev:
             ums_client_dev.define_environment(env)
-    except:
+    except Exception as e:
         main_logger.error("Failed to prepare UMS clients. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
-    return ums_client_prod, ums_client_dev
+    return ums_client_prod, ums_client_dev, env
 
 
 def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
 
-    ums_client_prod, ums_client_dev = prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info)
+    ums_client_prod, ums_client_dev, env = prepare_ums_clients(gpu_os_name, suite_name, status, node_retry_info)
 
     cases = generate_stubs(cases_names, status)
     try:
@@ -103,7 +104,7 @@ def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
                     break
                 send_try += 1
                 time.sleep(UMS_SEND_RETRY_INTERVAL)
-    except:
+    except Exception as e:
         main_logger.error("Failed to send stubs to UMS PROD. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
@@ -122,7 +123,7 @@ def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
                     break
                 send_try += 1
                 time.sleep(UMS_SEND_RETRY_INTERVAL)
-    except:
+    except Exception as e:
         main_logger.error("Failed to send stubs to UMS DEV. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
@@ -142,7 +143,7 @@ if __name__ == "__main__":
         if os.path.exists(os.path.join(args.path_to_retry_info)):
             with open(os.path.join(args.path_to_retry_info), "r") as file:
                 node_retry_info = json.load(file)            
-    except:
+    except Exception as e:
         main_logger.error("Failed to read retry info. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
@@ -151,7 +152,7 @@ if __name__ == "__main__":
             with open(args.path_to_skipped_cases, "r") as file:
                 skipped_cases_data = json.load(file)
                 data_summary.append({'status': 'skipped', 'data': skipped_cases_data})
-    except:
+    except Exception as e:
         main_logger.error("Failed to read list of skipped cases. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
     try:
@@ -159,7 +160,7 @@ if __name__ == "__main__":
             with open(args.path_to_error_cases, "r") as file:
                 error_cases_data = json.load(file)
                 data_summary.append({'status': 'error', 'data': error_cases_data})
-    except:
+    except Exception as e:
         main_logger.error("Failed to read list of error cases. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
