@@ -41,16 +41,11 @@ def prepare_ums_clients(gpu_os_name, suite_name, node_retry_info, status):
         os_label = LABELS_CONVERTATIONS[os_name]["os_name"]
         host_name = recover_hostname(suite_name, gpu_os_name, node_retry_info, status)
 
-        env = {"host": host_name, "gpu": gpu_name, "cpu_count": 0, "ram": 0.0, "cpu": ""}
+        env = {"hostname": host_name, "gpu": gpu_name, "cpu_count": 0, "ram": 0.0, "cpu": ""}
 
         env_label = "{}-{}".format(os_label, gpu_label)
         ums_client_prod = create_ums_client("PROD", env_label)
         ums_client_dev = create_ums_client("DEV", env_label)
-
-        if ums_client_prod:
-            ums_client_prod.define_environment(env)
-        if ums_client_dev:
-            ums_client_dev.define_environment(env)
     except Exception as e:
         main_logger.error("Failed to prepare UMS clients. Exception: {}".format(str(e)))
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
@@ -68,6 +63,7 @@ def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
     try:
         if ums_client_prod:
             ums_client_prod.get_suite_id_by_name(suite_name)
+            ums_client_prod.define_environment(env)
             send_try = 0
             while send_try < MAX_UMS_SEND_RETRIES:
                 response_prod = ums_client_prod.send_test_suite(res=cases, env=env)
@@ -87,6 +83,7 @@ def send_stubs(gpu_os_name, suite_name, cases_names, status, node_retry_info):
     try:
         if ums_client_dev:
             ums_client_dev.get_suite_id_by_name(suite_name)
+            ums_client_dev.define_environment(env)
             send_try = 0
             while send_try < MAX_UMS_SEND_RETRIES:
                 response_dev = ums_client_dev.send_test_suite(res=cases, env=env)
