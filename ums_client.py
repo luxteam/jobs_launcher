@@ -77,11 +77,14 @@ class UMS_Client:
 
     def get_token(self):
         main_logger.info('Try to get auth token')
+        main_logger.info("Sending POST to URL {}/user/login".format(self.url))
+        main_logger.info("Auth data {}:{}".format(self.login, self.password))
         response = post(
             url="{url}/user/login".format(url=self.url),
             auth=HTTPBasicAuth(self.login, self.password),
         )
         response_content = json.loads(response.content.decode("utf-8"))
+        main_logger.info("Response {}".format(str(response_content)))
         if 'token' not in response_content:
             raise RequestException('Check login and password')
         token = response_content["token"]
@@ -118,6 +121,9 @@ class UMS_Client:
                 "environment": env,
                 "env_label": self.env_label
             }
+            main_logger.info("Sending PUT to URL {}".format("{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(url=self.url,build_id=self.build_id,suite_id=self.suite_id,job_id=self.job_id)))
+            main_logger.info("Headers {}".format(str(self.headers)))
+            main_logger.info("Data {}".format(str(data)))
             response = post(
                 headers=self.headers,
                 json=data,
@@ -128,6 +134,8 @@ class UMS_Client:
                     job_id=self.job_id
                 )
             )
+            response_content = json.loads(response.content.decode("utf-8"))
+            main_logger.info("Response {}".format(str(response_content)))
             main_logger.info('Test suite result sent with code {}'.format(response.status_code))
 
             if response.status_code == 401:
@@ -166,6 +174,9 @@ class UMS_Client:
                 "env_label": self.env_label,
                 "environment": env
             }
+            main_logger.info("Sending PUT to URL {}".format("{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(url=self.url,build_id=self.build_id,suite_id=self.suite_id,job_id=self.job_id)))
+            main_logger.info("Headers {}".format(str(self.headers)))
+            main_logger.info("Data {}".format(str(data)))
             response = put(
                 headers=self.headers,
                 json=data,
@@ -176,6 +187,8 @@ class UMS_Client:
                     job_id=self.job_id
                 )
             )
+            response_content = json.loads(response.content.decode("utf-8"))
+            main_logger.info("Response {}".format(str(response_content)))
             main_logger.info("Environment defined with code {}".format(response.status_code))
             return response
 
