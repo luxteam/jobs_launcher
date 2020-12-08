@@ -28,7 +28,8 @@ RENDER_REPORT_BASE = {
     "testcase_timeout": 0,
     "message": [],
     "testcase_timeout_exceeded": False,
-    "group_timeout_exceeded": True
+    "group_timeout_exceeded": True,
+    "has_time_diff": False
 }
 
 RENDER_REPORT_DEFAULT_PACK = {
@@ -139,7 +140,7 @@ TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
         'maya': 'test_cases.json',
         'max': 'case_list.json',
-        'core': 'SceneList.json',
+        'core': 'test_cases.json',
         'rprviewer': 'test.cases.json',
         'USD': 'test_cases.json'
     }
