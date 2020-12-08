@@ -214,7 +214,13 @@
             Test case finished</b><br/>
 
 
-            <b>&check; Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
+            <b>
+            {%- if not item.has_time_diff -%}
+                &check; 
+            {%- else -%}
+                &times; 
+            {%- endif %}
+            Difference render time:</b> {{ item.difference_time | round(3) }} %<br/>
             {%- if item.message -%}
                 <b>Message:</b> {{ item.message | join('. ') }}<br/>
             {%- endif -%}

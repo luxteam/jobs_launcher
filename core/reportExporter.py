@@ -304,7 +304,9 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                     temp_report = json.loads(report_file.read())
                     try:
                         basename = temp_report['machine_info']['render_device'] + ' ' + temp_report['machine_info']['os']
-                    except KeyError:
+                    except KeyError as err:
+                        traceback.print_exc()
+                        main_logger.error(repr(err))
                         continue
 
                     # update relative paths
@@ -731,13 +733,15 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                                      i=execution)
             save_html_report(detailed_summary_html, work_dir, execution + "_detailed.html", replace_pathsep=True)
     except Exception as err:
+        traceback.print_exc()
+        main_logger.error(repr(err))
         try:
-            traceback.print_exc()
             main_logger.error(summary_html)
             save_html_report("Error while building summary report: {}".format(str(err)), work_dir, SUMMARY_REPORT_HTML,
                              replace_pathsep=True)
-        except Exception as err:
+        except Exception as e:
             traceback.print_exc()
+            main_logger.error(repr(e))
         rc = -1
 
     main_logger.info("Saving performance report...")
@@ -764,12 +768,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                        synchronization_time=sync_time(summary_report))
         save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
+        traceback.print_exc()
+        main_logger.error(repr(err))
         try:
-            traceback.print_exc()
             main_logger.error(performance_html)
             save_html_report(performance_html, work_dir, PERFORMANCE_REPORT_HTML, replace_pathsep=True)
-        except Exception as err:
+        except Exception as e:
             traceback.print_exc()
+            main_logger.error(repr(e))
         # TODO: make building of performance tab more stable
         # rc = -2
 
@@ -788,12 +794,14 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
                                                common_info=common_info)
         save_html_report(compare_html, work_dir, COMPARE_REPORT_HTML, replace_pathsep=True)
     except Exception as err:
+        traceback.print_exc()
+        main_logger.error(repr(err))
         try:
-            traceback.print_exc()
             main_logger.error(compare_html)
             save_html_report(compare_html, work_dir, "compare_report.html", replace_pathsep=True)
-        except Exception as err:
+        except Exception as e:
             traceback.print_exc()
+            main_logger.error(repr(e))
         rc = -3
 
     try:

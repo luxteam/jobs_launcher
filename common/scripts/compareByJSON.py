@@ -163,6 +163,7 @@ def get_rendertime_difference(base_dir, img, time_diff_max):
                 img.update({'time_diff_status': core.config.TEST_DIFF_STATUS})
                 if img['test_status'] != core.config.TEST_CRASH_STATUS:
                     img['message'].append('Unacceptable time difference')
+                    img['has_time_diff'] = True
                     break
 
         img.update({'difference_time': get_diff(render_time, baseline_time)})
