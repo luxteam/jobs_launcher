@@ -140,8 +140,10 @@ TEST_CASES_JSON_NAME = {
         'maya': 'test_cases.json',
         'max': 'case_list.json',
         'core': 'SceneList.json',
-        'rprviewer': 'test.cases.json'
+        'rprviewer': 'test.cases.json',
+        'USD': 'test_cases.json'
     }
+
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
 SKIPPED_TESTS_JSON_NAME = 'skipped_tests.json'
 RETRY_INFO_NAME = 'retry_info.json'
@@ -175,3 +177,28 @@ ODD_FOR_BASELINES = [
 
 MAX_UMS_SEND_RETRIES = 3
 UMS_SEND_RETRY_INTERVAL = 5
+UMS_POSSIBLE_INFO_FIELD = [
+    'date_time',
+    'script_info',
+    'render_version',
+    'render_mode',
+    'scene_name',
+    'core_version',
+    'render_device',
+    'testcase_timeout',
+    'message',
+    'testcase_timeout_exceeded',
+    'group_timeout_exceeded',
+    'minor_version',
+    'iterations',
+    'width', 
+    'height', 
+    'system_memory_usage',
+    'gpu_memory_usage'
+    'gpu_memory_total'
+    'gpu_memory_max',
+    'baseline_gpu_memory_usage',
+    'baseline_system_memory_usage',
+    'difference_vram',
+    'difference_ram'
+]

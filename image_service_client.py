@@ -58,6 +58,8 @@ class ISClient:
                         },
                         headers=self.headers
                     )
+                    if response.status_code == 401:
+                        self.get_token()
                     img.close()
                 main_logger.info('Image sent with code {} (try #{})'.format(response.status_code, send_try))
                 image_id = json.loads(response.content.decode("utf-8"))["image_id"]

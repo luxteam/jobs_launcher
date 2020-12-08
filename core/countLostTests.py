@@ -39,7 +39,7 @@ PLATFORM_CONVERTATIONS = {
 		}
 	},
 	"OSX": {
-		"os_name": "Darwin 10.14.6(64bit)",
+		"os_name": "Darwin 10.15.7(64bit)",
 		"cards": {
 			"AMD_RXVEGA": "AMD Radeon RX Vega 56 (Metal)",
 			"RadeonPro560": "Radeon Pro 560"
@@ -53,6 +53,8 @@ def get_lost_tests_count(data, tool_name, test_package_name):
 		lost_tests_count = len(data)
 	elif tool_name == 'max':
 		lost_tests_count = len(data['cases'])
+	elif tool_name == 'USD':
+		lost_tests_count = len(data)
 	elif tool_name == 'core':
 		lost_tests_count = len(data)
 		for scene in data:

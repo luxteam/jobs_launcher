@@ -210,7 +210,7 @@ def main():
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
             # FIXME: refactor report building of Core: make reports parallel with render
-            if ((i == 0 and 'Core' not in args.work_dir) or (i == 1 and 'Core' in args.work_dir)) and (ums_client_prod or ums_client_dev):
+            if (i == 0) and (ums_client_prod or ums_client_dev):
                 if job_launcher_report['rc'] != -10:
                     try:
                         monitor.wait()
@@ -253,6 +253,16 @@ def main():
                 suites = data["results"]
 
             for suite_name, suite_result in suites.items():
+                events_data = []
+                summary_sync_time = 0
+                try:
+                    events_data_path = os.path.join(session_dir, suite_name + "_performance_ums.json")
+                    if os.path.exists(events_data_path):
+                        with open(events_data_path, 'r') as json_file:
+                            events_data = json.load(json_file)
+                except Exception as e:
+                    main_logger.error("Can't read performance data: {}".format(str(e)))
+                    main_logger.error("Traceback: {}".format(traceback.format_exc()))
                 res = []
                 cases = suite_result[""]["render_results"]
                 if ums_client_prod:
@@ -261,6 +271,8 @@ def main():
                     ums_client_dev.get_suite_id_by_name(suite_name)
                 for case in cases:
                     try:
+                        summary_sync_time += case.get('sync_time', 0)
+
                         if 'image_service_id' in case:
                             rendered_image = str(case['image_service_id'])
                         else:
@@ -272,6 +284,11 @@ def main():
                                     data = json.load(file)[0]
                                     if 'image_service_id' in data:
                                         rendered_image = str(data['image_service_id'])
+
+                        case_info = {}
+                        for key in case:
+                            if key in UMS_POSSIBLE_INFO_FIELD:
+                                case_info[key] = case[key]
                                     
                         res.append({
                             'name': case['test_case'],
@@ -281,15 +298,16 @@ def main():
                             },
                             "artefacts": {
                                 "rendered_image": rendered_image
-                            }
+                            },
+                            "info": case_info
                         })
                         
                         path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
                         if os.path.exists(path_to_test_case_log):
                             if ums_client_prod and mc_prod:
-                                mc_prod.upload_file(path_to_test_case_log, ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
+                                mc_prod.upload_file(path_to_test_case_log, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
                             if ums_client_dev and mc_dev:
-                                mc_dev.upload_file(path_to_test_case_log, ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
+                                mc_dev.upload_file(path_to_test_case_log, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
                     except Exception as e1:
                         main_logger.error("Failed to send results for case {}. Error: {}".format(e1, str(e1)))
                         main_logger.error("Traceback: {}".format(traceback.format_exc()))
@@ -301,9 +319,9 @@ def main():
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if os.path.exists(path_to_test_suite_render_log):
                         if ums_client_prod and mc_prod:
-                            mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
+                            mc_prod.upload_file(path_to_test_suite_render_log, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id)
                         if ums_client_dev and mc_dev:
-                            mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
+                            mc_dev.upload_file(path_to_test_suite_render_log, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -316,25 +334,79 @@ def main():
                 main_logger.info("Generated results:\n{}".format(json.dumps(res, indent=2)))
                 main_logger.info("Environment: {}".format(env))
 
+                # calculate time of 'Refactor logs' step
+                if events_data:
+                    try:
+                        sum_steps = 0
+                        for event_data in events_data:
+                            sum_steps += event_data['time']
+                        session_report_path = os.path.join(session_dir, "session_report.json")
+                        if os.path.exists(session_report_path):
+                            with open(session_report_path, 'r') as json_file:
+                                data = json.load(json_file)
+                                duration = data['results'][suite_name]['']['duration']
+                                render_duration = data['results'][suite_name]['']['render_duration']
+                                events_data.append({'name': 'Refactor logs', 'time': duration - sum_steps - render_duration - summary_sync_time})
+                    except Exception as e:
+                        main_logger.error("Can't calculate time of 'Refactor logs' step: {}".format(str(e)))
+                        main_logger.error("Traceback: {}".format(traceback.format_exc()))
+                # collect performance data
+                performance_data = {'setup_time': events_data, 'sync_time': summary_sync_time}
+                main_logger.info("Generated performance data:\n{}".format(json.dumps(performance_data, indent=2)))
+
+                test_suite_result_id_prod = None
+                test_suite_result_id_dev = None
                 send_try = 0
                 while send_try < MAX_UMS_SEND_RETRIES:
                     response_prod = ums_client_prod.send_test_suite(res=res, env=env)
                     main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
                     main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
-                    if response_prod.status_code < 300:
+                    if response_prod and response_prod.status_code < 300:
+                        response_data = json.loads(response_prod.content.decode("utf-8"))
+                        if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
+                            test_suite_result_id_prod = response_data['data']['test_suite_result_id']
                         break
                     send_try += 1
                     time.sleep(UMS_SEND_RETRY_INTERVAL)
 
+                if test_suite_result_id_prod:
+                    send_try = 0
+                    while send_try < MAX_UMS_SEND_RETRIES:
+                        response_prod = ums_client_prod.send_test_suite_performance(data=performance_data, test_suite_result_id=test_suite_result_id_prod)
+                        main_logger.info('Test suite performance sent for {} to UMS PROD with code {} (try #{})'.format(test_suite_result_id_prod, response_prod.status_code, send_try))
+                        main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
+                        if response_prod and response_prod.status_code < 300:
+                            break
+                        send_try += 1
+                        time.sleep(UMS_SEND_RETRY_INTERVAL)
+                else:
+                    main_logger.info("UMS client did not set. Result won't be sent to UMS PROD")
+
                 send_try = 0
                 while send_try < MAX_UMS_SEND_RETRIES:
-                    response_prod = ums_client_dev.send_test_suite(res=res, env=env)
-                    main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_prod.status_code, send_try))
-                    main_logger.info('Response from UMS DEV: \n{}'.format(response_prod.content))
-                    if response_prod.status_code < 300:
+                    response_dev = ums_client_dev.send_test_suite(res=res, env=env)
+                    main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
+                    main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
+                    if response_dev and response_dev.status_code < 300:
+                        response_data = json.loads(response_dev.content.decode("utf-8"))
+                        if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
+                            test_suite_result_id_dev = response_data['data']['test_suite_result_id']
                         break
                     send_try += 1
                     time.sleep(UMS_SEND_RETRY_INTERVAL)
+
+                if test_suite_result_id_dev:
+                    send_try = 0
+                    while send_try < MAX_UMS_SEND_RETRIES:
+                        response_dev = ums_client_dev.send_test_suite_performance(data=performance_data, test_suite_result_id=test_suite_result_id_dev)
+                        main_logger.info('Test suite performance sent for {} to UMS DEV with code {} (try #{})'.format(test_suite_result_id_dev, response_dev.status_code, send_try))
+                        main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
+                        if response_dev and response_dev.status_code < 300:
+                            break
+                        send_try += 1
+                        time.sleep(UMS_SEND_RETRY_INTERVAL)
+                else:
+                    main_logger.info("UMS client did not set. Result won't be sent to UMS DEV")
 
             shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
 
@@ -346,10 +418,10 @@ def main():
                 for suite in suites:
                     if ums_client_prod and mc_prod:
                         ums_client_prod.get_suite_id_by_name(suite_name)
-                        mc_prod.upload_file(path_to_test_suite_render_log, ums_client_prod.build_id, ums_client_prod.suite_id)
+                        mc_prod.upload_file(path_to_test_suite_render_log, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id)
                     if ums_client_dev and mc_dev:
                         ums_client_dev.get_suite_id_by_name(suite_name)
-                        mc_dev.upload_file(path_to_test_suite_render_log, ums_client_dev.build_id, ums_client_dev.suite_id)
+                        mc_dev.upload_file(path_to_test_suite_render_log, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id)
 
 
         except Exception as e:
