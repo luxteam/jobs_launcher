@@ -61,7 +61,8 @@ LABELS_CONVERTATIONS = {
 			"AMD Radeon (TM) Pro WX 7100 Graphics": "AMD_WX7100",
 			"Radeon (TM) Pro WX 9100": "AMD_WX9100",
 			"GeForce RTX 2080 Ti": "NVIDIA_RTX2080TI",
-			"NVIDIA GeForce RTX 2080": "NVIDIA_RTX2080"
+			"NVIDIA GeForce RTX 2080": "NVIDIA_RTX2080",
+			"NVIDIA GeForce RTX 2070 Super": "NVIDIA_RTX2070S"
 		}
 	},
 	"Ubuntu 18.04(64bit)": {
