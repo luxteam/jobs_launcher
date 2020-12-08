@@ -41,7 +41,7 @@ def prepare_ums_clients(gpu_os_name, suite_name, node_retry_info, status):
         os_label = LABELS_CONVERTATIONS[os_name]["os_name"]
         host_name = recover_hostname(suite_name, gpu_os_name, node_retry_info, status)
 
-        env = {"host": host_name, "gpu": gpu_name, "cpu_count": 0, "ram": 0.0, "cpu": ""}
+        env = {"hostname": host_name, "gpu": gpu_name, "cpu_count": 0, "ram": 0.0, "cpu": ""}
 
         env_label = "{}-{}".format(os_label, gpu_label)
         ums_client_prod = create_ums_client("PROD", env_label)
