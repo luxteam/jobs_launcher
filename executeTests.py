@@ -276,7 +276,7 @@ def main():
                         if 'image_service_id' in case:
                             rendered_image = str(case['image_service_id'])
                         else:
-                            rendered_image = ''
+                            rendered_image = 'error'
                             # FIXME: refactor report building of Core: make reports parallel with render
                             test_case_path = os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')
                             if os.path.exists(test_case_path):
