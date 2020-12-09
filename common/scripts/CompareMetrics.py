@@ -1,3 +1,5 @@
+import argparse
+import sys
 import numpy as np
 import cv2
 
@@ -39,7 +41,8 @@ class CompareMetrics(object):
         # diffA = abs(img1A - img2A)
 
         self.diff_pixels = len(list(filter(
-            lambda x: x[0] <= tolerance and x[1] <= tolerance and x[2] <= tolerance, zip(diffR.ravel(), diffG.ravel(), diffB.ravel())
+            lambda x: x[0] <= tolerance and x[1] <= tolerance and x[2] <= tolerance,
+            zip(diffR.ravel(), diffG.ravel(), diffB.ravel())
         )))
 
         # get percent
@@ -96,3 +99,12 @@ class CompareMetrics(object):
 
             # 1 - there is a difference. 0 - there isn't a difference
             return 0 if median[0][0] != 255 else 1
+
+
+# commandline interface for CompareMetrics.
+if __name__ == '__main__':
+    p = argparse.ArgumentParser()
+    p.add_argument('--img1', required=True, help='First image for comparison')
+    p.add_argument('--img2', required=True, help='Second image for comparison')
+    args = p.parse_args()
+    sys.exit(CompareMetrics(args.img1, args.img2).getPrediction())
