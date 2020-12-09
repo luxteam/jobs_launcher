@@ -211,23 +211,7 @@ def build_session_report(report, session_dir):
     return report
 
 
-def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info, status):
-    summary_report[gpu_os_case]['results'][lost_test_package] = {}
-    # add empty conf
-    summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
-    # specify data
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = 0.0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['error'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['failed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['machine_info'] = ""
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['passed'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = -0.0
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_results'] = []
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['result_path'] = ""
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
-    summary_report[gpu_os_case]['results'][lost_test_package][""][status] = lost_tests_count
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
-
+def recover_hostname(lost_test_package, gpu_os_case, node_retry_info, status):
     host_name = ''
     for retry_info in node_retry_info:
         try:
@@ -255,9 +239,8 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
                         if not host_name and package_or_default_execution:
                             host_name = groups[package_or_default_execution][-1]['host']
         except Exception as e:
-            print("Failed to process retry info. Reason: {}".format(str(e)))
-
-    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
+            main_logger.error("Failed to process retry info. Exception: {}".format(str(e)))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     if host_name:
         # replace tester prefix
@@ -280,7 +263,29 @@ def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case,
             host_name = 'Skipped'
         else:
             host_name = 'Unknown'
+    return host_name
 
+
+def generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count, node_retry_info, status):
+    summary_report[gpu_os_case]['results'][lost_test_package] = {}
+    # add empty conf
+    summary_report[gpu_os_case]['results'][lost_test_package][""] = {}
+    # specify data
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['duration'] = 0.0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['error'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['failed'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['machine_info'] = ""
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['passed'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_duration'] = -0.0
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['render_results'] = []
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['result_path'] = ""
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['skipped'] = 0
+    summary_report[gpu_os_case]['results'][lost_test_package][""][status] = lost_tests_count
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['total'] = lost_tests_count
+
+    host_name = recover_hostname(lost_test_package, gpu_os_case, node_retry_info, status)
+
+    summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info'] = {}
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['host'] = host_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['os'] = os_name
     summary_report[gpu_os_case]['results'][lost_test_package][""]['recovered_info']['render_device'] = gpu_name
@@ -401,7 +406,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                 for gpu_os_case in summary_report:
                     if gpu_name.lower() in gpu_os_case.lower() and os_name.lower() in gpu_os_case.lower():
                         for lost_test_package in lost_tests_count[lost_test_result]:
-                            generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info, key)
+                            generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, len(lost_tests_count[lost_test_result][lost_test_package]), node_retry_info, key)
                         test_case_found = True
                         break
                 # if all data for GPU + OS was lost (it can be regression.json execution)
@@ -418,7 +423,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                     summary_report[gpu_os_case]['summary']['skipped'] = 0
                     summary_report[gpu_os_case]['summary']['total'] = 0
                     for lost_test_package in lost_tests_count[lost_test_result]:
-                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, lost_tests_count[lost_test_result][lost_test_package], node_retry_info, key)
+                        generate_empty_render_result(summary_report, lost_test_package, gpu_os_case, gpu_name, os_name, len(lost_tests_count[lost_test_result][lost_test_package]), node_retry_info, key)
 
     for config in summary_report:
         summary_report[config]['summary']['setup_duration'] = summary_report[config]['summary']['duration'] - summary_report[config]['summary']['render_duration'] - summary_report[config]['summary'].get('synchronization_duration', -0.0)
