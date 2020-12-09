@@ -142,7 +142,8 @@ TEST_CASES_JSON_NAME = {
         'max': 'case_list.json',
         'core': 'test_cases.json',
         'rprviewer': 'test.cases.json',
-        'USD': 'test_cases.json'
+        'USD': 'test_cases.json',
+        'usdviewer': 'test_cases.json'
     }
 
 LOST_TESTS_JSON_NAME = 'lost_tests.json'
