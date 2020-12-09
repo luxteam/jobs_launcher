@@ -4,18 +4,18 @@
             <button class="commonButton closePopup" type="button" onclick="closeModalWindow('{{ performance_window_name }}');return false;"><img src="{{ pre_path }}/report_resources/img/close-button.png"/></button>
         </form>
         <div class="performance_tab" style="position: relative; width:1280px; margin:auto;">
-            {% if tracked_metrics | length > 1 %}
-                <div class="performance_tab" style="height:50px; width:1280px;">
-                    <form class="popupForm">
+            {% if groupped_tracked_metrics | length > 1 %}
+                <div class="performance_tab" style="height:30px; width:1280px;">
+                    <form class="popupForm" style="position: relative; text-align:left; top: 0.5vw;">
                         {#- Generate button for each metric -#}
-                            {% for tracked_metric in tracked_metrics | reverse %}
-                                <button class="commonButton closePopup" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ tracked_metric }}');return false;">{{ tracked_metrics[tracked_metric]['name'] }}</button>
-                            {% endfor %}
+                        {% for metric_group_name in groupped_tracked_metrics | reverse %}
+                            <button class="commonButton closePopup" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ metric_group_name }}');return false;">{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }}</button>
+                        {% endfor %}
                     </form>
                 </div>
             {% endif %}
-            <div class="performance_tab" style="height:50px; width:1280px;">
-                <form class="popupForm">
+            <div class="performance_tab" style="height:30px; width:1280px;">
+                <form class="popupForm" style="position: relative; text-align:left; top: 0.5vw;">
                     <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 10);return false;">Show last 10</button>
                     <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 50);return false;">Show last 50</button>
                     <button class="commonButton closePopup" type="button" onclick="showPartOfBuilds('{{ performance_chart_name }}', 100);return false;">Show last 100</button>
@@ -40,68 +40,103 @@
                         let nextColorIndex = 0
                         let options
                         let labels
+                        let datasets
                         let dataset
-                        {% for tracked_metric in tracked_metrics %}
-                            options = { "title": { "display": true, "text": "{{ tracked_metrics[tracked_metric]['name'] }} per build ({{ tracked_metrics[tracked_metric]['displaying_unit'] }})" }}
+                        let has_only_nulls
+                        {% for metric_group_name in groupped_tracked_metrics %}
+                            datasets = []
+
+                            {% if groupped_tracked_metrics[metric_group_name]['config'] %}
+                                {% if groupped_tracked_metrics[metric_group_name]['config']['displaying_unit'] %}
+                                    options = { "title": { "display": true, "text": "{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }} per build ({{ groupped_tracked_metrics[metric_group_name]['config']['displaying_unit'] }})" }}
+                                {% else %}
+                                        options = { "title": { "display": true, "text": "{{ groupped_tracked_metrics[metric_group_name]['config']['displaying_name'] }} per build" }}
+                                {% endif %}
+                            {% endif %}
+
                             labels = [
                                 {% for build_number in tracked_metrics_history %}
                                     "Build #{{ build_number }}"{{ "," if not loop.last }}
                                 {% endfor %}
                             ]
 
-                            dataset = {}
-                            dataset.label = "{{ test_package }}"
-                            dataset.borderColor = colors[nextColorIndex]
-                            nextColorIndex = (nextColorIndex + 1) % colors.length
+                            {% for tracked_metric in groupped_tracked_metrics[metric_group_name]['metrics'] %}
+                                dataset = {}
+                                // check that dataset doesn't contain only null values
+                                has_only_nulls = true
+                                dataset.label = "{{ groupped_tracked_metrics[metric_group_name]['metrics'][tracked_metric]['displaying_name'] }}"
+                                dataset.borderColor = colors[nextColorIndex]
+                                nextColorIndex = (nextColorIndex + 1) % colors.length
+                                dataset.data = [
+                                {%- for build_number in tracked_metrics_history -%}
+                                    {%- if performance_window_scope == "platform" -%}
+                                        {% if i in tracked_metrics_history[build_number] -%}
+                                            {%- set platform = tracked_metrics_history[build_number][i] -%}
+                                            {%- if tracked_metric in platform['summary'] -%}
+                                                {%- if platform['summary'][tracked_metric] != 0 or groupped_tracked_metrics[metric_group_name]['config']['display_zeros'] -%}
+                                                    "{{ platform['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
+                                                {%- else -%}
+                                                    null{{ "," if not loop.last }}
+                                                {%- endif -%}
+                                            {%- else -%}
+                                                null{{ "," if not loop.last }}
+                                            {%- endif -%}
+                                        {%- else -%}
+                                            null{{ "," if not loop.last }}
+                                        {%- endif -%}
+                                    {%- elif performance_window_scope == "test_group" -%}
+                                        {% if i in tracked_metrics_history[build_number] and test_package in tracked_metrics_history[build_number][i]['groups'] -%}
+                                            {%- set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] -%}
+                                            {%- if tracked_metric in test_group['summary'] -%}
+                                                {%- if test_group['summary'][tracked_metric] != 0 or groupped_tracked_metrics[metric_group_name]['config']['display_zeros'] -%}
+                                                    "{{ test_group['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
+                                                {%- else -%}
+                                                    null{{ "," if not loop.last }}
+                                                {%- endif -%}
+                                            {%- else -%}
+                                                null{{ "," if not loop.last }}
+                                            {%- endif -%}
+                                        {%- else -%}
+                                            null{{ "," if not loop.last }}
+                                        {%- endif -%}
+                                    {%- elif performance_window_scope == "test_case" -%}
+                                        {% if platform in tracked_metrics_history[build_number] and test_group in tracked_metrics_history[build_number][platform]['groups'] and test_case in tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'] -%}
+                                            {%- set test_case_data = tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'][test_case] -%}
+                                            {%- if tracked_metric in test_case_data -%}
+                                                {%- if test_case_data[tracked_metric] != 0 or groupped_tracked_metrics[metric_group_name]['config']['display_zeros'] -%}
+                                                    "{{ test_case_data[tracked_metric] | round(3) }}"{{ "," if not loop.last }}
+                                                {%- else -%}
+                                                    null{{ "," if not loop.last }}
+                                                {%- endif -%}
+                                            {%- else -%}
+                                                null{{ "," if not loop.last }}
+                                            {%- endif -%}
+                                        {%- else -%}
+                                            null{{ "," if not loop.last }}
+                                        {%- endif -%}
+                                    {%- endif -%}
+                                {%- endfor -%}
+                                ]
 
-                            dataset.data = [
-                            {%- for build_number in tracked_metrics_history -%}
-                                {%- if performance_window_scope == "platform" -%}
-                                    {% if i in tracked_metrics_history[build_number] -%}
-                                        {%- set platform = tracked_metrics_history[build_number][i] -%}
-                                        {%- if tracked_metric in platform['summary'] and platform['summary'][tracked_metric] != 0 -%}
-                                            "{{ platform['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
-                                        {%- else -%}
-                                            null{{ "," if not loop.last }}
-                                        {%- endif -%}
-                                    {%- else -%}
-                                        null{{ "," if not loop.last }}
-                                    {%- endif -%}
-                                {%- elif performance_window_scope == "test_group" -%}
-                                    {% if i in tracked_metrics_history[build_number] and test_package in tracked_metrics_history[build_number][i]['groups'] -%}
-                                        {%- set test_group = tracked_metrics_history[build_number][i]['groups'][test_package] -%}
-                                        {%- if tracked_metric in test_group['summary'] and test_group['summary'][tracked_metric] != 0 -%}
-                                            "{{ test_group['summary'][tracked_metric] | round(3) }}"{{ "," if not loop.last }}
-                                        {%- else -%}
-                                            null{{ "," if not loop.last }}
-                                        {%- endif -%}
-                                    {%- else -%}
-                                        null{{ "," if not loop.last }}
-                                    {%- endif -%}
-                                {%- elif performance_window_scope == "test_case" -%}
-                                    {% if platform in tracked_metrics_history[build_number] and test_group in tracked_metrics_history[build_number][platform]['groups'] and test_case in tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'] -%}
-                                        {%- set test_case_data = tracked_metrics_history[build_number][platform]['groups'][test_group]['metrics'][test_case] -%}
-                                        {%- if tracked_metric in test_case_data and test_case_data[tracked_metric] != 0 -%}
-                                            "{{ test_case_data[tracked_metric] | round(3) }}"{{ "," if not loop.last }}
-                                        {%- else -%}
-                                            null{{ "," if not loop.last }}
-                                        {%- endif -%}
-                                    {%- else -%}
-                                        null{{ "," if not loop.last }}
-                                    {%- endif -%}
-                                {%- endif -%}
-                            {%- endfor -%}
-                            ]
-
-                            performanceCharts[currentChart].renderData["{{ tracked_metric }}"] = { "labels": labels, "datasets": [ dataset ] }
-                            performanceCharts[currentChart].optionsData["{{ tracked_metric }}"] = options
+                                for (i in dataset.data) {
+                                    if (dataset.data[i] || dataset.data[i] == 0) {
+                                        has_only_nulls = false
+                                        break
+                                    }
+                                }
+                                if (!has_only_nulls) {
+                                    datasets.push(dataset)
+                                }
+                            {% endfor %}
+                            performanceCharts[currentChart].renderData["{{ metric_group_name }}"] = { "labels": labels, "datasets": datasets }
+                            performanceCharts[currentChart].optionsData["{{ metric_group_name }}"] = options
                         {% endfor %}
 
                         // initialize chart with data from the last iteration
                         performanceCharts[currentChart].chart = new Chart(document.getElementById(currentChart), { "type": "line", "data": { "labels": labels, "datasets": [ dataset ] }, "options": options });
                     }
                 </script>                                    
-                <canvas id="{{ performance_chart_name }}"></canvas>
+                <canvas id="{{ performance_chart_name }}" style="position: relative; top: 1vw;"></canvas>
             </div>
         </div>
     </div>
