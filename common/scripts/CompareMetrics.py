@@ -107,4 +107,5 @@ if __name__ == '__main__':
     p.add_argument('--img1', required=True, help='First image for comparison')
     p.add_argument('--img2', required=True, help='Second image for comparison')
     args = p.parse_args()
-    sys.exit(CompareMetrics(args.img1, args.img2).getPrediction())
+    rc = CompareMetrics(args.img1, args.img2).getPrediction()
+    print(rc)

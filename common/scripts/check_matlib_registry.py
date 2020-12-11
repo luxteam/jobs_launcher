@@ -17,4 +17,4 @@ if __name__ == '__main__':
     MATLIB_KEY = r'SOFTWARE\AMD\RadeonProRender\MaterialLibrary\{tool}'
     p = argparse.ArgumentParser()
     p.add_argument('--tool', required=True, help='The program for which you want to check matlib')
-    sys.exit(0) if not get_reg(MATLIB_KEY.format(tool=p.parse_args().tool), 'MaterialLibraryPath') else sys.exit(1)
+    print(0) if get_reg(MATLIB_KEY.format(tool=p.parse_args().tool), 'MaterialLibraryPath') else print(1)
