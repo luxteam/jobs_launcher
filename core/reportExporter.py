@@ -822,7 +822,11 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
             for group_dir in os.listdir(os.path.join(northstar_dir, root_dir)):
                 group_dir_path = os.path.join(northstar_dir, root_dir, group_dir)
                 if os.path.isdir(group_dir_path):
-                    sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
+                    sr = []
+                    for x in os.listdir(group_dir_path):
+                        if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX):
+                            current_item = json.loads(open(os.path.join(group_dir_path, x), 'r').read())
+                            sr.append(current_item[0] if type(current_item) is list else current_item)
                     with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
                         json.dump(sr, write_sum_report, indent=4)
     ###############
@@ -834,7 +838,11 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
             for group_dir in os.listdir(os.path.join(rpr_dir, root_dir)):
                 group_dir_path = os.path.join(rpr_dir, root_dir, group_dir)
                 if os.path.isdir(group_dir_path):
-                    sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
+                    sr = []
+                    for x in os.listdir(group_dir_path):
+                        if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX):
+                            current_item = json.loads(open(os.path.join(group_dir_path, x), 'r').read())
+                            sr.append(current_item[0] if type(current_item) is list else current_item)
                     with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
                         json.dump(sr, write_sum_report, indent=4)
 
@@ -959,7 +967,11 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
             for group_dir in os.listdir(os.path.join(northstar_dir, root_dir)):
                 group_dir_path = os.path.join(northstar_dir, root_dir, group_dir)
                 if os.path.isdir(group_dir_path):
-                    sr = [json.loads(open(os.path.join(group_dir_path, x), 'r').read()) for x in os.listdir(group_dir_path) if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX)]
+                    sr = []
+                    for x in os.listdir(group_dir_path):
+                        if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX):
+                            current_item = json.loads(open(os.path.join(group_dir_path, x), 'r').read())
+                            sr.append(current_item[0] if type(current_item) is list else current_item)
                     with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
                         json.dump(sr, write_sum_report, indent=4)
 
