@@ -98,7 +98,7 @@ class UMS_Client:
                 build_id=self.build_id,
                 job_id=self.job_id
             )
-            main_logger('GET: {url}'.format(url=url))
+            main_logger.info('GET: {url}'.format(url=url))
 
             response = get(
                 url=url,
@@ -189,7 +189,7 @@ class UMS_Client:
                 job_id=self.job_id
             )
 
-            main_logger('PUT: {url}'.format(url=url))
+            main_logger.info('PUT: {url}'.format(url=url))
             response = put(
                 headers=self.headers,
                 json=data,
