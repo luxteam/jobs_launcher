@@ -93,17 +93,31 @@ class UMS_Client:
 
     def get_suite_id_by_name(self, suite_name):
         try:
-            response = get(url="{url}/api/build?id={build_id}&jobId={job_id}".format(
-                    url=self.url,
-                    build_id=self.build_id,
-                    job_id=self.job_id
-                ),
+            url="{url}/api/build?id={build_id}&jobId={job_id}".format(
+                url=self.url,
+                build_id=self.build_id,
+                job_id=self.job_id
+            )
+            main_logger('GET: {url}'.format(url=url))
+
+            response = get(
+                url=url,
                 headers=self.headers
             )
+            
             main_logger.info("Get suite id by name {}".format(suite_name))
-            suites = [el['suite'] for el in json.loads(response.content.decode("utf-8"))['suites'] if el['suite']['name'] == suite_name]
-            self.suite_id = suites[0]['_id']
+            suites = json.loads(response.content.decode("utf-8"))['suites']
+            
+            self.suite_id = None
+            for el in suites:
+                if el['suite']['name'] == suite_name:
+                    self.suite_id = el['suite']['_id']
+                    break
 
+            assert self.suite_id != None
+        
+        except AssertionError as e:
+            main_logger.error("Not found suite in UMS Build response.")
         except Exception as e:
             self.suite_id = None
             main_logger.error("Suite id getting error")
@@ -129,7 +143,8 @@ class UMS_Client:
                 )
             )
             main_logger.info('Test suite result sent with code {}'.format(response.status_code))
-
+            main_logger.info('Test suite response: {}'.format(response.content))
+            
             if response.status_code == 401:
                 self.get_token()
 
@@ -166,16 +181,21 @@ class UMS_Client:
                 "env_label": self.env_label,
                 "environment": env
             }
+
+            url = "{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(
+                url=self.url,
+                build_id=self.build_id,
+                suite_id=self.suite_id,
+                job_id=self.job_id
+            )
+
+            main_logger('PUT: {url}'.format(url=url))
             response = put(
                 headers=self.headers,
                 json=data,
-                url="{url}/api/testSuiteResult?jobId={job_id}&buildId={build_id}&suiteId={suite_id}".format(
-                    url=self.url,
-                    build_id=self.build_id,
-                    suite_id=self.suite_id,
-                    job_id=self.job_id
-                )
+                url=url
             )
+            
             main_logger.info("Environment defined with code {}".format(response.status_code))
             return response
 
