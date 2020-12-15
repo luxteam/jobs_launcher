@@ -108,6 +108,7 @@ class UMS_Client:
             main_logger.info("Get suite id by name {}".format(suite_name))
             suites = json.loads(response.content.decode("utf-8"))['suites']
             
+            main_logger.info("Got suites {}".format(suites))
             self.suite_id = None
             for el in suites:
                 if el['suite']['name'] == suite_name:
