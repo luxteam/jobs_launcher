@@ -93,30 +93,38 @@ def send_finished_cases(session_dir, suite_name):
 
     if ums_client_prod:
         ums_client_prod.get_suite_id_by_name(suite_name)
-        minio_client_prod.upload_file(test_cases_path, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id, ums_client.env_label)
+        minio_client_prod.upload_file(test_cases_path, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id or "", ums_client.env_label)
     if ums_client_dev:
         ums_client_dev.get_suite_id_by_name(suite_name)
-        minio_client_dev.upload_file(test_cases_path, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id, ums_client.env_label)
+        minio_client_dev.upload_file(test_cases_path, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id or "", ums_client.env_label)
+
     for test_case in new_test_cases:
-        print('Sending artefacts & images for: {}'.format(test_case))
-        with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json')) as case_file:
-            case_file_data = json.load(case_file)[0]
+        try:
+            print('Sending artefacts & images for: {}'.format(test_case))
+            case_file_path = os.path.join(session_dir, suite_name, test_case + '_RPR.json')
+            with open(case_file_path) as case_file:
+                case_file_data = json.load(case_file)[0]
 
-            if test_case in new_cases_existence_hashes_info and \
-                    new_cases_existence_hashes_info[test_case] and \
-                    'id' in new_cases_existence_hashes_info[test_case]:
-                image_id = new_cases_existence_hashes_info[test_case]['id']
-                print("Use id found by hash for case: {} id: {}".format(test_case, image_id))
-            else:
-                image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
-                    'render_color_path'])) if is_client else -1
-                print("Upload new image for case: {} and get image id: {}".format(test_case, image_id))
-            case_file_data['image_service_id'] = image_id
+                if test_case in new_cases_existence_hashes_info and \
+                        new_cases_existence_hashes_info[test_case] and \
+                        'id' in new_cases_existence_hashes_info[test_case]:
+                    image_id = new_cases_existence_hashes_info[test_case]['id']
+                    print("Use id found by hash for case: {} id: {}".format(test_case, image_id))
+                else:
+                    image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
+                        'render_color_path'])) if is_client else -1
+                    print("Upload new image for case: {} and get image id: {}".format(test_case, image_id))
+                case_file_data['image_service_id'] = image_id
 
-        with open(os.path.join(session_dir, suite_name, test_case + '_RPR.json'), 'w') as case_file:
-            json.dump([case_file_data], case_file, indent=4, sort_keys=True)
+            with open(case_file_path, 'w') as case_file:
+                json.dump([case_file_data], case_file, indent=4, sort_keys=True)
 
-    transferred_test_cases += list(new_test_cases.keys())
+            transferred_test_cases.append(test_case)
+
+        except Exception as e:
+            main_logger.error("Failed iteration of test case {} send: {}".format(test_case, e))
+            main_logger.error("Traceback: {}".format(traceback.format_exc()))
+
     diff = len(test_cases) - len(transferred_test_cases)
     print('Monitor is waiting {} cases'.format(diff))
     if diff <= 0:
