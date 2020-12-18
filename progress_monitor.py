@@ -93,10 +93,10 @@ def send_finished_cases(session_dir, suite_name):
 
     if ums_client_prod:
         ums_client_prod.get_suite_id_by_name(suite_name)
-        minio_client_prod.upload_file(test_cases_path, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id or "", ums_client.env_label)
+        minio_client_prod.upload_file(test_cases_path, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id or "", ums_client_prod.env_label)
     if ums_client_dev:
         ums_client_dev.get_suite_id_by_name(suite_name)
-        minio_client_dev.upload_file(test_cases_path, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id or "", ums_client.env_label)
+        minio_client_dev.upload_file(test_cases_path, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id or "", ums_client_dev.env_label)
 
     for test_case in new_test_cases:
         try:
