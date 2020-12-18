@@ -42,7 +42,7 @@ def create_mc_client(job_id):
         )
         return mc
     except Exception as e:
-        main_logger.error("MINIO Client creation error: {}")
+        main_logger.error("MINIO Client creation error")
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
