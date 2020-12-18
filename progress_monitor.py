@@ -154,7 +154,7 @@ if __name__ == '__main__':
                 break
         except Exception as e:
             fails_in_succession += 1
-            main_logger.error("UMS progress monitor failed look up for new cases iteration. Sleep for {}".format(args.interval))
+            main_logger.error("UMS progress monitor failed look up for new cases iteration. Sleep for {} seconds".format(args.interval))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
         if MAX_UMS_SEND_RETRIES == fails_in_succession:
             break
