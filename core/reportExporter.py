@@ -760,7 +760,7 @@ def build_summary_reports(work_dir, major_title, commit_sha='undefined', branch_
         rc = -3
 
     try:
-        build_local_reports(work_dir, summary_report, common_info, env, tracked_metrics, tracked_metrics_history)
+        build_local_reports(work_dir, summary_report, common_info, env, groupped_tracked_metrics, tracked_metrics_history)
     except Exception as err:
         traceback.print_exc()
         main_logger.error(str(err))
