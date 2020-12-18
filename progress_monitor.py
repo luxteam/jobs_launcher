@@ -124,7 +124,7 @@ def send_finished_cases(session_dir, suite_name):
             transferred_test_cases.append(test_case)
 
         except Exception as e:
-            main_logger.error("UMS progress monitor failed iteration of test case {} send.")
+            main_logger.error("UMS progress monitor failed iteration of test case {} send.".format(test_case))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     diff = len(test_cases) - len(transferred_test_cases)
