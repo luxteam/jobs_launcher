@@ -284,6 +284,8 @@ def main():
                                     data = json.load(file)[0]
                                     if 'image_service_id' in data:
                                         rendered_image = str(data['image_service_id'])
+                            else:
+                                main_logger.error("File {} does not exists. Mark case {} image as error.".format(test_case_path, case['test_case']))
 
                         case_info = {}
                         for key in case:
@@ -311,7 +313,8 @@ def main():
                                 mc_dev.upload_file(path_to_test_case_log, "DEV", ums_client_dev.build_id,
                                     ums_client_dev.suite_id, ums_client_dev.env_label, case["test_case"])
                     except Exception as e1:
-                        main_logger.error("Failed to send results for case {}. Error: {}".format(e1, str(e1)))
+                        if 'test_case' in case:
+                            main_logger.error("UMS failed to prepare results for case {}. Error: {}".format(case['test_case'], str(e1)))
                         main_logger.error("Traceback: {}".format(traceback.format_exc()))
                 #TODO: send logs for each test cases
                 
@@ -431,7 +434,7 @@ def main():
 
 
         except Exception as e:
-            main_logger.error("Test case result creation error: {}".format(str(e)))
+            main_logger.error("UMS Failed in preparing test cases results and sending")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
             shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
     else:

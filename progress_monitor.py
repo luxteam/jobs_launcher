@@ -13,6 +13,8 @@ import traceback
 res = []
 transferred_test_cases = []
 
+main_logger.info("UMS progress monitor is running")
+
 is_client = None
 ums_client_prod = create_ums_client("PROD")
 ums_client_dev = create_ums_client("DEV")
@@ -28,9 +30,9 @@ try:
         login=os.getenv("IS_LOGIN"),
         password=os.getenv("IS_PASSWORD")
     )
-    main_logger.info("Image Service client created for url: {}".format(is_client.url))
+    main_logger.info("UMS progress monitor Image Service client created for url: {}".format(is_client.url))
 except Exception as e:
-    main_logger.error("Can't create Image Service client for url: {}. Error: {}".format(is_client.url, str(e)))
+    main_logger.error("UMS progress monitor can't create Image Service client for url: {}. Error: {}".format(is_client.url, str(e)))
 
 
 def render_color_full_path(session_dir, suite_name, render_color_path):
@@ -122,7 +124,7 @@ def send_finished_cases(session_dir, suite_name):
             transferred_test_cases.append(test_case)
 
         except Exception as e:
-            main_logger.error("Failed iteration of test case {} send: {}".format(test_case, e))
+            main_logger.error("UMS progress monitor failed iteration of test case {} send.")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
     diff = len(test_cases) - len(transferred_test_cases)
@@ -148,10 +150,11 @@ if __name__ == '__main__':
             result = send_finished_cases(args.session_dir, args.suite_name)
             fails_in_succession = 0
             if result:
+                main_logger.info("UMS progress monitor send all expected results.")
                 break
         except Exception as e:
             fails_in_succession += 1
-            main_logger.error("Failed iteration of progress monitor: {}".format(e))
+            main_logger.error("UMS progress monitor failed look up for new cases iteration. Sleep for {}".format(args.interval))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
         if MAX_UMS_SEND_RETRIES == fails_in_succession:
             break
