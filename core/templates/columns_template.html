@@ -302,7 +302,13 @@
 [Skipped] status means case wasn't launched by QA team decision."></span>
         </th>
     {%- else -%}
-        <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+        {#- Colorize passed status for ML Performance reports -#}
+        {%- if report_type == 'perf' and tool_name == 'ml' and item.test_status == 'passed' -%}
+            {%- set performance_window_name = 'Colored' -%}
+        {%- else -%}
+            {%- set performance_window_name = '' -%}
+        {%- endif -%}
+        <td class="{{ item.test_status }}Status{{ status_postfix }}">{{ item.test_status | title }}</td>
     {%- endif -%}
 {%- endif -%}
 

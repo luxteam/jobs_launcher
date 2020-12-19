@@ -13,6 +13,10 @@
 .passedStatus {
 }
 
+.passedStatusColored {
+  background: #d3ffe4 !important;
+}
+
 .failedStatus {
   background:
        repeating-linear-gradient(
