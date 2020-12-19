@@ -304,9 +304,9 @@
     {%- else -%}
         {#- Colorize passed status for ML Performance reports -#}
         {%- if report_type == 'perf' and tool_name == 'ml' and item.test_status == 'passed' -%}
-            {%- set performance_window_name = 'Colored' -%}
+            {%- set status_postfix = 'Colored' -%}
         {%- else -%}
-            {%- set performance_window_name = '' -%}
+            {%- set status_postfix = '' -%}
         {%- endif -%}
         <td class="{{ item.test_status }}Status{{ status_postfix }}">{{ item.test_status | title }}</td>
     {%- endif -%}
