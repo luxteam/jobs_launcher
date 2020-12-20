@@ -139,9 +139,9 @@ REPORT_RPR_LOG = 'renderTool.log'
 TEST_CASES_JSON_NAME = {
         'blender': 'test_cases.json',
         'maya': 'test_cases.json',
-        'max': 'case_list.json',
+        'max': 'test_cases.json',
         'core': 'test_cases.json',
-        'rprviewer': 'test.cases.json',
+        'rprviewer': 'test_cases.json',
         'USD': 'test_cases.json',
         'usdviewer': 'test_cases.json'
     }
