@@ -57,7 +57,7 @@ def get_machine_info():
         custom_os_name = os.getenv('CIS_OS')
         if custom_os_name:
             return custom_os_name
-        if platform.system() == "Windows":
+        elif platform.system() == "Windows":
             return '{} {}({})'.format(platform.system(), platform.release(), platform.architecture()[0])
         elif platform.system() == "Darwin":
             return '{} {}({})'.format(platform.system(), platform.mac_ver()[0], platform.architecture()[0])
@@ -93,7 +93,8 @@ def get_machine_info():
         # info['asic_count'] = "{}".format(len(info['asic'].split('+')))
         info['ram'] = psutil.virtual_memory().total / 1024 ** 3
         # info['cpu'] = platform.processor()
-        info['cpu'] = cpuinfo.get_cpu_info()['brand']
+        info['cpu'] = cpuinfo.get_cpu_info()['brand_raw']
+        print(info)
         return info
     except Exception as err:
         print("Exception: {0}".format(err))
@@ -101,4 +102,4 @@ def get_machine_info():
 
 
 def print_machine_info():
-    info = get_machine_info();
+    info = get_machine_info()
