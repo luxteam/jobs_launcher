@@ -2,6 +2,7 @@ import argparse
 import sys
 import numpy as np
 import cv2
+from numpy.lib.function_base import percentile
 
 
 class CompareMetrics(object):
@@ -101,11 +102,12 @@ class CompareMetrics(object):
             return 0 if median[0][0] != 255 else 1
 
 
-# commandline interface for CompareMetrics.
+# Commandline interface for CompareMetrics. Return percentage of images diffrence. 0 - the same, 100 - completely different
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--img1', required=True, help='First image for comparison')
     p.add_argument('--img2', required=True, help='Second image for comparison')
     args = p.parse_args()
-    rc = CompareMetrics(args.img1, args.img2).getPrediction()
-    print(rc)
+    pixDiff = CompareMetrics(args.img1, args.img2).getDiffPixeles()
+    # if images are completely different, getDiffPixeles returns -1
+    print(100.0 if pixDiff == -1 else pixDiff)
