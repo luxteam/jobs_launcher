@@ -331,6 +331,7 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                                             elif key == 'render_version' and temp_report['machine_info'][key]:
                                                 common_info[key].append(temp_report['machine_info'][key])
                                                 if len(common_info[key]) > 1:
+                                                    main_logger.error("Found multiple plugin versions: {}".format(common_info[key]))
                                                     rc = -5
                                             else:
                                                 common_info[key].append(temp_report['machine_info'][key])
