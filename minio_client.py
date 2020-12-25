@@ -1,4 +1,5 @@
 import os
+import time
 from core.config import main_logger, MAX_UMS_SEND_RETRIES, UMS_SEND_RETRY_INTERVAL
 import subprocess
 import sys
@@ -41,7 +42,7 @@ def create_mc_client(job_id):
         )
         return mc
     except Exception as e:
-        main_logger.error("MINIO Client creation error: {}".format(e))
+        main_logger.error("MINIO Client creation error")
         main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
@@ -88,8 +89,9 @@ class UMS_Minio:
                 main_logger.info("Artifact '{}' sent to MINIO".format(artifact_name))
                 file_sent = True
             except Exception as e:
-                main_logger.error(str(e))
-            main_logger.info('File sent to MINIO for UMS {} with result {} (try #{})'.format(ums_name, file_sent, send_try))
+                main_logger.error("MINIO file sending error")
+                main_logger.error("Traceback: {}".format(traceback.format_exc()))
+            main_logger.info('File {} sent to MINIO for UMS {} with result {} (try #{})'.format(file_path, ums_name, file_sent, send_try))
             if file_sent:
                 break
             send_try += 1
