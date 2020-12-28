@@ -51,7 +51,7 @@ def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
                         bytes_data = img.read()
                         cases_hashes[case] = hashlib.md5(bytes_data).hexdigest()
             except Exception as e1:
-                main_logger.error("Failed to process case {}. Excetpion: {}".format(case, e1))
+                main_logger.error("Failed to process case {} while hash check. Excetpion: {}".format(case, e1))
                 main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
         hash_info_from_is = is_client.get_existence_info_by_hash(
