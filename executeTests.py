@@ -276,7 +276,7 @@ def main():
                         if 'image_service_id' in case:
                             rendered_image = str(case['image_service_id'])
                         else:
-                            rendered_image = ''
+                            rendered_image = 'error'
                             # FIXME: refactor report building of Core: make reports parallel with render
                             test_case_path = os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')
                             if os.path.exists(test_case_path):
@@ -284,6 +284,8 @@ def main():
                                     data = json.load(file)[0]
                                     if 'image_service_id' in data:
                                         rendered_image = str(data['image_service_id'])
+                            else:
+                                main_logger.error("File {} does not exists. Mark case {} image as error.".format(test_case_path, case['test_case']))
 
                         case_info = {}
                         for key in case:
@@ -305,11 +307,14 @@ def main():
                         path_to_test_case_log = os.path.join(session_dir, suite_name, 'render_tool_logs', case["test_case"] + ".log")
                         if os.path.exists(path_to_test_case_log):
                             if ums_client_prod and mc_prod:
-                                mc_prod.upload_file(path_to_test_case_log, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id, case["test_case"])
+                                mc_prod.upload_file(path_to_test_case_log, "PROD",ums_client_prod.build_id,
+                                    ums_client_prod.suite_id, ums_client_prod.env_label, case["test_case"])
                             if ums_client_dev and mc_dev:
-                                mc_dev.upload_file(path_to_test_case_log, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id, case["test_case"])
+                                mc_dev.upload_file(path_to_test_case_log, "DEV", ums_client_dev.build_id,
+                                    ums_client_dev.suite_id, ums_client_dev.env_label, case["test_case"])
                     except Exception as e1:
-                        main_logger.error("Failed to send results for case {}. Error: {}".format(e1, str(e1)))
+                        if 'test_case' in case:
+                            main_logger.error("UMS failed to prepare results for case {}. Error: {}".format(case['test_case'], str(e1)))
                         main_logger.error("Traceback: {}".format(traceback.format_exc()))
                 #TODO: send logs for each test cases
                 
@@ -319,9 +324,11 @@ def main():
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if os.path.exists(path_to_test_suite_render_log):
                         if ums_client_prod and mc_prod:
-                            mc_prod.upload_file(path_to_test_suite_render_log, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id)
+                            mc_prod.upload_file(path_to_test_suite_render_log, "PROD",
+                                ums_client_prod.build_id, ums_client_prod.suite_id, ums_client_prod.env_label)
                         if ums_client_dev and mc_dev:
-                            mc_dev.upload_file(path_to_test_suite_render_log, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id)
+                            mc_dev.upload_file(path_to_test_suite_render_log, "DEV",
+                                ums_client_dev.build_id, ums_client_dev.suite_id, ums_client_prod.env_label)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -418,14 +425,16 @@ def main():
                 for suite in suites:
                     if ums_client_prod and mc_prod:
                         ums_client_prod.get_suite_id_by_name(suite_name)
-                        mc_prod.upload_file(path_to_test_suite_render_log, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id)
+                        mc_prod.upload_file(path_to_test_suite_render_log, "PROD",
+                            ums_client_prod.build_id, ums_client_prod.suite_id, ums_client_prod.env_label)
                     if ums_client_dev and mc_dev:
                         ums_client_dev.get_suite_id_by_name(suite_name)
-                        mc_dev.upload_file(path_to_test_suite_render_log, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id)
+                        mc_dev.upload_file(path_to_test_suite_render_log, "DEV",
+                            ums_client_dev.build_id, ums_client_dev.suite_id, ums_client_dev.env_label)
 
 
         except Exception as e:
-            main_logger.error("Test case result creation error: {}".format(str(e)))
+            main_logger.error("UMS Failed in preparing test cases results and sending")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
             shutil.copyfile('launcher.engine.log', os.path.join(session_dir, 'launcher.engine.log'))
     else:

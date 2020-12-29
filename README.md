@@ -2,7 +2,7 @@
 [![Version](https://img.shields.io/github/v/tag/luxteam/jobs_launcher?label=Version&style=flat-square)](https://github.com/luxteam/jobs_launcher/releases)
 
 ## local config
-Currently, switch between `master.ct` `master.ec` `master` reports has produced by `local_config.py` file in root dir.  
+Currently, switch between versions of reports (core, converters and original) has produced by `local_config.py` file in root dir.  
 Required content - definition of:
 * tool_name
 * report_type
@@ -24,7 +24,7 @@ report_type = 'default'
 
 - [Blender](https://github.com/luxteam/jobs_test_blender) : Regression group and any few test groups   
 - [Maya](https://github.com/luxteam/jobs_test_maya) : Regression group and any few test groups   
-- [Max](https://github.com/luxteam/jobs_test_max) : Regression group and any few test groups   
+- [Max](https://github.com/luxteam/jobs_test_max) : Smoke test group   
 - [RPRViewer](https://github.com/luxteam/jobs_test_rprviewer) : Scene_tests test group   
 - [Core](https://github.com/luxteam/jobs_test_core) : Full 
 - Conversion tools : Any conversion tool job with any few test groups   

@@ -40,13 +40,17 @@
     <div id="infoBox"></div>
 
     <div id="header">
-        <img src="{{ pre_path}}/report_resources/img/logo.png"/>
+        {% if report_type == 'perf' %}
+            <a class="logo" href='{{ pre_path }}/summary_report.html'>{{ tool_name }} performance</a>
+        {% else %}
+            <img src="{{ pre_path}}/report_resources/img/logo.png"/>
 
-        <ul>
-            <li><a id="summaryA" href='{{ pre_path }}/summary_report.html'>summary</a></li>
-            <li><a id="performanceA" href='{{ pre_path }}/performance_report.html'>performance</a></li>
-            <li><a id="compareA" href='{{ pre_path }}/compare_report.html'>compare</a></li>
-        </ul>
+            <ul>
+                <li><a id="summaryA" href='{{ pre_path }}/summary_report.html'>summary</a></li>
+                <li><a id="performanceA" href='{{ pre_path }}/performance_report.html'>performance</a></li>
+                <li><a id="compareA" href='{{ pre_path }}/compare_report.html'>compare</a></li>
+            </ul>
+        {% endif %}
     </div>
 
     {% include "base_table_block.html" %}

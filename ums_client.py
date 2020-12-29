@@ -19,17 +19,19 @@ def str2bool(v):
         raise ValueError('Boolean value expected. Got <{}>'.format(v))
 
 
-def create_ums_client(client_postfix_raw=""):
+def create_ums_client(client_postfix_raw="", env_label=""):
     try:
         if client_postfix_raw:
             client_postfix = "_" + client_postfix_raw
         else:
             client_postfix = ""
+        if not env_label:
+            env_label = os.getenv("UMS_ENV_LABEL")
         ums_client = UMS_Client(
             job_id=os.getenv("UMS_JOB_ID" + client_postfix),
             url=os.getenv("UMS_URL" + client_postfix),
             build_id=os.getenv("UMS_BUILD_ID" + client_postfix),
-            env_label=os.getenv("UMS_ENV_LABEL"),
+            env_label=env_label,
             suite_id=None,
             login=os.getenv("UMS_LOGIN" + client_postfix),
             password=os.getenv("UMS_PASSWORD" + client_postfix)
@@ -98,14 +100,13 @@ class UMS_Client:
                 ),
                 headers=self.headers
             )
-            main_logger.info("Get suite id by name {}".format(suite_name))
+            main_logger.info("UMS get suite id by name {}".format(suite_name))
             suites = [el['suite'] for el in json.loads(response.content.decode("utf-8"))['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
 
         except Exception as e:
             self.suite_id = None
-            main_logger.error("Suite id getting error")
-            main_logger.error(str(e))
+            main_logger.error("UMS suite id getting error")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
@@ -126,7 +127,7 @@ class UMS_Client:
                     job_id=self.job_id
                 )
             )
-            main_logger.info('Test suite result sent with code {}'.format(response.status_code))
+            main_logger.info('Test suite result sent to UMS with code {}'.format(response.status_code))
 
             if response.status_code == 401:
                 self.get_token()
@@ -134,7 +135,7 @@ class UMS_Client:
             return response
 
         except Exception as e:
-            main_logger.error("Test suite result send error: {}".format(str(e)))
+            main_logger.error("Test suite result send to UMS error")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
@@ -149,12 +150,12 @@ class UMS_Client:
                     product_id=self.job_id
                 )
             )
-            main_logger.info('Test suite performance sent with code {}'.format(response.status_code))
+            main_logger.info('Test suite performance sent with code {}. test_suite_result_id = {}'.format(response.status_code, test_suite_result_id))
 
             return response
 
         except Exception as e:
-            main_logger.error("Test suite performance send error: {}".format(str(e)))
+            main_logger.error("Test suite performance for UMS send error. test_suite_result_id = {}".format(test_suite_result_id))
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
 
@@ -174,9 +175,9 @@ class UMS_Client:
                     job_id=self.job_id
                 )
             )
-            main_logger.info("Environment defined with code {}".format(response.status_code))
+            main_logger.info("Environment defined for UMS with code {}".format(response.status_code))
             return response
 
         except Exception as e:
-            main_logger.error("Environment definition error: {}".format(str(e)))
+            main_logger.error("Environment definition for UMS error")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))

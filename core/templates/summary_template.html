@@ -58,11 +58,11 @@
                     "Job name"
                     {% endif %}
                 </td>
-                {% if tracked_metrics and tracked_metrics_history %}
+                {% if groupped_tracked_metrics and tracked_metrics_history %}
                     <td>
                         {%- set performance_window_name = "performanceWindow-" + i | string -%}
                         {%- set performance_chart_name = "performanceChart-" + i | string -%}
-                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (groupped_tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                         {% with performance_window_scope="platform" -%}
                             {%- include 'performance_history_tab.html' -%}
                         {%- endwith %}
@@ -263,7 +263,7 @@
                 {% if report[i].results[test_package][test_conf].result_path %}
                 <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/report.html">Report</a></td>
 
-                {% if report_type == 'default' %}
+                {% if report_type == 'default' or report_type == 'perf' %}
                     <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/renderTool.log">Render Log</a></td>
                 {% elif report_type == 'ec' %}
                     <td><a href="{{ report[i].results[test_package][test_conf].result_path }}/render_log.txt">Render Log</a></td>
@@ -275,11 +275,11 @@
                 <td>Render Log</td>
                 <td>Engine log</td>
                 {% endif %}
-                {% if tracked_metrics and tracked_metrics_history %}
+                {% if groupped_tracked_metrics and tracked_metrics_history %}
                     <td>
                         {%- set performance_window_name = "performanceWindow-" + i + "-" + test_package -%}
                         {%- set performance_chart_name = "performanceChart-" + i + "-" + test_package -%}
-                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                        <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (groupped_tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                         {% with performance_window_scope="test_group" -%}
                             {%- include 'performance_history_tab.html' -%}
                         {%- endwith %}

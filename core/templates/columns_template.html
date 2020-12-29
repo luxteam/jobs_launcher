@@ -125,6 +125,19 @@
                     {{ param }}<br/>
                 {%- endfor -%}
             </td>
+        {%- elif report_type == 'perf' and tool_name == 'ml' -%}
+            <td class="infoColumn">
+                {%- if item.onnx -%}
+                    <b>ONNX file:</b> {{ item.onnx }}<br/>
+                {%- endif -%}
+                {%- if item.csv -%}
+                    <b>CSV file:</b> {{ item.csv }}<br/>
+                {%- endif -%}
+                {%- if item.bin -%}
+                    <b>BIN file:</b> {{ item.bin }}<br/>
+                {%- endif -%}
+                <b>Render time:</b> {{ item.render_time | round(3) }}<br/>
+            </td>
         {%- elif report_type == 'ec' -%}
             <td class="infoColumn {{ item.test_status }}Status">
                 <b>Test status:</b> {{ item.test_status }}<br/>
@@ -289,7 +302,13 @@
 [Skipped] status means case wasn't launched by QA team decision."></span>
         </th>
     {%- else -%}
-        <td class="{{ item.test_status }}Status">{{ item.test_status | title }}</td>
+        {#- Colorize passed status for ML Performance reports -#}
+        {%- if report_type == 'perf' and tool_name == 'ml' and item.test_status == 'passed' -%}
+            {%- set status_postfix = 'Colored' -%}
+        {%- else -%}
+            {%- set status_postfix = '' -%}
+        {%- endif -%}
+        <td class="{{ item.test_status }}Status{{ status_postfix }}">{{ item.test_status | title }}</td>
     {%- endif -%}
 {%- endif -%}
 
@@ -298,11 +317,11 @@
     {%- if is_head -%}
         <th data-field="performance_history" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Performance history</th>
     {%- else -%}
-        {% if tracked_metrics and tracked_metrics_history %}
+        {% if groupped_tracked_metrics and tracked_metrics_history %}
             <td>
                 {%- set performance_window_name = "performanceWindow-" + platform + "-" + common_info.test_group + "-" + item.test_case -%}
                 {%- set performance_chart_name = "performanceChart-" + platform + "-" + common_info.test_group + "-" + item.test_case -%}
-                <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
+                <button class="commonButton popupButton" type="button" onclick="changeMetric('{{ performance_chart_name }}', '{{ (groupped_tracked_metrics.keys() | list)[-1] }}');openModalWindow('{{ performance_window_name }}');return false;">Open history</button>
                 {% with performance_window_scope="test_case", test_group=common_info.test_group, test_case=item.test_case -%}
                     {%- include 'performance_history_tab.html' -%}
                 {%- endwith %}
@@ -320,14 +339,14 @@
 {%- if column.name == 'render_time' -%}
     {%- if is_head -%}
         <th data-field="render_time" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="timeFormatterFull">
-            {%- if report_type == 'default' or report_type == 'ec' -%}
+            {%- if report_type == 'default' or report_type == 'ec' or report_type == 'perf' -%}
                 Render time
             {%- elif report_type == 'ct' -%}
                 RPR render time
             {%- endif -%}
         </th>
     {%- else -%}
-        {%- if report_type == 'default' or report_type == 'ec' -%}
+        {%- if report_type == 'default' or report_type == 'ec' or report_type == 'perf' -%}
             <td>{{ item.render_time | round(3) }}</td>
         {%- elif report_type == 'ct' -%}
             <td>{{ item.render_time }}</td>
@@ -411,7 +430,7 @@
     {%- if is_head -%}
         <th data-field="render_log" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Log files</th>
     {%- else -%}
-        {%- if report_type == 'default' -%}
+        {%- if report_type == 'default' or report_type == 'perf' -%}
             <td>
                 {%- if 'render_log' in item -%}
                 <a href="{{ item.render_log }}">Render log</a>
