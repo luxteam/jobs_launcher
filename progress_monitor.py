@@ -42,30 +42,34 @@ def render_color_full_path(session_dir, suite_name, render_color_path):
 def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
     cases_hashes_info = {}
     cases_hashes = {}
-    for case in test_cases:
-        try:
-            with open(os.path.join(session_dir, suite_name, case + '_RPR.json')) as case_file:
-                case_file_data = json.load(case_file)[0]
-                with open(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path']), 'rb') as img:
-                    bytes_data = img.read()
-                    cases_hashes[case] = hashlib.md5(bytes_data).hexdigest()
-        except:
-            pass
+    try:
+        for case in test_cases:
+            try:
+                with open(os.path.join(session_dir, suite_name, case + '_RPR.json')) as case_file:
+                    case_file_data = json.load(case_file)[0]
+                    with open(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path']), 'rb') as img:
+                        bytes_data = img.read()
+                        cases_hashes[case] = hashlib.md5(bytes_data).hexdigest()
+            except Exception as e1:
+                main_logger.error("Failed to process case {} while hash check. Excetpion: {}".format(case, e1))
+                main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
-    hash_info_from_is = is_client.get_existence_info_by_hash(
-        [case_hash for case, case_hash in cases_hashes.items() if case_hash]
-    )
-    if hash_info_from_is:
-        cases_hashes_info = {
-            case: hash_info_from_is[case_hash]
-            for case, case_hash in cases_hashes.items() if case_hash in hash_info_from_is
-        }
+        hash_info_from_is = is_client.get_existence_info_by_hash(
+            [case_hash for case, case_hash in cases_hashes.items() if case_hash]
+        )
+        if hash_info_from_is:
+            cases_hashes_info = {
+                case: hash_info_from_is[case_hash]
+                for case, case_hash in cases_hashes.items() if case_hash in hash_info_from_is
+            }
+        main_logger.info("Hashes of existing images were received from Image Service")
+    except Exception as e:
+        main_logger.error("Failed to get hashed from Image Service. Excetpion: {}".format(e))
+        main_logger.error("Traceback: {}".format(traceback.format_exc()))
     return cases_hashes_info
 
 
 def send_finished_cases(session_dir, suite_name):
-
-
     if os.path.exists(os.path.join(session_dir, suite_name, 'test_cases.json')):
         test_cases_path = os.path.join(session_dir, suite_name, 'test_cases.json')
         with open(test_cases_path) as test_cases_file:
@@ -88,10 +92,14 @@ def send_finished_cases(session_dir, suite_name):
     new_test_cases = {}
     for test_case in test_cases:
         if test_case['status'] in ('skipped', 'error', 'done', 'passed') and not test_case[name_key] in transferred_test_cases:
-            new_test_cases[test_case[name_key]] = test_case['status']
-            if 'aovs' in test_case:
-                for aov in test_case['aovs']:
-                    new_test_cases[test_case[name_key] + aov['aov']] = aov['status']
+            # check that file with case info already exists
+            if os.path.exists(os.path.join(session_dir, suite_name, test_case[name_key] + '_RPR.json')):
+                new_test_cases[test_case[name_key]] = test_case['status']
+                if 'aovs' in test_case:
+                    for aov in test_case['aovs']:
+                        new_test_cases[test_case[name_key] + aov['aov']] = aov['status']
+            else:
+                main_logger.warning("File with case info for case {} doesn't exist. Make sure that it is expected".format(test_case[name_key]))
 
     new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
     print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
