@@ -14,6 +14,7 @@
             <th>Branch name</th>
             <th>Commit SHA</th>
             <th>Commit message</th>
+            <th>Build name</th>
             {% if common_info.engine %}
                 <th>Engine</th>
             {% endif %}
@@ -36,6 +37,7 @@
             <td>{{ common_info.branch_name }}</td>
             <td>{{ common_info.commit_sha }}</td>
             <td>{{ common_info.commit_message }}</td>
+            <td>{{ env_override("BUILD_NAME") }}</td>
             {% if common_info.engine %}
                 <td>{{ common_info.engine }}</td>
             {% endif %}
