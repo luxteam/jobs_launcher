@@ -1,6 +1,7 @@
 {% if pageID %}
     <table class="baseTable">
         <tr>
+            <th>Build name</th>
             <th>Testing start</th>
             {% if report_type == 'ec' %}
                 {# Core #}
@@ -14,12 +15,12 @@
             <th>Branch name</th>
             <th>Commit SHA</th>
             <th>Commit message</th>
-            <th>Build name</th>
             {% if common_info.engine %}
                 <th>Engine</th>
             {% endif %}
         </tr>
         <tr>
+            <td>{{ "" | env_override("BUILD_NAME") }}</td>
             <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
             {% if report_type == 'ec' %}
                 {# Core #}
@@ -37,7 +38,6 @@
             <td>{{ common_info.branch_name }}</td>
             <td>{{ common_info.commit_sha }}</td>
             <td>{{ common_info.commit_message }}</td>
-            <td>{{ "" | env_override("BUILD_NAME") }}</td>
             {% if common_info.engine %}
                 <td>{{ common_info.engine }}</td>
             {% endif %}
