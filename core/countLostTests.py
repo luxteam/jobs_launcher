@@ -171,7 +171,7 @@ def main(lost_tests_results, tests_dir, output_dir, split_tests_execution, tests
 						if test_package_name in excluded_groups:
 							continue
 						try:
-							lost_tests_count = len(set(tests_package_data["groups"][test_package_name].split(',')))
+							lost_tests_count = tests_package_data["groups"][test_package_name].replace(' ', '').split(',')
 							gpu_name = lost_package_stach.split('-')[0]
 							os_name = lost_package_stach.split('-')[1]
 							# join converted gpu name and os name
