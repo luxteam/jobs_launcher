@@ -1,6 +1,7 @@
 {% if pageID %}
     <table class="baseTable">
         <tr>
+            <th>Build name</th>
             <th>Testing start</th>
             {% if report_type == 'ec' %}
                 {# Core #}
@@ -19,6 +20,7 @@
             {% endif %}
         </tr>
         <tr>
+            <td>{{ "" | env_override("BUILD_NAME") }}</td>
             <td>{{ common_info.reporting_date | env_override("JOB_STARTED_TIME") }}</td>
             {% if report_type == 'ec' %}
                 {# Core #}
