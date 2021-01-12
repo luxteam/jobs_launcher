@@ -141,7 +141,7 @@ TEST_CASES_JSON_NAME = {
         'maya': 'test_cases.json',
         'max': 'case_list.json',
         'core': 'test_cases.json',
-        'rprviewer': 'test.cases.json',
+        'rprviewer': 'test_cases.json',
         'USD': 'test_cases.json',
         'usdviewer': 'test_cases.json'
     }
