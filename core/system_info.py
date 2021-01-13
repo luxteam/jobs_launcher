@@ -62,7 +62,12 @@ def get_machine_info():
         elif platform.system() == "Darwin":
             return '{} {}({})'.format(platform.system(), platform.mac_ver()[0], platform.architecture()[0])
         else:
-            return '{} {}({})'.format(platform.linux_distribution()[0], platform.linux_distribution()[1], platform.architecture()[0])
+            try:
+                return '{} {}({})'.format(platform.linux_distribution()[0], platform.linux_distribution()[1], platform.architecture()[0])
+            except:
+                import distro
+                return '{} {}({})'.format(distro.linux_distribution()[0], distro.linux_distribution()[1], platform.architecture()[0])
+
 
     def get_driver_ver():
         if os.name == "nt":
