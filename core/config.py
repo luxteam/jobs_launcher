@@ -11,6 +11,7 @@ RENDER_REPORT_BASE = {
     "script_info": [],
     "render_color_path": "",
     "test_case": "",
+    "case_functions": "",
     "render_version": "",
     "test_status": "undefined",
     "tool": "",
