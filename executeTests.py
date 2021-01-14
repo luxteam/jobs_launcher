@@ -319,7 +319,7 @@ def main():
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
-                test_suite_artefacts = {"renderTool.log", "render_log.txt"}
+                test_suite_artefacts = {"renderTool.log", "render_log.txt", "test_cases.json"}
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if os.path.exists(path_to_test_suite_render_log):
