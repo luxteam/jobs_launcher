@@ -71,6 +71,7 @@ def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
 
 
 def send_finished_cases(session_dir, suite_name):
+    global test_cases_sent
     if os.path.exists(os.path.join(session_dir, suite_name, 'test_cases.json')):
         test_cases_path = os.path.join(session_dir, suite_name, 'test_cases.json')
         with open(test_cases_path) as test_cases_file:
