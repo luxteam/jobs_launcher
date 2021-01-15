@@ -326,8 +326,8 @@ def build_summary_report(work_dir, node_retry_info, collect_tracked_metrics):
                                     for key in common_info:
                                         if not temp_report['machine_info'][key] in common_info[key]:
                                             if key == 'reporting_date':
-                                                if common_info[key] > temp_report["results"]["Transform"][""]["render_results"][0]["date_time"]:
-                                                    common_info[key] = temp_report["results"]["Transform"][""]["render_results"][0]["date_time"] 
+                                                if common_info.get(key, [''])[0] > temp_report['machine_info'][key]:
+                                                    common_info[key] = [temp_report['machine_info'][key]]
                                             elif key == 'render_version' and temp_report['machine_info'][key]:
                                                 common_info[key].append(temp_report['machine_info'][key])
                                                 if len(common_info[key]) > 1:
