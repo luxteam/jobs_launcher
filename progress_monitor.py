@@ -123,16 +123,17 @@ def send_finished_cases(session_dir, suite_name):
                         new_cases_existence_hashes_info[test_case] and \
                         'id' in new_cases_existence_hashes_info[test_case]:
                     image_id = new_cases_existence_hashes_info[test_case]['id']
-                    print("Use id found by hash for case: {} id: {}".format(test_case, image_id))
+                    print('Use id found by hash for case: {} id: {}'.format(test_case, image_id))
                 else:
                     image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
                         'render_color_path'])) if is_client else -1
-                    print("Upload new image for case: {} and get image id: {}".format(test_case, image_id))
+                    print('Upload new image for case: {} and get image id: {}'.format(test_case, image_id))
 
                 # upload error screen if it exists
-                error_screen_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
-                    'error_screen_path'])) if is_client else -1
-                print("Upload error screen for case: {} and get image id: {}".format(test_case, image_id))
+                if 'error_screen_path' in case_file_data and case_file_data['error_screen_path']:
+                    error_screen_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
+                        'error_screen_path'])) if is_client else -1
+                    print('Upload error screen for case: {} and get image id: {}'.format(test_case, image_id))
 
                 case_file_data['rendered_image_is_id'] = image_id
                 case_file_data['error_image_is_id'] = error_screen_id
