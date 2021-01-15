@@ -273,19 +273,15 @@ def main():
                     try:
                         summary_sync_time += case.get('sync_time', 0)
 
-                        if 'image_service_id' in case:
-                            rendered_image = str(case['image_service_id'])
+                        if 'rendered_image_is_id' in case:
+                            rendered_image = str(case['rendered_image_is_id'])
                         else:
                             rendered_image = 'error'
-                            # FIXME: refactor report building of Core: make reports parallel with render
-                            test_case_path = os.path.join(session_dir, suite_name, case['test_case'] + '_RPR.json')
-                            if os.path.exists(test_case_path):
-                                with open(test_case_path) as file:
-                                    data = json.load(file)[0]
-                                    if 'image_service_id' in data:
-                                        rendered_image = str(data['image_service_id'])
-                            else:
-                                main_logger.error("File {} does not exists. Mark case {} image as error.".format(test_case_path, case['test_case']))
+
+                        if 'error_screen_is_id' in case:
+                            error_screen = str(case['error_screen_is_id'])
+                        else:
+                            error_screen = 'error'
 
                         case_info = {}
                         for key in case:
@@ -299,7 +295,8 @@ def main():
                                 'render_time': case['render_time']
                             },
                             "artefacts": {
-                                "rendered_image": rendered_image
+                                "rendered_image": rendered_image,
+                                "error_screen": error_screen
                             },
                             "info": case_info
                         })

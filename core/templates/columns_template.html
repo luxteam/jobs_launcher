@@ -110,6 +110,36 @@
     {%- endif -%}
 {%- endif -%}
 
+{#- ------------------------------ ERROR SCREEN ------------------------------ -#}
+{%- if column.name == 'error_screen' -%}
+    {%- if is_head -%}
+        <th data-field="error_screen" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}" data-formatter="metaAJAX">Error screen
+        </th>
+    {%- else -%}
+        <td class="hatching">
+        {%- if item.error_screen_path -%}
+
+            {%- if template_name == 'local' -%}
+                {%- if 'thumb256_error_screen_path' in item -%}
+                <img data-src="{{ item.thumb256_error_screen_path }}"/>
+                {%- else -%}
+                <img data-src="{{ item.error_screen_path }}"/>
+                {%- endif -%}
+            {%- elif template_name == 'detailed' -%}
+                {%- if 'thumb64_error_screen_path' in item -%}
+                <img data-src="{{ item.thumb64_error_screen_path }}"/>
+                {%- else -%}
+                <img data-src="{{ item.error_screen_path }}"/>
+                {%- endif -%}
+            {%- endif -%}
+
+        {%- else -%}
+            No error screen
+        {%- endif -%}
+        </td>
+    {%- endif -%}
+{%- endif -%}
+
 {#- ------------------------------ INFO ------------------------------ -#}
 {%- if column.name == 'info' -%}
     {%- if is_head -%}
