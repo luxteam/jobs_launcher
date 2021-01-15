@@ -134,7 +134,7 @@ def send_finished_cases(session_dir, suite_name):
                     error_screen_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
                         'error_screen_path'])) if is_client else -1
                     print('Upload error screen for case: {} and get image id: {}'.format(test_case, image_id))
-                    case_file_data['error_image_is_id'] = error_screen_id
+                    case_file_data['error_screen_is_id'] = error_screen_id
 
                 case_file_data['rendered_image_is_id'] = image_id
 

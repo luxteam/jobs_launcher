@@ -281,7 +281,7 @@ def main():
                         if 'error_screen_is_id' in case:
                             error_screen = str(case['error_screen_is_id'])
                         else:
-                            error_screen = 'error'
+                            error_screen = ''
 
                         case_info = {}
                         for key in case:
