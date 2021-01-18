@@ -3,7 +3,7 @@ import subprocess
 import jinja2
 import json
 import base64
-from shutil import rmtree, copytree
+from shutil import rmtree, copytree, move
 from codecs import open
 import datetime
 import operator
@@ -813,24 +813,6 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
 
     #######################
 
-    for root_dir in os.listdir(northstar_dir):
-        if os.path.isdir(os.path.join(northstar_dir, root_dir)):
-            session_gpu, session_os = os.path.basename(root_dir).split('-')
-            engine_postf = 'NorthStar'
-
-            main_logger.debug("Generate for NorthStar: {}".format(session_gpu + session_os))
-            for group_dir in os.listdir(os.path.join(northstar_dir, root_dir)):
-                group_dir_path = os.path.join(northstar_dir, root_dir, group_dir)
-                if os.path.isdir(group_dir_path):
-                    sr = []
-                    for x in os.listdir(group_dir_path):
-                        if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX):
-                            current_item = json.loads(open(os.path.join(group_dir_path, x), 'r').read())
-                            sr.append(current_item[0] if type(current_item) is list else current_item)
-                    with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
-                        json.dump(sr, write_sum_report, indent=4)
-    ###############
-
     for root_dir in os.listdir(rpr_dir):
         if os.path.isdir(os.path.join(rpr_dir, root_dir)):
             session_gpu, session_os = os.path.basename(root_dir).split('-')
@@ -971,7 +953,22 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                     for x in os.listdir(group_dir_path):
                         if os.path.isfile(os.path.join(group_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX):
                             current_item = json.loads(open(os.path.join(group_dir_path, x), 'r').read())
-                            sr.append(current_item[0] if type(current_item) is list else current_item)
+                            current_item_content = current_item[0] if type(current_item) is list else current_item
+                            # if error - replace by baseline
+                            if current_item_content["test_status"] == "error":
+                                baseline_group_dir = os.path.join(northstar_dir + "_Baselines", root_dir, group_dir)
+                                baseline_path = os.path.join(baseline_group_dir, x)
+                                if os.path.isfile(baseline_path):
+                                    current_item = json.loads(open(baseline_path, 'r').read())
+                                    current_item_content = current_item[0] if type(current_item) is list else current_item
+                                    move(os.path.join(baseline_group_dir, current_item_content["render_color_path"]), 
+                                        os.path.join(group_dir_path, current_item_content["render_color_path"]))
+                                    move(os.path.join(baseline_group_dir, current_item_content["thumb64_render_color_path"]), 
+                                        os.path.join(group_dir_path, current_item_content["thumb64_render_color_path"]))
+                                    move(os.path.join(baseline_group_dir, current_item_content["thumb256_render_color_path"]), 
+                                        os.path.join(group_dir_path, current_item_content["thumb256_render_color_path"]))
+                            sr.append(current_item_content)
+
                     with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
                         json.dump(sr, write_sum_report, indent=4)
 
