@@ -1,21 +1,30 @@
 import json
 import pyscreenshot
+sys.path.append(os.path.abspath(os.path.join(
+    os.path.dirname(__file__), os.path.pardir, os.path.pardir, os.path.pardir)))
+import local_config
 
 
 def get_error_case(cases_path):
-    with open(cases_path) as file:
-        cases = json.load(file)
+    # FIXME: make general implementation after refactoring of Max repository
+    if local_config.tool_name == "max":
+        with open(cases_path) as file:
+            data = json.loads(file.read())
 
-    for case in cases:
-        if case["status"] == "inprogress":
-            case["status"] = "error"
-
-            with open(cases_path, "w") as file:
-                json.dump(cases, file, indent=4)
-
-            return case["case"]
+        for case in data["cases"]:
+            if case["status"] == "progress":
+                return case["case"]
+        else:
+            return False
     else:
-        return False
+        with open(cases_path) as file:
+            cases = json.load(file)
+
+        for case in cases:
+            if case["status"] == "inprogress":
+                return case["case"]
+        else:
+            return False
 
 
 def make_error_screen(case_path, absolute_screen_path, relative_screen_path):
