@@ -557,7 +557,7 @@ def build_local_reports(work_dir, summary_report, common_info, jinja_env, groupp
                     if os.path.exists(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED)):
                         with open(os.path.join(work_dir, report_dir, TEST_REPORT_NAME_COMPARED), 'r') as file:
                             render_report = json.loads(file.read())
-                            keys_for_upd = ['tool', 'render_device', 'testing_start', 'test_group']
+                            keys_for_upd = ['tool', 'render_device', 'date_time', 'test_group']
                             for key_upd in keys_for_upd:
                                 if key_upd in render_report[0].keys():
                                     common_info.update({key_upd: render_report[0][key_upd]})
