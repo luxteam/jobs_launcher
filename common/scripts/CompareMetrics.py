@@ -99,7 +99,7 @@ class CompareMetrics(object):
             # print("Max: 0")
 
             # 1 - there is a difference. 0 - there isn't a difference
-            return 0 if median[0][0] != 255 else 1
+            return 0 if median[0][0] != 255 else 1, max(a)
 
 
 # Commandline interface for CompareMetrics. Return percentage of images diffrence. 0 - the same, 100 - completely different
