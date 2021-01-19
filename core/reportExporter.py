@@ -872,13 +872,13 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                 if not os.path.exists(group_dir_path):
                                     os.makedirs(os.path.join(group_dir_path, "Color"))
 
-                                if os.path.exists(os.path.join(group_baseline_dir_path, baseline_item_content["render_color_path"])):
+                                if "render_color_path" in baseline_item_content and os.path.exists(os.path.join(group_baseline_dir_path, baseline_item_content["render_color_path"])):
                                     move(os.path.join(group_baseline_dir_path, baseline_item_content["render_color_path"]), 
                                         os.path.join(group_dir_path, baseline_item_content["render_color_path"]))
-                                if os.path.exists(os.path.join(group_baseline_dir_path, baseline_item_content["thumb64_render_color_path"])):
+                                if "thumb64_render_color_path" in baseline_item_content and os.path.exists(os.path.join(group_baseline_dir_path, baseline_item_content["thumb64_render_color_path"])):
                                     move(os.path.join(group_baseline_dir_path, baseline_item_content["thumb64_render_color_path"]), 
                                     os.path.join(group_dir_path, baseline_item_content["thumb64_render_color_path"]))
-                                if os.path.exists(os.path.join(group_baseline_dir_path, baseline_item_content["thumb256_render_color_path"])):
+                                if "thumb256_render_color_path" in baseline_item_content and os.path.exists(os.path.join(group_baseline_dir_path, baseline_item_content["thumb256_render_color_path"])):
                                     move(os.path.join(group_baseline_dir_path, baseline_item_content["thumb256_render_color_path"]), 
                                     os.path.join(group_dir_path, baseline_item_content["thumb256_render_color_path"]))                             
 
