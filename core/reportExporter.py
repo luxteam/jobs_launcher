@@ -816,7 +816,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
     for root_dir in os.listdir(northstar_dir):
         if os.path.isdir(os.path.join(northstar_dir, root_dir)):
             session_gpu, session_os = os.path.basename(root_dir).split('-')
-            engine_postf = 'NorthStar'
+            engine_postf = "NorthStar"
 
             main_logger.debug("Generate for NorthStar: {}".format(session_gpu + session_os))
             for group_dir in os.listdir(os.path.join(northstar_dir, root_dir)):
@@ -831,7 +831,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                             if current_item_content["test_status"] != "error":
                                 sr.append(current_item[0] if type(current_item) is list else current_item)
 
-                    with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as write_sum_report:
+                    with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), "w") as write_sum_report:
                         json.dump(sr, write_sum_report, indent=4)
 
     # go through Northstar baselines and replace lost and error rendered cases by them
@@ -849,8 +849,8 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                     sr = []
                     # if report exists - read it
                     if os.path.exists(os.path.join(group_dir_path, BASELINE_REPORT_NAME)):
-                        with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), 'w') as sum_report:
-                            sr = json.load(sum_report)
+                        with open(os.path.join(group_dir_path, BASELINE_REPORT_NAME), "r") as read_sum_report:
+                            sr = json.load(read_sum_report)
                     for x in os.listdir(group_baseline_dir_path):
                         if os.path.isfile(os.path.join(group_baseline_dir_path, x)) and x.endswith(CASE_REPORT_SUFFIX):
                             replace = False
