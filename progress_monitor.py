@@ -15,6 +15,7 @@ transferred_test_cases = []
 
 main_logger.info("UMS progress monitor is running")
 
+test_cases_sent = False
 is_client = None
 ums_client_prod = create_ums_client("PROD")
 ums_client_dev = create_ums_client("DEV")
@@ -70,6 +71,7 @@ def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
 
 
 def send_finished_cases(session_dir, suite_name):
+    global test_cases_sent
     if os.path.exists(os.path.join(session_dir, suite_name, 'test_cases.json')):
         test_cases_path = os.path.join(session_dir, suite_name, 'test_cases.json')
         with open(test_cases_path) as test_cases_file:
@@ -104,12 +106,15 @@ def send_finished_cases(session_dir, suite_name):
     new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
     print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
 
-    if ums_client_prod:
-        ums_client_prod.get_suite_id_by_name(suite_name)
-        minio_client_prod.upload_file(test_cases_path, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id or "", ums_client_prod.env_label)
-    if ums_client_dev:
-        ums_client_dev.get_suite_id_by_name(suite_name)
-        minio_client_dev.upload_file(test_cases_path, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id or "", ums_client_dev.env_label)
+    if not test_cases_sent:
+        if ums_client_prod:
+            ums_client_prod.get_suite_id_by_name(suite_name)
+            minio_client_prod.upload_file(test_cases_path, "PROD", ums_client_prod.build_id, ums_client_prod.suite_id or "", ums_client_prod.env_label)
+        if ums_client_dev:
+            ums_client_dev.get_suite_id_by_name(suite_name)
+            minio_client_dev.upload_file(test_cases_path, "DEV", ums_client_dev.build_id, ums_client_dev.suite_id or "", ums_client_dev.env_label)
+
+        test_cases_sent = True
 
     for test_case in new_test_cases:
         try:

@@ -209,7 +209,6 @@ def main():
                 report['results'][found_job[0]][' '.join(found_job[1])]['duration'] += job_launcher_report['report']['duration']
             report['results'][found_job[0]][' '.join(found_job[1])]['result_path'] = os.path.relpath(temp_path, session_dir)
 
-            # FIXME: refactor report building of Core: make reports parallel with render
             if (i == 0) and (ums_client_prod or ums_client_dev):
                 if job_launcher_report['rc'] != -10:
                     try:
@@ -319,7 +318,7 @@ def main():
                 #TODO: send logs for each test cases
                 
                 # logs from suite dir
-                test_suite_artefacts = {"renderTool.log", "render_log.txt"}
+                test_suite_artefacts = {"renderTool.log", "render_log.txt", "test_cases.json"}
                 for artefact in test_suite_artefacts:
                     path_to_test_suite_render_log = os.path.join(session_dir, suite_name, artefact)
                     if os.path.exists(path_to_test_suite_render_log):
@@ -364,17 +363,20 @@ def main():
                 test_suite_result_id_prod = None
                 test_suite_result_id_dev = None
                 send_try = 0
-                while send_try < MAX_UMS_SEND_RETRIES:
-                    response_prod = ums_client_prod.send_test_suite(res=res, env=env)
-                    main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
-                    main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
-                    if response_prod and response_prod.status_code < 300:
-                        response_data = json.loads(response_prod.content.decode("utf-8"))
-                        if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
-                            test_suite_result_id_prod = response_data['data']['test_suite_result_id']
-                        break
-                    send_try += 1
-                    time.sleep(UMS_SEND_RETRY_INTERVAL)
+                if ums_client_prod.suite_id:
+                    while send_try < MAX_UMS_SEND_RETRIES:
+                        response_prod = ums_client_prod.send_test_suite(res=res, env=env)
+                        main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
+                        main_logger.info('Response from UMS PROD: \n{}'.format(response_prod.content))
+                        if response_prod and response_prod.status_code < 300:
+                            response_data = json.loads(response_prod.content.decode("utf-8"))
+                            if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
+                                test_suite_result_id_prod = response_data['data']['test_suite_result_id']
+                            break
+                        send_try += 1
+                        time.sleep(UMS_SEND_RETRY_INTERVAL)
+                else:
+                    main_logger.info('Result for test suite {} won\'t be send on UMS PROD due to empty suite_id'.format(suite_name))
 
                 if test_suite_result_id_prod:
                     send_try = 0
@@ -390,17 +392,20 @@ def main():
                     main_logger.info("UMS client did not set. Result won't be sent to UMS PROD")
 
                 send_try = 0
-                while send_try < MAX_UMS_SEND_RETRIES:
-                    response_dev = ums_client_dev.send_test_suite(res=res, env=env)
-                    main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
-                    main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
-                    if response_dev and response_dev.status_code < 300:
-                        response_data = json.loads(response_dev.content.decode("utf-8"))
-                        if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
-                            test_suite_result_id_dev = response_data['data']['test_suite_result_id']
-                        break
-                    send_try += 1
-                    time.sleep(UMS_SEND_RETRY_INTERVAL)
+                if ums_client_dev.suite_id:
+                    while send_try < MAX_UMS_SEND_RETRIES:
+                        response_dev = ums_client_dev.send_test_suite(res=res, env=env)
+                        main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
+                        main_logger.info('Response from UMS DEV: \n{}'.format(response_dev.content))
+                        if response_dev and response_dev.status_code < 300:
+                            response_data = json.loads(response_dev.content.decode("utf-8"))
+                            if 'data' in response_data and 'test_suite_result_id' in response_data['data']:
+                                test_suite_result_id_dev = response_data['data']['test_suite_result_id']
+                            break
+                        send_try += 1
+                        time.sleep(UMS_SEND_RETRY_INTERVAL)
+                else:
+                    main_logger.info('Result for test suite {} won\'t be send on UMS DEV due to empty suite_id'.format(suite_name))
 
                 if test_suite_result_id_dev:
                     send_try = 0
