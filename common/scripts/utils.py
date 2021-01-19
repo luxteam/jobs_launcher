@@ -31,6 +31,7 @@ def get_error_case(cases_path):
 
 def make_error_screen(case_path, absolute_screen_path, relative_screen_path):
     screen = pyscreenshot.grab()
+    screen = screen.convert('RGB')
     screen.save(absolute_screen_path)
 
     with open(case_path) as file:
