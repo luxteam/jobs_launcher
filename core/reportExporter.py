@@ -643,7 +643,7 @@ def build_summary_reports(work_dir, major_title='', commit_sha='undefined', bran
                                     for key in copy_summary_report[basename_ext_engine]['summary']:
                                         copy_summary_report[basename_ext_engine]['summary'][key] += temp_report['summary'][key]
 
-            save_json_report(copy_summary_report, work_dir, 'copy_summay.json')
+            save_json_report(copy_summary_report, work_dir, 'copy_summary.json')
             performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report_engine(copy_summary_report)
         else:
             performance_report, hardware, performance_report_detail, summary_info_for_report = build_performance_report(copy_summary_report)
@@ -1015,6 +1015,7 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
 
     for root_dir in os.listdir(northstar_dir):
         if os.path.isdir(os.path.join(northstar_dir, root_dir)):
+            session_gpu, session_os = os.path.basename(root_dir).split('-')
             for path, dirs, files in os.walk(os.path.join(northstar_dir, root_dir)):
                 for json_report in files:
                     if json_report == BASELINE_REPORT_NAME:
@@ -1101,7 +1102,10 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                                                        summary_report_north[configuration]['results'][test_group][test_config]['setup_duration']})
                     report['results'][test_group][test_config].update({'synchronization_duration_north':
                                                                        summary_report_north[configuration]['results'][test_group][test_config]['synchronization_duration']})
-                except:pass
+                except Exception as e:
+                    traceback.print_exc()
+                    main_logger.error(repr(e))
+
         try:
             summary_report_gen_2[configuration]['summary'].update({'render_duration_north': 0})
             summary_report_gen_2[configuration]['summary'].update({'setup_duration_north': 0})
@@ -1113,7 +1117,9 @@ def generate_reports_for_perf_comparison(rpr_dir, northstar_dir, work_dir):
                                                                summary_report_north[configuration]['summary']['setup_duration']})
             summary_report_gen_2[configuration]['summary'].update({'synchronization_duration_north':
                                                                summary_report_north[configuration]['summary']['synchronization_duration']})
-        except:pass
+        except Exception as e:
+            traceback.print_exc()
+            main_logger.error(repr(e))
 
     with open(os.path.join(work_dir, SUMMARY_REPORT+"north.json"), 'w') as file:
         json.dump(summary_report_gen_2, file, indent=4)
