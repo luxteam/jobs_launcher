@@ -84,14 +84,14 @@ class CompareMetrics(object):
         # print("Count:", max(stat[0]))
 
         a = np.delete(stat[1], np.where(stat[1] == max(stat[1])))
-        max_to_return = max(a)
+
         try:
 
             # maximum object size
-            print("Max:", max_to_return)
+            #print("Max:", max(a))
 
             # 1 - there is a difference. 0 - there isn't a difference
-            return 0 if max_to_return <= max_size and median[0][0] != 255 else 1, max_to_return
+            return 0 if max(a) <= max_size and median[0][0] != 255 else 1, max(a)
 
         except ValueError:
 
@@ -99,7 +99,7 @@ class CompareMetrics(object):
             # print("Max: 0")
 
             # 1 - there is a difference. 0 - there isn't a difference
-            return 0 if median[0][0] != 255 else 1, max_to_return
+            return 0 if median[0][0] != 255 else 1, 0
 
 
 # Commandline interface for CompareMetrics. Return percentage of images diffrence. 0 - the same, 100 - completely different
