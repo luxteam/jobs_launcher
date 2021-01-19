@@ -25,6 +25,7 @@ RENDER_REPORT_BASE = {
     "core_version": "",
     "render_device": "",
     "difference_color_2": -0,
+    "compare_result": 0,
     "testcase_timeout": 0,
     "message": [],
     "testcase_timeout_exceeded": False,
