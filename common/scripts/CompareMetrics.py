@@ -55,7 +55,7 @@ class CompareMetrics(object):
     def getPrediction(self, max_size=1000, div_image_path=False, mark_failed_if_black=True):
 
         if self.img1.shape != self.img2.shape:
-            return -1, 0
+            return -1, 0 
 
         # if img1 is full black - mark as different
         if not np.any(self.img1) and mark_failed_if_black:
