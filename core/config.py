@@ -164,6 +164,7 @@ ODD_FOR_BASELINES = [
     'baseline_render_time',
     'baseline_color_path',
     'difference_color_2',
+    'compare_result',
     'difference_color',
     'difference_time',
     'render_log',
