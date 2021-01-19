@@ -88,7 +88,7 @@ class CompareMetrics(object):
         try:
 
             # maximum object size
-            #print("Max:", max(a))
+            # print("Max:", max(a))
 
             # 1 - there is a difference. 0 - there isn't a difference
             return 0 if max(a) <= max_size and median[0][0] != 255 else 1, max(a)
