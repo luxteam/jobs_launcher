@@ -344,6 +344,18 @@
     {%- endif -%}
 {%- endif -%}
 
+{#- ------------------------------ COMPARE RESULT COLUMN ------------------------------ -#}
+{%- if column.name == 'compare_result' -%}
+    {%- if is_head -%}
+        <th data-field="case_functions" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Compare result
+        </th>
+    {%- else -%}
+        <td>
+            {{ item.compare_result }}
+        </td>
+    {%- endif -%}
+{%- endif -%}
+
 {#- ****************************** RENDER TIME ****************************** -#}
 {#- ------------------------------ RENDER TIME ------------------------------ -#}
 {%- if column.name == 'render_time' -%}
