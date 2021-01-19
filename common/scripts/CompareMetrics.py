@@ -55,11 +55,11 @@ class CompareMetrics(object):
     def getPrediction(self, max_size=1000, div_image_path=False, mark_failed_if_black=True):
 
         if self.img1.shape != self.img2.shape:
-            return -1
+            return -1, 0
 
         # if img1 is full black - mark as different
         if not np.any(self.img1) and mark_failed_if_black:
-            return 2
+            return 2, 0
 
         img_1 = cv2.GaussianBlur(self.img1, (5, 5), 0)
         img_2 = cv2.GaussianBlur(self.img2, (5, 5), 0)
@@ -99,7 +99,7 @@ class CompareMetrics(object):
             # print("Max: 0")
 
             # 1 - there is a difference. 0 - there isn't a difference
-            return 0 if median[0][0] != 255 else 1
+            return 0 if median[0][0] != 255 else 1, max(a)
 
 
 # Commandline interface for CompareMetrics. Return percentage of images diffrence. 0 - the same, 100 - completely different
