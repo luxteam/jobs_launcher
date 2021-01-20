@@ -123,7 +123,7 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 if compare_result != None:
                     img.update({'compare_result': compare_result})
                 else:
-                    img.update({'compare_result': '0'})
+                    img.update({'compare_result': -4})
                 # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
                 if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
                     img['message'].append('Unacceptable pixel difference')
