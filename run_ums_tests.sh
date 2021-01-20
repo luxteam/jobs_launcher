@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 ums.py
+python3.6 tests/ums.py
