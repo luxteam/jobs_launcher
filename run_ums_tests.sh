@@ -11,7 +11,7 @@ export UMS_BUILD_ID_TEST=${6:-'6007fd00cf43c198e4d3e298'}
 echo "Test cases configuration."
 echo "$UMS_URL_TEST"
 echo "$UMS_JOB_ID_TEST"
-echo "$UMS_ENV_LABEL_TEST"
+echo "$UMS_ENV_LABEL"
 echo "$UMS_LOGIN_TEST"
 echo "$UMS_PASSWORD_TEST"
 echo "$UMS_BUILD_ID_TEST"
