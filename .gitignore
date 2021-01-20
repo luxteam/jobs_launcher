@@ -4,3 +4,4 @@ UnitTests/Results/*
 *.pyc
 *.log
 /debug_folder/
+.vscode
