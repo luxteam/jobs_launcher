@@ -14,7 +14,7 @@ import argparse
 def test_create_client():
     test_ums_client = create_ums_client("TEST")
 
-    for group in ['Smoke', 'Sanity']:
+    for group in ['Smoke']:
         r = test_ums_client.get_suite_id_by_name(group)
         assert r.status_code == 200
 

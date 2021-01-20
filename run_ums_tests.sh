@@ -2,7 +2,7 @@
 # export variabels *** default values for easy manual testing
 export UMS_URL_TEST=${1:-'https://umsapi2.cistest.luxoft.com'}
 export UMS_JOB_ID_TEST=${2:-'5f881e5a8e8872f31dc413e3'}
-export UMS_ENV_LABEL_TEST=${3:-'Windows-AMD'}
+export UMS_ENV_LABEL=${3:-'Windows-AMD'}
 export UMS_LOGIN_TEST=${4:-'dm1tryG'}
 export UMS_PASSWORD_TEST=${5:-'root'}
 export UMS_BUILD_ID_TEST=${6:-'6007fd00cf43c198e4d3e298'}
