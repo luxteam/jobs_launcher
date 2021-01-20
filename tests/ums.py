@@ -27,7 +27,6 @@ def test_create_client():
         }
 
         r = test_ums_client.define_environment(env)
-        print(r.content)
         assert r.status_code == 200
 
     assert 1 == 1

@@ -17,4 +17,5 @@ echo "$UMS_PASSWORD_TEST"
 echo "$UMS_BUILD_ID_TEST"
 
 # run tests
-pytest tests/ums.py
+# TODO: optimize to version or use virtual env in jobs launcher
+python3.6 -m pytest tests/ums.py
