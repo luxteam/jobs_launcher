@@ -41,6 +41,7 @@ def parse_cmd_variables(tests_root, cmd_variables):
 
 def send_machine_info(ums_client, machine_info, args):
     print('Tests filter: ' + str(args.test_filter))
+    
     for group in args.test_filter:
         delete_chars = ' ,[]"'
         group = group.translate(str.maketrans("", "", delete_chars))

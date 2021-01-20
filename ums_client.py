@@ -103,12 +103,12 @@ class UMS_Client:
             main_logger.info("UMS get suite id by name {}".format(suite_name))
             suites = [el['suite'] for el in json.loads(response.content.decode("utf-8"))['suites'] if el['suite']['name'] == suite_name]
             self.suite_id = suites[0]['_id']
-
         except Exception as e:
             self.suite_id = None
             main_logger.error("UMS suite id getting error")
             main_logger.error("Traceback: {}".format(traceback.format_exc()))
 
+        return response
 
     def send_test_suite(self, res, env):
         try:
