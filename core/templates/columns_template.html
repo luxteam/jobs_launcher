@@ -344,14 +344,22 @@
     {%- endif -%}
 {%- endif -%}
 
-{#- ------------------------------ COMPARE RESULT COLUMN ------------------------------ -#}
-{%- if column.name == 'compare_result' -%}
+{#- ------------------------------ IMAGE COMPARISON VALUE ------------------------------ -#}
+{%- if column.name == 'image_comparison_value' -%}
     {%- if is_head -%}
-        <th data-field="case_functions" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Compare result
+        <th data-field="image_comparison_value" data-halign="{{ column.data_halign }}" data-valign="{{ column.data_valign }}" data-sortable="{{ column.data_sortable }}" data-visible="{{ column.data_visible }}">Compare result
+            <span class="glyphicon glyphicon-question-sign" aria-haspopup="true" aria-hidden="true"data-toggle="tooltip" data-placement="top" title="
+                [0] - failed test or valid value.
+                [-1] - diff images.
+                [-2] - images has diff resolution, so couldn't be compared.
+                [-3] - the value of the comparison algorithm is not exist.
+                [other] - the value of the comparison algorithm.
+                ">
+            </span>
         </th>
     {%- else -%}
         <td>
-            {{ item.compare_result }}
+            {{ item.image_comparison_value }}
         </td>
     {%- endif -%}
 {%- endif -%}
