@@ -10,6 +10,7 @@ RENDER_REPORT_BASE = {
     "date_time": "",
     "script_info": [],
     "render_color_path": "",
+    "error_screen_path": "",
     "test_case": "",
     "case_functions": "",
     "render_version": "",
@@ -89,6 +90,7 @@ TEST_DIFF_STATUS = 'failed'
 GROUP_TIMEOUT = 'timeout'
 
 CASE_REPORT_SUFFIX = '_RPR.json'
+ERROR_SCREEN_SUFFIX = '_ERROR'
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'
 TEST_REPORT_EXPECTED_NAME = 'expected.json'
@@ -101,7 +103,7 @@ NOT_RENDERED_REPORT = "not_rendered.json"
 
 THUMBNAIL_PREFIXES = ['thumb64_', 'thumb256_']
 
-POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'render_color_path', 'original_color_path']
+POSSIBLE_JSON_IMG_KEYS = ['baseline_color_path', 'render_color_path', 'original_color_path', 'error_screen_path']
 POSSIBLE_JSON_IMG_KEYS_THUMBNAIL = ['thumb64_' + x for x in POSSIBLE_JSON_IMG_KEYS]
 POSSIBLE_JSON_IMG_KEYS_THUMBNAIL = POSSIBLE_JSON_IMG_KEYS_THUMBNAIL + ['thumb256_' + x for x in POSSIBLE_JSON_IMG_KEYS]
 POSSIBLE_JSON_IMG_RENDERED_KEYS = ['render_color_path', 'original_color_path']
@@ -162,6 +164,7 @@ SETUP_STEPS_RPR_PLUGIN = ["Prepare tests", "Open tool", "Load rpr", "Open scene"
 ODD_FOR_BASELINES = [
     'baseline_render_time',
     'baseline_color_path',
+    'error_screen_path',
     'difference_color_2',
     'difference_color',
     'difference_time',
