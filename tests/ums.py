@@ -32,7 +32,7 @@ def test_create_client():
         res = [
             {
                 "artefacts": {
-                    "rendered_image": 'passed'
+                    "rendered_image": str(random.randint(1, 10))
                 },
                 "status": "passed",
                 "metrics": {
