@@ -11,7 +11,6 @@ import argparse
 import random
 
 
-
 def test_create_client():
     test_ums_client = create_ums_client("TEST")
 
@@ -31,7 +30,7 @@ def test_create_client():
         assert r.status_code == 200
 
         res = {
-        "test_cases_results": [
+            "test_cases_results": [
                 {
                     "artefacts": {
                         "rendered_image": 'passed'
@@ -45,6 +44,7 @@ def test_create_client():
             ]
         }
 
-        test_ums_client.send_test_suite(res=res, env=env)
+        r = test_ums_client.send_test_suite(res=res, env=env)
+        assert r.status_code == 200
 
     assert 1 == 1
