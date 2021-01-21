@@ -327,7 +327,7 @@ def main():
                                 ums_client_prod.build_id, ums_client_prod.suite_id, ums_client_prod.env_label)
                         if ums_client_dev and mc_dev:
                             mc_dev.upload_file(path_to_test_suite_render_log, "DEV",
-                                ums_client_dev.build_id, ums_client_dev.suite_id, ums_client_prod.env_label)
+                                ums_client_dev.build_id, ums_client_dev.suite_id, ums_client_dev.env_label)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
