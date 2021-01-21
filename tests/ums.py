@@ -14,7 +14,7 @@ import random
 def test_create_client():
     test_ums_client = create_ums_client("TEST")
 
-    for group in ['Smoke']:
+    for group in os.getenv('TEST_FILTER').split(','):
         r = test_ums_client.get_suite_id_by_name(group)
         assert r.status_code == 200
 
@@ -44,5 +44,3 @@ def test_create_client():
 
         r = test_ums_client.send_test_suite(res=res, env=env)
         assert r.status_code == 200
-
-    assert 1 == 1
