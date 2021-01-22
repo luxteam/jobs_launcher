@@ -279,7 +279,7 @@ a {
   width: 15vw;
 }
 
-#imgsModalContent output {
+.imgModalContent output {
     color: #c1c1c1;
     text-shadow: 2px 2px 1px black;
     font-size: 16px;
@@ -351,6 +351,12 @@ a.highlightedLink {
     max-width: 50vw;
     max-height: 80vh;
     width: 30vw;
+    height: auto;
+}
+
+#errorScreenTable img {
+    max-width: 75vw;
+    width: 50vw;
     height: auto;
 }
 

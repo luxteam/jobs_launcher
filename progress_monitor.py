@@ -103,8 +103,9 @@ def send_finished_cases(session_dir, suite_name):
             else:
                 main_logger.warning("File with case info for case {} doesn't exist. Make sure that it is expected".format(test_case[name_key]))
 
-    new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
-    print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
+    if new_test_cases:
+        new_cases_existence_hashes_info = get_cases_existence_info_by_hashes(session_dir, suite_name, new_test_cases) if is_client else {}
+        print('Got hashes info from image service:\n{}'.format(json.dumps(new_cases_existence_hashes_info, indent=2)))
 
     if not test_cases_sent:
         if ums_client_prod:
@@ -127,12 +128,20 @@ def send_finished_cases(session_dir, suite_name):
                         new_cases_existence_hashes_info[test_case] and \
                         'id' in new_cases_existence_hashes_info[test_case]:
                     image_id = new_cases_existence_hashes_info[test_case]['id']
-                    print("Use id found by hash for case: {} id: {}".format(test_case, image_id))
+                    print('Use id found by hash for case: {} id: {}'.format(test_case, image_id))
                 else:
                     image_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
                         'render_color_path'])) if is_client else -1
-                    print("Upload new image for case: {} and get image id: {}".format(test_case, image_id))
-                case_file_data['image_service_id'] = image_id
+                    print('Upload new image for case: {} and get image id: {}'.format(test_case, image_id))
+
+                # upload error screen if it exists
+                if 'error_screen_path' in case_file_data and case_file_data['error_screen_path']:
+                    error_screen_id = is_client.send_image(render_color_full_path(session_dir, suite_name, case_file_data[
+                        'error_screen_path'])) if is_client else -1
+                    print('Upload error screen for case: {} and get image id: {}'.format(test_case, error_screen_id))
+                    case_file_data['error_screen_is_id'] = error_screen_id
+
+                case_file_data['rendered_image_is_id'] = image_id
 
             with open(case_file_path, 'w') as case_file:
                 json.dump([case_file_data], case_file, indent=4, sort_keys=True)
