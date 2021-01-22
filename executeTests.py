@@ -363,7 +363,7 @@ def main():
                 test_suite_result_id_prod = None
                 test_suite_result_id_dev = None
                 send_try = 0
-                if ums_client_prod.suite_id:
+                if ums_client_prod and ums_client_prod.suite_id:
                     while send_try < MAX_UMS_SEND_RETRIES:
                         response_prod = ums_client_prod.send_test_suite(res=res, env=env)
                         main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
@@ -392,7 +392,7 @@ def main():
                     main_logger.info("UMS client did not set. Result won't be sent to UMS PROD")
 
                 send_try = 0
-                if ums_client_dev.suite_id:
+                if ums_client_dev and ums_client_dev.suite_id:
                     while send_try < MAX_UMS_SEND_RETRIES:
                         response_dev = ums_client_dev.send_test_suite(res=res, env=env)
                         main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
