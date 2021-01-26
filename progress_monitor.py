@@ -33,7 +33,7 @@ try:
     )
     main_logger.info("UMS progress monitor Image Service client created for url: {}".format(is_client.url))
 except Exception as e:
-    main_logger.error("UMS progress monitor can't create Image Service client for url: {}. Error: {}".format(is_client.url, str(e)))
+    main_logger.error("UMS progress monitor can't create Image Service client for url: {}. Error: {}".format(os.getenv("IS_URL"), str(e)))
 
 
 def render_color_full_path(session_dir, suite_name, render_color_path):

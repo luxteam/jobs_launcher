@@ -324,7 +324,7 @@ def main():
                                 ums_client_prod.build_id, ums_client_prod.suite_id, ums_client_prod.env_label)
                         if ums_client_dev and mc_dev:
                             mc_dev.upload_file(path_to_test_suite_render_log, "DEV",
-                                ums_client_dev.build_id, ums_client_dev.suite_id, ums_client_prod.env_label)
+                                ums_client_dev.build_id, ums_client_dev.suite_id, ums_client_dev.env_label)
 
                 if ums_client_prod:
                     ums_client_prod.get_suite_id_by_name(suite_name)
@@ -360,7 +360,7 @@ def main():
                 test_suite_result_id_prod = None
                 test_suite_result_id_dev = None
                 send_try = 0
-                if ums_client_prod.suite_id:
+                if ums_client_prod and ums_client_prod.suite_id:
                     while send_try < MAX_UMS_SEND_RETRIES:
                         response_prod = ums_client_prod.send_test_suite(res=res, env=env)
                         main_logger.info('Test suite results sent to UMS PROD with code {} (try #{})'.format(response_prod.status_code, send_try))
@@ -389,7 +389,7 @@ def main():
                     main_logger.info("UMS client did not set. Result won't be sent to UMS PROD")
 
                 send_try = 0
-                if ums_client_dev.suite_id:
+                if ums_client_dev and ums_client_dev.suite_id:
                     while send_try < MAX_UMS_SEND_RETRIES:
                         response_dev = ums_client_dev.send_test_suite(res=res, env=env)
                         main_logger.info('Test suite results sent to UMS DEV with code {} (try #{})'.format(response_dev.status_code, send_try))
