@@ -89,7 +89,7 @@ TEST_DIFF_STATUS = 'failed'
 
 GROUP_TIMEOUT = 'timeout'
 
-CASE_REPORT_SUFFIX = '_RPR.json'
+CASE_REPORT_SUFFIX = '_USD.json'
 ERROR_SCREEN_SUFFIX = '_ERROR'
 TEST_REPORT_NAME = 'report.json'
 TEST_REPORT_NAME_COMPARED = 'report_compare.json'

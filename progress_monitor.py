@@ -46,7 +46,7 @@ def get_cases_existence_info_by_hashes(session_dir, suite_name, test_cases):
     try:
         for case in test_cases:
             try:
-                with open(os.path.join(session_dir, suite_name, case + '_RPR.json')) as case_file:
+                with open(os.path.join(session_dir, suite_name, case + '_USD.json')) as case_file:
                     case_file_data = json.load(case_file)[0]
                     with open(render_color_full_path(session_dir, suite_name, case_file_data['render_color_path']), 'rb') as img:
                         bytes_data = img.read()
@@ -95,7 +95,7 @@ def send_finished_cases(session_dir, suite_name):
     for test_case in test_cases:
         if test_case['status'] in ('skipped', 'error', 'done', 'passed') and not test_case[name_key] in transferred_test_cases:
             # check that file with case info already exists
-            if os.path.exists(os.path.join(session_dir, suite_name, test_case[name_key] + '_RPR.json')):
+            if os.path.exists(os.path.join(session_dir, suite_name, test_case[name_key] + '_USD.json')):
                 new_test_cases[test_case[name_key]] = test_case['status']
                 if 'aovs' in test_case:
                     for aov in test_case['aovs']:
@@ -120,7 +120,7 @@ def send_finished_cases(session_dir, suite_name):
     for test_case in new_test_cases:
         try:
             print('Sending artefacts & images for: {}'.format(test_case))
-            case_file_path = os.path.join(session_dir, suite_name, test_case + '_RPR.json')
+            case_file_path = os.path.join(session_dir, suite_name, test_case + '_USD.json')
             with open(case_file_path) as case_file:
                 case_file_data = json.load(case_file)[0]
 

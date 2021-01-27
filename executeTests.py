@@ -30,7 +30,6 @@ from minio_client import create_mc_client
 
 SCRIPTS = os.path.dirname(os.path.realpath(__file__))
 
-
 def parse_cmd_variables(tests_root, cmd_variables):
     # if TestsFilter doesn't exist or is empty - set it 'full'
     if 'TestsFilter' not in cmd_variables.keys() or not cmd_variables['TestsFilter']:
