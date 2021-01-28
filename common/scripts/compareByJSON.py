@@ -123,6 +123,8 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 if image_comparison_value != None:
                     if type(image_comparison_value) == int or type(image_comparison_value) == float:
                         img.update({'image_comparison_value': image_comparison_value})
+                    else:
+                        img.update({'image_comparison_value': type(image_comparison_value).__name__})
                 else:
                     img.update({'image_comparison_value': -4})
                 # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
