@@ -86,12 +86,12 @@ class CompareMetrics(object):
         a = np.delete(stat[1], np.where(stat[1] == max(stat[1])))
 
         try:
-
+            out = max(a)
             # maximum object size
             # print("Max:", max(a))
 
             # 1 - there is a difference. 0 - there isn't a difference
-            return 0 if max(a) <= max_size and median[0][0] != 255 else 1, max(a)
+            return 0 if out <= max_size and median[0][0] != 255 else 1, out
 
         except ValueError:
 

@@ -121,7 +121,8 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 pix_difference_2, image_comparison_value = metrics.getPrediction(mark_failed_if_black=mark_failed_if_black)
                 img.update({'difference_color_2': pix_difference_2})
                 if image_comparison_value != None:
-                    img.update({'image_comparison_value': image_comparison_value})
+                    if type(image_comparison_value) == int or type(image_comparison_value) == float:
+                        img.update({'image_comparison_value': image_comparison_value})
                 else:
                     img.update({'image_comparison_value': -4})
                 # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
