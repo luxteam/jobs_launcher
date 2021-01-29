@@ -119,14 +119,8 @@ def get_pixel_difference(work_dir, base_dir, img, tolerance, pix_diff_max):
                 # if 'Black image expected' in script_info - allow black img
                 mark_failed_if_black = core.config.CASE_EXPECTS_BLACK not in img.get('script_info', '')
                 pix_difference_2, image_comparison_value = metrics.getPrediction(mark_failed_if_black=mark_failed_if_black)
+                img.update({'image_comparison_value': image_comparison_value})
                 img.update({'difference_color_2': pix_difference_2})
-                if image_comparison_value != None:
-                    if type(image_comparison_value) == int or type(image_comparison_value) == float:
-                        img.update({'image_comparison_value': image_comparison_value})
-                    else:
-                        img.update({'image_comparison_value': type(image_comparison_value).__name__})
-                else:
-                    img.update({'image_comparison_value': -4})
                 # if type(pix_difference) is str or pix_difference > float(pix_diff_max):
                 if pix_difference_2 != 0 and img['test_status'] != core.config.TEST_CRASH_STATUS:
                     img['message'].append('Unacceptable pixel difference')
